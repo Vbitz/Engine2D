@@ -3,9 +3,9 @@ CXX=clang++
 RM=rm -f
 CPPFLAGS= -g -Wall -Werror
 LDFLAGS= -g
-LDLIBS= -framework OpenGL
+LDLIBS= -framework OpenGL -lglfw
 
-SRCS= src/main.cpp src/App.cpp
+SRCS= src/main.cpp src/App.cpp src/Display_GLFW.cpp src/Render.cpp
 OBJS=$(subst .cc,.o,$(SRCS))
 
 run: all
