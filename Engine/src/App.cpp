@@ -1,8 +1,9 @@
 #include "App.hpp"
 
 namespace Engine {
-	App::App() {
+	App::App(const char* argv0) {
 		this->_running = false;
+		Filesystem::Init(argv0);
 	}
 
 	int App::Run() {
@@ -14,11 +15,14 @@ namespace Engine {
 		Render::SetClearColor(100, 149, 237);
 
 		this->_mainLoop();
+
+		this->Finish();
+
 		return 0;
 	}
 
 	void App::Draw() {
-
+		
 	}
 
 	void App::Update() {
@@ -31,6 +35,10 @@ namespace Engine {
 
 	void App::Stop() {
 		this->_running = false;
+	}
+
+	void App::Finish() {
+		Filesystem::Destroy();
 	}
 
 	void App::_mainLoop() {

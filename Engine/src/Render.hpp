@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gl/glfw.h>
+#include "OpenGL.hpp"
 
 namespace Engine {
 	namespace Render {
