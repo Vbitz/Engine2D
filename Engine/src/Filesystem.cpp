@@ -2,6 +2,10 @@
 
 namespace Engine {
 	namespace Filesystem {
+		bool IsLoaded() {
+			return PHYSFS_isInit();
+		}
+
 		void Init(const char* argv0) {
 			PHYSFS_init(argv0);
 			Logger::WriteVerbose("Filesystem Loaded");
@@ -13,14 +17,51 @@ namespace Engine {
 		}
 
 		void AddToSearchPath(std::string path) {
+			if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return;
+			}
 			PHYSFS_addToSearchPath(path.c_str(), 1);
 		}
 
 		bool FileExists(std::string path) {
-			return PHYSFS_exists(path.c_str());
+			if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return false;
+			}
+			const char* pathC = path.c_str();
+			return PHYSFS_exists(pathC) && !PHYSFS_isDirectory(pathC);
+		}
+
+		bool FolderExists(std::string path) {
+			if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return false;
+			}
+			const char* pathC = path.c_str();
+			return PHYSFS_exists(pathC) && PHYSFS_isDirectory(pathC);
+		}
+
+		std::vector<std::string> GetDirectoryContent(std::string path) {
+			std::vector<std::string> ret;
+			if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return ret;
+			}
+			char** list = PHYSFS_enumerateFiles(path.c_str());
+			char** i;
+			for (i = list; *i != NULL; i++) {
+				ret.push_back(*i);
+			}
+			PHYSFS_freeList(list);
+			return ret;
 		}
 
 		int FileSize(std::string path) {
+			if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return -1;
+			}
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
 			int length = PHYSFS_fileLength(f);
 			PHYSFS_close(f);
@@ -28,6 +69,10 @@ namespace Engine {
 		}
 
 		std::string GetFileContentString(std::string path) {
+			if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return "";
+			}
 			if (!PHYSFS_exists(path.c_str())) {
 				Logger::WriteError("File does not exist");
 				return "";

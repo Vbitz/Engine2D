@@ -5,6 +5,7 @@ namespace Engine {
 		void Init(int width, int height) {
 			glfwInit();
 			glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, GLFW_WINDOW);
+			glViewport(0, 0, width, height);
 		}
 
 		void Present() {

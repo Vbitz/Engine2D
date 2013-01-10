@@ -9,5 +9,9 @@ namespace Engine {
 		void WriteVerbose(std::string data) {
 			std::cout << "Verbose: " << data << std::endl;
 		}
+
+		void WriteWarning(std::string warn) {
+			std::cout << "Warning: " << warn << std::endl;
+		}
 	}
 }

@@ -3,6 +3,7 @@
 #include <string>
 
 #include "Render.hpp"
+#include "Logger.hpp"
 
 namespace Engine {
 	namespace Display {

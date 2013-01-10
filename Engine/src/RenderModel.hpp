@@ -1,7 +1,11 @@
 #pragma once
 
+#include <vector>
+
 #include "OpenGL.hpp"
 #include "Shader.hpp"
+#include "Vector3f.hpp"
+#include "Logger.hpp"
 
 namespace Engine {
 	namespace Render {
@@ -14,14 +18,21 @@ namespace Engine {
 			public:
 				RenderModel();
 
-				void SetMode();
+				void SetMode(RenderMode mode);
+				void SetShader(Shader shader);
+
 				void AddVertex(float x, float y, float z);
 
 				void Draw();
+				void Upload();
 			private:
-				GLint bufferPointer;
+				std::vector<Vector3f> _vertexs;
+
+				GLuint _bufferPointer;
+				bool _uploaded;
 
 				Shader _currentShader;
+				RenderMode _currentRenderMode;
 		};
 	}
 }

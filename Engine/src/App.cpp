@@ -14,6 +14,14 @@ namespace Engine {
 
 		Render::SetClearColor(100, 149, 237);
 
+		_testingModel.SetShader(Render::Shader(Render::PreDefinedShader_Basic));
+		_testingModel.SetMode(Render::RenderMode_Triangles);
+		_testingModel.AddVertex(1, 1, 1);
+		_testingModel.AddVertex(0, 1, 1);
+		_testingModel.AddVertex(1, 0, 1);
+		
+		_testingModel.Upload();
+
 		this->_mainLoop();
 
 		this->Finish();
@@ -22,7 +30,7 @@ namespace Engine {
 	}
 
 	void App::Draw() {
-		
+		_testingModel.Draw();
 	}
 
 	void App::Update() {
