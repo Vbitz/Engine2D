@@ -15,6 +15,7 @@ namespace Engine {
 	namespace Render {
 		RenderModel::RenderModel() :  _uploaded(false) {
 			this->_bufferPointer = 0;
+			this->_vertexCount = 0;
 		}
 
 		void RenderModel::SetMode(RenderMode mode) {
@@ -35,6 +36,14 @@ namespace Engine {
 				Logger::WriteWarning("Model data is not uploaded, it will be uploaded now, this is a preformance concirn");
 				this->Upload();
 			}
+			glBindBuffer(GL_ARRAY_BUFFER, _bufferPointer);
+			_currentShader.Activate();
+			glDrawArrays(getGLMode(_currentRenderMode), 0, _vertexCount);
+			int glError = glGetError();
+			if (glError != GL_NO_ERROR) {
+				std::cout << glewGetErrorString(glError) << std::endl;
+			}
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		void RenderModel::Upload() {
@@ -56,6 +65,13 @@ namespace Engine {
 
 			_uploaded = true;
 			_bufferPointer = bufferPointer;
+			_vertexCount = _vertexs.size();
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+
+		void RenderModel::BindShader() {
+			_currentShader.BindAttrib("vertex"); // well that's not much code
 		}
 	}
 }

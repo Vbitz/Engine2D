@@ -13,6 +13,8 @@ std::string getShaderPath(Engine::Render::PreDefinedShader shader) {
 
 namespace Engine {
 	namespace Render {
+		Shader* _currentShader = NULL;
+
 		Shader::Shader() {
 
 		}
@@ -36,17 +38,20 @@ namespace Engine {
 		void Shader::Activate() {
 			if (_checkProgramPointer()) {
 				glUseProgram(_programPointer);
+				_currentShader = this;
 			}
 		}
 
 		void Shader::BindUniform(std::string id) {
 			if (_checkProgramPointer()) {
+				this->Activate();
 				this->_uniforms[id] = glGetUniformLocation(_programPointer, id.c_str());
 			}
 		}
 
 		void Shader::UploadUniform(std::string id, std::vector<Vector3f> vectorData) {
 			if (_checkProgramPointer()) {
+				this->Activate();
 				int vDataSize = vectorData.size();
 				float* vectors = new float[vDataSize * 3];
 				for (int i = 0; i < vDataSize; i++) {
@@ -60,19 +65,59 @@ namespace Engine {
 
 		void Shader::BindAttrib(std::string id) {
 			if (_checkProgramPointer()) {
-				this->_attribs[id] = glGetAttribLocation(_programPointer, id.c_str());
+				this->Activate(); // checks for program pointer twice
+				GLint arrayPointer = glGetAttribLocation(_programPointer, id.c_str());
+				glVertexAttribPointer(arrayPointer, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				glEnableVertexAttribArray(arrayPointer);
 			}
 		}
 
 		bool Shader::_checkProgramPointer() {
 			if (_programPointer == 0) {
 				Logger::WriteError("Shader is not loaded");
+				return false;
+			} else {
+				return true;
 			}
-			return _programPointer != 0;
 		}
 
 		void Shader::_compile() {
+			_vertPointer = glCreateShader(GL_VERTEX_SHADER);
+			_fragPointer = glCreateShader(GL_FRAGMENT_SHADER);
 
+			const char* vertSourceStr = _vertSource.c_str();
+
+			glShaderSource(_vertPointer, 1, &vertSourceStr, NULL);
+
+			glCompileShader(_vertPointer);
+
+			GLint status;
+			glGetShaderiv(_vertPointer, GL_COMPILE_STATUS, &status);
+			if (status != GL_TRUE) {
+				char buffer[512];
+				glGetShaderInfoLog(_vertPointer, 512, NULL, buffer);
+				Logger::WriteError(std::string(buffer));
+			}
+
+			const char* fragSourceStr = _fragSource.c_str();
+
+			glShaderSource(_fragPointer, 1, &fragSourceStr, NULL);
+
+			glCompileShader(_fragPointer);
+
+			glGetShaderiv(_fragPointer, GL_COMPILE_STATUS, &status);
+			if (status != GL_TRUE) {
+				char buffer[512];
+				glGetShaderInfoLog(_fragPointer, 512, NULL, buffer);
+				Logger::WriteError(std::string(buffer));
+			}
+
+			_programPointer = glCreateProgram();
+			glAttachShader(_programPointer, _vertPointer);
+			glAttachShader(_programPointer, _fragPointer);
+
+			glLinkProgram(_programPointer);
+			glUseProgram(_programPointer);
 		}
 
 		void Shader::_init(std::string vertSource, std::string fragSource) {
@@ -82,6 +127,8 @@ namespace Engine {
 
 			_vertSource = vertSource;
 			_fragSource = fragSource;
+
+			std::cout << "vert: " << vertSource << std::endl << "frag: " << fragSource << std::endl;
 
 			_compile();
 		}

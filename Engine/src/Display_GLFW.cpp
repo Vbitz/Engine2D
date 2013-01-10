@@ -3,8 +3,14 @@
 namespace Engine {
 	namespace Display {
 		void Init(int width, int height) {
-			glfwInit();
-			glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, GLFW_WINDOW);
+			if (!glfwInit()) {
+				Logger::WriteError("Could not init GLFW");
+			}
+			if (!glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, GLFW_WINDOW)) {
+				Logger::WriteError("Could not init GLFW");
+			}
+			glewExperimental = GL_TRUE;
+			glewInit();
 			glViewport(0, 0, width, height);
 		}
 

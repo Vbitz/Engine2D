@@ -36,8 +36,7 @@ namespace Engine {
 				GLuint _programPointer, _vertPointer, _fragPointer;
 
 				std::string _vertSource, _fragSource;
-
-				std::map<std::string, GLint> _attribs;
+				
 				std::map<std::string, GLint> _uniforms;
 		};
 	}

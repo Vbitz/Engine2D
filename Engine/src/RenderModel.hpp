@@ -25,8 +25,10 @@ namespace Engine {
 
 				void Draw();
 				void Upload();
+				void BindShader();
 			private:
 				std::vector<Vector3f> _vertexs;
+				int _vertexCount;
 
 				GLuint _bufferPointer;
 				bool _uploaded;
