@@ -1,24 +1,31 @@
-#ifndef __JSDRAWH
-#define __JSDRAWH
+#pragma once
 
 #include "common.hpp"
 #include "main.hpp"
 
-void Begin2d();
-void End2d();
+#include "Filesystem.hpp"
 
-v8::Handle<v8::Value> JS_Draw_Drawfunc(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_Begin(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_End(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_Rect(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_Grid(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_Grad(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_Draw(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_SetColorF(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_SetColor(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_SetColorI(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_ClearColor(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_Print(const v8::Arguments& args);
-v8::Handle<v8::Value> JS_Draw_OpenImage(const v8::Arguments& args);
+namespace Engine {
 
-#endif
+	namespace JsDraw {
+
+		void Begin2d();
+		void End2d();
+
+		v8::Handle<v8::Value> Drawfunc(const v8::Arguments& args);
+		v8::Handle<v8::Value> Begin(const v8::Arguments& args);
+		v8::Handle<v8::Value> End(const v8::Arguments& args);
+		v8::Handle<v8::Value> Rect(const v8::Arguments& args);
+		v8::Handle<v8::Value> Grid(const v8::Arguments& args);
+		v8::Handle<v8::Value> Grad(const v8::Arguments& args);
+		v8::Handle<v8::Value> Draw(const v8::Arguments& args);
+		v8::Handle<v8::Value> SetColorF(const v8::Arguments& args);
+		v8::Handle<v8::Value> SetColor(const v8::Arguments& args);
+		v8::Handle<v8::Value> SetColorI(const v8::Arguments& args);
+		v8::Handle<v8::Value> ClearColor(const v8::Arguments& args);
+		v8::Handle<v8::Value> Print(const v8::Arguments& args);
+		v8::Handle<v8::Value> OpenImage(const v8::Arguments& args);
+	
+	}
+
+}

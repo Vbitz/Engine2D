@@ -1,15 +1,21 @@
-#ifndef __MAINH
-#define __MAINH
+#pragma once
 
 #include "common.hpp"
 
-GLFT_Font* getFont();
+#include "Filesystem.hpp"
 
-int getScreenWidth();
-int getScreenHeight();
+#include "JSSys.hpp"
+#include "JSDraw.hpp"
 
-void addTexture(int tex);
+namespace Engine {
 
-void setDrawFunction(v8::Persistent<v8::Function> func);
+	GLFT_Font* getFont();
 
-#endif
+	int getScreenWidth();
+	int getScreenHeight();
+
+	void addTexture(int tex);
+
+	void setDrawFunction(v8::Persistent<v8::Function> func);
+
+}

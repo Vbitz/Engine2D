@@ -2,4 +2,5 @@ Engine3D/bin
 Engine3D/.depend
 Engine2D/bin/Engine
 Engine2D/bin/Engine.dSYM
-Engine2D/bin/SourceSansPro-Regular.ttf
+Engine2D/res/fonts
+Engine2D/.depend
