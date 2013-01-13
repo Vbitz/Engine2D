@@ -9,8 +9,6 @@ namespace Engine {
 			if (!glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, GLFW_WINDOW)) {
 				Logger::WriteError("Could not init GLFW");
 			}
-			glewExperimental = GL_TRUE;
-			glewInit();
 			glViewport(0, 0, width, height);
 		}
 
