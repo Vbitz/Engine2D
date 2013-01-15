@@ -30,6 +30,7 @@ namespace Engine {
 	
 		Scripting Defines
 		=================
+		I should really have each file return it's own table
 	
 	 ****************************************
 	 ****************************************
@@ -45,7 +46,7 @@ namespace Engine {
 		// sysTable
 		v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
 	
-			addItem(sysTable, "println", JS_Sys_Println);
+			addItem(sysTable, "println", JsSys::Println);
 	
 			addItem(sysTable, "drawFunc", JsDraw::Drawfunc);
 	
@@ -78,8 +79,10 @@ namespace Engine {
 	
 		v8::Context::Scope ctx_scope(_globalContext);
 	
+		std::string inputScript = Filesystem::GetFileContentString("script/startup.js");
+
 		v8::Handle<v8::Script> script = v8::Script::Compile(
-			v8::String::New(Filesystem::GetFileContentString("script/startup.js").c_str()));
+			v8::String::New(inputScript.c_str()));
 		script->Run();
 	}
 	
@@ -129,7 +132,7 @@ namespace Engine {
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
 		input_table->Set(v8::String::New("frameTime"), v8::Number::New(glfwGetTime() - lastTime));
-		lastTime = glfwGetTime();
+		lastTime = glfwGetTime(); // eh
 	}
 	
 	void UpdateScreen() {
@@ -203,7 +206,7 @@ namespace Engine {
 			}
 	
 			v8::Handle<v8::Value> argv[2];
-	
+		
 			argv[0] = v8::Undefined();
 			argv[1] = v8::String::New(str);
 	
@@ -214,7 +217,7 @@ namespace Engine {
 	void InitOpenGL() {
 		glfwInit();
 	
-		glfwOpenWindow(800, 600, 1, 1, 1, 1, 1, 1, GLFW_WINDOW);
+		glfwOpenWindow(800, 600, 1, 1, 1, 1, 1, 1, GLFW_WINDOW); // you can resize how ever much you like
 	
 		glfwSetWindowSizeCallback(ResizeWindow);
 		glfwSetKeyCallback(KeyPress);
@@ -233,14 +236,14 @@ namespace Engine {
 	// font rendering
 	
 	void InitFonts() {
-		_font.open("res/fonts/SourceSansPro-Regular.ttf", 16); // font's can't work in physfs sadly
+		_font.open(Filesystem::GetRealPath("fonts/SourceSansPro-Regular.ttf").c_str(), 16);
 	}
 	
 	void ShutdownFonts() {
 	
 	}
 	
-	// real time loading
+	// semi-realtime time loading
 	
 	bool CheckUpdate() {
 		long lastMod = Filesystem::GetFileModifyTime("script/startup.js");
@@ -329,6 +332,9 @@ namespace Engine {
 		ShutdownOpenGL();
 		ShutdownScripting();
 		ShutdownFonts();
+
+		Filesystem::Destroy();
+
 		return 0;
 	}
 	

@@ -33,8 +33,7 @@ namespace Engine {
 				return v8::Undefined();
 			}
 		
-			if (!args[0]->IsFunction())
-			{
+			if (!args[0]->IsFunction()) {
 				// TODO : Error
 				return v8::Undefined();
 			}
@@ -132,6 +131,7 @@ namespace Engine {
 				glVertex3f(x + w, y, 0);
 				glVertex3f(x + w, y + h, 0);
 				glVertex3f(x, y + h, 0);
+				glVertex3f(x, y, 0);
 				glEnd();
 			if (_effDraw) {
 				glBegin(GL_QUADS);
@@ -166,13 +166,13 @@ namespace Engine {
 		
 			vert = args[6]->BooleanValue();
 		
-			if (col1 > 255 * 255 * 255)
+			if (col1 > 256 * 256 * 256) // there fixed that age old bug
 			{
 				// TODO : Error
 				return v8::Undefined();
 			}
 		
-			if (col2 > 255 * 255 * 255)
+			if (col2 > 256 * 256 * 256)
 			{
 				// TODO : Error
 				return v8::Undefined();
@@ -384,7 +384,9 @@ namespace Engine {
 		
 			glBindTexture(GL_TEXTURE_2D, text);
 		
-			glfwLoadTexture2D(*v8::String::AsciiValue(args[0]), GLFW_BUILD_MIPMAPS_BIT);
+			// dam, get glfw to load from physfs or write my own loader
+
+			glfwLoadTexture2D(Filesystem::GetRealPath(*v8::String::AsciiValue(args[0])).c_str(), GLFW_BUILD_MIPMAPS_BIT);
 		
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 								GL_LINEAR_MIPMAP_LINEAR );

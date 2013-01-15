@@ -36,7 +36,7 @@ namespace Engine {
 			return ret;
 		}
 
-		int FileSize(std::string path) {
+		int GetFileSize(std::string path) {
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
 			int length = PHYSFS_fileLength(f);
 			PHYSFS_close(f);
@@ -68,6 +68,11 @@ namespace Engine {
 				return -1;
 			}
 			return PHYSFS_getLastModTime(path.c_str());
+		}
+
+		std::string GetRealPath(std::string physfs_path) {
+			const char* real_path = PHYSFS_getRealDir(physfs_path.c_str());
+			return std::string(real_path) + '/' + physfs_path;
 		}
 	}
 }

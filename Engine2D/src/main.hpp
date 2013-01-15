@@ -9,13 +9,13 @@
 
 namespace Engine {
 
-	GLFT_Font* getFont();
+	GLFT_Font* 					getFont();
 
-	int getScreenWidth();
-	int getScreenHeight();
+	int 						getScreenWidth();
+	int 						getScreenHeight();
 
-	void addTexture(int tex);
+	void 						addTexture(int tex);
 
-	void setDrawFunction(v8::Persistent<v8::Function> func);
+	void 						setDrawFunction(v8::Persistent<v8::Function> func);
 
 }

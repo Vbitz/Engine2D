@@ -1,8 +1,13 @@
-#ifndef __JSSYSH
-#define __JSSYSH
+#pragma once
 
 #include "common.hpp"
 
-v8::Handle<v8::Value> JS_Sys_Println(const v8::Arguments& args);
+namespace Engine {
 
-#endif
+	namespace JsSys {
+
+		v8::Handle<v8::Value>		Println(const v8::Arguments& args);
+
+	}
+
+}
