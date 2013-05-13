@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Engine2D Documentation - Because I'm really sick of reading the source each time</title>
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div class="container">
+		<div class="method" style="display: none;">
+			<h2>Method Title (<small>Method Args</small>)</h2>
+			<p>
+				Method Docs
+			</p>
+		</div>
+		<h1><i>sys</i> - System Functions and Variables</h1>
+		<div class="method">
+			<h2>sys.println (<small>...</small>)</h2>
+			<p>
+				Basicly console.log.
+				Prints to the console, this may not be visible so I recommend writing to somewhere in the game window.
+			</p>
+		</div>
+		<div class="method">
+			<h2>sys.runFile (<small>string filename, boolean autoReload</small>)</h2>
+			<p>
+				Loads filename. Unlike require() in node.js this acts more like appending a script tag in a browser so it exists in the same scope.
+			</p>
+		</div>
+		<div class="method">
+			<h2>sys.drawFunc (<small>function() drawFunc</small>)</h2>
+			<p>
+				This method is where you should do all your drawing, there will be undefined behavior if you draw outside of this method.
+			</p>
+		</div>
+		<div class="method">
+			<h2>sys.keyboardFunc (<small>function(string type, string key, boolean press) keyboardFunc</small>)</h2>
+			<p>
+				This method gets called each time you press or release a key.
+				Type can be char/special depending on if the key was 'a' or 'ESC'.
+				Press is true when the key was pressed and false when it's released.
+			</p>
+		</div>
+		<div class="method">
+			<h2>sys.getGLVersion ( )</h2>
+			<p>
+				Returns a Object containing:
+			</p>
+			<ul>
+				<li><strong>major: </strong>OpenGL Major Version</li>
+				<li><strong>minor: </strong>OpenGL Minor Version</li>
+				<li><strong>rev: </strong>OpenGL Revision</li>
+			</ul>
+		</div>
+		<div class="method">
+			<h2>sys.microtime ( )</h2>
+			<p>
+				Returns a floating point number from gettimeofday. On unix platforms this should be microsecond accurate but Windows returns up to milisecond accuracy (this may become untrue as I improve the windows version).
+			</p>
+		</div>
+		<div class="method">
+			<h2>sys.heapStats ( )</h2>
+			<p>
+				Returns a Object containing:
+			</p>
+			<ul>
+				<li><strong>heapLimit: </strong>Heap Limit</li>
+				<li><strong>heapTotalSize: </strong>Heap Total Size</li>
+				<li><strong>heapTotalExecSize: </strong>Heap Total Executable Size</li>
+				<li><strong>heapUsed: </strong>Heap Used</li>
+			</ul>
+		</div>
+		<div class="field">
+			<h2>sys.screenWidth and sys.screenHeight</h2>
+			<p>
+				Width and Height of the current display area.
+			</p>
+		</div>
+		<div class="field">
+			<h2>sys.platform</h2>
+			<p>
+				Returns one of "Windows", "Linux", "Darwin (OSX)" depending on what platform your on.
+			</p>
+		</div>
+
+		<h1><i>draw</i> - Drawing Functions</h1>
+		<div class="method">
+			<h2>draw.begin( ) and draw.end( )</h2>
+			<p>
+				Tries to build all calls between this and draw.end into 1 OpenGL draw call, currently this stops each draw call from calling glBegin and glEnd.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.rect (<small>number x, number y, number width, number height</small>)</h2>
+			<p>
+				Draws a rectangle with the current color at x, y with a size of width, height.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.grid (<small>number x, number y, number width, number height</small>)</h2>
+			<p>
+				Draws a rectangle with the current color at x, y with a size of width, height. The diffence if this method only draws the outline of the rectangle.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.grad (<small>number x, number y, number width, number height, number color1, number color2, boolean vertical</small>)</h2>
+			<p>
+				Draws a rectangle with the current color at x, y with a size of width, height. The rectangle is colored in a gradient between color1 and color2, both colors are to be specified in the form 0xrrggbb. vertical rotates the rectangle 90 degrees.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.draw (<small>image image, number x, number y, number width, number height</small>)</h2>
+			<p>
+				Draws image at x, y with a size of width, height
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.setColorF (<small>number r, number g, number b</small>)</h2>
+			<p>
+				Sets the current drawing color to r, g, b. Each should be between 0 and 1
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.setColor (<small>number color</small>)</h2>
+			<p>
+				Sets the current drawing color to color which should be specified as a hex number in the form 0xrrggbb.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.setColorI (<small>number r, number g, number b</small>)</h2>
+			<p>
+				Sets the current drawing color to r, g, b. Each should be between 0 and 255
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.clearColor (<small>number r, number g, number b</small>)</h2>
+			<p>
+				Sets the current background color to r, g, b. Each should be between 0 and 1
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.print (<small>number x, number y, string text</small>)</h2>
+			<p>
+				Draws text at x, y with the current color.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.openImage (<small>string path</small>)</h2>
+			<p>
+				Loads and returns a image from path
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.cameraReset ( )</h2>
+			<p>
+				Reset the current camera view
+			</p>
+		</div>
+	</div>
+</body>
+</html>

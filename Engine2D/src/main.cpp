@@ -15,14 +15,25 @@ namespace Engine {
 	std::vector<GLuint> _textures;
 	
 	std::map<std::string, std::string> _persists;
-	
-	long lastUpdate = 0;
-	
+
 	// v8 Scripting
+	v8::Isolate* _globalIsolate;
+
 	v8::Persistent<v8::Context> _globalContext;
 	
 	v8::Persistent<v8::Function> _drawFunc;
 	v8::Persistent<v8::Function> _keyboardFunc;
+
+	std::map<std::string, long> _loadedFiles;
+    
+    std::string _keys[] = {"ESC","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12",
+                    "F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23",
+                    "F24","F25","UP","DOWN","LEFT","RIGHT","LSHIFT","RSHIFT","LCTRL",
+                    "RCTRL","LALT","RALT","TAB","ENTER","BACKSPACE","INSERT","DEL",
+                    "PAGEUP","PAGEDOWN","HOME","END","KP_0","KP_1","KP_2","KP_3",
+                    "KP_4","KP_5","KP_6","KP_7","KP_8","KP_9","KP_DIVIDE","KP_MULTIPLY",
+                    "KP_SUBTRACT","KP_ADD","KP_DECIMAL","KP_EQUAL","KP_ENTER","KP_NUM_LOCK",
+                    "CAPS_LOCK","SCROLL_LOCK","PAUSE","LSUPER","RSUPER","MENU"};
 	
 	/****************************************
 	 ****************************************
@@ -39,16 +50,28 @@ namespace Engine {
 	#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct)) 
 	
 	void InitScripting() {
-		v8::HandleScope scp;
-	
+		_globalIsolate = v8::Isolate::New();
+		_globalIsolate->Enter();
+
+		v8::HandleScope handle_scope;
+
 		v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
 	
 		// sysTable
 		v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
 	
 			addItem(sysTable, "println", JsSys::Println);
+			addItem(sysTable, "runFile", JsSys::RunFile);
 	
 			addItem(sysTable, "drawFunc", JsDraw::Drawfunc);
+            addItem(sysTable, "keyboardFunc", JsSys::KeyboardFunc);
+        
+            addItem(sysTable, "getGLVersion", JsSys::GetGLVersion);
+        
+            addItem(sysTable, "microtime", JsSys::Microtime);
+            addItem(sysTable, "heapStats", JsSys::HeapStats);
+        
+        sysTable->Set("platform", v8::String::New(_PLATFORM));
 	
 		global->Set("sys", sysTable);
 	
@@ -67,31 +90,36 @@ namespace Engine {
 			addItem(drawTable, "clearColor", JsDraw::ClearColor);
 			addItem(drawTable, "print", JsDraw::Print);
 			addItem(drawTable, "openImage", JsDraw::OpenImage);
+        
+            addItem(drawTable, "cameraReset", JsDraw::CameraReset);
+            addItem(drawTable, "cameraPan", JsDraw::CameraPan);
+            addItem(drawTable, "cameraZoom", JsDraw::CameraZoom);
+            addItem(drawTable, "cameraRotate", JsDraw::CameraRotate);
+        
+            addItem(drawTable, "setDrawOffscreen", JsDraw::SetDrawOffscreen);
+            addItem(drawTable, "getVerts", JsDraw::GetVerts);
+            addItem(drawTable, "setCenter", JsDraw::SetCenter);
 	
 		global->Set("draw", drawTable);
 	
 		// inputTable
 		v8::Handle<v8::ObjectTemplate> inputTable = v8::ObjectTemplate::New();
 	
+            addItem(inputTable, "keyDown", JsInput::KeyDown);
+        
 		global->Set("input", inputTable);
-	
-		_globalContext = v8::Context::New(NULL, global);
-	
-		v8::Context::Scope ctx_scope(_globalContext);
-	
-		std::string inputScript = Filesystem::GetFileContentString("script/startup.js");
 
-		v8::Handle<v8::Script> script = v8::Script::Compile(
-			v8::String::New(inputScript.c_str()));
-		script->Run();
+		_globalContext = v8::Context::New(NULL, global);
+
+		runFile("lib/boot.js", true);
 	}
 	
 	#undef addItem
 	
 	void ShutdownScripting() {
-	
-		_globalContext.Dispose();
-	
+		_globalIsolate->Exit();
+		_globalIsolate->Dispose();
+
 		for (int i = 0; i < _textures.size(); ++i)
 		{
 			glDeleteTextures(1, &_textures[i]);
@@ -125,16 +153,6 @@ namespace Engine {
 		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(glfwGetMouseButton(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS));
 	}
 	
-	void UpdateFrameTime() {
-		v8::HandleScope scp;
-		v8::Context::Scope ctx_scope(_globalContext);
-	
-		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
-		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
-		input_table->Set(v8::String::New("frameTime"), v8::Number::New(glfwGetTime() - lastTime));
-		lastTime = glfwGetTime(); // eh
-	}
-	
 	void UpdateScreen() {
 		v8::HandleScope scp;
 		v8::Context::Scope ctx_scope(_globalContext);
@@ -156,62 +174,51 @@ namespace Engine {
 	}
 	
 	void CharPress(int key, int state) {
-		if (state == GLFW_PRESS) {
-			if (_keyboardFunc.IsEmpty()) {
-				return;
-			}
+        if (_keyboardFunc.IsEmpty()) {
+            return;
+        }
+            
+        if (key > 256) {
+            return; // that's handled by KeyPress
+        }
 	
-			v8::HandleScope scp;
-			v8::Context::Scope ctx_scope(_globalContext);
+        v8::HandleScope scp;
+        v8::Context::Scope ctx_scope(_globalContext);
 	
-			v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(_keyboardFunc);
+        v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(_keyboardFunc);
 	
-			uint16_t str[2] = {(uint16_t)key, 0x00};
+        uint16_t str[2] = {(uint16_t)key, 0x00};
+
+        v8::Handle<v8::Value> argv[3];
 	
-			v8::Handle<v8::Value> argv[2];
+        argv[0] = v8::String::NewSymbol("char");
+        argv[1] = v8::String::New(str);
+        argv[2] = v8::Boolean::New(state);
 	
-			argv[0] = v8::String::New(str);
-			argv[1] = v8::Undefined();
-	
-			real_func->Call(_globalContext->Global(), 2, argv);
-		}
+        real_func->Call(_globalContext->Global(), 3, argv);
 	}
 	
 	void KeyPress(int key, int state) {
-		if (state == GLFW_PRESS) {
-			if (_keyboardFunc.IsEmpty()) {
-				return;
-			}
+        if (_keyboardFunc.IsEmpty()) {
+            return;
+        }
+        
+        if (key < 256) {
+            return; // that's already handled by CharPress
+        }
 	
-			v8::HandleScope scp;
-			v8::Context::Scope ctx_scope(_globalContext);
-	
-			v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(_keyboardFunc);
-	
-			const char* str = "";
-	
-			if (key == GLFW_KEY_BACKSPACE)
-			{
-				str = "backspace";
-			} else if (key == GLFW_KEY_UP) {
-				str = "up";
-			} else if (key == GLFW_KEY_DOWN) {
-				str = "down";
-			} else if (key == GLFW_KEY_LEFT) {
-				str = "left";
-			} else if (key == GLFW_KEY_RIGHT) {
-				str = "right";
-			} else if (key == GLFW_KEY_ENTER) {
-				str = "enter";
-			}
-	
-			v8::Handle<v8::Value> argv[2];
-		
-			argv[0] = v8::Undefined();
-			argv[1] = v8::String::New(str);
-	
-			real_func->Call(_globalContext->Global(), 2, argv);
-		}
+        v8::HandleScope scp;
+        v8::Context::Scope ctx_scope(_globalContext);
+        
+        v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(_keyboardFunc);
+
+        v8::Handle<v8::Value> argv[3];
+        
+        argv[0] = v8::String::NewSymbol("special");
+        argv[1] = v8::String::NewSymbol(_keys[key - 257].c_str());
+        argv[2] = v8::Boolean::New(state == 1);
+        
+        real_func->Call(_globalContext->Global(), 3, argv);
 	}
 	
 	void InitOpenGL() {
@@ -236,7 +243,12 @@ namespace Engine {
 	// font rendering
 	
 	void InitFonts() {
-		_font.open(Filesystem::GetRealPath("fonts/SourceSansPro-Regular.ttf").c_str(), 16);
+		std::string fontPath = Filesystem::GetRealPath("fonts/OpenSans-Regular.ttf");
+		if (fontPath.length() > 0) {
+			_font.open(fontPath.c_str(), 16);
+		} else {
+			std::cout << "Could not load font" << std::endl;
+		}
 	}
 	
 	void ShutdownFonts() {
@@ -245,13 +257,13 @@ namespace Engine {
 	
 	// semi-realtime time loading
 	
-	bool CheckUpdate() {
-		long lastMod = Filesystem::GetFileModifyTime("script/startup.js");
-		if (lastMod > lastUpdate) {
-			lastUpdate = lastMod;
-			return true;
-		} else {
-			return false;
+	void CheckUpdate() {
+		typedef std::map<std::string, long>::iterator it_type;
+		for(it_type iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
+			long lastMod = Filesystem::GetFileModifyTime(iterator->first);
+			if (lastMod > iterator->second) {
+                runFile(iterator->first, true);
+			}
 		}
 	}
 	
@@ -276,13 +288,51 @@ namespace Engine {
 	void setDrawFunction(v8::Persistent<v8::Function> func) {
 		_drawFunc = func;
 	}
+    
+    void setKeyFunction(v8::Persistent<v8::Function> func) {
+        _keyboardFunc = func;
+    }
+    
+	bool _runFile(std::string path, bool persist) {
+        v8::HandleScope handle_scope;
+        
+		std::cout << "Loading File: " << path << std::endl;
+
+		v8::Context::Scope ctx_scope(_globalContext);
+
+		std::string inputScript = Filesystem::GetFileContentString(path);
+
+		v8::TryCatch tryCatch;
+
+		v8::Handle<v8::Script> script = v8::Script::Compile(
+			v8::String::New(inputScript.c_str()));
+
+		if (script.IsEmpty()) {
+			std::cout << "Could not Load file" << std::endl;
+			v8::Handle<v8::Value> exception = tryCatch.Exception();
+			v8::String::AsciiValue exception_str(exception);
+			printf("Exception: %s\n", *exception_str);
+            return false;
+		} else {
+			script->Run();
+            std::cout << "Loaded File: " << path << std::endl;
+            if (persist) {
+                _loadedFiles[path] = Filesystem::GetFileModifyTime(path);
+            }
+            return true;
+		}
+	}
+    
+    void runFile(std::string path, bool persist) {
+        while (!_runFile(path, persist)) {
+            std::cout << "Could not load File" << std::endl;
+        }
+    }
 	
 	// main function
 	
 	int main(int argc, char const *argv[]) {
 		Filesystem::Init(argv[0]);
-
-		lastUpdate = Filesystem::GetFileModifyTime("script/startup.js");
 		
 		// TODO: split OpenGl, Scripting and Fonts into seprate files
 		InitOpenGL();
@@ -296,21 +346,15 @@ namespace Engine {
 		while (running) {
 			if (!glfwGetWindowParam(GLFW_ACTIVE)) {
 				glfwWaitEvents();
-#ifdef _WIN32
-				Sleep(0);
-#else
-				sleep(0);
-#endif
+                sleep(0);
 				continue;
 			}
+            
+            CheckUpdate();
+            
+            UpdateMousePos();
 	
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-			if (CheckUpdate()) {
-				ShutdownScripting();
-				InitScripting();
-				UpdateScreen();
-			}
 	
 			JsDraw::Begin2d();
 	
@@ -319,9 +363,6 @@ namespace Engine {
 			}
 	
 			JsDraw::End2d();
-	
-			UpdateMousePos();
-			UpdateFrameTime();
 	
 			glfwSwapBuffers();
 	

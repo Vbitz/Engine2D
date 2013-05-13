@@ -1,12 +1,12 @@
 CC=clang
 CXX=clang++
 RM=rm -f
-CPPFLAGS= -g -Wall -Werror `freetype-config --cflags`
-LDFLAGS= -g
-LDLIBS= -framework OpenGL -lglew -lglfw `freetype-config --libs --cflags` -lphysfs -lv8
+CXXFLAGS= -g -Wall -Werror -I/usr/local/include/freetype2 -I/usr/local/include
+LDFLAGS= -g  -L/usr/local/lib/ -lfreetype
+LDLIBS= -framework OpenGL -lglew -lglfw -lphysfs -lv8
 
-SRCS= src/main.cpp src/extern/GLFT_Font.cpp src/JsDraw.cpp src/JsSys.cpp src/Filesystem.cpp
-OBJS=$(subst .cc,.o,$(SRCS))
+SRCS= src/main.cpp src/JSInput.cpp src/JSDraw.cpp src/JSSys.cpp src/Filesystem.cpp src/Logger.cpp src/extern/GLFT_Font.cpp
+OBJS=$(subst .cpp,.o,$(SRCS))
 
 gdb: all
 	gdb bin/Engine
@@ -23,7 +23,7 @@ depend: .depend
 
 .depend: $(SRCS)
 	rm -f ./.depend
-	$(CXX) $(CPPFLAGS) -MM $^>>./.depend;
+	$(CXX) $(CXXFLAGS) -MM $^>>./.depend;
 
 clean:
 	$(RM) $(OBJS)
