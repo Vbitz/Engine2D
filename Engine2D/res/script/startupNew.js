@@ -148,8 +148,6 @@ function genTree() {
 
 genTree();
 
-draw.setDrawOffscreen(false);
-
 var r = 0;
 
 sys.drawFunc(function () {

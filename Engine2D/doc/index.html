@@ -13,11 +13,23 @@
 				Method Docs
 			</p>
 		</div>
+		<h1>How to Build Engine2D</h1>
+		<p>The Current Makefile is designed for OSX though with a little effort it should work on Linux as well.</p>
+		<p>Although this code was originally designed in mind for Windows it's been a little while since I've compiled it on Windows so right now it won't compile with rewriting some functions.</p>
+		<p>All of the Library's on OSX came from Homebrew. On Linux you should be able to use your distro's package manager</p>
+		<p><strong>Librarys Needed: </strong></p>
+		<ul>
+			<li><strong>Freetype 2</strong> Version: 2.4.11</li>
+			<li><strong>glew</strong> Version: 1.9.0</li>
+			<li><strong>glfw</strong> Version: 2.7.7</li>
+			<li><strong>physfs</strong> Version: 2.03</li>
+			<li><strong>v8</strong> Version: 3.18.2</li>
+		</ul>
 		<h1><i>sys</i> - System Functions and Variables</h1>
 		<div class="method">
 			<h2>sys.println (<small>...</small>)</h2>
 			<p>
-				Basicly console.log.
+				Basically console.log.
 				Prints to the console, this may not be visible so I recommend writing to somewhere in the game window.
 			</p>
 		</div>
@@ -55,7 +67,7 @@
 		<div class="method">
 			<h2>sys.microtime ( )</h2>
 			<p>
-				Returns a floating point number from gettimeofday. On unix platforms this should be microsecond accurate but Windows returns up to milisecond accuracy (this may become untrue as I improve the windows version).
+				Returns a floating point number from gettimeofday. On UNIX platforms this should be microsecond accurate but Windows returns up to millisecond accuracy (this may become untrue as I improve the windows version).
 			</p>
 		</div>
 		<div class="method">
@@ -99,7 +111,7 @@
 		<div class="method">
 			<h2>draw.grid (<small>number x, number y, number width, number height</small>)</h2>
 			<p>
-				Draws a rectangle with the current color at x, y with a size of width, height. The diffence if this method only draws the outline of the rectangle.
+				Draws a rectangle with the current color at x, y with a size of width, height. The difference if this method only draws the outline of the rectangle.
 			</p>
 		</div>
 		<div class="method">
@@ -147,13 +159,60 @@
 		<div class="method">
 			<h2>draw.openImage (<small>string path</small>)</h2>
 			<p>
-				Loads and returns a image from path
+				Loads and returns a image from path. This method currently supports these formats
+				<ul>
+					<li><strong>.tga</strong>: Truevision TGA</li>
+				</ul>
 			</p>
 		</div>
 		<div class="method">
 			<h2>draw.cameraReset ( )</h2>
 			<p>
-				Reset the current camera view
+				Reset the current camera view.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.cameraPan (<small>number x, number y</small>)</h2>
+			<p>
+				Pans the camera by X and Y. Camera Functions stack on top of each other and can be combined for useful effects.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.cameraZoom (<small>number factor</small>)</h2>
+			<p>
+				Zooms the camera by factor. Camera Functions stack on top of each other and can be combined for useful effects.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.cameraRotate (<small>double rotation</small>)</h2>
+			<p>
+				Rotates the camera by rotation. Camera Functions stack on top of each other and can be combined for useful effects.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.getVerts ( )</h2>
+			<p>
+				Returns the number of vertices's that have been drawn this frame.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.setCenter (<small>number x, number y</small>)</h2>
+			<p>
+				Offset's all drawing by x, y. Useful to rotate stuff around a point.
+			</p>
+		</div>
+
+		<h1><i>input</i> - Current state of input devices</h1>
+		<div class="field">
+			<h2>input.mouseX and input.mouseY</h2>
+			<p>
+				Updated each frame with the current mouse location.
+			</p>
+		</div>
+		<div class="field">
+			<h2>input.leftMouseButton and input.rightMouseButton</h2>
+			<p>
+				Updated each frame with the current state of the left and right mouse buttons.
 			</p>
 		</div>
 	</div>
