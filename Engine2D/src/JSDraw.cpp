@@ -540,6 +540,20 @@ namespace Engine {
             return scope.Close(v8::Undefined());
         }
         
+        v8::Handle<v8::Value> GetTextWidth(const v8::Arguments& args) {
+            v8::HandleScope scope;
+            
+            float textWidth = args[0]->ToString()->Length() * 10;
+            
+            return scope.Close(v8::Number::New(textWidth));
+        }
+        
+        v8::Handle<v8::Value> GetVerts(const v8::Arguments& args) {
+            v8::HandleScope scope;
+            
+            return scope.Close(v8::Integer::New(_polygons));
+        }
+        
         v8::Handle<v8::Value> SetDrawOffscreen(const v8::Arguments& args) {
             v8::HandleScope scope;
             
@@ -556,12 +570,6 @@ namespace Engine {
             _drawOffScreen = args[0]->BooleanValue();
             
             return scope.Close(v8::Undefined());
-        }
-        
-        v8::Handle<v8::Value> GetVerts(const v8::Arguments& args) {
-            v8::HandleScope scope;
-            
-            return scope.Close(v8::Integer::New(_polygons));
         }
         
         v8::Handle<v8::Value> SetCenter(const v8::Arguments& args) {

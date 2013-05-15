@@ -36,7 +36,7 @@
 		<div class="method">
 			<h2>sys.runFile (<small>string filename, boolean autoReload</small>)</h2>
 			<p>
-				Loads filename. Unlike require() in node.js this acts more like appending a script tag in a browser so it exists in the same scope.
+				Loads filename. Unlike require() in node.js this acts more like appending a script tag in a browser so it exists in the same scope. Like require() in node.js this will automatically append the .js file extension
 			</p>
 		</div>
 		<div class="method">
@@ -187,6 +187,12 @@
 			<h2>draw.cameraRotate (<small>double rotation</small>)</h2>
 			<p>
 				Rotates the camera by rotation. Camera Functions stack on top of each other and can be combined for useful effects.
+			</p>
+		</div>
+		<div class="method">
+			<h2>draw.getTextWidth (<small>string text</small>)</h2>
+			<p>
+				Returns the width of the text specifyed.
 			</p>
 		</div>
 		<div class="method">

@@ -31,7 +31,8 @@ namespace Engine {
 			if (!args[0]->IsString() || !args[1]->IsBoolean()) {
 				return handle_scope.Close(v8::Undefined());
 			}
-			runFile(*v8::String::AsciiValue(args[0]), args[1]->ToBoolean()->Value());
+            std::string scriptFilename = *v8::String::AsciiValue(args[0]) + std::string(".js");
+			runFile(scriptFilename, args[1]->ToBoolean()->Value());
 			return handle_scope.Close(v8::Undefined());
 		}
         

@@ -31,8 +31,10 @@ namespace Engine {
         v8::Handle<v8::Value>       CameraZoom(const v8::Arguments& args);
         v8::Handle<v8::Value>       CameraRotate(const v8::Arguments& args);
         
-        v8::Handle<v8::Value>       SetDrawOffscreen(const v8::Arguments& args);
+        v8::Handle<v8::Value>       GetTextWidth(const v8::Arguments& args);
+        
         v8::Handle<v8::Value>       GetVerts(const v8::Arguments& args);
+        v8::Handle<v8::Value>       SetDrawOffscreen(const v8::Arguments& args);
         v8::Handle<v8::Value>       SetCenter(const v8::Arguments& args);
 	
 	}

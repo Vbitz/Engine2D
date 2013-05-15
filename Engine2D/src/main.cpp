@@ -96,8 +96,10 @@ namespace Engine {
             addItem(drawTable, "cameraZoom", JsDraw::CameraZoom);
             addItem(drawTable, "cameraRotate", JsDraw::CameraRotate);
         
-            addItem(drawTable, "setDrawOffscreen", JsDraw::SetDrawOffscreen);
+            addItem(drawTable, "getTextWidth", JsDraw::GetTextWidth);
+        
             addItem(drawTable, "getVerts", JsDraw::GetVerts);
+            addItem(drawTable, "setDrawOffscreen", JsDraw::SetDrawOffscreen);
             addItem(drawTable, "setCenter", JsDraw::SetCenter);
 	
 		global->Set("draw", drawTable);
@@ -315,6 +317,11 @@ namespace Engine {
             return false;
 		} else {
 			script->Run();
+            if (!tryCatch.Exception().IsEmpty()) {
+                v8::Handle<v8::Value> exception = tryCatch.Exception();
+                v8::String::AsciiValue exception_str(exception);
+                printf("Exception: %s\n", *exception_str);
+            }
             std::cout << "Loaded File: " << path << std::endl;
             if (persist) {
                 _loadedFiles[path] = Filesystem::GetFileModifyTime(path);
