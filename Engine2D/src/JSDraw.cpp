@@ -3,9 +3,6 @@
 namespace Engine {
 
 	namespace JsDraw {
-
-		bool _effDraw = false;
-        
         bool _drawOffScreen = true;
 		
 		double _currentColorR = 1.0f;
@@ -33,7 +30,6 @@ namespace Engine {
         }
 		
 		void Begin2d() {
-			_effDraw = false;
             resetMatrix();
 		}
 		
@@ -42,56 +38,6 @@ namespace Engine {
 			glPopMatrix();
             
             _polygons = 0;
-		}
-		
-		v8::Handle<v8::Value> Drawfunc(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			if (args.Length() != 1) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			if (!args[0]->IsFunction()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
-		
-			setDrawFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
-		
-			return scope.Close(v8::Undefined());
-		}
-		
-		v8::Handle<v8::Value> Begin(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			if (_effDraw) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			glBegin(GL_QUADS);
-		
-			_effDraw = true;
-		
-			return scope.Close(v8::Undefined());
-		}
-		
-		v8::Handle<v8::Value> End(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			if (!_effDraw) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			glEnd();
-		
-			_effDraw = false;
-		
-			return scope.Close(v8::Undefined());
 		}
 		
 		v8::Handle<v8::Value> Rect(const v8::Arguments& args) {
@@ -113,18 +59,14 @@ namespace Engine {
 			y = (GLfloat)args[1]->NumberValue();
 			w = (GLfloat)args[2]->NumberValue();
 			h = (GLfloat)args[3]->NumberValue();
-		
-			if (!_effDraw) {
-				glBegin(GL_QUADS);
-			}
+            
+            glBegin(GL_QUADS);
 				SetColor();
 				glVertex3f(x        - _centerX, y       - _centerY, 0);
 				glVertex3f(x + w    - _centerX, y       - _centerY, 0);
 				glVertex3f(x + w    - _centerX, y + h   - _centerY, 0);
 				glVertex3f(x        - _centerX, y + h   - _centerY, 0);
-			if (!_effDraw) {
-				glEnd();
-			}
+            glEnd();
             
             _polygons += 4;
 		
@@ -150,21 +92,15 @@ namespace Engine {
 			y = (GLfloat)args[1]->NumberValue();
 			w = (GLfloat)args[2]->NumberValue();
 			h = (GLfloat)args[3]->NumberValue();
-		
-			if (_effDraw) {
-				glEnd();
-			}
-				SetColor();
-				glBegin(GL_LINE_LOOP);
+            
+            SetColor();
+            glBegin(GL_LINE_LOOP);
                 glVertex3f(x        - _centerX, y       - _centerY, 0);
                 glVertex3f(x + w    - _centerX, y       - _centerY, 0);
                 glVertex3f(x + w    - _centerX, y + h   - _centerY, 0);
                 glVertex3f(x        - _centerX, y + h   - _centerY, 0);
 				glVertex3f(x        - _centerX, y       - _centerY, 0);
-				glEnd();
-			if (_effDraw) {
-				glBegin(GL_QUADS);
-			}
+            glEnd();
 		
             _polygons += 5;
             
@@ -214,10 +150,8 @@ namespace Engine {
 				// TODO : Error
 				return scope.Close(v8::Undefined());
 			}
-		
-			if (!_effDraw) {
-				glBegin(GL_QUADS);
-			}
+            
+            glBegin(GL_QUADS);
 				if (vert) {
 					glColor3f((float)((col1 & 0xff0000) >> 16) / 255, (float)((col1 & 0x00ff00) >> 8) / 255, (float)(col1 & 0x0000ff) / 255);
                     glVertex3f(x        - _centerX, y       - _centerY, 0);
@@ -234,9 +168,7 @@ namespace Engine {
 					glColor3f((float)((col1 & 0xff0000) >> 16) / 255, (float)((col1 & 0x00ff00) >> 8) / 255, (float)(col1 & 0x0000ff) / 255);
                     glVertex3f(x        - _centerX, y + h   - _centerY, 0);
 				}
-			if (!_effDraw) {
-				glEnd();
-			}
+            glEnd();
             
             _polygons += 4;
 		
@@ -265,10 +197,6 @@ namespace Engine {
 			w = (GLfloat)args[3]->NumberValue();
 			h = (GLfloat)args[4]->NumberValue();
 		
-			if (_effDraw) {
-				glEnd();
-			}
-		
 			glEnable(GL_TEXTURE_2D);
 			//glDisable(GL_BLEND);
 		
@@ -289,10 +217,6 @@ namespace Engine {
 			//glBindTexture(GL_TEXTURE_2D, 0);
 		
 			glDisable(GL_TEXTURE_2D);
-		
-			if (_effDraw) {
-				glBegin(GL_QUADS);
-			}
 		
 			return scope.Close(v8::Undefined());
 		}
@@ -395,11 +319,6 @@ namespace Engine {
 				// TODO : Error
 				return scope.Close(v8::Undefined());
 			}
-		
-			if (_effDraw)
-			{
-				glEnd();
-			}
 
             const char* str = *v8::String::Utf8Value(args[2]);
 		
@@ -409,11 +328,6 @@ namespace Engine {
 			glDisable(GL_TEXTURE_2D);
             
             _polygons += strlen(str) * 4;
-		
-			if (_effDraw)
-			{
-				glBegin(GL_QUADS);
-			}
 		
 			return scope.Close(v8::Undefined());
 		}
@@ -462,22 +376,12 @@ namespace Engine {
         v8::Handle<v8::Value> CameraReset(const v8::Arguments& args) {
             v8::HandleScope scope;
             
-            bool wasEffDraw = _effDraw;
             int oldVertCount = _polygons;
-            
-            if (wasEffDraw) {
-                glEnd();
-            }
             
             End2d();
             Begin2d();
             
             _polygons = oldVertCount;
-            
-            if (wasEffDraw) {
-                _effDraw = true;
-                glBegin(GL_QUADS);
-            }
             
             return scope.Close(v8::Undefined());
         }

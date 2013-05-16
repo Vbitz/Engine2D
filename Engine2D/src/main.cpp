@@ -63,7 +63,7 @@ namespace Engine {
 			addItem(sysTable, "println", JsSys::Println);
 			addItem(sysTable, "runFile", JsSys::RunFile);
 	
-			addItem(sysTable, "drawFunc", JsDraw::Drawfunc);
+			addItem(sysTable, "drawFunc", JsSys::Drawfunc);
             addItem(sysTable, "keyboardFunc", JsSys::KeyboardFunc);
         
             addItem(sysTable, "getGLVersion", JsSys::GetGLVersion);
@@ -77,9 +77,7 @@ namespace Engine {
 	
 		// drawTable
 		v8::Handle<v8::ObjectTemplate> drawTable = v8::ObjectTemplate::New();
-	
-			addItem(drawTable, "begin", JsDraw::Begin);
-			addItem(drawTable, "end", JsDraw::End);
+        
 			addItem(drawTable, "rect", JsDraw::Rect);
 			addItem(drawTable, "grid", JsDraw::Grid);
 			addItem(drawTable, "grad", JsDraw::Grad);

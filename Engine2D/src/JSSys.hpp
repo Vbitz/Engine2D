@@ -11,6 +11,7 @@ namespace Engine {
         
 		v8::Handle<v8::Value>		RunFile(const v8::Arguments& args);
 
+		v8::Handle<v8::Value>		Drawfunc(const v8::Arguments& args);
         v8::Handle<v8::Value>       KeyboardFunc(const v8::Arguments& args);
         
         v8::Handle<v8::Value>       GetGLVersion(const v8::Arguments& args);

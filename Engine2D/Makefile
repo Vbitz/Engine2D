@@ -5,7 +5,7 @@ CXXFLAGS= -g -Wall -Werror -I/usr/local/include/freetype2 -I/usr/local/include
 LDFLAGS= -g  -L/usr/local/lib/ -lfreetype
 LDLIBS= -framework OpenGL -lglew -lglfw -lphysfs -lv8
 
-SRCS= src/main.cpp src/JSInput.cpp src/JSDraw.cpp src/JSSys.cpp src/Filesystem.cpp src/Logger.cpp src/extern/GLFT_Font.cpp
+SRCS= src/main.cpp src/JSInput.cpp src/JSDraw.cpp src/JSSys.cpp src/Filesystem.cpp src/Logger.cpp src/extern/GLFT_Font.cpp src/Shader.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 
 gdb: all

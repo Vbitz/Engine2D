@@ -12,9 +12,6 @@ namespace Engine {
 		void						Begin2d();
 		void						End2d();
 
-		v8::Handle<v8::Value>		Drawfunc(const v8::Arguments& args);
-		v8::Handle<v8::Value>		Begin(const v8::Arguments& args);
-		v8::Handle<v8::Value>		End(const v8::Arguments& args);
 		v8::Handle<v8::Value>		Rect(const v8::Arguments& args);
 		v8::Handle<v8::Value>		Grid(const v8::Arguments& args);
 		v8::Handle<v8::Value>		Grad(const v8::Arguments& args);

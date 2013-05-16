@@ -35,6 +35,26 @@ namespace Engine {
 			runFile(scriptFilename, args[1]->ToBoolean()->Value());
 			return handle_scope.Close(v8::Undefined());
 		}
+		
+		v8::Handle<v8::Value> Drawfunc(const v8::Arguments& args) {
+			v8::HandleScope scope;
+            
+			if (args.Length() != 1) {
+				// TODO : Error
+				return scope.Close(v8::Undefined());
+			}
+            
+			if (!args[0]->IsFunction()) {
+				// TODO : Error
+				return scope.Close(v8::Undefined());
+			}
+            
+			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
+            
+			setDrawFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+            
+			return scope.Close(v8::Undefined());
+		}
         
         v8::Handle<v8::Value> KeyboardFunc(const v8::Arguments& args) {
             v8::HandleScope handle_scope;
