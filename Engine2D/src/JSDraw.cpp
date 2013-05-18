@@ -13,10 +13,6 @@ namespace Engine {
         
         int _centerX = 0;
         int _centerY = 0;
-		
-		void SetColor() {
-			glColor3f(_currentColorR, _currentColorG, _currentColorB);
-		}
         
         void resetMatrix() {
             glPushMatrix();
@@ -27,6 +23,47 @@ namespace Engine {
         
         bool isOffscreen(int x, int y, int w, int h) {
             return false;
+        }
+        
+        void beginRendering(GLenum mode) {
+            glBegin(mode);
+            glColor3f(_currentColorR, _currentColorG, _currentColorB);
+        }
+        
+        void endRendering() {
+            glEnd();
+        }
+        
+        void addVert(float x, float y, float z) {
+            glVertex3f(x - _centerX, y - _centerY, z);
+            _polygons++;
+        }
+        
+        void addVert(float x, float y, float z, float r, int g, int b) {
+            glColor3f(r, g, b);
+            addVert(x, y, z);
+        }
+        
+        void addVert(float x, float y, float z, float s, float t) {
+            glTexCoord2f(s, t);
+            addVert(x, y, z);
+        }
+        
+        void addVert(float x, float y, float z, float r, float g, float b, float s, float t) {
+            glTexCoord2f(s, t);
+            addVert(x, y, z, r, g, b);
+        }
+        
+        void enableTexture(int texId) {
+            glEnable(GL_TEXTURE_2D);
+            
+            glBindTexture(GL_TEXTURE_2D, texId);
+        }
+        
+        void disableTexture() {
+            glBindTexture(GL_TEXTURE_2D, 0);
+            
+            glDisable(GL_TEXTURE_2D);
         }
 		
 		void Begin2d() {
@@ -57,15 +94,16 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
-            glBegin(GL_QUADS);
-				SetColor();
-				glVertex3f(x        - _centerX, y       - _centerY, 0);
-				glVertex3f(x + w    - _centerX, y       - _centerY, 0);
-				glVertex3f(x + w    - _centerX, y + h   - _centerY, 0);
-				glVertex3f(x        - _centerX, y + h   - _centerY, 0);
-            glEnd();
+            if (isOffscreen(x, y, w, h)) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
             
-            _polygons += 4;
+            beginRendering(GL_QUADS);
+				addVert(x, y, 0);
+				addVert(x + w, y, 0);
+				addVert(x + w, y + h, 0);
+				addVert(x, y + h, 0);
+            endRendering();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -87,16 +125,17 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
-            glBegin(GL_LINE_LOOP);
-                SetColor();
-                glVertex3f(x        - _centerX, y       - _centerY, 0);
-                glVertex3f(x + w    - _centerX, y       - _centerY, 0);
-                glVertex3f(x + w    - _centerX, y + h   - _centerY, 0);
-                glVertex3f(x        - _centerX, y + h   - _centerY, 0);
-				glVertex3f(x        - _centerX, y       - _centerY, 0);
-            glEnd();
-		
-            _polygons += 5;
+            if (isOffscreen(x, y, w, h)) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            beginRendering(GL_LINE_LOOP);
+                addVert(x, y, 0);
+                addVert(x + w, y, 0);
+                addVert(x + w, y + h, 0);
+                addVert(x, y + h, 0);
+				addVert(x, y, 0);
+            endRendering();
             
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -146,26 +185,27 @@ namespace Engine {
 				ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 			}
             
-            glBegin(GL_QUADS);
-				if (vert) {
-					glColor3f((float)((col1 & 0xff0000) >> 16) / 255, (float)((col1 & 0x00ff00) >> 8) / 255, (float)(col1 & 0x0000ff) / 255);
-                    glVertex3f(x        - _centerX, y       - _centerY, 0);
-                    glVertex3f(x + w    - _centerX, y       - _centerY, 0);
-					glColor3f((float)((col2 & 0xff0000) >> 16) / 255, (float)((col2 & 0x00ff00) >> 8) / 255, (float)(col2 & 0x0000ff) / 255);
-                    glVertex3f(x + w    - _centerX, y + h   - _centerY, 0);
-                    glVertex3f(x        - _centerX, y + h   - _centerY, 0);
-				} else {
-					glColor3f((float)((col1 & 0xff0000) >> 16) / 255, (float)((col1 & 0x00ff00) >> 8) / 255, (float)(col1 & 0x0000ff) / 255);
-                    glVertex3f(x        - _centerX, y       - _centerY, 0);
-					glColor3f((float)((col2 & 0xff0000) >> 16) / 255, (float)((col2 & 0x00ff00) >> 8) / 255, (float)(col2 & 0x0000ff) / 255);
-                    glVertex3f(x + w    - _centerX, y       - _centerY, 0);
-                    glVertex3f(x + w    - _centerX, y + h   - _centerY, 0);
-					glColor3f((float)((col1 & 0xff0000) >> 16) / 255, (float)((col1 & 0x00ff00) >> 8) / 255, (float)(col1 & 0x0000ff) / 255);
-                    glVertex3f(x        - _centerX, y + h   - _centerY, 0);
-				}
-            glEnd();
+            float col1R = (float)((col1 & 0xff0000) >> 16) / 255;
+            float col1G = (float)((col1 & 0x00ff00) >> 8) / 255;
+            float col1B = (float)(col1 & 0x0000ff) / 255;
             
-            _polygons += 4;
+            float col2R = (float)((col2 & 0xff0000) >> 16) / 255;
+            float col2G = (float)((col2 & 0x00ff00) >> 8) / 255;
+            float col2B = (float)(col2 & 0x0000ff) / 255;
+            
+            beginRendering(GL_QUADS);
+				if (vert) {
+                    addVert(x, y, 0, col1R, col1G, col1B);
+                    addVert(x + w, y, 0, col1R, col1G, col1B);
+                    addVert(x, y + h, 0, col2R, col2G, col2B);
+                    addVert(x + w, y + h, 0, col2R, col2G, col2B);
+				} else {
+                    addVert(x, y, 0, col1R, col1G, col1B);
+                    addVert(x + w, y, 0, col2R, col2G, col2B);
+                    addVert(x, y + h, 0, col2R, col2G, col2B);
+                    addVert(x + w, y + h, 0, col1R, col1G, col1B);
+				}
+            endRendering();
 		
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -190,27 +230,20 @@ namespace Engine {
 			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
-		
-			glEnable(GL_TEXTURE_2D);
-		
-			glBindTexture(GL_TEXTURE_2D, texId);
-		
-			glBegin(GL_QUADS);
-		
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(x        - _centerX, y       - _centerY, 0);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(x + w    - _centerX, y       - _centerY, 0);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(x + w    - _centerX, y + h   - _centerY, 0);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(x        - _centerX, y + h   - _centerY, 0);
-
-			glEnd();
             
-            _polygons += 4;
-		
-			glBindTexture(GL_TEXTURE_2D, 0);
-		
-			glDisable(GL_TEXTURE_2D);
-		
+            enableTexture(texId);
+            
+			beginRendering(GL_QUADS);
+            
+                addVert(x, y, 0, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+                addVert(x + w, y, 0, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+                addVert(x + w, y + h, 0, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+                addVert(x, y + h, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+
+			endRendering();
+            
+            disableTexture();
+            
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
@@ -296,7 +329,7 @@ namespace Engine {
             const char* str = *ENGINE_GET_ARG_CSTRING_VALUE(2);
 		
 			glEnable(GL_TEXTURE_2D);
-			SetColor();
+            glColor3f(_currentColorR, _currentColorG, _currentColorB);
 			getFont()->beginDraw(ENGINE_GET_ARG_NUMBER_VALUE(0) - _centerX,
                                  ENGINE_GET_ARG_NUMBER_VALUE(1) - _centerY) << str << getFont()->endDraw();
 			glDisable(GL_TEXTURE_2D);
@@ -362,7 +395,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(0);
             ENGINE_CHECK_ARG_NUMBER(1);
             
-            glTranslatef(args[0]->NumberValue(), args[1]->NumberValue(), 0.0f);
+            glTranslatef(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), 0.0f);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

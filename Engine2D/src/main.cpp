@@ -50,6 +50,7 @@ namespace Engine {
 	#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct)) 
 	
 	void InitScripting() {
+        std::cout << "Loading Scripting" << std::endl;
 		_globalIsolate = v8::Isolate::New();
 		_globalIsolate->Enter();
 
@@ -119,6 +120,8 @@ namespace Engine {
 		_globalContext = v8::Context::New(NULL, global);
 
 		runFile("lib/boot.js", true);
+        
+        std::cout << "Loaded Scripting" << std::endl;
 	}
 	
 	#undef addItem
@@ -229,18 +232,28 @@ namespace Engine {
 	}
 	
 	void InitOpenGL() {
+        std::cout << "Loading OpenGL : Init GLFW" << std::endl;
+        
 		glfwInit();
 	
+        std::cout << "Loading OpenGL : Init Window" << std::endl;
+        
 		glfwOpenWindow(800, 600, 1, 1, 1, 1, 1, 1, GLFW_WINDOW); // you can resize how ever much you like
+        
+        std::cout << "Loading OpenGL : Init Callbacks" << std::endl;
 	
 		glfwSetWindowSizeCallback(ResizeWindow);
 		glfwSetKeyCallback(KeyPress);
 		glfwSetCharCallback(CharPress);
+        
+        std::cout << "Loading OpenGL : Init OpenGL State" << std::endl;
 	
 		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_LIGHTING);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        std::cout << "Loaded OpenGL" << std::endl;
 	}
 	
 	void ShutdownOpenGL() {
@@ -250,12 +263,14 @@ namespace Engine {
 	// font rendering
 	
 	void InitFonts() {
+        std::cout << "Loading Font" << std::endl;
 		std::string fontPath = Filesystem::GetRealPath("fonts/OpenSans-Regular.ttf");
 		if (fontPath.length() > 0) {
 			_font.open(fontPath.c_str(), 16);
 		} else {
 			std::cout << "Could not load font" << std::endl;
 		}
+        std::cout << "Loaded Font" << std::endl;
 	}
 	
 	void ShutdownFonts() {
@@ -365,6 +380,8 @@ namespace Engine {
             CheckUpdate();
             
             UpdateMousePos();
+            
+            CheckGLError("startOfRendering");
 	
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -377,6 +394,8 @@ namespace Engine {
 			JsDraw::End2d();
 	
 			glfwSwapBuffers();
+            
+            CheckGLError("endOfRendering");
 	
 			if (!glfwGetWindowParam(GLFW_OPENED))
 				running = false;
