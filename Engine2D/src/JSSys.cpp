@@ -83,6 +83,16 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
         
+        ENGINE_JS_METHOD(HasExtention) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0);
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(glewGetExtension(*ENGINE_GET_ARG_CSTRING_VALUE(0))));
+        }
+        
         ENGINE_JS_METHOD(Microtime) {
             ENGINE_JS_SCOPE_OPEN;
             

@@ -15,8 +15,12 @@ namespace Engine {
         ENGINE_JS_METHOD(KeyboardFunc);
         
         ENGINE_JS_METHOD(GetGLVersion);
+        ENGINE_JS_METHOD(HasExtention);
         
         ENGINE_JS_METHOD(Microtime);
+        
+        ENGINE_JS_METHOD(ResizeWindow);
+        
         ENGINE_JS_METHOD(HeapStats);
         
 	}

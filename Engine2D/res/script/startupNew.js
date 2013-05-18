@@ -148,6 +148,8 @@ function genTree() {
 
 genTree();
 
+console.log(sys.hasExtention("GL_ARB_fragment_program"));
+
 var r = 0;
 
 sys.drawFunc(function () {

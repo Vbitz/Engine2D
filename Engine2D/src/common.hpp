@@ -14,9 +14,11 @@
 
 // system includes
 #ifdef _WIN32
+    #include <GL\glew.h>
     #include <GL\glfw.h>
     #define _PLATFORM "Windows"
 #else
+    #include <GL/glew.h>
     #include <GL/glfw.h>
     #include <sys/time.h>
     #ifdef __APPLE__

@@ -75,8 +75,12 @@ namespace Engine {
             addItem(sysTable, "keyboardFunc", JsSys::KeyboardFunc);
         
             addItem(sysTable, "getGLVersion", JsSys::GetGLVersion);
+            addItem(sysTable, "hasExtention", JsSys::HasExtention);
         
             addItem(sysTable, "microtime", JsSys::Microtime);
+        
+            addItem(sysTable, "resizeWindow", JsSys::ResizeWindow);
+        
             addItem(sysTable, "heapStats", JsSys::HeapStats);
         
         sysTable->Set("platform", v8::String::New(_PLATFORM));
@@ -236,9 +240,13 @@ namespace Engine {
         
 		glfwInit();
 	
-        std::cout << "Loading OpenGL : Init Window" << std::endl;
+        std::cout << "Loading OpenGL : Init Window/Context" << std::endl;
         
 		glfwOpenWindow(800, 600, 1, 1, 1, 1, 1, 1, GLFW_WINDOW); // you can resize how ever much you like
+        
+        std::cout << "Loading OpenGL : Init GLEW" << std::endl;
+        
+        glewInit();
         
         std::cout << "Loading OpenGL : Init Callbacks" << std::endl;
 	
