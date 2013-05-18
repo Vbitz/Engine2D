@@ -57,6 +57,13 @@ namespace Engine {
 
 		v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
 	
+        // consoleTable
+        v8::Handle<v8::ObjectTemplate> consoleTable = v8::ObjectTemplate::New();
+        
+            addItem(consoleTable, "log", JsSys::Println);
+        
+        global->Set("console", consoleTable);
+        
 		// sysTable
 		v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
 	

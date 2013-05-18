@@ -4,8 +4,9 @@ namespace Engine {
 
 	namespace JsSys {
 
-		v8::Handle<v8::Value> Println(const v8::Arguments& args) {
-			v8::HandleScope handle_scope;
+		ENGINE_JS_METHOD(Println) {
+			ENGINE_JS_SCOPE_OPEN;
+            
 			bool first = true;
 			for (int i = 0; i < args.Length(); i++) {
 				if (first) {
@@ -20,88 +21,94 @@ namespace Engine {
 			printf("\n");
 	
 			fflush(stdout);
-			return handle_scope.Close(v8::Undefined());
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 
-		v8::Handle<v8::Value> RunFile(const v8::Arguments& args) {
-			v8::HandleScope handle_scope;
-			if (args.Length() != 2) {
-				return handle_scope.Close(v8::Undefined());
-			}
-			if (!args[0]->IsString() || !args[1]->IsBoolean()) {
-				return handle_scope.Close(v8::Undefined());
-			}
-            std::string scriptFilename = *v8::String::AsciiValue(args[0]) + std::string(".js");
-			runFile(scriptFilename, args[1]->ToBoolean()->Value());
-			return handle_scope.Close(v8::Undefined());
+        ENGINE_JS_METHOD(RunFile) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_BOOLEAN(1);
+            
+            std::string scriptFilename = *ENGINE_GET_ARG_CSTRING_VALUE(0) + std::string(".js");
+			runFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1));
+			
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> Drawfunc(const v8::Arguments& args) {
-			v8::HandleScope scope;
+        ENGINE_JS_METHOD(Drawfunc) {
+            ENGINE_JS_SCOPE_OPEN;
             
-			if (args.Length() != 1) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARGS_LENGTH(1);
             
-			if (!args[0]->IsFunction()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARG_FUNCTION(0);
             
 			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
             
 			setDrawFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
             
-			return scope.Close(v8::Undefined());
+			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
         
-        v8::Handle<v8::Value> KeyboardFunc(const v8::Arguments& args) {
-            v8::HandleScope handle_scope;
+        ENGINE_JS_METHOD(KeyboardFunc) {
+            ENGINE_JS_SCOPE_OPEN;
             
-            if (args.Length() != 1) {
-				// TODO : Error
-				return handle_scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARGS_LENGTH(1);
             
-			if (!args[0]->IsFunction()) {
-				// TODO : handle_scope
-				return handle_scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARG_FUNCTION(0);
             
 			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
             
 			setKeyFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
             
-            return handle_scope.Close(v8::Undefined());
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        v8::Handle<v8::Value> GetGLVersion(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(GetGLVersion) {
+            ENGINE_JS_SCOPE_OPEN;
+            
             v8::Handle<v8::Object> ret = v8::Object::New();
             
             int glMajor, glMinor, glRev;
             
             glfwGetGLVersion(&glMajor, &glMinor, &glRev);
             
-            ret->Set(v8::String::New("major"), v8::Number::New(glMajor));
-            ret->Set(v8::String::New("minor"), v8::Number::New(glMinor));
-            ret->Set(v8::String::New("rev"), v8::Number::New(glRev));
+            ret->Set(v8::String::NewSymbol("major"), v8::Number::New(glMajor));
+            ret->Set(v8::String::NewSymbol("minor"), v8::Number::New(glMinor));
+            ret->Set(v8::String::NewSymbol("rev"), v8::Number::New(glRev));
             
-            return scope.Close(ret);
+            ENGINE_JS_SCOPE_CLOSE(ret);
         }
         
-        v8::Handle<v8::Value> Microtime(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(Microtime) {
+            ENGINE_JS_SCOPE_OPEN;
             
             timeval time;
             gettimeofday(&time, NULL);
             
-            return scope.Close(v8::Number::New(time.tv_sec + (time.tv_usec * 0.000001)));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(time.tv_sec + (time.tv_usec * 0.000001)));
         }
         
-        v8::Handle<v8::Value> HeapStats(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(ResizeWindow) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_INT32(0);
+            ENGINE_CHECK_ARG_INT32(1);
+            
+            glfwSetWindowSize(ENGINE_GET_ARG_INT32_VALUE(0),
+                              ENGINE_GET_ARG_INT32_VALUE(1));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(HeapStats) {
+            ENGINE_JS_SCOPE_OPEN;
+            
             v8::Handle<v8::Object> ret = v8::Object::New();
             
             v8::HeapStatistics stats;
@@ -113,7 +120,7 @@ namespace Engine {
             ret->Set(v8::String::NewSymbol("heapTotalExecSize"), v8::Number::New(stats.total_heap_size_executable()));
             ret->Set(v8::String::NewSymbol("heapUsed"), v8::Number::New(stats.used_heap_size()));
             
-            return scope.Close(ret);
+            ENGINE_JS_SCOPE_CLOSE(ret);
         }
 
 	}

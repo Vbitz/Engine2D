@@ -40,25 +40,22 @@ namespace Engine {
             _polygons = 0;
 		}
 		
-		v8::Handle<v8::Value> Rect(const v8::Arguments& args) {
-			v8::HandleScope scope;
+		ENGINE_JS_METHOD(Rect) {
+            ENGINE_JS_SCOPE_OPEN;
 
 			GLfloat x, y, w, h;
+            
+            ENGINE_CHECK_ARGS_LENGTH(4);
+            
+            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(2);
+            ENGINE_CHECK_ARG_NUMBER(3);
 		
-			if (args.Length() != 4) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			if (!args[0]->IsNumber() && !args[1]->IsNumber() && !args[2]->IsNumber() && !args[3]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			x = (GLfloat)args[0]->NumberValue();
-			y = (GLfloat)args[1]->NumberValue();
-			w = (GLfloat)args[2]->NumberValue();
-			h = (GLfloat)args[3]->NumberValue();
+			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
+			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
+			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
+			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
             glBegin(GL_QUADS);
 				SetColor();
@@ -69,32 +66,29 @@ namespace Engine {
             glEnd();
             
             _polygons += 4;
-		
-			return scope.Close(v8::Undefined());
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> Grid(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			GLfloat x, y, w, h;
-		
-			if (args.Length() != 4) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			if (!args[0]->IsNumber() && !args[1]->IsNumber() && !args[2]->IsNumber() && !args[3]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			x = (GLfloat)args[0]->NumberValue();
-			y = (GLfloat)args[1]->NumberValue();
-			w = (GLfloat)args[2]->NumberValue();
-			h = (GLfloat)args[3]->NumberValue();
+		ENGINE_JS_METHOD(Grid) {
+            ENGINE_JS_SCOPE_OPEN;
             
-            SetColor();
+			GLfloat x, y, w, h;
+            
+            ENGINE_CHECK_ARGS_LENGTH(4);
+            
+            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(2);
+            ENGINE_CHECK_ARG_NUMBER(3);
+            
+			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
+			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
+			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
+			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
+            
             glBegin(GL_LINE_LOOP);
+                SetColor();
                 glVertex3f(x        - _centerX, y       - _centerY, 0);
                 glVertex3f(x + w    - _centerX, y       - _centerY, 0);
                 glVertex3f(x + w    - _centerX, y + h   - _centerY, 0);
@@ -104,51 +98,52 @@ namespace Engine {
 		
             _polygons += 5;
             
-			return scope.Close(v8::Undefined());
+			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> Grad(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
+		ENGINE_JS_METHOD(Grad) {
+            ENGINE_JS_SCOPE_OPEN;
+            
 			GLfloat x, y, w, h;
-			unsigned int col1, col2;
-			bool vert;
-		
-			if (args.Length() != 7) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			if (!args[0]->IsNumber() || !args[1]->IsNumber() || !args[2]->IsNumber() || !args[3]->IsNumber() ||
-					!args[4]->IsNumber() || !args[5]->IsNumber() || !args[6]->IsBoolean()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			x = (GLfloat)args[0]->NumberValue();
-			y = (GLfloat)args[1]->NumberValue();
-			w = (GLfloat)args[2]->NumberValue();
-			h = (GLfloat)args[3]->NumberValue();
+            
+            unsigned int col1, col2;
+            
+            bool vert;
+            
+            ENGINE_CHECK_ARGS_LENGTH(7);
+            
+            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(2);
+            ENGINE_CHECK_ARG_NUMBER(3);
+            ENGINE_CHECK_ARG_INT32(4);
+            ENGINE_CHECK_ARG_INT32(5);
+            ENGINE_CHECK_ARG_BOOLEAN(6);
+            
+			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
+			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
+			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
+			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
             if (isOffscreen(x, y, w, h)) {
                 return scope.Close(v8::Undefined());
             }
 		
-			col1 = (unsigned int)args[4]->NumberValue();
-			col2 = (unsigned int)args[5]->NumberValue();
+			col1 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(4);
+			col2 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(5);
 		
-			vert = args[6]->BooleanValue();
+			vert = ENGINE_GET_ARG_BOOLEAN_VALUE(6);
 		
 			if (col1 > 256 * 256 * 256) // there fixed that age old bug
 			{
 				// TODO : Error
-				return scope.Close(v8::Undefined());
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 			}
 		
 			if (col2 > 256 * 256 * 256)
 			{
 				// TODO : Error
-				return scope.Close(v8::Undefined());
+				ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 			}
             
             glBegin(GL_QUADS);
@@ -172,35 +167,33 @@ namespace Engine {
             
             _polygons += 4;
 		
-			return scope.Close(v8::Undefined());
+			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> Draw(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			GLuint texID;
+		ENGINE_JS_METHOD(Draw) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            GLuint texId;
 			GLfloat x, y, w, h;
-		
-			if (args.Length() != 5) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			if (!args[0]->IsNumber() && !args[1]->IsNumber() && !args[2]->IsNumber() && !args[3]->IsNumber() && !args[4]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			texID = (GLuint)args[0]->NumberValue();
-			x = (GLfloat)args[1]->NumberValue();
-			y = (GLfloat)args[2]->NumberValue();
-			w = (GLfloat)args[3]->NumberValue();
-			h = (GLfloat)args[4]->NumberValue();
+            
+            ENGINE_CHECK_ARGS_LENGTH(4);
+            
+            ENGINE_CHECK_ARG_INT32(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(2);
+            ENGINE_CHECK_ARG_NUMBER(3);
+            ENGINE_CHECK_ARG_NUMBER(4);
+            
+            texId = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(0);
+            
+			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
+			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
+			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
+			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
 		
 			glEnable(GL_TEXTURE_2D);
-			//glDisable(GL_BLEND);
 		
-			glBindTexture(GL_TEXTURE_2D, texID); 
+			glBindTexture(GL_TEXTURE_2D, texId);
 		
 			glBegin(GL_QUADS);
 		
@@ -214,141 +207,116 @@ namespace Engine {
             
             _polygons += 4;
 		
-			//glBindTexture(GL_TEXTURE_2D, 0);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		
 			glDisable(GL_TEXTURE_2D);
 		
-			return scope.Close(v8::Undefined());
+			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> SetColorF(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			if (args.Length() != 3) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+		ENGINE_JS_METHOD(SetColorF) {
+			ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(2);
 		
-			if (!args[0]->IsNumber() && !args[1]->IsNumber() && !args[2]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+			_currentColorR = ENGINE_GET_ARG_NUMBER_VALUE(0);
+			_currentColorG = ENGINE_GET_ARG_NUMBER_VALUE(1);
+			_currentColorB = ENGINE_GET_ARG_NUMBER_VALUE(2);
 		
-			_currentColorR = args[0]->NumberValue();
-			_currentColorG = args[1]->NumberValue();
-			_currentColorB = args[2]->NumberValue();
-		
-			return scope.Close(v8::Undefined());
+			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> SetColor(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			if (args.Length() != 1) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+		ENGINE_JS_METHOD(SetColor) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_INT32(0);
 		
-			if (!args[0]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			int col1 = args[0]->NumberValue();
+			int col1 = ENGINE_GET_ARG_INT32_VALUE(0);
 		
 			if (col1 > (256 * 256 * 256))
 			{
-				// TODO : Error
-				return scope.Close(v8::Undefined());
+                // TODO : Error
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 			}
 		
 			_currentColorR = (float)((col1 & 0xff0000) >> 16) / 255;
 			_currentColorG = (float)((col1 & 0x00ff00) >> 8) / 255;
 			_currentColorB = (float)(col1 & 0x0000ff) / 255;
-		
-			return scope.Close(v8::Undefined());
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> SetColorI(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			if (args.Length() != 3) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+		ENGINE_JS_METHOD(SetColorI) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(2);
 		
-			if (!args[0]->IsNumber() && !args[1]->IsNumber() && !args[2]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			_currentColorR = args[0]->NumberValue() / 255;
-			_currentColorG = args[1]->NumberValue() / 255;
-			_currentColorB = args[2]->NumberValue() / 255;
-		
-			return scope.Close(v8::Undefined());
+			_currentColorR = ENGINE_GET_ARG_NUMBER_VALUE(0) / 255;
+			_currentColorG = ENGINE_GET_ARG_NUMBER_VALUE(1) / 255;
+			_currentColorB = ENGINE_GET_ARG_NUMBER_VALUE(2) / 255;
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> ClearColor(const v8::Arguments& args) {
-			v8::HandleScope scope;
-
-			if (args.Length() != 3) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+		ENGINE_JS_METHOD(ClearColor) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(2);
 		
-			if (!args[0]->IsNumber() && !args[1]->IsNumber() && !args[2]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			glClearColor(args[0]->NumberValue(), args[1]->NumberValue(), args[2]->NumberValue(), 1.0f);
-		
-			return scope.Close(v8::Undefined());
+			glClearColor(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                         ENGINE_GET_ARG_NUMBER_VALUE(1),
+                         ENGINE_GET_ARG_NUMBER_VALUE(2), 1.0f);
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		v8::Handle<v8::Value> Print(const v8::Arguments& args) {
-			v8::HandleScope scope;
+		ENGINE_JS_METHOD(Print) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_STRING(2);
 
-			if (args.Length() != 3) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			if (!args[0]->IsNumber() && !args[1]->IsNumber() && !args[2]->IsString()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-
-            const char* str = *v8::String::Utf8Value(args[2]);
+            const char* str = *ENGINE_GET_ARG_CSTRING_VALUE(2);
 		
 			glEnable(GL_TEXTURE_2D);
 			SetColor();
-			getFont()->beginDraw(args[0]->NumberValue() - _centerX, args[1]->NumberValue() - _centerY) << str << getFont()->endDraw();
+			getFont()->beginDraw(ENGINE_GET_ARG_NUMBER_VALUE(0) - _centerX,
+                                 ENGINE_GET_ARG_NUMBER_VALUE(1) - _centerY) << str << getFont()->endDraw();
 			glDisable(GL_TEXTURE_2D);
             
             _polygons += strlen(str) * 4;
 		
-			return scope.Close(v8::Undefined());
+			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
 		// TODO: add support for this function to open anything ( or just png\jpg\gif )
-		v8::Handle<v8::Value> OpenImage(const v8::Arguments& args) {
-			v8::HandleScope scope;
+		ENGINE_JS_METHOD(OpenImage) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0);
 
-			if (args.Length() != 1) {
+			if (!Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))) {
 				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-		
-			if (!args[0]->IsString()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
-
-			if (!Filesystem::FileExists(*v8::String::AsciiValue(args[0]))) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
+				ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 			}
 		
 			GLuint text = 0;
@@ -359,7 +327,7 @@ namespace Engine {
 		
 			// TODO: Write my own loader
 
-			glfwLoadTexture2D(Filesystem::GetRealPath(*v8::String::AsciiValue(args[0])).c_str(), GLFW_BUILD_MIPMAPS_BIT);
+			glfwLoadTexture2D(Filesystem::GetRealPath(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str(), GLFW_BUILD_MIPMAPS_BIT);
 		
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 								GL_LINEAR_MIPMAP_LINEAR );
@@ -369,12 +337,12 @@ namespace Engine {
 		
 			addTexture(text);
 		
-			return scope.Close(v8::Integer::New(text));
+			ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
 		}
         
         // basicly restarts 2d drawing
-        v8::Handle<v8::Value> CameraReset(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(CameraReset) {
+            ENGINE_JS_SCOPE_OPEN;
             
             int oldVertCount = _polygons;
             
@@ -383,116 +351,92 @@ namespace Engine {
             
             _polygons = oldVertCount;
             
-            return scope.Close(v8::Undefined());
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        v8::Handle<v8::Value> CameraPan(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(CameraPan) {
+            ENGINE_JS_SCOPE_OPEN;
             
-			if (args.Length() != 2) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARGS_LENGTH(2);
             
-			if (!args[0]->IsNumber() || !args[1]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
             
             glTranslatef(args[0]->NumberValue(), args[1]->NumberValue(), 0.0f);
             
-            return scope.Close(v8::Undefined());
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        v8::Handle<v8::Value> CameraZoom(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(CameraZoom) {
+            ENGINE_JS_SCOPE_OPEN;
             
-            if (args.Length() != 1) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARGS_LENGTH(1);
             
-			if (!args[0]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARG_NUMBER(0);
             
             double zoomFactor = args[0]->NumberValue();
             
             glScalef(zoomFactor, zoomFactor, 0.0f);
             
-            return scope.Close(v8::Undefined());
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        v8::Handle<v8::Value> CameraRotate(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(CameraRotate) {
+            ENGINE_JS_SCOPE_OPEN;
             
-            if (args.Length() != 1) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARGS_LENGTH(1);
             
-			if (!args[0]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARG_NUMBER(0);
             
-            double rotateFactor = args[0]->NumberValue();
+            double rotateFactor = ENGINE_GET_ARG_NUMBER_VALUE(0);
             
             glRotatef(rotateFactor, 0.0f, 0.0f, 1.0f);
             
-            return scope.Close(v8::Undefined());
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        v8::Handle<v8::Value> GetTextWidth(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(GetTextWidth) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0);
             
             float textWidth = args[0]->ToString()->Length() * 10;
             
-            return scope.Close(v8::Number::New(textWidth));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(textWidth));
         }
         
-        v8::Handle<v8::Value> GetVerts(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(GetVerts) {
+            ENGINE_JS_SCOPE_OPEN;
             
-            return scope.Close(v8::Integer::New(_polygons));
+            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(_polygons));
         }
         
-        v8::Handle<v8::Value> SetDrawOffscreen(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(SetDrawOffscreen) {
+            ENGINE_JS_SCOPE_OPEN;
             
-            if (args.Length() != 1) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARGS_LENGTH(1);
             
-			if (!args[0]->IsBoolean()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARG_BOOLEAN(0);
             
-            _drawOffScreen = args[0]->BooleanValue();
+            _drawOffScreen = ENGINE_GET_ARG_BOOLEAN_VALUE(0);
             
-            return scope.Close(v8::Undefined());
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        v8::Handle<v8::Value> SetCenter(const v8::Arguments& args) {
-            v8::HandleScope scope;
+        ENGINE_JS_METHOD(SetCenter) {
+            ENGINE_JS_SCOPE_OPEN;
             
-            if (args.Length() != 2) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARGS_LENGTH(2);
             
-			if (!args[0]->IsNumber() || !args[1]->IsNumber()) {
-				// TODO : Error
-				return scope.Close(v8::Undefined());
-			}
+            ENGINE_CHECK_ARG_INT32(0);
+            ENGINE_CHECK_ARG_INT32(1);
             
-            _centerX = args[0]->Int32Value();
-            _centerY = args[1]->Int32Value();
+            _centerX = ENGINE_GET_ARG_INT32_VALUE(0);
+            _centerY = ENGINE_GET_ARG_INT32_VALUE(1);
             
-            return scope.Close(v8::Undefined());
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
 
 	} // namespace JsDraw

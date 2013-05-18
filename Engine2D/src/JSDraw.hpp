@@ -9,30 +9,30 @@ namespace Engine {
 
 	namespace JsDraw {
 
-		void						Begin2d();
-		void						End2d();
+		void Begin2d();
+		void End2d();
 
-		v8::Handle<v8::Value>		Rect(const v8::Arguments& args);
-		v8::Handle<v8::Value>		Grid(const v8::Arguments& args);
-		v8::Handle<v8::Value>		Grad(const v8::Arguments& args);
-		v8::Handle<v8::Value>		Draw(const v8::Arguments& args);
-		v8::Handle<v8::Value>		SetColorF(const v8::Arguments& args);
-		v8::Handle<v8::Value>		SetColor(const v8::Arguments& args);
-		v8::Handle<v8::Value>		SetColorI(const v8::Arguments& args);
-		v8::Handle<v8::Value>		ClearColor(const v8::Arguments& args);
-		v8::Handle<v8::Value>		Print(const v8::Arguments& args);
-		v8::Handle<v8::Value>		OpenImage(const v8::Arguments& args);
+		ENGINE_JS_METHOD(Rect);
+		ENGINE_JS_METHOD(Grid);
+		ENGINE_JS_METHOD(Grad);
+		ENGINE_JS_METHOD(Draw);
+		ENGINE_JS_METHOD(SetColorF);
+		ENGINE_JS_METHOD(SetColor);
+		ENGINE_JS_METHOD(SetColorI);
+		ENGINE_JS_METHOD(ClearColor);
+		ENGINE_JS_METHOD(Print);
+		ENGINE_JS_METHOD(OpenImage);
         
-        v8::Handle<v8::Value>       CameraReset(const v8::Arguments& args);
-        v8::Handle<v8::Value>       CameraPan(const v8::Arguments& args);
-        v8::Handle<v8::Value>       CameraZoom(const v8::Arguments& args);
-        v8::Handle<v8::Value>       CameraRotate(const v8::Arguments& args);
+        ENGINE_JS_METHOD(CameraReset);
+        ENGINE_JS_METHOD(CameraPan);
+        ENGINE_JS_METHOD(CameraZoom);
+        ENGINE_JS_METHOD(CameraRotate);
         
-        v8::Handle<v8::Value>       GetTextWidth(const v8::Arguments& args);
+        ENGINE_JS_METHOD(GetTextWidth);
         
-        v8::Handle<v8::Value>       GetVerts(const v8::Arguments& args);
-        v8::Handle<v8::Value>       SetDrawOffscreen(const v8::Arguments& args);
-        v8::Handle<v8::Value>       SetCenter(const v8::Arguments& args);
+        ENGINE_JS_METHOD(GetVerts);
+        ENGINE_JS_METHOD(SetDrawOffscreen);
+        ENGINE_JS_METHOD(SetCenter);
 	
 	}
 
