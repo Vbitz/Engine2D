@@ -4,6 +4,10 @@ namespace Engine {
 	
 	// state
 	bool running = false;
+    
+    bool isFullscreen = false;
+    
+    bool toggleNextframe = false;
 	
 	double lastTime = 0;
 	
@@ -83,6 +87,10 @@ namespace Engine {
             addItem(sysTable, "heapStats", JsSys::HeapStats);
         
             addItem(sysTable, "readFile", JsSys::ReadFile);
+        
+            addItem(sysTable, "toggleFullscreen", JsSys::ToggleFullscreen);
+        
+            addItem(sysTable, "exit", JsSys::Exit);
         
         sysTable->Set("platform", v8::String::New(_PLATFORM));
 	
@@ -208,36 +216,46 @@ namespace Engine {
         
         real_func->Call(_globalContext->Global(), 3, argv);
 	}
-	
-	void InitOpenGL() {
-        std::cout << "Loading OpenGL : Init GLFW" << std::endl;
-        
-		glfwInit();
-	
+    
+    void OpenWindow(int width, int height, int r, int g, int b, bool fullscreen) {
         std::cout << "Loading OpenGL : Init Window/Context" << std::endl;
         
-		glfwOpenWindow(800, 600, 1, 1, 1, 1, 1, 1, GLFW_WINDOW); // you can resize how ever much you like
+		glfwOpenWindow(width, height, r, g, b, 1, 1, 1, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW); // you can resize how ever much you like
         
         std::cout << "Loading OpenGL : Init GLEW" << std::endl;
         
         glewInit();
         
         std::cout << "Loading OpenGL : Init Callbacks" << std::endl;
-	
+        
 		glfwSetWindowSizeCallback(ResizeWindow);
 		glfwSetKeyCallback(KeyPress);
         
         std::cout << "Loading OpenGL : Init OpenGL State" << std::endl;
-	
+        
 		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_LIGHTING);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
         std::cout << "Loaded OpenGL" << std::endl;
+    }
+    
+    void CloseWindow() {
+        std::cout << "Terminating Window" << std::endl;
+        glfwCloseWindow();
+    }
+	
+	void InitOpenGL() {
+        std::cout << "Loading OpenGL : Init GLFW" << std::endl;
+        
+		glfwInit();
+        
+        OpenWindow(800, 600, 1, 1, 1, false);
 	}
 	
 	void ShutdownOpenGL() {
+        CloseWindow();
 		glfwTerminate();
 	}
 	
@@ -332,6 +350,30 @@ namespace Engine {
             std::cout << "Could not load File" << std::endl;
         }
     }
+    
+    void exit() {
+        running = false;
+    }
+    
+    void toggleFullscreen() {
+        toggleNextframe = true;
+    }
+    
+    void _toggleFullscreen() {
+        if (isFullscreen) {
+            CloseWindow();
+            OpenWindow(800, 600, 1, 1, 1, false);
+            isFullscreen = false;
+            UpdateScreen();
+        } else {
+            GLFWvidmode desktopMode;
+            glfwGetDesktopMode(&desktopMode);
+            CloseWindow();
+            OpenWindow(desktopMode.Width, desktopMode.Height, desktopMode.RedBits, desktopMode.GreenBits, desktopMode.BlueBits, true);
+            isFullscreen = true;
+            UpdateScreen();
+        }
+    }
 	
 	// main function
 	
@@ -376,6 +418,11 @@ namespace Engine {
 	
 			if (!glfwGetWindowParam(GLFW_OPENED))
 				running = false;
+            
+            if (toggleNextframe) {
+                _toggleFullscreen();
+                toggleNextframe = false;
+            }
 		}
 	
 		ShutdownOpenGL();

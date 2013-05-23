@@ -1,5 +1,9 @@
 #include "JSDraw.hpp"
-		
+
+#define USING_NEW_RENDERER false
+
+#define BUFFER_SIZE 256
+
 namespace Engine {
 
 	namespace JsDraw {
@@ -10,9 +14,16 @@ namespace Engine {
 		double _currentColorB = 1.0f;
         
         int _polygons = 0;
+        int _drawCalls = 0;
         
         int _centerX = 0;
         int _centerY = 0;
+        
+        int _currentVerts = 0;
+        
+        float _vertexBuffer[BUFFER_SIZE * 3];
+        float _colorBuffer[BUFFER_SIZE * 4];
+        float _texCoardBuffer[BUFFER_SIZE * 2];
         
         float clamp(float val, float min, float max) {
             if (val != val) {
@@ -37,55 +48,105 @@ namespace Engine {
         }
         
         void beginRendering(GLenum mode) {
-            glBegin(mode);
-            glColor3f(_currentColorR, _currentColorG, _currentColorB);
+            if (USING_NEW_RENDERER) {
+                _currentVerts = 0;
+            } else {
+                glBegin(mode);
+                glColor3f(_currentColorR, _currentColorG, _currentColorB);
+            }
         }
         
         void endRendering() {
-            glEnd();
+            if (USING_NEW_RENDERER) {
+                
+            } else {
+                glEnd();
+            }
         }
+        
+        void addVert(float x, float y, float z);
+        void addVert(float x, float y, float z, double r, double g, double b);
+        void addVert(float x, float y, float z, float s, float t);
+        void addVert(float x, float y, float z, double r, double g, double b, float s, float t);
         
         void addVert(float x, float y, float z) {
-            glVertex3f(x - _centerX, y - _centerY, z);
-            _polygons++;
+            if (USING_NEW_RENDERER) {
+                addVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, 0.0, 0.0);
+            } else {
+                glVertex3f(x - _centerX, y - _centerY, z);
+                _polygons++;
+            }
         }
         
-        void addVert(float x, float y, float z, float r, int g, int b) {
-            glColor3f(r, g, b);
-            addVert(x, y, z);
+        void addVert(float x, float y, float z, double r, double g, double b) {
+            if (USING_NEW_RENDERER) {
+                addVert(x, y, z, r, g, b, 0.0, 0.0);
+            } else {
+                glColor3f(r, g, b);
+                addVert(x, y, z);
+            }
         }
         
         void addVert(float x, float y, float z, float s, float t) {
-            glTexCoord2f(s, t);
-            addVert(x, y, z);
+            if (USING_NEW_RENDERER) {
+                addVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, s, t);
+            } else {
+                glTexCoord2f(s, t);
+                addVert(x, y, z);
+            }
         }
         
-        void addVert(float x, float y, float z, float r, float g, float b, float s, float t) {
-            glTexCoord2f(s, t);
-            addVert(x, y, z, r, g, b);
+        void addVert(float x, float y, float z, double r, double g, double b, float s, float t) {
+            if (USING_NEW_RENDERER) {
+                _vertexBuffer[_currentVerts * 3 + 0] = x;
+                _vertexBuffer[_currentVerts * 3 + 1] = y;
+                _vertexBuffer[_currentVerts * 3 + 2] = z;
+                _colorBuffer[_currentVerts * 4 + 0] = r;
+                _colorBuffer[_currentVerts * 4 + 1] = g;
+                _colorBuffer[_currentVerts * 4 + 2] = b;
+                _colorBuffer[_currentVerts * 4 + 3] = 1.0f;
+                _texCoardBuffer[_currentVerts * 2 + 0] = s;
+                _texCoardBuffer[_currentVerts * 2 + 0] = t;
+                _currentVerts++;
+            } else {
+                glTexCoord2f(s, t);
+                addVert(x, y, z, r, g, b);
+            }
         }
         
         void enableTexture(int texId) {
             glEnable(GL_TEXTURE_2D);
             
             glBindTexture(GL_TEXTURE_2D, texId);
-        }
+        } 
         
         void disableTexture() {
             glBindTexture(GL_TEXTURE_2D, 0);
             
             glDisable(GL_TEXTURE_2D);
         }
+        
+        void flushAll() {
+            
+        }
 		
 		void Begin2d() {
-            resetMatrix();
+            if (!USING_NEW_RENDERER) {
+                resetMatrix();
+            }
 		}
 		
 		void End2d() {
 			glEnable(GL_DEPTH_TEST);
-			glPopMatrix();
+            
+            if (USING_NEW_RENDERER) {
+                flushAll();
+            } else {
+                glPopMatrix();
+            }
             
             _polygons = 0;
+            _drawCalls = 0;
 		}
 		
 		ENGINE_JS_METHOD(Rect) {

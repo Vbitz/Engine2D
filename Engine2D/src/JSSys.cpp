@@ -148,6 +148,22 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContentString(path).c_str()));
         }
+        
+        ENGINE_JS_METHOD(ToggleFullscreen) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            toggleFullscreen();
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(Exit) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            exit();
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
 
 	}
 

@@ -24,6 +24,10 @@ namespace Engine {
         ENGINE_JS_METHOD(HeapStats);
         
         ENGINE_JS_METHOD(ReadFile);
+        
+        ENGINE_JS_METHOD(ToggleFullscreen);
+        
+        ENGINE_JS_METHOD(Exit);
 	}
 
 }
