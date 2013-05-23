@@ -12,8 +12,6 @@ namespace Engine {
 	
 	GLFT_Font _font;
 	
-	std::vector<GLuint> _textures;
-	
 	std::map<std::string, std::string> _persists;
 
 	// v8 Scripting
@@ -23,7 +21,7 @@ namespace Engine {
 	
 	v8::Persistent<v8::Function> _drawFunc;
 	v8::Persistent<v8::Function> _keyboardFunc;
-
+    
 	std::map<std::string, long> _loadedFiles;
     
     std::string _keys[] = {"ESC","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12",
@@ -51,6 +49,7 @@ namespace Engine {
 	
 	void InitScripting() {
         std::cout << "Loading Scripting" << std::endl;
+        
 		_globalIsolate = v8::Isolate::New();
 		_globalIsolate->Enter();
 
@@ -93,13 +92,16 @@ namespace Engine {
 			addItem(drawTable, "rect", JsDraw::Rect);
 			addItem(drawTable, "grid", JsDraw::Grid);
 			addItem(drawTable, "grad", JsDraw::Grad);
-			addItem(drawTable, "draw", JsDraw::Draw);
 			addItem(drawTable, "setColorF", JsDraw::SetColorF);
 			addItem(drawTable, "setColor", JsDraw::SetColor);
 			addItem(drawTable, "setColorI", JsDraw::SetColorI);
 			addItem(drawTable, "clearColor", JsDraw::ClearColor);
 			addItem(drawTable, "print", JsDraw::Print);
+        
+            addItem(drawTable, "draw", JsDraw::Draw);
 			addItem(drawTable, "openImage", JsDraw::OpenImage);
+            addItem(drawTable, "createImage", JsDraw::CreateImage);
+            addItem(drawTable, "freeImage", JsDraw::FreeImage);
         
             addItem(drawTable, "cameraReset", JsDraw::CameraReset);
             addItem(drawTable, "cameraPan", JsDraw::CameraPan);
@@ -133,13 +135,6 @@ namespace Engine {
 	void ShutdownScripting() {
 		_globalIsolate->Exit();
 		_globalIsolate->Dispose();
-
-		for (int i = 0; i < _textures.size(); ++i)
-		{
-			glDeleteTextures(1, &_textures[i]);
-		}
-	
-		_textures.clear();
 	}
 	
 	void CallFunction(v8::Handle<v8::Value> func) {
@@ -187,39 +182,10 @@ namespace Engine {
 		glViewport(0, 0, w, h);
 	}
 	
-	void CharPress(int key, int state) {
-        if (_keyboardFunc.IsEmpty()) {
-            return;
-        }
-            
-        if (key > 256) {
-            return; // that's handled by KeyPress
-        }
-	
-        v8::HandleScope scp;
-        v8::Context::Scope ctx_scope(_globalContext);
-	
-        v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(_keyboardFunc);
-	
-        uint16_t str[2] = {(uint16_t)key, 0x00};
-
-        v8::Handle<v8::Value> argv[3];
-	
-        argv[0] = v8::String::NewSymbol("char");
-        argv[1] = v8::String::New(str);
-        argv[2] = v8::Boolean::New(state);
-	
-        real_func->Call(_globalContext->Global(), 3, argv);
-	}
-	
 	void KeyPress(int key, int state) {
         if (_keyboardFunc.IsEmpty()) {
             return;
         }
-        
-        if (key < 256) {
-            return; // that's already handled by CharPress
-        }
 	
         v8::HandleScope scp;
         v8::Context::Scope ctx_scope(_globalContext);
@@ -228,9 +194,15 @@ namespace Engine {
 
         v8::Handle<v8::Value> argv[3];
         
-        argv[0] = v8::String::NewSymbol("special");
-        argv[1] = v8::String::NewSymbol(_keys[key - 257].c_str());
-        argv[2] = v8::Boolean::New(state == 1);
+        const char* str = _keys[key - 257].c_str();
+        
+        if (key < 256) {
+            str = (char[]) { (char) key, '\0' };
+        }
+        
+        argv[0] = v8::String::NewSymbol(key < 256 ? "char" : "special");
+        argv[1] = v8::String::NewSymbol(str);
+        argv[2] = v8::Boolean::New(state == GLFW_PRESS);
         
         real_func->Call(_globalContext->Global(), 3, argv);
 	}
@@ -252,7 +224,6 @@ namespace Engine {
 	
 		glfwSetWindowSizeCallback(ResizeWindow);
 		glfwSetKeyCallback(KeyPress);
-		glfwSetCharCallback(CharPress);
         
         std::cout << "Loading OpenGL : Init OpenGL State" << std::endl;
 	
@@ -305,10 +276,6 @@ namespace Engine {
 	
 	int getScreenHeight() {
 		return _screenHeight;
-	}
-	
-	void addTexture(int tex) {
-		_textures.push_back(tex);
 	}
 	
 	GLFT_Font* getFont() {

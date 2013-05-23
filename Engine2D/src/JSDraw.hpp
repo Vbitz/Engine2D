@@ -15,13 +15,16 @@ namespace Engine {
 		ENGINE_JS_METHOD(Rect);
 		ENGINE_JS_METHOD(Grid);
 		ENGINE_JS_METHOD(Grad);
-		ENGINE_JS_METHOD(Draw);
 		ENGINE_JS_METHOD(SetColorF);
 		ENGINE_JS_METHOD(SetColor);
 		ENGINE_JS_METHOD(SetColorI);
 		ENGINE_JS_METHOD(ClearColor);
 		ENGINE_JS_METHOD(Print);
+        
+        ENGINE_JS_METHOD(Draw);
 		ENGINE_JS_METHOD(OpenImage);
+        ENGINE_JS_METHOD(CreateImage);
+        ENGINE_JS_METHOD(FreeImage);
         
         ENGINE_JS_METHOD(CameraReset);
         ENGINE_JS_METHOD(CameraPan);

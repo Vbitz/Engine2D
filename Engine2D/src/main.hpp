@@ -15,8 +15,6 @@ namespace Engine {
 	int 						getScreenWidth();
 	int 						getScreenHeight();
 
-	void 						addTexture(int tex);
-
 	void 						setDrawFunction(v8::Persistent<v8::Function> func);
     void                        setKeyFunction(v8::Persistent<v8::Function> func);
 

@@ -1,7 +1,7 @@
 CC=clang
 CXX=clang++
 RM=rm -f
-CXXFLAGS= -g -Wall -Werror -I/usr/local/include/freetype2 -I/usr/local/include
+CXXFLAGS= -g -Wall -I/usr/local/include/freetype2 -I/usr/local/include
 LDFLAGS= -g  -L/usr/local/lib/ -lfreetype
 LDLIBS= -framework OpenGL -lglew -lglfw -lphysfs -lv8
 

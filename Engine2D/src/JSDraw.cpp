@@ -14,6 +14,17 @@ namespace Engine {
         int _centerX = 0;
         int _centerY = 0;
         
+        float clamp(float val, float min, float max) {
+            if (val != val) {
+                return 0.0f; // handle nan
+            } else if (val < min) {
+                return min;
+            } else if (val > max) {
+                return max;
+            }
+            return val;
+        }
+        
         void resetMatrix() {
             glPushMatrix();
 			glDisable(GL_DEPTH_TEST);
@@ -210,43 +221,6 @@ namespace Engine {
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		ENGINE_JS_METHOD(Draw) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            GLuint texId;
-			GLfloat x, y, w, h;
-            
-            ENGINE_CHECK_ARGS_LENGTH(4);
-            
-            ENGINE_CHECK_ARG_INT32(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
-            ENGINE_CHECK_ARG_NUMBER(3);
-            ENGINE_CHECK_ARG_NUMBER(4);
-            
-            texId = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(0);
-            
-			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
-			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
-			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
-			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
-            
-            enableTexture(texId);
-            
-			beginRendering(GL_QUADS);
-            
-                addVert(x, y, 0, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-                addVert(x + w, y, 0, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-                addVert(x + w, y + h, 0, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-                addVert(x, y + h, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-
-			endRendering();
-            
-            disableTexture();
-            
-			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-		}
-		
 		ENGINE_JS_METHOD(SetColorF) {
 			ENGINE_JS_SCOPE_OPEN;
             
@@ -338,6 +312,47 @@ namespace Engine {
 		
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
+        
+        ENGINE_JS_METHOD(Draw) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            CheckGLError("Pre Image Draw");
+            
+            GLuint texId;
+			GLfloat x, y, w, h;
+            
+            ENGINE_CHECK_ARGS_LENGTH(5);
+            
+            ENGINE_CHECK_ARG_INT32(0);
+            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(2);
+            ENGINE_CHECK_ARG_NUMBER(3);
+            ENGINE_CHECK_ARG_NUMBER(4);
+            
+            texId = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(0);
+            
+			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
+			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
+			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
+			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
+            
+            enableTexture(texId);
+            
+			beginRendering(GL_QUADS);
+                //      x       y       z       r       g       b       s       t
+                addVert(x,      y,      0,      1.0f,   1.0f,   1.0f,   0.0f,   1.0f);
+                addVert(x + w,  y,      0,      1.0f,   1.0f,   1.0f,   1.0f,   1.0f);
+                addVert(x + w,  y + h,  0,      1.0f,   1.0f,   1.0f,   1.0f,   0.0f);
+                addVert(x,      y + h,  0,      1.0f,   1.0f,   1.0f,   0.0f,   0.0f);
+            
+			endRendering();
+            
+            disableTexture();
+            
+            CheckGLError("Post Image Draw");
+            
+			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+		}
 		
 		// TODO: add support for this function to open anything ( or just png\jpg\gif )
 		ENGINE_JS_METHOD(OpenImage) {
@@ -367,11 +382,83 @@ namespace Engine {
 		
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
 								GL_LINEAR );
-		
-			addTexture(text);
+            
+            glBindTexture(GL_TEXTURE_2D, 0);
+            
+            std::cout << "Created Image from file: " << text << std::endl;
 		
 			ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
 		}
+        
+        ENGINE_JS_METHOD(CreateImage) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_ARRAY(0);
+            ENGINE_CHECK_ARG_INT32(1);
+            ENGINE_CHECK_ARG_INT32(2);
+            
+            v8::Local<v8::Array> arr = ENGINE_GET_ARG_ARRAY(0);
+            
+            int width = ENGINE_GET_ARG_INT32_VALUE(1);
+            int height = ENGINE_GET_ARG_INT32_VALUE(2);
+            int len = width * height;
+            
+            if (arr->Length() != width * height * 3) {
+                std::cout << "Array size != width * height * 3 : " << arr->Length() << std::endl;
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            float pixels[len * 4];
+            
+            for (int i = 0; i < len * 4; i += 4) {
+                pixels[i + 0] = clamp((float) arr->Get(i + 0)->NumberValue(), 0.0f, 1.0f);
+                pixels[i + 1] = clamp((float) arr->Get(i + 1)->NumberValue(), 0.0f, 1.0f);
+                pixels[i + 2] = clamp((float) arr->Get(i + 2)->NumberValue(), 0.0f, 1.0f);
+                pixels[i + 3] = 1.0f;
+            }
+            
+			GLuint text = 0;
+            
+            glEnable(GL_TEXTURE_2D);
+            
+			glGenTextures(1, &text);
+            
+			glBindTexture(GL_TEXTURE_2D, text);
+            
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, &pixels);
+            
+            glGenerateMipmap(GL_TEXTURE_2D);
+            
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            GL_LINEAR_MIPMAP_LINEAR );
+            
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                            GL_LINEAR );
+            
+			glBindTexture(GL_TEXTURE_2D, 0);
+            
+            glDisable(GL_TEXTURE_2D);
+            
+            std::cout << "Created Image from data: " << text << std::endl;
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
+        }
+        
+        ENGINE_JS_METHOD(FreeImage) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_INT32(0);
+            
+            GLuint texture = ENGINE_GET_ARG_INT32_VALUE(0);
+            
+            glDeleteTextures(1, &texture);
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
         
         // basicly restarts 2d drawing
         ENGINE_JS_METHOD(CameraReset) {
