@@ -12,8 +12,6 @@ namespace Engine {
             
             const char* str = *ENGINE_GET_ARG_CSTRING_VALUE(0);
             
-            std::cout << str[0] << " : " << glfwGetKey(str[0]) << std::endl;
-            
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(glfwGetKey((int) str[0]) == GLFW_PRESS));
         }
     }

@@ -132,6 +132,22 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
+        
+        ENGINE_JS_METHOD(ReadFile) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0);
+            
+            std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
+            
+            if (!Filesystem::FileExists(path)) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContentString(path).c_str()));
+        }
 
 	}
 

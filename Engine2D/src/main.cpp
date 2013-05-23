@@ -82,6 +82,8 @@ namespace Engine {
         
             addItem(sysTable, "heapStats", JsSys::HeapStats);
         
+            addItem(sysTable, "readFile", JsSys::ReadFile);
+        
         sysTable->Set("platform", v8::String::New(_PLATFORM));
 	
 		global->Set("sys", sysTable);

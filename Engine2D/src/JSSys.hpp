@@ -23,6 +23,7 @@ namespace Engine {
         
         ENGINE_JS_METHOD(HeapStats);
         
+        ENGINE_JS_METHOD(ReadFile);
 	}
 
 }

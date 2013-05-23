@@ -1,8 +1,26 @@
 // TODO: Make a better loader
 
+var str = sys.readFile("config.json");
+
+var globalConfig = {};
+
+try {
+	globalConfig = JSON.parse(str);
+} catch (e) {
+	console.log("Error Loading config: " + e);
+}
+
+function getConfig(str, def) {
+	if (globalConfig[str]) {
+		return globalConfig[str];
+	} else {
+		return def;
+	}
+}
+
 //sys.runFile("script/basic", true);
 sys.runFile("lib/ui", true);
 //sys.runFile("script/uiTest", true);
 //sys.runFile("script/startupNew", true);
 //sys.runFile("script/startupCustomImage", true);
-sys.runFile("script/platformer", true);
+sys.runFile(getConfig("startup", "script/basic"), true);
