@@ -9,20 +9,24 @@ namespace Engine {
 		void Init(const char* argv0) {
 			PHYSFS_init(argv0);
 			Logger::WriteVerbose("Filesystem Loaded");
-			PHYSFS_addToSearchPath("res", 1);
+			PHYSFS_mount("res", "/", 1);
 		}
 
 		void Destroy() {
 			PHYSFS_deinit();
 		}
-
-		void AddToSearchPath(std::string path) {
-			if (!IsLoaded()) {
-				Logger::WriteError("FS not loaded");
-				return;
-			}
-			PHYSFS_addToSearchPath(path.c_str(), 1);
-		}
+        
+        bool Mount(std::string path, std::string fsPath) {
+            if (!IsLoaded()) {
+                Logger::WriteError("FS not loaded");
+                return false;
+            }
+            int result = PHYSFS_mount(path.c_str(), fsPath.c_str(), 1);
+            if (result == 0) {
+                std::cout << "Error Mounting " << PHYSFS_getLastError() << std::endl;
+            }
+            return result > 0;
+        }
 
 		bool FileExists(std::string path) {
 			if (!IsLoaded()) {

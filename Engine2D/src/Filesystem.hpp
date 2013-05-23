@@ -14,8 +14,8 @@ namespace Engine {
 		void						Init(const char* argv0);
 		void						Destroy();
 
-		void						AddToSearchPath(std::string path);
-
+        bool                        Mount(std::string path, std::string fsPath);
+        
 		bool						FileExists(std::string path);
 		bool						FolderExists(std::string path);
 

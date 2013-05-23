@@ -1,6 +1,12 @@
 // TODO: Make a better loader
 
-var str = sys.readFile("config.json");
+if (!sys.mountFile("config.zip", "config/")) {
+	console.log("could not mount res/config.zip");
+}
+
+var str = sys.readFile("config/config.json");
+
+console.log(str);
 
 var globalConfig = {};
 
