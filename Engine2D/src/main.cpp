@@ -87,6 +87,7 @@ namespace Engine {
             addItem(sysTable, "heapStats", JsSys::HeapStats);
         
             addItem(sysTable, "readFile", JsSys::ReadFile);
+            addItem(sysTable, "fileExists", JsSys::FileExists);
             addItem(sysTable, "mountFile", JsSys::MountFile);
         
             addItem(sysTable, "toggleFullscreen", JsSys::ToggleFullscreen);

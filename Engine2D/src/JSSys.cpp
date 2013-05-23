@@ -149,6 +149,16 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContentString(path).c_str()));
         }
         
+        ENGINE_JS_METHOD(FileExists) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0);
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+        }
+        
         ENGINE_JS_METHOD(MountFile) {
             ENGINE_JS_SCOPE_OPEN;
             
