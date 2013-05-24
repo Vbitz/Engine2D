@@ -7,6 +7,8 @@
 #include "JSSys.hpp"
 #include "JSDraw.hpp"
 #include "JSInput.hpp"
+#include "JSFS.hpp"
+#include "JSDatabase.hpp"
 
 namespace Engine {
 

@@ -2,6 +2,8 @@
 
 namespace Engine {
 	namespace Filesystem {
+        bool hasSetUserDir = false;
+        
 		bool IsLoaded() {
 			return PHYSFS_isInit();
 		}
@@ -27,6 +29,15 @@ namespace Engine {
             }
             return result > 0;
         }
+        
+        void SetupUserDir(std::string path) {
+            if (!IsLoaded()) {
+                Logger::WriteError("FS not loaded");
+                return;
+            }
+            PHYSFS_setSaneConfig("Engine2D", path.c_str(), NULL, 0, 0);
+            hasSetUserDir = true;
+        }
 
 		bool FileExists(std::string path) {
 			if (!IsLoaded()) {
@@ -45,6 +56,14 @@ namespace Engine {
 			const char* pathC = path.c_str();
 			return PHYSFS_exists(pathC) && PHYSFS_isDirectory(pathC);
 		}
+        
+        void Mkdir(std::string path) {
+            if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return;
+			}
+            PHYSFS_mkdir(path.c_str());
+        }
 
 		std::vector<std::string> GetDirectoryContent(std::string path) {
 			std::vector<std::string> ret;
@@ -91,6 +110,22 @@ namespace Engine {
 			PHYSFS_close(f);
 			return std::string(fBuffer);
 		}
+        
+        void WriteFile(std::string path, std::string content) {
+			if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return;
+			}
+            if (!hasSetUserDir) {
+                Logger::WriteError("UserDir needs to be set to writefiles");
+                return;
+            }
+            PHYSFS_File* f = PHYSFS_openWrite(path.c_str());
+            if (!PHYSFS_write(f, content.c_str(), sizeof(char), content.length())) {
+                std::cout << "File Write Failed" << std::endl;
+            }
+            PHYSFS_close(f);
+        }
 
 		std::string GetRealPath(std::string path) {
 			const char* fontPath = PHYSFS_getRealDir(path.c_str());
@@ -104,5 +139,9 @@ namespace Engine {
 		long GetFileModifyTime(std::string path) {
 			return PHYSFS_getLastModTime(path.c_str());
 		}
+        
+        bool HasSetUserDir() {
+            return hasSetUserDir;
+        }
 	}
 }

@@ -1,10 +1,10 @@
 // TODO: Make a better loader
 
-if (!sys.mountFile("config.zip", "config/")) {
+if (!fs.mountFile("config.zip", "config/")) {
 	console.log("could not mount res/config.zip");
 }
 
-var str = sys.readFile("config/config.json");
+var str = fs.readFile("config/config.json");
 
 console.log(str);
 

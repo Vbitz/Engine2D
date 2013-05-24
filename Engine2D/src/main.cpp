@@ -86,10 +86,6 @@ namespace Engine {
         
             addItem(sysTable, "heapStats", JsSys::HeapStats);
         
-            addItem(sysTable, "readFile", JsSys::ReadFile);
-            addItem(sysTable, "fileExists", JsSys::FileExists);
-            addItem(sysTable, "mountFile", JsSys::MountFile);
-        
             addItem(sysTable, "toggleFullscreen", JsSys::ToggleFullscreen);
         
             addItem(sysTable, "exit", JsSys::Exit);
@@ -134,6 +130,28 @@ namespace Engine {
             addItem(inputTable, "keyDown", JsInput::KeyDown);
         
 		global->Set("input", inputTable);
+        
+        // fsTable
+        v8::Handle<v8::ObjectTemplate> fsTable = v8::ObjectTemplate::New();
+        
+            addItem(fsTable, "readFile", JsFS::ReadFile);
+            addItem(fsTable, "writeFile", JsFS::WriteFile);
+            addItem(fsTable, "fileExists", JsFS::FileExists);
+            addItem(fsTable, "fileSize", JsFS::FileSize);
+            addItem(fsTable, "mountFile", JsFS::MountFile);
+            addItem(fsTable, "configDir", JsFS::ConfigDir);
+            addItem(fsTable, "mkdir", JsFS::Mkdir);
+        
+        global->Set("fs", fsTable);
+        
+        // dbTable
+        v8::Handle<v8::ObjectTemplate> dbTable = v8::ObjectTemplate::New();
+        
+            addItem(dbTable, "open", JSDatabase::SetDatabaseFilename);
+            addItem(dbTable, "exec", JSDatabase::Exec);
+            addItem(dbTable, "execPrepare", JSDatabase::ExecPrepare);
+        
+        global->Set("db", dbTable);
 
 		_globalContext = v8::Context::New(NULL, global);
 

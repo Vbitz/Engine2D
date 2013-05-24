@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "Shader.hpp"
 
 namespace Engine {
     Shader::Shader(std::string shaderFilename) {
