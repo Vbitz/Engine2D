@@ -57,7 +57,7 @@ sys.drawFunc(function () {
 					avr += items[x - 1][y + 1];
 					avr += items[x - 1][y - 1];
 
-					items[x][y] = Math.floor(avr / 3 + 1);
+					items[x][y] = Math.floor(avr / 3 + (Math.random() * 20));
 				}
 			}
 
@@ -76,5 +76,7 @@ sys.keyboardFunc(function (type, key, press) {
 		regen();
 	} else if (press && key === " ") {
 		paused = !paused;
+	} else if (press && key === "S") {
+		sys.saveScreenshot(Math.floor(Math.random() * 100000).toString(16) + ".bmp");
 	}
 });

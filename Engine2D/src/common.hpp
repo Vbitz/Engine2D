@@ -34,6 +34,8 @@
     #endif
 #endif
 
+#include <FreeImage.h>
+
 #include "extern/GLFT_Font.hpp"
 
 #include "Util.hpp"

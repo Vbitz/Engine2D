@@ -17,6 +17,8 @@ namespace Engine {
         ENGINE_JS_METHOD(GetGLVersion);
         ENGINE_JS_METHOD(HasExtention);
         
+        ENGINE_JS_METHOD(SaveScreenshot);
+        
         ENGINE_JS_METHOD(Microtime);
         
         ENGINE_JS_METHOD(ResizeWindow);

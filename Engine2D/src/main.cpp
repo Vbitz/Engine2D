@@ -8,6 +8,9 @@ namespace Engine {
     bool isFullscreen = false;
     
     bool toggleNextframe = false;
+    bool screenshotNextframe = false;
+    
+    std::string _screenshotFilename;
 	
 	double lastTime = 0;
 	
@@ -79,6 +82,8 @@ namespace Engine {
         
             addItem(sysTable, "getGLVersion", JsSys::GetGLVersion);
             addItem(sysTable, "hasExtention", JsSys::HasExtention);
+        
+            addItem(sysTable, "saveScreenshot", JsSys::SaveScreenshot);
         
             addItem(sysTable, "microtime", JsSys::Microtime);
         
@@ -394,7 +399,28 @@ namespace Engine {
             UpdateScreen();
         }
     }
-	
+
+	void saveScreenshot(std::string screenshotFilename) {
+        _screenshotFilename = screenshotFilename;
+        screenshotNextframe = true;
+    }
+    
+    void _saveScreenshot() {
+        int width, height;
+        glfwGetWindowSize(&width, &height);
+        BYTE* pixels = new BYTE[3 * width * height];
+        glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+        
+        FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, 3 * width,
+                                                       24, 0x0000FF, 0x00FF00, 0xFF0000, false);
+        
+        FreeImage_Save(FIF_BMP, image, _screenshotFilename.c_str(), 0);
+        
+        std::cout << "Saved Screenshot as: " << _screenshotFilename << std::endl;
+        
+        delete [] pixels;
+    }
+    
 	// main function
 	
 	int main(int argc, char const *argv[]) {
@@ -404,6 +430,8 @@ namespace Engine {
 		InitOpenGL();
 		InitScripting();
 		InitFonts();
+        
+        FreeImage_Initialise();
 	
 		running = true;
 	
@@ -442,6 +470,11 @@ namespace Engine {
             if (toggleNextframe) {
                 _toggleFullscreen();
                 toggleNextframe = false;
+            }
+            
+            if (screenshotNextframe) {
+                _saveScreenshot();
+                screenshotNextframe = false;
             }
 		}
 	
