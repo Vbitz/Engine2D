@@ -1,6 +1,3 @@
-ClosedGames
-Engine3D/bin
-Engine3D/.depend
 Engine2D/bin/Engine
 Engine2D/bin/Engine.dSYM
 Engine2D/res/fonts
@@ -9,3 +6,5 @@ Engine2D/.depend
 .DS_Store
 SmallGames-Engine2D
 *.o
+*.png
+*.bmp
