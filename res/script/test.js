@@ -70,7 +70,7 @@ sys.drawFunc(function () {
 	draw.print(400, 220, "PNG Image");
 	draw.draw(img, 410, 250, 100, 100);
 	draw.print(520, 220, "Gen Image");
-	draw.drawSub(img2, 530, 250, 512, 400, t, t++, 16, 16);
+	draw.drawSub(img2, 530, 250, 512, 400, t, t += 0.1, 16, 16);
 });
 
 sys.keyboardFunc(function (type, key, press) {

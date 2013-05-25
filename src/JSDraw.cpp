@@ -455,10 +455,10 @@ namespace Engine {
             
 			beginRendering(GL_QUADS);
             //      x           y           z       r       g       b       s                       t
-            addVert(x1,         y1,         0,      1.0f,   1.0f,   1.0f,   (x2 + x2) / imageWidth, (y2 + h2) / imageHeight);
-            addVert(x1 + w1,    y1,         0,      1.0f,   1.0f,   1.0f,   w2 / imageWidth,        (y2 + h2) / imageHeight);
-            addVert(x1 + w1,    y1 + h1,    0,      1.0f,   1.0f,   1.0f,   w2 / imageWidth,        y2 / imageHeight);
-            addVert(x1,         y1 + h1,    0,      1.0f,   1.0f,   1.0f,   (x2 + x2) / imageWidth, y2 / imageHeight);
+            addVert(x1,         y1,         0,      1.0f,   1.0f,   1.0f,   x2 / imageWidth,        y2 / imageHeight);
+            addVert(x1 + w1,    y1,         0,      1.0f,   1.0f,   1.0f,   (x2 + w2) / imageWidth, y2 / imageHeight);
+            addVert(x1 + w1,    y1 + h1,    0,      1.0f,   1.0f,   1.0f,   (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
+            addVert(x1,         y1 + h1,    0,      1.0f,   1.0f,   1.0f,   x2 / imageWidth,        (y2 + h2) / imageHeight);
             
 			endRendering();
             
