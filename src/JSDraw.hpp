@@ -22,6 +22,7 @@ namespace Engine {
 		ENGINE_JS_METHOD(Print);
         
         ENGINE_JS_METHOD(Draw);
+        ENGINE_JS_METHOD(DrawSub);
 		ENGINE_JS_METHOD(OpenImage);
         ENGINE_JS_METHOD(CreateImage);
         ENGINE_JS_METHOD(FreeImage);

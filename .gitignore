@@ -1,7 +1,7 @@
-Engine2D/bin/Engine
-Engine2D/bin/Engine.dSYM
-Engine2D/res/fonts
-Engine2D/.depend
+bin/Engine
+bin/Engine.dSYM
+res/fonts
+.depend
 .tags*
 .DS_Store
 SmallGames-Engine2D

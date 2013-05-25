@@ -112,6 +112,7 @@ namespace Engine {
 			addItem(drawTable, "print", JsDraw::Print);
         
             addItem(drawTable, "draw", JsDraw::Draw);
+            addItem(drawTable, "drawSub", JsDraw::DrawSub);
 			addItem(drawTable, "openImage", JsDraw::OpenImage);
             addItem(drawTable, "createImage", JsDraw::CreateImage);
             addItem(drawTable, "freeImage", JsDraw::FreeImage);
@@ -298,7 +299,7 @@ namespace Engine {
 	}
 	
 	void ShutdownFonts() {
-	
+        
 	}
 	
 	// semi-realtime time loading
@@ -409,10 +410,10 @@ namespace Engine {
         int width, height;
         glfwGetWindowSize(&width, &height);
         BYTE* pixels = new BYTE[3 * width * height];
-        glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+        glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, pixels);
         
         FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, 3 * width,
-                                                       24, 0x0000FF, 0x00FF00, 0xFF0000, false);
+                                                       24, 0xFF0000, 0x00FF00, 0x0000FF, false);
         
         FreeImage_Save(FIF_BMP, image, _screenshotFilename.c_str(), 0);
         

@@ -126,6 +126,19 @@ namespace Engine {
             }
             PHYSFS_close(f);
         }
+    
+        void TouchFile(std::string path) {
+			if (!IsLoaded()) {
+				Logger::WriteError("FS not loaded");
+				return;
+			}
+            if (!hasSetUserDir) {
+                Logger::WriteError("UserDir needs to be set to touchfiles");
+                return;
+            }
+            PHYSFS_File* f = PHYSFS_openWrite(path.c_str());
+            PHYSFS_close(f);
+        }
 
 		std::string GetRealPath(std::string path) {
 			const char* fontPath = PHYSFS_getRealDir(path.c_str());

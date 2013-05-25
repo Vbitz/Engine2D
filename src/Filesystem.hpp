@@ -30,6 +30,7 @@ namespace Engine {
 
 		std::string					GetFileContentString(std::string path);
         void                        WriteFile(std::string path, std::string content);
+        void                        TouchFile(std::string path);
 
 		std::string					GetRealPath(std::string path);
 		long						GetFileModifyTime(std::string path);

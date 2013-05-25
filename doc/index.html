@@ -24,6 +24,8 @@
 			<li><strong>glfw</strong> Version: 2.7.7</li>
 			<li><strong>physfs</strong> Version: 2.03</li>
 			<li><strong>v8</strong> Version: 3.18.2</li>
+			<li><strong>freeimage</strong> Version: 3.15.4</li>
+			<li><strong>sqlite3</strong> Version: 3.7.16.2</li>
 		</ul>
 		<h1><i>sys</i> - System Functions and Variables</h1>
 		<div class="method">
@@ -202,6 +204,12 @@
 		</div>
 
 		<h1><i>input</i> - Current state of input devices</h1>
+		<div class="method">
+			<h2>input.keyDown(<small>string keycode</small>)</h2>
+			<p>
+				Returns if keycode is currently down, keycode needs to be uppercase
+			</p>
+		</div>
 		<div class="field">
 			<h2>input.mouseX and input.mouseY</h2>
 			<p>
@@ -212,6 +220,51 @@
 			<h2>input.leftMouseButton and input.rightMouseButton</h2>
 			<p>
 				Updated each frame with the current state of the left and right mouse buttons.
+			</p>
+		</div>
+
+		<h1><i>fs</i> - Restricted Filesystem Access</h1>
+		<div class="method">
+			<h2>fs.readFile (<small>string filename</small>)</h2>
+			<p>
+				Returns the content of the file.
+			</p>
+		</div>
+		<div class="method">
+			<h2>fs.writeFile (<small>string filename, string content</small>)</h2>
+			<p>
+				Writes content to filename.
+				fs.configDir needs to be called before you can write a file.
+			</p>
+		</div>
+		<div class="method">
+			<h2>fs.fileExists (<small>string filename</small>)</h2>
+			<p>
+				Returns if the file exists.
+			</p>
+		</div>
+		<div class="method">
+			<h2>fs.fileSize (<small>string filename</small>)</h2>
+			<p>
+				Offset's all drawing by x, y. Useful to rotate stuff around a point.
+			</p>
+		</div>
+		<div class="method">
+			<h2>fs.mountFile (<small>number x, number y</small>)</h2>
+			<p>
+				Offset's all drawing by x, y. Useful to rotate stuff around a point.
+			</p>
+		</div>
+		<div class="method">
+			<h2>fs.configDir (<small>number x, number y</small>)</h2>
+			<p>
+				Offset's all drawing by x, y. Useful to rotate stuff around a point.
+			</p>
+		</div>
+		<div class="method">
+			<h2>fs.mkdir (<small>number x, number y</small>)</h2>
+			<p>
+				Offset's all drawing by x, y. Useful to rotate stuff around a point.
 			</p>
 		</div>
 	</div>

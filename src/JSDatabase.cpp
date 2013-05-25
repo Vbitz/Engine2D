@@ -15,11 +15,15 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            std::string path = Filesystem::GetRealPath(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
             
-            std::cout << path << std::endl;
+            Filesystem::TouchFile(path);
             
-            currentDatabase = new Database(path);
+            std::string realPath = Filesystem::GetRealPath(path);
+            
+            std::cout << realPath << std::endl;
+            
+            currentDatabase = new Database(realPath);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
