@@ -508,7 +508,7 @@ namespace Engine {
             
             unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
             unsigned char* texture = new unsigned char[4 * width * height];
-            
+
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     texture[(x * width + y) * 4 + 0] = pixel[(x * width + y) * 4 + 2];
@@ -565,7 +565,7 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            float pixels[len * 4];
+            float* pixels = (float*) malloc(sizeof(float) * len * 4);
             
             int i2 = 0;
             

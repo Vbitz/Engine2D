@@ -108,10 +108,14 @@ namespace Engine {
         ENGINE_JS_METHOD(Microtime) {
             ENGINE_JS_SCOPE_OPEN;
             
-            timeval time;
+#ifdef _PLATFORM_WIN32
+			ENGINE_JS_SCOPE_CLOSE(v8::Number::New(GetTickCount()));
+#else
+			timeval time;
             gettimeofday(&time, NULL);
-            
+
             ENGINE_JS_SCOPE_CLOSE(v8::Number::New(time.tv_sec + (time.tv_usec * 0.000001)));
+#endif
         }
         
         ENGINE_JS_METHOD(ResizeWindow) {

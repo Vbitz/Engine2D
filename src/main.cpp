@@ -230,10 +230,12 @@ namespace Engine {
 
         v8::Handle<v8::Value> argv[3];
         
-        const char* str = _keys[key - 257].c_str();
+        char* str = (char*)_keys[key - 257].c_str();
         
         if (key < 256) {
-            str = (char[]) { (char) key, '\0' };
+			str = (char*) malloc(sizeof(char) * 2);
+			str[0] = (char) key;
+			str[1] = 0x00;
         }
         
         argv[0] = v8::String::NewSymbol(key < 256 ? "char" : "special");
@@ -465,10 +467,13 @@ namespace Engine {
 	
 			glfwSwapBuffers();
             
-            CheckGLError("endOfRendering");
-	
-			if (!glfwGetWindowParam(GLFW_OPENED))
+			if (!glfwGetWindowParam(GLFW_OPENED)) {
+				std::cout << "Exiting" << std::endl;
 				running = false;
+				break;
+			}
+
+            CheckGLError("endOfRendering");
             
             if (toggleNextframe) {
                 _toggleFullscreen();

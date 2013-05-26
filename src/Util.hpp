@@ -1,13 +1,12 @@
 #pragma once
 
+#include "common.hpp"
+
 #ifdef _WIN32
-#include <windows.h>
 #define sleep Sleep
 #else
 #include <unistd.h>
 #endif
-
-#include "common.hpp"
 
 #define ENGINE_JS_METHOD(name) v8::Handle<v8::Value> name(const v8::Arguments& args)
 

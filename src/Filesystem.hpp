@@ -1,11 +1,11 @@
 #pragma once
 
+#include "common.hpp"
+
 #include <string>
 #include <vector>
 
 #include <physfs.h>
-
-#include "Logger.hpp"
 
 namespace Engine {
 	namespace Filesystem {

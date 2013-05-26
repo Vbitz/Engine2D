@@ -2,7 +2,12 @@
 
 #include "common.hpp"
 
+#ifdef _PLATFORM_WIN32
+// TODO: Fix this
+#include "../../../org/sqlite-amalgamation-3071700/sqlite3.h"
+#else
 #include <sqlite3.h>
+#endif
 
 namespace Engine {
     class Database {
