@@ -1,3 +1,5 @@
+fs.configDir("GameOfLife");
+
 var width = 320;
 var height = 188;
 
@@ -77,6 +79,6 @@ sys.keyboardFunc(function (type, key, press) {
 	} else if (press && key === " ") {
 		paused = !paused;
 	} else if (press && key === "S") {
-		sys.saveScreenshot(Math.floor(Math.random() * 100000).toString(16) + ".bmp");
+		sys.saveScreenshot(Math.floor(Math.random() * 100000).toString(16) + ".png");
 	}
 });

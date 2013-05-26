@@ -416,12 +416,30 @@ namespace Engine {
         BYTE* pixels = new BYTE[3 * width * height];
         glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, pixels);
         
+        FIMEMORY* mem = FreeImage_OpenMemory();
+        
         FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, 3 * width,
                                                        24, 0xFF0000, 0x00FF00, 0x0000FF, false);
         
-        FreeImage_Save(FIF_BMP, image, _screenshotFilename.c_str(), 0);
+        FREE_IMAGE_FORMAT format = FreeImage_GetFIFFromFilename(_screenshotFilename.c_str());
         
-        std::cout << "Saved Screenshot as: " << _screenshotFilename << std::endl;
+        if (format == FIF_UNKNOWN) {
+            format = FIF_BMP;
+        }
+        
+        FreeImage_SaveToMemory(format, image, mem);
+        
+        long fileSize = FreeImage_TellMemory(mem);
+        
+        FreeImage_SeekMemory(mem, 0, SEEK_SET);
+        
+        char* buffer = (char*)malloc(sizeof(char) * fileSize);
+        
+        FreeImage_ReadMemory(buffer, sizeof(char), fileSize, mem);
+        
+        Filesystem::WriteFile(_screenshotFilename, buffer, fileSize);
+        
+        std::cout << "Saved Screenshot as: " << Filesystem::GetRealPath(_screenshotFilename) << std::endl;
         
         delete [] pixels;
     }

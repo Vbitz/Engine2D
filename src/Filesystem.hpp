@@ -30,7 +30,7 @@ namespace Engine {
         
         char*                       GetFileContent(std::string path);
         char*                       GetFileContent(std::string path, long& fileSize);
-        void                        WriteFile(std::string path, std::string content);
+        void                        WriteFile(std::string path, char* content, long length);
         void                        TouchFile(std::string path);
 
 		std::string					GetRealPath(std::string path);

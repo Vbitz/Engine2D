@@ -24,7 +24,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0);
             ENGINE_CHECK_ARG_STRING(1);
             
-            Filesystem::WriteFile(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+            Filesystem::WriteFile(ENGINE_GET_ARG_CPPSTRING_VALUE(0), *ENGINE_GET_ARG_CSTRING_VALUE(1), args[1]->ToString()->Length());
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

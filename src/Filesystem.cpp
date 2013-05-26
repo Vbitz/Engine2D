@@ -122,7 +122,7 @@ namespace Engine {
 			return fBuffer;
 		}
         
-        void WriteFile(std::string path, std::string content) {
+        void WriteFile(std::string path, char* content, long length) {
             if (!IsLoaded()) {
                 std::cout << "FS not loaded" << std::endl;
                 return;
@@ -132,7 +132,7 @@ namespace Engine {
                 return;
             }
             PHYSFS_File* f = PHYSFS_openWrite(path.c_str());
-            if (!PHYSFS_write(f, content.c_str(), sizeof(char), content.length())) {
+            if (!PHYSFS_write(f, content, sizeof(char), length)) {
                 std::cout << "File Write Failed" << std::endl;
             }
             PHYSFS_close(f);
