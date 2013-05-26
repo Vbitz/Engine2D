@@ -400,11 +400,11 @@ namespace Engine {
             enableTexture(texId);
             
 			beginRendering(GL_QUADS);
-                //      x       y       z       r       g       b       s       t
-                addVert(x,      y,      0,      1.0f,   1.0f,   1.0f,   0.0f,   1.0f);
-                addVert(x + w,  y,      0,      1.0f,   1.0f,   1.0f,   1.0f,   1.0f);
-                addVert(x + w,  y + h,  0,      1.0f,   1.0f,   1.0f,   1.0f,   0.0f);
-                addVert(x,      y + h,  0,      1.0f,   1.0f,   1.0f,   0.0f,   0.0f);
+            //      x         y         z   s     t
+            addVert(x,        y,        0,  0.0f, 0.0f);
+            addVert(x + w,    y,        0,  1.0f, 0.0f);
+            addVert(x + w,    y + h,    0,  1.0f, 1.0f);
+            addVert(x,        y + h,    0,  0.0f, 1.0f);
             
 			endRendering();
             
@@ -454,11 +454,11 @@ namespace Engine {
             glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &imageHeight);
             
 			beginRendering(GL_QUADS);
-            //      x           y           z       r       g       b       s                       t
-            addVert(x1,         y1,         0,      1.0f,   1.0f,   1.0f,   x2 / imageWidth,        y2 / imageHeight);
-            addVert(x1 + w1,    y1,         0,      1.0f,   1.0f,   1.0f,   (x2 + w2) / imageWidth, y2 / imageHeight);
-            addVert(x1 + w1,    y1 + h1,    0,      1.0f,   1.0f,   1.0f,   (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
-            addVert(x1,         y1 + h1,    0,      1.0f,   1.0f,   1.0f,   x2 / imageWidth,        (y2 + h2) / imageHeight);
+            //      x           y           z       s                       t
+            addVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
+            addVert(x1 + w1,    y1,         0,      (x2 + w2) / imageWidth, y2 / imageHeight);
+            addVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
+            addVert(x1,         y1 + h1,    0,      x2 / imageWidth,        (y2 + h2) / imageHeight);
             
 			endRendering();
             
@@ -485,10 +485,14 @@ namespace Engine {
 			}
 		
 			GLuint text = 0;
-
-            const char* path = Filesystem::GetRealPath(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str();
-
-            FIBITMAP *lImg = FreeImage_Load(FreeImage_GetFileType(path), path);
+            
+            long fileSize = 0;
+            
+            const char* file = Filesystem::GetFileContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0), fileSize);
+            
+            FIMEMORY* mem = FreeImage_OpenMemory((BYTE*) file, fileSize);
+            
+            FIBITMAP *lImg = FreeImage_LoadFromMemory(FreeImage_GetFileTypeFromMemory(mem), mem);
             
             FIBITMAP *img = 0;
             
@@ -535,6 +539,8 @@ namespace Engine {
             CheckGLError("Post Image Load");
             
             std::cout << "Created Image from file: " << text << std::endl;
+            
+            FreeImage_CloseMemory(mem);
 		
 			ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
 		}

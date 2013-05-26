@@ -19,11 +19,7 @@ namespace Engine {
             
             Filesystem::TouchFile(path);
             
-            std::string realPath = Filesystem::GetRealPath(path);
-            
-            std::cout << realPath << std::endl;
-            
-            currentDatabase = new Database(realPath);
+            currentDatabase = new Database(Filesystem::GetRealPath(path));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

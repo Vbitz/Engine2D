@@ -91,7 +91,12 @@ namespace Engine {
 			return length;
 		}
 
-		std::string GetFileContentString(std::string path) {
+        char* GetFileContent(std::string path) {
+            long f = 0;
+            return GetFileContent(path, f);
+        }
+        
+		char* GetFileContent(std::string path, long &fileSize) {
 			if (!IsLoaded()) {
 				Logger::WriteError("FS not loaded");
 				return "";
@@ -101,14 +106,20 @@ namespace Engine {
 				return "";
 			}
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
-			long fileSize = PHYSFS_fileLength(f);
-			char* fBuffer;
-			fBuffer = new char[fileSize];
-			if (PHYSFS_read(f, fBuffer, sizeof(char), fileSize) != fileSize) {
-				std::cout << "File Read Failed" << std::endl;
-			}
+            long len = PHYSFS_fileLength(f);
+			char* fBuffer = new char[len + 1];
+            int i = 0;
+            while (!PHYSFS_eof(f)) {
+                if (PHYSFS_read(f, &fBuffer[i++], sizeof(char), 1) != 1) {
+                    std::cout << "File Read Failed" << std::endl;
+                    return "";
+                }
+            }
 			PHYSFS_close(f);
-			return std::string(fBuffer);
+            //std::cout << fBuffer << std::endl;
+            fBuffer[len] = 0x00;
+            fileSize = len;
+			return fBuffer;
 		}
         
         void WriteFile(std::string path, std::string content) {

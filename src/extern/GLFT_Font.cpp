@@ -78,20 +78,12 @@ GLFT_Font::GLFT_Font() :
 {
 }
 
-GLFT_Font::GLFT_Font(const std::string& filename, unsigned int size) :
-    texID_(0), listBase_(0),    // initalize GL variables to zero
-    widths_(NUM_CHARS),         // make room for 96 widths
-    height_(0), drawX_(0), drawY_(0)
-{
-    open(filename, size);
-}
-
 GLFT_Font::~GLFT_Font()
 {
     release();
 }
 
-void GLFT_Font::open(const std::string& filename, unsigned int size)
+void GLFT_Font::open(char* file, long fileSize, unsigned int size)
 {
     const size_t MARGIN = 3;
 
@@ -104,7 +96,7 @@ void GLFT_Font::open(const std::string& filename, unsigned int size)
     // Step 1: Open the font using FreeType //
     FT_Face face;
 
-    if(FT_New_Face(library_.getLibrary(), filename.c_str(), 0, &face) != 0)
+    if(FT_New_Memory_Face(library_.getLibrary(), (FT_Byte*)file, fileSize, 0, &face) != 0)
     {
         throw std::runtime_error("Could not load font file.");
     }

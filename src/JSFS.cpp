@@ -15,7 +15,7 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContentString(path).c_str()));
+            ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContent(path)));
         }
         
         ENGINE_JS_METHOD(WriteFile) {

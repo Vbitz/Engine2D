@@ -27,8 +27,9 @@ namespace Engine {
 		std::vector<std::string>	GetDirectoryContent(std::string path);
 
 		long						FileSize(std::string path);
-
-		std::string					GetFileContentString(std::string path);
+        
+        char*                       GetFileContent(std::string path);
+        char*                       GetFileContent(std::string path, long& fileSize);
         void                        WriteFile(std::string path, std::string content);
         void                        TouchFile(std::string path);
 

@@ -50,23 +50,21 @@ namespace Engine {
     }
     
     void Shader::init(std::string vertShaderFilename, std::string fragShaderFilename) {
-        std::string vertShader = Filesystem::GetFileContentString(vertShaderFilename);
-        std::string fragShader = Filesystem::GetFileContentString(fragShaderFilename);
+        const char* vertShader = Filesystem::GetFileContent(vertShaderFilename);
+        const char* fragShader = Filesystem::GetFileContent(fragShaderFilename);
         
         while (!this->compile(vertShader, fragShader)) {
             std::cout << "Could not Compile Shader" << std::endl;
-            vertShader = Filesystem::GetFileContentString(vertShaderFilename);
-            fragShader = Filesystem::GetFileContentString(fragShaderFilename);
+            vertShader = Filesystem::GetFileContent(vertShaderFilename);
+            fragShader = Filesystem::GetFileContent(fragShaderFilename);
         }
     }
     
-    bool Shader::compile(std::string vertShader, std::string fragShader) {
+    bool Shader::compile(const char* vertSource, const char* fragSource) {
         this->_vertPointer = glCreateShader(GL_VERTEX_SHADER);
         this->_fragPointer = glCreateShader(GL_FRAGMENT_SHADER);
         
-        const char* vertSourceStr = vertShader.c_str();
-        
-        glShaderSource(this->_vertPointer, 1, &vertSourceStr, NULL);
+        glShaderSource(this->_vertPointer, 1, &vertSource, NULL);
       
         glCompileShader(this->_vertPointer);
         
@@ -81,9 +79,7 @@ namespace Engine {
             return false;
         }
         
-        const char* fragSourceStr = fragShader.c_str();
-        
-        glShaderSource(this->_fragPointer, 1, &fragSourceStr, NULL);
+        glShaderSource(this->_fragPointer, 1, &fragSource, NULL);
         
         glCompileShader(this->_fragPointer);
         

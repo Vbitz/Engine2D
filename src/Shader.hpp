@@ -23,7 +23,7 @@ namespace Engine {
         
     private:
         void init(std::string vertShaderFilename, std::string fragShaderFilename);
-        bool compile(std::string vertShader, std::string fragShader);
+        bool compile(const char* vertSource, const char* fragSource);
         
         inline bool checkProgramPointer() {
             return this->_programPointer != 0;

@@ -75,11 +75,10 @@ class GLFT_Font
 {
 public:
     GLFT_Font();
-    GLFT_Font(const std::string& filename, unsigned int size);
 
     ~GLFT_Font();
 
-    void open(const std::string& filename, unsigned int size);
+    void open(char* filename, long fileSize, unsigned int size);
     void release();
     
     bool isValid() const;

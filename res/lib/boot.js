@@ -26,4 +26,4 @@ sys.runFile("lib/ui", true);
 //sys.runFile("script/startupNew", true);
 //sys.runFile("script/startupCustomImage", true);
 //sys.runFile("script/gol", true);
-sys.runFile("script/test", true);
+sys.runFile(getConfig("startup", "script/basic"), true);

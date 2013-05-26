@@ -289,9 +289,11 @@ namespace Engine {
 	
 	void InitFonts() {
         std::cout << "Loading Font" << std::endl;
-		std::string fontPath = Filesystem::GetRealPath("fonts/OpenSans-Regular.ttf");
-		if (fontPath.length() > 0) {
-			_font.open(fontPath.c_str(), 16);
+        std::string filePath = "fonts/OpenSans-Regular.ttf";
+		if (Filesystem::FileExists(filePath)) {
+            long fileSize = 0;
+            char* file = Filesystem::GetFileContent(filePath, fileSize);
+			_font.open(file, fileSize, 16);
 		} else {
 			std::cout << "Could not load font" << std::endl;
 		}
@@ -343,12 +345,12 @@ namespace Engine {
 
 		v8::Context::Scope ctx_scope(_globalContext);
 
-		std::string inputScript = Filesystem::GetFileContentString(path);
+		const char* inputScript = Filesystem::GetFileContent(path);
 
 		v8::TryCatch tryCatch;
 
 		v8::Handle<v8::Script> script = v8::Script::Compile(
-			v8::String::New(inputScript.c_str()));
+			v8::String::New(inputScript));
 
 		if (script.IsEmpty()) {
 			std::cout << "Could not Load file" << std::endl;

@@ -28,7 +28,7 @@ for (var i in tests) {
 
 draw.clearColor(0.01, 0.01, 0.01);
 
-var img = draw.openImage("image/testing.png");
+var img = img ? img : draw.openImage("image/testing.png");
 
 var pix = [];
 
@@ -36,7 +36,7 @@ for (var i = 0; i < 100 * 100 * 3; i++) {
 	pix[i] = Math.cos(i);
 }
 
-var img2 = draw.createImage(pix, 100, 100);
+var img2 = img2 ? img2 : draw.createImage(pix, 100, 100);
 
 var t = 0;
 
@@ -59,6 +59,7 @@ sys.drawFunc(function () {
 		x++;
 	}
 	draw.setColor(0xffffff);
+	draw.print(10, x * 40 + 5, "Supports Framebuffer: " + sys.hasExtention("GL_ARB_framebuffer_object"));
 	draw.print(400, 50, "Rendering Tests");
 	draw.print(420, 80, "Rect");
 	draw.rect(410, 100, 100, 100);
@@ -68,9 +69,13 @@ sys.drawFunc(function () {
 	draw.grad(650, 100, 100, 100, 0xffffff, 0x000000, true);
 	draw.grad(770, 100, 100, 100, 0xffffff, 0x000000, false);
 	draw.print(400, 220, "PNG Image");
+	draw.setColor(0xffffff);
 	draw.draw(img, 410, 250, 100, 100);
 	draw.print(520, 220, "Gen Image");
-	draw.drawSub(img2, 530, 250, 512, 400, t, t += 0.1, 16, 16);
+	draw.drawSub(img2, 530, 250, 100, 100, t, t += 0.1, 16, 16);
+	draw.print(640, 220, "Tinted Image");
+	draw.setColor(Math.floor(Math.random() * 255 * 255 * 255));
+	draw.draw(img, 650, 250, 100, 100);
 });
 
 sys.keyboardFunc(function (type, key, press) {
