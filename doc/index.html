@@ -83,6 +83,31 @@
 				<li><strong>heapUsed: </strong>Heap Used</li>
 			</ul>
 		</div>
+		<div class="method">
+			<h2>sys.toggleFullscreen ( )</h2>
+			<p>
+				Switchs to fullscreen mode, after this is called your textures will become invalid so you need to recreate them.
+				The resolution switched to is defined by your current desktop resolution at the time of the switch.
+			</p>
+		</div>
+		<div class="method">
+			<h2>sys.microtime ( )</h2>
+			<p>
+				Returns a floating point number from gettimeofday. On UNIX platforms this should be microsecond accurate but Windows returns up to millisecond accuracy (this may become untrue as I improve the windows version).
+			</p>
+		</div>
+		<div class="method">
+			<h2>sys.resizeWindow (int width, int height)</h2>
+			<p>
+				Resizes the window to width, height. Will not work in fullscreen mode
+			</p>
+		</div>
+		<div class="method">
+			<h2>sys.exit ( )</h2>
+			<p>
+				Closes the application.
+			</p>
+		</div>
 		<div class="field">
 			<h2>sys.screenWidth and sys.screenHeight</h2>
 			<p>
@@ -154,10 +179,7 @@
 		<div class="method">
 			<h2>draw.openImage (<small>string path</small>)</h2>
 			<p>
-				Loads and returns a image from path. This method currently supports these formats
-				<ul>
-					<li><strong>.tga</strong>: Truevision TGA</li>
-				</ul>
+				Loads and returns a image from path. This method currently supports any format supported by Freeimage.
 			</p>
 		</div>
 		<div class="method">
@@ -223,7 +245,7 @@
 			</p>
 		</div>
 
-		<h1><i>fs</i> - Restricted Filesystem Access</h1>
+		<h1><i>fs</i> - PhysFS Filesystem Access</h1>
 		<div class="method">
 			<h2>fs.readFile (<small>string filename</small>)</h2>
 			<p>
@@ -246,25 +268,27 @@
 		<div class="method">
 			<h2>fs.fileSize (<small>string filename</small>)</h2>
 			<p>
-				Offset's all drawing by x, y. Useful to rotate stuff around a point.
+				Returns the size of filename.
 			</p>
 		</div>
 		<div class="method">
-			<h2>fs.mountFile (<small>number x, number y</small>)</h2>
+			<h2>fs.mountFile (<small>string filename, string mountpoint</small>)</h2>
 			<p>
-				Offset's all drawing by x, y. Useful to rotate stuff around a point.
+				Mounts archive at filename to mountpoint. File formats currently supported are
 			</p>
 		</div>
 		<div class="method">
-			<h2>fs.configDir (<small>number x, number y</small>)</h2>
+			<h2>fs.configDir (<small>string applicationName</small>)</h2>
 			<p>
-				Offset's all drawing by x, y. Useful to rotate stuff around a point.
+				Set's up a directory to write to.
+				It rests at (your user directory)\.Engine2D\(applicationName)
 			</p>
 		</div>
 		<div class="method">
-			<h2>fs.mkdir (<small>number x, number y</small>)</h2>
+			<h2>fs.mkdir (<small>string filename</small>)</h2>
 			<p>
-				Offset's all drawing by x, y. Useful to rotate stuff around a point.
+				Creates a new directory at filename.
+				fs.configDir needs to be called before you can create a directory.
 			</p>
 		</div>
 	</div>

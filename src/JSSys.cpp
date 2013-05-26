@@ -175,27 +175,6 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
-        ENGINE_JS_METHOD(MountFile) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(2);
-            
-            ENGINE_CHECK_ARG_STRING(0);
-            ENGINE_CHECK_ARG_STRING(1);
-            
-            std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
-            
-            if (!Filesystem::FileExists(path)) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
-            
-            bool result = Filesystem::Mount(Filesystem::GetRealPath(path), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
-            
-            std::cout << result << std::endl;
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(result));
-        }
-        
         ENGINE_JS_METHOD(ToggleFullscreen) {
             ENGINE_JS_SCOPE_OPEN;
             
