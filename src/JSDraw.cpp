@@ -126,6 +126,10 @@ namespace Engine {
             glDisable(GL_TEXTURE_2D);
         }
         
+        bool isValidTextureID(int texID) {
+            return glIsTexture(texID);
+        }
+        
         void flushAll() {
             
         }
@@ -149,6 +153,15 @@ namespace Engine {
             _drawCalls = 0;
 		}
 		
+        ENGINE_JS_METHOD(LoadShader) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 has to be a filename pointing to a shader");
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
 		ENGINE_JS_METHOD(Rect) {
             ENGINE_JS_SCOPE_OPEN;
 
@@ -156,10 +169,10 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(4);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
-            ENGINE_CHECK_ARG_NUMBER(3);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 has to be X of a rect");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be Y of a rect");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Width of a rect");
+            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Height of a rect");
 		
 			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
 			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
@@ -187,10 +200,10 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(4);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
-            ENGINE_CHECK_ARG_NUMBER(3);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 has to be X of a rect");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be Y of a rect");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Width of a rect");
+            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Height of a rect");
             
 			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
 			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
@@ -223,13 +236,13 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(7);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
-            ENGINE_CHECK_ARG_NUMBER(3);
-            ENGINE_CHECK_ARG_INT32(4);
-            ENGINE_CHECK_ARG_INT32(5);
-            ENGINE_CHECK_ARG_BOOLEAN(6);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 has to be X of a rect");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be Y of a rect");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Width of a rect");
+            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Height of a rect");
+            ENGINE_CHECK_ARG_INT32(4, "Arg4 is Color1 of the gradient");
+            ENGINE_CHECK_ARG_INT32(5, "Arg5 is Color2 of the gradient");
+            ENGINE_CHECK_ARG_BOOLEAN(6, "Arg6 set's orientation of the gradient");
             
 			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
 			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
@@ -287,9 +300,9 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(3);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Red Component between 0.0f and 1.0f");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0.0f and 1.0f");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0.0f and 1.0f");
 		
 			_currentColorR = ENGINE_GET_ARG_NUMBER_VALUE(0);
 			_currentColorG = ENGINE_GET_ARG_NUMBER_VALUE(1);
@@ -303,7 +316,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_INT32(0);
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is a color between 0x000000 and 0xffffff");
 		
 			int col1 = ENGINE_GET_ARG_INT32_VALUE(0);
 		
@@ -325,9 +338,9 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(3);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Red Component between 0 and 255");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0 and 255");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0 and 255");
 		
 			_currentColorR = ENGINE_GET_ARG_NUMBER_VALUE(0) / 255;
 			_currentColorG = ENGINE_GET_ARG_NUMBER_VALUE(1) / 255;
@@ -341,9 +354,9 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(3);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Red Component between 0.0f and 1.0f");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0.0f and 1.0f");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0.0f and 1.0f");
 		
 			glClearColor(ENGINE_GET_ARG_NUMBER_VALUE(0),
                          ENGINE_GET_ARG_NUMBER_VALUE(1),
@@ -357,9 +370,9 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(3);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_STRING(2);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X position of Arg2");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y position of Arg2");
+            ENGINE_CHECK_ARG_STRING(2, "Arg2 is the string to print");
 
             const char* str = *ENGINE_GET_ARG_CSTRING_VALUE(2);
 		
@@ -384,13 +397,18 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(5);
             
-            ENGINE_CHECK_ARG_INT32(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
-            ENGINE_CHECK_ARG_NUMBER(3);
-            ENGINE_CHECK_ARG_NUMBER(4);
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is a valid textureID that's been loaded since the last context change");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be X of a rect");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Y of a rect");
+            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Width of a rect");
+            ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Height of a rect");
             
             texId = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(0);
+            
+            if (!isValidTextureID(texId)) {
+                ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
             
 			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
 			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
@@ -427,17 +445,22 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(9);
             
-            ENGINE_CHECK_ARG_INT32(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
-            ENGINE_CHECK_ARG_NUMBER(2);
-            ENGINE_CHECK_ARG_NUMBER(3);
-            ENGINE_CHECK_ARG_NUMBER(4);
-            ENGINE_CHECK_ARG_NUMBER(5);
-            ENGINE_CHECK_ARG_NUMBER(6);
-            ENGINE_CHECK_ARG_NUMBER(7);
-            ENGINE_CHECK_ARG_NUMBER(8);
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is a valid textureID that's been loaded since the last context change");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be X of a rect");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Y of a rect");
+            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Width of a rect");
+            ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Height of a rect");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg5 has to be X of a sub rectangle");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg6 has to be Y of a sub rectangle");
+            ENGINE_CHECK_ARG_NUMBER(3, "Arg7 has to be Width of a sub rectangle");
+            ENGINE_CHECK_ARG_NUMBER(4, "Arg8 has to be Height of a sub rectangle");
             
             texId = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(0);
+            
+            if (!isValidTextureID(texId)) {
+                ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
             
 			x1 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
 			y1 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
@@ -475,12 +498,12 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the image to load");
             
             CheckGLError("Pre Image Load");
 
 			if (!Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))) {
-				// TODO : Error
+                ENGINE_THROW_ARGERROR("File does not Exist");
 				ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 			}
 		
@@ -550,9 +573,9 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(3);
             
-            ENGINE_CHECK_ARG_ARRAY(0);
-            ENGINE_CHECK_ARG_INT32(1);
-            ENGINE_CHECK_ARG_INT32(2);
+            ENGINE_CHECK_ARG_ARRAY(0, "Arg0 is a a");
+            ENGINE_CHECK_ARG_INT32(1, "Arg1 is the width of the new image");
+            ENGINE_CHECK_ARG_INT32(2, "Arg2 is the height of the new image");
             
             v8::Local<v8::Array> arr = ENGINE_GET_ARG_ARRAY(0);
             
@@ -561,7 +584,7 @@ namespace Engine {
             int len = width * height;
             
             if (arr->Length() != width * height * 3) {
-                std::cout << "Array size != width * height * 3 : " << arr->Length() << std::endl;
+                ENGINE_THROW_ARGERROR("Array size != width * height * 3");
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
@@ -609,9 +632,14 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_INT32(0);
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the textureID of the texture to free");
             
             GLuint texture = ENGINE_GET_ARG_INT32_VALUE(0);
+            
+            if (!isValidTextureID(texture)) {
+                ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
             
             glDeleteTextures(1, &texture);
             
@@ -637,8 +665,8 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(2);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
-            ENGINE_CHECK_ARG_NUMBER(1);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X Distince to pan");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y Distince to pan");
             
             glTranslatef(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), 0.0f);
             
@@ -650,7 +678,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to zoom the camera");
             
             double zoomFactor = args[0]->NumberValue();
             
@@ -664,7 +692,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_NUMBER(0);
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to rotate the camera");
             
             double rotateFactor = ENGINE_GET_ARG_NUMBER_VALUE(0);
             
@@ -678,11 +706,9 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the string to return the width of");
             
-            float textWidth = args[0]->ToString()->Length() * 10;
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(textWidth));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(getFont()->calcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(GetVerts) {
@@ -696,7 +722,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_BOOLEAN(0);
+            ENGINE_CHECK_ARG_BOOLEAN(0, "Set Arg0 to false to disable drawing offscreen");
             
             _drawOffScreen = ENGINE_GET_ARG_BOOLEAN_VALUE(0);
             
@@ -708,8 +734,8 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(2);
             
-            ENGINE_CHECK_ARG_INT32(0);
-            ENGINE_CHECK_ARG_INT32(1);
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the x to offset drawing by");
+            ENGINE_CHECK_ARG_INT32(1, "Arg1 is the y to offset drawing by");
             
             _centerX = ENGINE_GET_ARG_INT32_VALUE(0);
             _centerY = ENGINE_GET_ARG_INT32_VALUE(1);

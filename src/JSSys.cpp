@@ -30,8 +30,8 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(2);
             
-            ENGINE_CHECK_ARG_STRING(0);
-            ENGINE_CHECK_ARG_BOOLEAN(1);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the script to load");
+            ENGINE_CHECK_ARG_BOOLEAN(1, "Arg1 is set to automaticly reload Arg0 when it's changed");
             
             std::string scriptFilename = *ENGINE_GET_ARG_CSTRING_VALUE(0) + std::string(".js");
 			runFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1));
@@ -44,7 +44,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_FUNCTION(0);
+            ENGINE_CHECK_ARG_FUNCTION(0, "Arg0 is a function to be called each time a frame is to be rendered");
             
 			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
             
@@ -58,7 +58,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_FUNCTION(0);
+            ENGINE_CHECK_ARG_FUNCTION(0, "Arg0 is a function to be called on each key pressed or released");
             
 			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
             
@@ -88,7 +88,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of a GL Extention to check for");
             
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(glewGetExtension(*ENGINE_GET_ARG_CSTRING_VALUE(0))));
         }
@@ -98,7 +98,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to save the screenshot as");
             
             saveScreenshot(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
@@ -123,8 +123,8 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(2);
             
-            ENGINE_CHECK_ARG_INT32(0);
-            ENGINE_CHECK_ARG_INT32(1);
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the new X size of the window");
+            ENGINE_CHECK_ARG_INT32(1, "Arg1 is the new Y size of the window");
             
             glfwSetWindowSize(ENGINE_GET_ARG_INT32_VALUE(0),
                               ENGINE_GET_ARG_INT32_VALUE(1));
@@ -147,32 +147,6 @@ namespace Engine {
             ret->Set(v8::String::NewSymbol("heapUsed"), v8::Number::New(stats.used_heap_size()));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
-        }
-        
-        ENGINE_JS_METHOD(ReadFile) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_STRING(0);
-            
-            std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
-            
-            if (!Filesystem::FileExists(path)) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContent(path)));
-        }
-        
-        ENGINE_JS_METHOD(FileExists) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_STRING(0);
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(ToggleFullscreen) {

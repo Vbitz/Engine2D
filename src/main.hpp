@@ -25,4 +25,5 @@ namespace Engine {
     void                        exit();
     void                        toggleFullscreen();
     void                        saveScreenshot(std::string filename);
+    void                        upgradeGL3();
 }

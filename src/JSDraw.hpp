@@ -11,6 +11,8 @@ namespace Engine {
 
 		void Begin2d();
 		void End2d();
+        
+        ENGINE_JS_METHOD(SetShader);
 
 		ENGINE_JS_METHOD(Rect);
 		ENGINE_JS_METHOD(Grid);

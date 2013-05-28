@@ -7,11 +7,12 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file to read");
             
             std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
             
             if (!Filesystem::FileExists(path)) {
+                ENGINE_THROW_ARGERROR("File does not exist");
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
@@ -21,8 +22,8 @@ namespace Engine {
         ENGINE_JS_METHOD(WriteFile) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARG_STRING(0);
-            ENGINE_CHECK_ARG_STRING(1);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file to write");
+            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the content to write to the file");
             
             Filesystem::WriteFile(ENGINE_GET_ARG_CPPSTRING_VALUE(0), *ENGINE_GET_ARG_CSTRING_VALUE(1), args[1]->ToString()->Length());
             
@@ -34,7 +35,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file");
             
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
@@ -44,7 +45,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file");
             
             ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(Filesystem::FileSize(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
@@ -54,12 +55,13 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(2);
             
-            ENGINE_CHECK_ARG_STRING(0);
-            ENGINE_CHECK_ARG_STRING(1);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the archivefile");
+            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the path to mount the archive to");
             
             std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
             
             if (!Filesystem::FileExists(path)) {
+                ENGINE_THROW_ARGERROR("File does not exist");
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
@@ -73,7 +75,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the application name");
             
             Filesystem::SetupUserDir(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
@@ -85,7 +87,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the directory to create");
             
             Filesystem::Mkdir(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             

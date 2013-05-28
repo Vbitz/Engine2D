@@ -9,9 +9,10 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the database");
             
             if (!Filesystem::HasSetUserDir()) {
+                ENGINE_THROW_ARGERROR("fs.configDir needs to be called before db.open can be called");
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
@@ -29,7 +30,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the query to be run on the database");
             
             currentDatabase->Execute(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
@@ -41,7 +42,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_STRING(0);
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the query to be run on the database");
             
             v8::Local<v8::Array> arr = v8::Array::New();
             

@@ -16,6 +16,8 @@ namespace Engine {
 	
 	int _screenWidth = 0;
 	int _screenHeight = 0;
+    
+    bool isGL3Context = false;
 	
 	GLFT_Font _font;
 	
@@ -39,6 +41,9 @@ namespace Engine {
                     "KP_4","KP_5","KP_6","KP_7","KP_8","KP_9","KP_DIVIDE","KP_MULTIPLY",
                     "KP_SUBTRACT","KP_ADD","KP_DECIMAL","KP_EQUAL","KP_ENTER","KP_NUM_LOCK",
                     "CAPS_LOCK","SCROLL_LOCK","PAUSE","LSUPER","RSUPER","MENU"};
+    
+    void InitFonts();
+    void ShutdownFonts();
 	
 	/****************************************
 	 ****************************************
@@ -245,8 +250,19 @@ namespace Engine {
         real_func->Call(_globalContext->Global(), 3, argv);
 	}
     
-    void OpenWindow(int width, int height, int r, int g, int b, bool fullscreen) {
+    void OpenWindow(int width, int height, int r, int g, int b, bool fullscreen, bool openGL3Context) {
         std::cout << "Loading OpenGL : Init Window/Context" << std::endl;
+        
+        if (openGL3Context) {
+            glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
+            glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
+            glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+            glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            
+            isGL3Context = true;
+        } else {
+            isGL3Context = false;
+        }
         
 		glfwOpenWindow(width, height, r, g, b, 1, 1, 1, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW); // you can resize how ever much you like
         
@@ -267,10 +283,13 @@ namespace Engine {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
         std::cout << "Loaded OpenGL" << std::endl;
+        
+        InitFonts();
     }
     
     void CloseWindow() {
         std::cout << "Terminating Window" << std::endl;
+        ShutdownFonts();
         glfwCloseWindow();
     }
 	
@@ -279,7 +298,7 @@ namespace Engine {
         
 		glfwInit();
         
-        OpenWindow(800, 600, 1, 1, 1, false);
+        OpenWindow(800, 600, 1, 1, 1, false, false);
 	}
 	
 	void ShutdownOpenGL() {
@@ -303,7 +322,7 @@ namespace Engine {
 	}
 	
 	void ShutdownFonts() {
-        
+        _font.release();
 	}
 	
 	// semi-realtime time loading
@@ -392,14 +411,14 @@ namespace Engine {
     void _toggleFullscreen() {
         if (isFullscreen) {
             CloseWindow();
-            OpenWindow(800, 600, 1, 1, 1, false);
+            OpenWindow(800, 600, 1, 1, 1, false, isGL3Context);
             isFullscreen = false;
             UpdateScreen();
         } else {
             GLFWvidmode desktopMode;
             glfwGetDesktopMode(&desktopMode);
             CloseWindow();
-            OpenWindow(desktopMode.Width, desktopMode.Height, desktopMode.RedBits, desktopMode.GreenBits, desktopMode.BlueBits, true);
+            OpenWindow(desktopMode.Width, desktopMode.Height, desktopMode.RedBits, desktopMode.GreenBits, desktopMode.BlueBits, true, isGL3Context);
             isFullscreen = true;
             UpdateScreen();
         }
@@ -441,18 +460,27 @@ namespace Engine {
         
         std::cout << "Saved Screenshot as: " << Filesystem::GetRealPath(_screenshotFilename) << std::endl;
         
+        FreeImage_CloseMemory(mem);
+        
         delete [] pixels;
+    }
+    
+    void upgradeGL3() {
+        int width, height;
+        
+        glfwGetWindowSize(&width, &height);
+        
+        CloseWindow();
+        OpenWindow(width, height, 1, 1, 1, isFullscreen, true);
     }
     
 	// main function
 	
 	int main(int argc, char const *argv[]) {
 		Filesystem::Init(argv[0]);
-		
-		// TODO: split OpenGl, Scripting and Fonts into seprate files
+        
 		InitOpenGL();
 		InitScripting();
-		InitFonts();
         
         FreeImage_Initialise();
 	
@@ -506,7 +534,6 @@ namespace Engine {
 	
 		ShutdownOpenGL();
 		ShutdownScripting();
-		ShutdownFonts();
 
 		Filesystem::Destroy();
 
