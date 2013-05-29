@@ -501,7 +501,7 @@ namespace Engine {
         
         char* buffer = (char*)malloc(sizeof(char) * fileSize);
         
-        FreeImage_ReadMemory(buffer, sizeof(char), fileSize, mem);
+        FreeImage_ReadMemory(buffer, sizeof(char), (unsigned int) fileSize, mem);
         
         Filesystem::WriteFile(_screenshotFilename, buffer, fileSize);
         

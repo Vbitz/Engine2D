@@ -588,7 +588,7 @@ namespace Engine {
             
             const char* file = Filesystem::GetFileContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0), fileSize);
             
-            FIMEMORY* mem = FreeImage_OpenMemory((BYTE*) file, fileSize);
+            FIMEMORY* mem = FreeImage_OpenMemory((BYTE*) file, (unsigned int)fileSize);
             
             FIBITMAP *lImg = FreeImage_LoadFromMemory(FreeImage_GetFileTypeFromMemory(mem), mem);
             
@@ -607,12 +607,15 @@ namespace Engine {
             unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
             unsigned char* texture = new unsigned char[4 * width * height];
 
+            int pos = 0;
+            
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    texture[(x * width + y) * 4 + 0] = pixel[(x * width + y) * 4 + 2];
-                    texture[(x * width + y) * 4 + 1] = pixel[(x * width + y) * 4 + 1];
-                    texture[(x * width + y) * 4 + 2] = pixel[(x * width + y) * 4 + 0];
-                    texture[(x * width + y) * 4 + 3] = pixel[(x * width + y) * 4 + 3];
+                    texture[pos + 0] = pixel[pos + 2];
+                    texture[pos + 1] = pixel[pos + 1];
+                    texture[pos + 2] = pixel[pos + 0];
+                    texture[pos + 3] = pixel[pos + 3];
+                    pos += 4;
                 }
             }
             

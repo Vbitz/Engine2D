@@ -47,7 +47,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file");
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(Filesystem::FileSize(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New((int) Filesystem::FileSize(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(MountFile) {

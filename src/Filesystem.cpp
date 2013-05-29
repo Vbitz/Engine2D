@@ -99,11 +99,11 @@ namespace Engine {
 		char* GetFileContent(std::string path, long &fileSize) {
             if (!IsLoaded()) {
                 std::cout << "FS not loaded" << std::endl;
-                return "";
+                return (char*) "";
             }
 			if (!PHYSFS_exists(path.c_str())) {
 				std::cout << "File does not exist" << std::endl;
-				return "";
+				return (char*) "";
 			}
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
             long len = PHYSFS_fileLength(f);
@@ -112,7 +112,7 @@ namespace Engine {
             while (!PHYSFS_eof(f)) {
                 if (PHYSFS_read(f, &fBuffer[i++], sizeof(char), 1) != 1) {
                     std::cout << "File Read Failed" << std::endl;
-                    return "";
+                    return (char*) "";
                 }
             }
 			PHYSFS_close(f);
@@ -132,7 +132,7 @@ namespace Engine {
                 return;
             }
             PHYSFS_File* f = PHYSFS_openWrite(path.c_str());
-            if (!PHYSFS_write(f, content, sizeof(char), length)) {
+            if (!PHYSFS_write(f, content, sizeof(char), (unsigned int) length)) {
                 std::cout << "File Write Failed" << std::endl;
             }
             PHYSFS_close(f);
