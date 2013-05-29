@@ -1,7 +1,5 @@
 #include "JSDraw.hpp"
 
-#define USING_NEW_RENDERER false
-
 #define BUFFER_SIZE 256
 
 namespace Engine {
@@ -48,7 +46,7 @@ namespace Engine {
         }
         
         void beginRendering(GLenum mode) {
-            if (USING_NEW_RENDERER) {
+            if (usingGL3()) {
                 _currentVerts = 0;
             } else {
                 glBegin(mode);
@@ -57,7 +55,7 @@ namespace Engine {
         }
         
         void endRendering() {
-            if (USING_NEW_RENDERER) {
+            if (usingGL3()) {
                 
             } else {
                 glEnd();
@@ -70,7 +68,7 @@ namespace Engine {
         void addVert(float x, float y, float z, double r, double g, double b, float s, float t);
         
         void addVert(float x, float y, float z) {
-            if (USING_NEW_RENDERER) {
+            if (usingGL3()) {
                 addVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, 0.0, 0.0);
             } else {
                 glVertex3f(x - _centerX, y - _centerY, z);
@@ -79,7 +77,7 @@ namespace Engine {
         }
         
         void addVert(float x, float y, float z, double r, double g, double b) {
-            if (USING_NEW_RENDERER) {
+            if (usingGL3()) {
                 addVert(x, y, z, r, g, b, 0.0, 0.0);
             } else {
                 glColor3f(r, g, b);
@@ -88,7 +86,7 @@ namespace Engine {
         }
         
         void addVert(float x, float y, float z, float s, float t) {
-            if (USING_NEW_RENDERER) {
+            if (usingGL3()) {
                 addVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, s, t);
             } else {
                 glTexCoord2f(s, t);
@@ -97,7 +95,7 @@ namespace Engine {
         }
         
         void addVert(float x, float y, float z, double r, double g, double b, float s, float t) {
-            if (USING_NEW_RENDERER) {
+            if (usingGL3()) {
                 _vertexBuffer[_currentVerts * 3 + 0] = x;
                 _vertexBuffer[_currentVerts * 3 + 1] = y;
                 _vertexBuffer[_currentVerts * 3 + 2] = z;
@@ -135,7 +133,7 @@ namespace Engine {
         }
 		
 		void Begin2d() {
-            if (!USING_NEW_RENDERER) {
+            if (!usingGL3()) {
                 resetMatrix();
             }
 		}
@@ -143,7 +141,7 @@ namespace Engine {
 		void End2d() {
 			glEnable(GL_DEPTH_TEST);
             
-            if (USING_NEW_RENDERER) {
+            if (usingGL3()) {
                 flushAll();
             } else {
                 glPopMatrix();
@@ -156,8 +154,10 @@ namespace Engine {
         ENGINE_JS_METHOD(LoadShader) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARGS_LENGTH(0);
+            ENGINE_CHECK_ARGS_LENGTH(1);
             ENGINE_CHECK_ARG_STRING(0, "Arg0 has to be a filename pointing to a shader");
+            
+            upgradeGL3();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

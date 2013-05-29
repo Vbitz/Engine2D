@@ -23,7 +23,7 @@ namespace Engine {
     bool _startingOpenGL3 = false;
     std::string _fontPath = "fonts/OpenSans-Regular.ttf";
     
-    bool isGL3Context = false;
+    bool isGL3Context;
 	
 	GLFT_Font _font;
 	
@@ -519,6 +519,10 @@ namespace Engine {
         
         CloseWindow();
         OpenWindow(width, height, 1, 1, 1, isFullscreen, true);
+    }
+    
+    bool usingGL3() {
+        return isGL3Context;
     }
     
 	// main function
