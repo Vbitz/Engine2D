@@ -14,7 +14,7 @@ namespace Engine {
 				} else {
 					printf(" ");
 				}
-				v8::String::Utf8Value str(args[i]);
+				v8::String::Utf8Value str(args[i]->ToString());
 				const char* cstr = *str;
 				printf("%s", cstr);
 			}
@@ -63,6 +63,20 @@ namespace Engine {
 			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
             
 			setKeyFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(OnPostLoad) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_FUNCTION(0, "Arg0 is a function to be called once the opengl context is created");
+            
+			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
+            
+			setPostLoadFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

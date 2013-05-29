@@ -20,10 +20,14 @@ function getConfig(str, def) {
 	}
 }
 
-//sys.runFile("script/basic", true);
-sys.runFile("lib/ui", true);
-//sys.runFile("script/uiTest", true);
-//sys.runFile("script/startupNew", true);
-//sys.runFile("script/startupCustomImage", true);
-//sys.runFile("script/gol", true);
-sys.runFile(getConfig("startup", "script/basic"), true);
+sys.setWindowCreateParams(getConfig("window", {}));
+
+var libarys = ["ui"];
+
+for (var i = 0; i < libarys.length; i++) {
+	sys.runFile("lib/" + libarys[i], false);
+}
+
+sys.onPostLoad(function () {
+	sys.runFile(getConfig("startup", "script/basic"), true);
+});

@@ -19,7 +19,8 @@ namespace Engine {
 
 	void 						setDrawFunction(v8::Persistent<v8::Function> func);
     void                        setKeyFunction(v8::Persistent<v8::Function> func);
-
+    void                        setPostLoadFunction(v8::Persistent<v8::Function> func);
+    
 	void						runFile(std::string path, bool persist);
     
     void                        exit();

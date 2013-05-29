@@ -32,6 +32,9 @@
 #define ENGINE_CHECK_ARG_ARRAY(num, errStr) if (!args[num]->IsArray()) {ENGINE_THROW_ARGERROR(errStr);return scope.Close(v8::Undefined());}
 #define ENGINE_GET_ARG_ARRAY(num) v8::Array::Cast(*args[num])
 
+#define ENGINE_CHECK_ARG_OBJECT(num, errStr) if (!args[num]->IsObject()) {ENGINE_THROW_ARGERROR(errStr);return scope.Close(v8::Undefined());}
+#define ENGINE_GET_ARG_OBJECT(num) v8::Object::Cast(*args[num])
+
 #define ENGINE_JS_SCOPE_OPEN v8::HandleScope scope
 #define ENGINE_JS_SCOPE_CLOSE(value) return scope.Close(value)
 #define ENGINE_JS_SCOPE_CLOSE_UNDEFINED return scope.Close(v8::Undefined())

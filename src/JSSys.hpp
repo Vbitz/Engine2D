@@ -13,6 +13,7 @@ namespace Engine {
 
 		ENGINE_JS_METHOD(Drawfunc);
         ENGINE_JS_METHOD(KeyboardFunc);
+        ENGINE_JS_METHOD(OnPostLoad);
         
         ENGINE_JS_METHOD(GetGLVersion);
         ENGINE_JS_METHOD(HasExtention);

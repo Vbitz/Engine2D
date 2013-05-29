@@ -17,6 +17,12 @@ namespace Engine {
 	int _screenWidth = 0;
 	int _screenHeight = 0;
     
+    int _startingWidth = 800;
+    int _startingHeight = 600;
+    bool _startingFullscreen = false;
+    bool _startingOpenGL3 = false;
+    std::string _fontPath = "fonts/OpenSans-Regular.ttf";
+    
     bool isGL3Context = false;
 	
 	GLFT_Font _font;
@@ -30,6 +36,7 @@ namespace Engine {
 	
 	v8::Persistent<v8::Function> _drawFunc;
 	v8::Persistent<v8::Function> _keyboardFunc;
+    v8::Persistent<v8::Function> _onPostLoadFunc;
     
 	std::map<std::string, long> _loadedFiles;
     
@@ -44,6 +51,8 @@ namespace Engine {
     
     void InitFonts();
     void ShutdownFonts();
+    
+    ENGINE_JS_METHOD(SetWindowInitParams);
 	
 	/****************************************
 	 ****************************************
@@ -84,41 +93,42 @@ namespace Engine {
 	
 			addItem(sysTable, "drawFunc", JsSys::Drawfunc);
             addItem(sysTable, "keyboardFunc", JsSys::KeyboardFunc);
+            addItem(sysTable, "onPostLoad", JsSys::OnPostLoad);
+        
+            addItem(sysTable, "microtime", JsSys::Microtime);
+        
+            addItem(sysTable, "heapStats", JsSys::HeapStats);
+        
+            addItem(sysTable, "exit", JsSys::Exit);
         
             addItem(sysTable, "getGLVersion", JsSys::GetGLVersion);
             addItem(sysTable, "hasExtention", JsSys::HasExtention);
         
             addItem(sysTable, "saveScreenshot", JsSys::SaveScreenshot);
         
-            addItem(sysTable, "microtime", JsSys::Microtime);
-        
             addItem(sysTable, "resizeWindow", JsSys::ResizeWindow);
-        
-            addItem(sysTable, "heapStats", JsSys::HeapStats);
-        
             addItem(sysTable, "toggleFullscreen", JsSys::ToggleFullscreen);
         
-            addItem(sysTable, "exit", JsSys::Exit);
+            addItem(sysTable, "setWindowCreateParams", SetWindowInitParams);
         
         sysTable->Set("platform", v8::String::New(_PLATFORM));
 	
 		global->Set("sys", sysTable);
-	
-		// drawTable
-		v8::Handle<v8::ObjectTemplate> drawTable = v8::ObjectTemplate::New();
         
-			addItem(drawTable, "rect", JsDraw::Rect);
-			addItem(drawTable, "grid", JsDraw::Grid);
-			addItem(drawTable, "grad", JsDraw::Grad);
-			addItem(drawTable, "setColorF", JsDraw::SetColorF);
-			addItem(drawTable, "setColor", JsDraw::SetColor);
-			addItem(drawTable, "setColorI", JsDraw::SetColorI);
-			addItem(drawTable, "clearColor", JsDraw::ClearColor);
-			addItem(drawTable, "print", JsDraw::Print);
+        v8::Handle<v8::ObjectTemplate> drawTable = v8::ObjectTemplate::New();
+        
+            addItem(drawTable, "rect", JsDraw::Rect);
+            addItem(drawTable, "grid", JsDraw::Grid);
+            addItem(drawTable, "grad", JsDraw::Grad);
+            addItem(drawTable, "setColorF", JsDraw::SetColorF);
+            addItem(drawTable, "setColor", JsDraw::SetColor);
+            addItem(drawTable, "setColorI", JsDraw::SetColorI);
+            addItem(drawTable, "clearColor", JsDraw::ClearColor);
+            addItem(drawTable, "print", JsDraw::Print);
         
             addItem(drawTable, "draw", JsDraw::Draw);
             addItem(drawTable, "drawSub", JsDraw::DrawSub);
-			addItem(drawTable, "openImage", JsDraw::OpenImage);
+            addItem(drawTable, "openImage", JsDraw::OpenImage);
             addItem(drawTable, "createImage", JsDraw::CreateImage);
             addItem(drawTable, "freeImage", JsDraw::FreeImage);
         
@@ -132,15 +142,8 @@ namespace Engine {
             addItem(drawTable, "getVerts", JsDraw::GetVerts);
             addItem(drawTable, "setDrawOffscreen", JsDraw::SetDrawOffscreen);
             addItem(drawTable, "setCenter", JsDraw::SetCenter);
-	
-		global->Set("draw", drawTable);
-	
-		// inputTable
-		v8::Handle<v8::ObjectTemplate> inputTable = v8::ObjectTemplate::New();
-	
-            addItem(inputTable, "keyDown", JsInput::KeyDown);
         
-		global->Set("input", inputTable);
+		global->Set("draw", drawTable);
         
         // fsTable
         v8::Handle<v8::ObjectTemplate> fsTable = v8::ObjectTemplate::New();
@@ -163,6 +166,12 @@ namespace Engine {
             addItem(dbTable, "execPrepare", JSDatabase::ExecPrepare);
         
         global->Set("db", dbTable);
+        
+        v8::Handle<v8::ObjectTemplate> inputTable = v8::ObjectTemplate::New();
+        
+            addItem(inputTable, "keyDown", JsInput::KeyDown);
+        
+		global->Set("input", inputTable);
 
 		_globalContext = v8::Context::New(NULL, global);
 
@@ -250,6 +259,38 @@ namespace Engine {
         real_func->Call(_globalContext->Global(), 3, argv);
 	}
     
+    ENGINE_JS_METHOD(SetWindowInitParams) {
+        ENGINE_JS_SCOPE_OPEN;
+        
+        ENGINE_CHECK_ARGS_LENGTH(1);
+        
+        ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is the object to set the window creation values with");
+        
+        v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
+        
+        if (obj->Has(v8::String::NewSymbol("width")) && obj->Get(v8::String::NewSymbol("width"))->IsInt32()) {
+            _startingWidth = obj->Get(v8::String::NewSymbol("width"))->Int32Value();
+        }
+        
+        if (obj->Has(v8::String::NewSymbol("height")) && obj->Get(v8::String::NewSymbol("height"))->IsInt32()) {
+            _startingHeight = obj->Get(v8::String::NewSymbol("height"))->Int32Value();
+        }
+        
+        if (obj->Has(v8::String::NewSymbol("fullscreen")) && obj->Get(v8::String::NewSymbol("fullscreen"))->IsBoolean()) {
+            _startingFullscreen = obj->Get(v8::String::NewSymbol("fullscreen"))->BooleanValue();
+        }
+        
+        if (obj->Has(v8::String::NewSymbol("openGL3")) && obj->Get(v8::String::NewSymbol("openGL3"))->IsBoolean()) {
+            _startingFullscreen = obj->Get(v8::String::NewSymbol("openGL3"))->BooleanValue();
+        }
+        
+        if (obj->Has(v8::String::NewSymbol("fontPath")) && obj->Get(v8::String::NewSymbol("fontPath"))->IsString()) {
+            _fontPath = std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("fontPath"))->ToString()));
+        }
+        
+        ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+    }
+    
     void OpenWindow(int width, int height, int r, int g, int b, bool fullscreen, bool openGL3Context) {
         std::cout << "Loading OpenGL : Init Window/Context" << std::endl;
         
@@ -298,7 +339,7 @@ namespace Engine {
         
 		glfwInit();
         
-        OpenWindow(800, 600, 1, 1, 1, false, false);
+        OpenWindow(_startingWidth, _startingHeight, 1, 1, 1, _startingFullscreen, _startingOpenGL3);
 	}
 	
 	void ShutdownOpenGL() {
@@ -309,11 +350,10 @@ namespace Engine {
 	// font rendering
 	
 	void InitFonts() {
-        std::cout << "Loading Font" << std::endl;
-        std::string filePath = "fonts/OpenSans-Regular.ttf";
-		if (Filesystem::FileExists(filePath)) {
+        std::cout << "Loading Font: " << _fontPath << std::endl;
+		if (Filesystem::FileExists(_fontPath)) {
             long fileSize = 0;
-            char* file = Filesystem::GetFileContent(filePath, fileSize);
+            char* file = Filesystem::GetFileContent(_fontPath, fileSize);
 			_font.open(file, fileSize, 16);
 		} else {
 			std::cout << "Could not load font" << std::endl;
@@ -359,6 +399,10 @@ namespace Engine {
         _keyboardFunc = func;
     }
     
+    void setPostLoadFunction(v8::Persistent<v8::Function> func) {
+        _onPostLoadFunc = func;
+    }
+    
 	bool _runFile(std::string path, bool persist) {
         v8::HandleScope handle_scope;
         
@@ -371,7 +415,7 @@ namespace Engine {
 		v8::TryCatch tryCatch;
 
 		v8::Handle<v8::Script> script = v8::Script::Compile(
-			v8::String::New(inputScript));
+            v8::String::New(inputScript), v8::String::New(path.c_str()));
 
 		if (script.IsEmpty()) {
 			std::cout << "Could not Load file" << std::endl;
@@ -479,8 +523,11 @@ namespace Engine {
 	int main(int argc, char const *argv[]) {
 		Filesystem::Init(argv[0]);
         
+        InitScripting();
 		InitOpenGL();
-		InitScripting();
+        if (!_onPostLoadFunc.IsEmpty()) {
+            CallFunction(_onPostLoadFunc);
+        }
         
         FreeImage_Initialise();
 	
