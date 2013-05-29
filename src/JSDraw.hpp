@@ -21,6 +21,7 @@ namespace Engine {
 		ENGINE_JS_METHOD(SetColor);
 		ENGINE_JS_METHOD(SetColorI);
 		ENGINE_JS_METHOD(ClearColor);
+        ENGINE_JS_METHOD(GetRGBFromHSV);
 		ENGINE_JS_METHOD(Print);
         
         ENGINE_JS_METHOD(Draw);

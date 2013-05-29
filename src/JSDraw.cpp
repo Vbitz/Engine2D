@@ -348,6 +348,81 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
+        
+        ENGINE_JS_METHOD(GetRGBFromHSV) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Hue Component between 0 and 360");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Saturation Component between 0.0f and 1.0f");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Value Component between 0.0f and 1.0f");
+            
+            v8::Handle<v8::Object> ret = v8::Object::New();
+            
+            float hue = ENGINE_GET_ARG_NUMBER_VALUE(0),
+                saturation = ENGINE_GET_ARG_NUMBER_VALUE(1),
+                value = ENGINE_GET_ARG_NUMBER_VALUE(2);
+            
+            double hh, p, q, t, ff;
+            long i;
+            
+            if(saturation <= 0.0) {       // < is bogus, just shuts up warnings
+                if(std::isnan(hue)) {   // in.h == NAN
+                    ret->Set(v8::String::New("r"), v8::Number::New(value));
+                    ret->Set(v8::String::New("g"), v8::Number::New(value));
+                    ret->Set(v8::String::New("b"), v8::Number::New(value));
+                    ENGINE_JS_SCOPE_CLOSE(ret);
+                }
+                // error - should never happen
+                ret->Set(v8::String::New("r"), v8::Number::New(0.0f));
+                ret->Set(v8::String::New("g"), v8::Number::New(0.0f));
+                ret->Set(v8::String::New("b"), v8::Number::New(0.0f));
+                ENGINE_JS_SCOPE_CLOSE(ret);
+            }
+            hh = hue;
+            if(hh >= 360.0) hh = 0.0;
+            hh /= 60.0;
+            i = (long)hh;
+            ff = hh - i;
+            p = value * (1.0 - saturation);
+            q = value * (1.0 - (saturation * ff));
+            t = value * (1.0 - (saturation * (1.0 - ff)));
+            
+            switch(i) {
+                case 0:
+                    ret->Set(v8::String::New("r"), v8::Number::New(value));
+                    ret->Set(v8::String::New("g"), v8::Number::New(t));
+                    ret->Set(v8::String::New("b"), v8::Number::New(p));
+                    ENGINE_JS_SCOPE_CLOSE(ret);
+                case 1:
+                    ret->Set(v8::String::New("r"), v8::Number::New(q));
+                    ret->Set(v8::String::New("g"), v8::Number::New(value));
+                    ret->Set(v8::String::New("b"), v8::Number::New(p));
+                    ENGINE_JS_SCOPE_CLOSE(ret);
+                case 2:
+                    ret->Set(v8::String::New("r"), v8::Number::New(p));
+                    ret->Set(v8::String::New("g"), v8::Number::New(value));
+                    ret->Set(v8::String::New("b"), v8::Number::New(t));
+                    ENGINE_JS_SCOPE_CLOSE(ret);
+                case 3:
+                    ret->Set(v8::String::New("r"), v8::Number::New(p));
+                    ret->Set(v8::String::New("g"), v8::Number::New(q));
+                    ret->Set(v8::String::New("b"), v8::Number::New(value));
+                    ENGINE_JS_SCOPE_CLOSE(ret);
+                case 4:
+                    ret->Set(v8::String::New("r"), v8::Number::New(t));
+                    ret->Set(v8::String::New("g"), v8::Number::New(p));
+                    ret->Set(v8::String::New("b"), v8::Number::New(value));
+                    ENGINE_JS_SCOPE_CLOSE(ret);
+                case 5:
+                default:
+                    ret->Set(v8::String::New("r"), v8::Number::New(value));
+                    ret->Set(v8::String::New("g"), v8::Number::New(p));
+                    ret->Set(v8::String::New("b"), v8::Number::New(q));
+                    ENGINE_JS_SCOPE_CLOSE(ret);
+            }
+        }
 		
 		ENGINE_JS_METHOD(ClearColor) {
             ENGINE_JS_SCOPE_OPEN;

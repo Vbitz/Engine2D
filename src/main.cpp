@@ -124,6 +124,7 @@ namespace Engine {
             addItem(drawTable, "setColor", JsDraw::SetColor);
             addItem(drawTable, "setColorI", JsDraw::SetColorI);
             addItem(drawTable, "clearColor", JsDraw::ClearColor);
+            addItem(drawTable, "getRGBFromHSV", JsDraw::GetRGBFromHSV);
             addItem(drawTable, "print", JsDraw::Print);
         
             addItem(drawTable, "draw", JsDraw::Draw);
@@ -281,7 +282,7 @@ namespace Engine {
         }
         
         if (obj->Has(v8::String::NewSymbol("openGL3")) && obj->Get(v8::String::NewSymbol("openGL3"))->IsBoolean()) {
-            _startingFullscreen = obj->Get(v8::String::NewSymbol("openGL3"))->BooleanValue();
+            _startingOpenGL3 = obj->Get(v8::String::NewSymbol("openGL3"))->BooleanValue();
         }
         
         if (obj->Has(v8::String::NewSymbol("fontPath")) && obj->Get(v8::String::NewSymbol("fontPath"))->IsString()) {
@@ -304,6 +305,8 @@ namespace Engine {
         } else {
             isGL3Context = false;
         }
+        
+        glfwEnable(GLFW_SYSTEM_KEYS);
         
 		glfwOpenWindow(width, height, r, g, b, 1, 1, 1, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW); // you can resize how ever much you like
         
