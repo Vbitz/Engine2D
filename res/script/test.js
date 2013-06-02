@@ -9,7 +9,7 @@ var tests = {
 		db.open("test.db");
 
 		db.exec("DROP TABLE IF EXISTS testing");
-		db.exec("CREATE TABLE IF NOT EXISTS testing(t1 TEXT)");
+		db.exec("CREATE TABLE testing(t1 TEXT)");
 		db.exec("INSERT INTO testing VALUES('hello world')");
 
 		return db.execPrepare("SELECT * FROM testing")[0].t1 === "hello world";

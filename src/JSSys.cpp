@@ -178,6 +178,33 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
+        
+#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+        
+        void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {
+			addItem(sysTable, "println", Println);
+			addItem(sysTable, "runFile", RunFile);
+            
+			addItem(sysTable, "drawFunc", Drawfunc);
+            addItem(sysTable, "keyboardFunc", KeyboardFunc);
+            addItem(sysTable, "onPostLoad", OnPostLoad);
+            
+            addItem(sysTable, "microtime", Microtime);
+            
+            addItem(sysTable, "heapStats", HeapStats);
+            
+            addItem(sysTable, "exit", Exit);
+            
+            addItem(sysTable, "getGLVersion", GetGLVersion);
+            addItem(sysTable, "hasExtention", HasExtention);
+            
+            addItem(sysTable, "saveScreenshot", SaveScreenshot);
+            
+            addItem(sysTable, "resizeWindow", ResizeWindow);
+            addItem(sysTable, "toggleFullscreen", ToggleFullscreen);
+        }
+        
+#undef addItem
 
 	}
 

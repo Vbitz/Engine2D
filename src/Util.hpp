@@ -45,15 +45,17 @@ namespace Engine {
         bool oneError = false;
         while ((err = glGetError()) != GL_NO_ERROR) {
             oneError = true;
-            std::cerr << "GLError in " << source << std::endl;
+            std::cerr << "GLError in " << source << " : ";
             if (err == GL_INVALID_ENUM) {
-                std::cerr << "INVALID ENUM!" << std::endl;
+                std::cerr << "Invalid Enum!" << std::endl;
             } else if (err == GL_INVALID_VALUE) {
                 std::cerr << "Invalid value!" << std::endl;
             } else if (err == GL_INVALID_OPERATION) {
                 std::cerr << "Invalid operation!" << std::endl;
             } else if (err == GL_OUT_OF_MEMORY) {
-                std::cerr << "Out of Memory" << std::endl;
+                std::cerr << "Out of Memory!" << std::endl;
+            } else {
+                std::cerr << "Unknown Error: " << err << std::endl;
             }
         }
         return oneError;

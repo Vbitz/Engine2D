@@ -6,8 +6,6 @@
 
 namespace Engine {
     namespace JSDatabase {
-        ENGINE_JS_METHOD(SetDatabaseFilename);
-        ENGINE_JS_METHOD(Exec);
-        ENGINE_JS_METHOD(ExecPrepare);
+        void InitDatabase(v8::Handle<v8::ObjectTemplate> dbTable);
     }
 }

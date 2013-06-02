@@ -1,5 +1,5 @@
 {
-	"startup": "script/gl3Test",
+	"startup": "script/test",
 	"window": {
 		"width": 1000,
 		"height": 600,

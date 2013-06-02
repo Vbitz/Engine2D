@@ -6,29 +6,9 @@
 namespace Engine {
 
 	namespace JsSys {
-
-		ENGINE_JS_METHOD(Println);
+        ENGINE_JS_METHOD(Println);
         
-		ENGINE_JS_METHOD(RunFile);
-
-		ENGINE_JS_METHOD(Drawfunc);
-        ENGINE_JS_METHOD(KeyboardFunc);
-        ENGINE_JS_METHOD(OnPostLoad);
-        
-        ENGINE_JS_METHOD(GetGLVersion);
-        ENGINE_JS_METHOD(HasExtention);
-        
-        ENGINE_JS_METHOD(SaveScreenshot);
-        
-        ENGINE_JS_METHOD(Microtime);
-        
-        ENGINE_JS_METHOD(ResizeWindow);
-        
-        ENGINE_JS_METHOD(HeapStats);
-        
-        ENGINE_JS_METHOD(ToggleFullscreen);
-        
-        ENGINE_JS_METHOD(Exit);
+        void InitSys(v8::Handle<v8::ObjectTemplate> sysTable);
 	}
 
 }

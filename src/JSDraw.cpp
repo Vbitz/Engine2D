@@ -451,11 +451,16 @@ namespace Engine {
 
             const char* str = *ENGINE_GET_ARG_CSTRING_VALUE(2);
 		
-			glEnable(GL_TEXTURE_2D);
+			// As it turns out calling glGetError here will cause the text not to draw, strange.
+            
+            glEnable(GL_TEXTURE_2D);
             glColor3f(_currentColorR, _currentColorG, _currentColorB);
+            
 			getFont()->beginDraw(ENGINE_GET_ARG_NUMBER_VALUE(0) - _centerX,
                                  ENGINE_GET_ARG_NUMBER_VALUE(1) - _centerY) << str << getFont()->endDraw();
 			glDisable(GL_TEXTURE_2D);
+            
+            CheckGLError("postPrint");
             
             _polygons += strlen(str) * 4;
 		
@@ -820,6 +825,41 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
+        
+#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+        
+        void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
+            addItem(drawTable, "loadShader", LoadShader);
+            
+            addItem(drawTable, "rect", Rect);
+            addItem(drawTable, "grid", Grid);
+            addItem(drawTable, "grad", Grad);
+            addItem(drawTable, "setColorF", SetColorF);
+            addItem(drawTable, "setColor", SetColor);
+            addItem(drawTable, "setColorI", SetColorI);
+            addItem(drawTable, "clearColor", ClearColor);
+            addItem(drawTable, "getRGBFromHSV", GetRGBFromHSV);
+            addItem(drawTable, "print", Print);
+            
+            addItem(drawTable, "draw", Draw);
+            addItem(drawTable, "drawSub", DrawSub);
+            addItem(drawTable, "openImage", OpenImage);
+            addItem(drawTable, "createImage", CreateImage);
+            addItem(drawTable, "freeImage", FreeImage);
+            
+            addItem(drawTable, "cameraReset", CameraReset);
+            addItem(drawTable, "cameraPan", CameraPan);
+            addItem(drawTable, "cameraZoom", CameraZoom);
+            addItem(drawTable, "cameraRotate", CameraRotate);
+            
+            addItem(drawTable, "getTextWidth", GetTextWidth);
+            
+            addItem(drawTable, "getVerts", GetVerts);
+            addItem(drawTable, "setDrawOffscreen", SetDrawOffscreen);
+            addItem(drawTable, "setCenter", SetCenter);
+        }
+        
+#undef addItem
 
 	} // namespace JsDraw
 } // namespace Engine

@@ -54,20 +54,8 @@ namespace Engine {
     
     ENGINE_JS_METHOD(SetWindowInitParams);
 	
-	/****************************************
-	 ****************************************
-	 **************************************** 
-	
-		Scripting Defines
-		=================
-		I should really have each file return it's own table
-	
-	 ****************************************
-	 ****************************************
-	 ****************************************/
-	
-	#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct)) 
-	
+#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+    
 	void InitScripting() {
         std::cout << "Loading Scripting" << std::endl;
         
@@ -87,90 +75,40 @@ namespace Engine {
         
 		// sysTable
 		v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
-	
-			addItem(sysTable, "println", JsSys::Println);
-			addItem(sysTable, "runFile", JsSys::RunFile);
-	
-			addItem(sysTable, "drawFunc", JsSys::Drawfunc);
-            addItem(sysTable, "keyboardFunc", JsSys::KeyboardFunc);
-            addItem(sysTable, "onPostLoad", JsSys::OnPostLoad);
         
-            addItem(sysTable, "microtime", JsSys::Microtime);
-        
-            addItem(sysTable, "heapStats", JsSys::HeapStats);
-        
-            addItem(sysTable, "exit", JsSys::Exit);
-        
-            addItem(sysTable, "getGLVersion", JsSys::GetGLVersion);
-            addItem(sysTable, "hasExtention", JsSys::HasExtention);
-        
-            addItem(sysTable, "saveScreenshot", JsSys::SaveScreenshot);
-        
-            addItem(sysTable, "resizeWindow", JsSys::ResizeWindow);
-            addItem(sysTable, "toggleFullscreen", JsSys::ToggleFullscreen);
+            JsSys::InitSys(sysTable);
         
             addItem(sysTable, "setWindowCreateParams", SetWindowInitParams);
         
-        sysTable->Set("platform", v8::String::New(_PLATFORM));
+            sysTable->Set("platform", v8::String::New(_PLATFORM));
 	
 		global->Set("sys", sysTable);
         
+        // drawTable
         v8::Handle<v8::ObjectTemplate> drawTable = v8::ObjectTemplate::New();
         
-            addItem(drawTable, "rect", JsDraw::Rect);
-            addItem(drawTable, "grid", JsDraw::Grid);
-            addItem(drawTable, "grad", JsDraw::Grad);
-            addItem(drawTable, "setColorF", JsDraw::SetColorF);
-            addItem(drawTable, "setColor", JsDraw::SetColor);
-            addItem(drawTable, "setColorI", JsDraw::SetColorI);
-            addItem(drawTable, "clearColor", JsDraw::ClearColor);
-            addItem(drawTable, "getRGBFromHSV", JsDraw::GetRGBFromHSV);
-            addItem(drawTable, "print", JsDraw::Print);
-        
-            addItem(drawTable, "draw", JsDraw::Draw);
-            addItem(drawTable, "drawSub", JsDraw::DrawSub);
-            addItem(drawTable, "openImage", JsDraw::OpenImage);
-            addItem(drawTable, "createImage", JsDraw::CreateImage);
-            addItem(drawTable, "freeImage", JsDraw::FreeImage);
-        
-            addItem(drawTable, "cameraReset", JsDraw::CameraReset);
-            addItem(drawTable, "cameraPan", JsDraw::CameraPan);
-            addItem(drawTable, "cameraZoom", JsDraw::CameraZoom);
-            addItem(drawTable, "cameraRotate", JsDraw::CameraRotate);
-        
-            addItem(drawTable, "getTextWidth", JsDraw::GetTextWidth);
-        
-            addItem(drawTable, "getVerts", JsDraw::GetVerts);
-            addItem(drawTable, "setDrawOffscreen", JsDraw::SetDrawOffscreen);
-            addItem(drawTable, "setCenter", JsDraw::SetCenter);
+            JsDraw::InitDraw(drawTable);
         
 		global->Set("draw", drawTable);
         
         // fsTable
         v8::Handle<v8::ObjectTemplate> fsTable = v8::ObjectTemplate::New();
         
-            addItem(fsTable, "readFile", JsFS::ReadFile);
-            addItem(fsTable, "writeFile", JsFS::WriteFile);
-            addItem(fsTable, "fileExists", JsFS::FileExists);
-            addItem(fsTable, "fileSize", JsFS::FileSize);
-            addItem(fsTable, "mountFile", JsFS::MountFile);
-            addItem(fsTable, "configDir", JsFS::ConfigDir);
-            addItem(fsTable, "mkdir", JsFS::Mkdir);
+            JsFS::InitFS(fsTable);
         
         global->Set("fs", fsTable);
         
         // dbTable
         v8::Handle<v8::ObjectTemplate> dbTable = v8::ObjectTemplate::New();
         
-            addItem(dbTable, "open", JSDatabase::SetDatabaseFilename);
-            addItem(dbTable, "exec", JSDatabase::Exec);
-            addItem(dbTable, "execPrepare", JSDatabase::ExecPrepare);
+            JSDatabase::InitDatabase(dbTable);
         
         global->Set("db", dbTable);
         
+        // inputTable
         v8::Handle<v8::ObjectTemplate> inputTable = v8::ObjectTemplate::New();
         
-            addItem(inputTable, "keyDown", JsInput::KeyDown);
+            JsInput::InitInput(inputTable);
         
 		global->Set("input", inputTable);
 
@@ -181,7 +119,7 @@ namespace Engine {
         std::cout << "Loaded Scripting" << std::endl;
 	}
 	
-	#undef addItem
+#undef addItem
 	
 	void ShutdownScripting() {
 		_globalIsolate->Exit();
@@ -231,7 +169,8 @@ namespace Engine {
 			UpdateScreen();
 		}
 		glViewport(0, 0, w, h);
-	}
+        CheckGLError("Post Viewpoint");
+    }
 	
 	void KeyPress(int key, int state) {
         if (_keyboardFunc.IsEmpty()) {
@@ -298,7 +237,6 @@ namespace Engine {
         if (openGL3Context) {
             glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
             glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
-            glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
             glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             
             isGL3Context = true;
@@ -312,19 +250,37 @@ namespace Engine {
         
         std::cout << "Loading OpenGL : Init GLEW" << std::endl;
         
-        glewInit();
+        CheckGLError("PostCreateContext");
+        
+        glewExperimental = GL_TRUE;
+        
+        GLenum err = glewInit();
+        
+        if (err != GLEW_OK) {
+            std::cout << "Error starting GLEW: " << glewGetErrorString(err) << std::endl;
+        }
+        
+        glGetError();
         
         std::cout << "Loading OpenGL : Init Callbacks" << std::endl;
         
-		glfwSetWindowSizeCallback(ResizeWindow);
+        glfwSetWindowSizeCallback(ResizeWindow);
 		glfwSetKeyCallback(KeyPress);
         
         std::cout << "Loading OpenGL : Init OpenGL State" << std::endl;
         
+        CheckGLError("PostSetCallback");
+        
 		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_LIGHTING);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        if (!isGL3Context) {
+            glDisable(GL_LIGHTING);
+        }
+        
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        CheckGLError("PostSetupContext");
         
         std::cout << "Loaded OpenGL" << std::endl;
         
@@ -353,7 +309,15 @@ namespace Engine {
 	// font rendering
 	
 	void InitFonts() {
+        if (isGL3Context) {
+            std::cout << "Skip loading fonts on OpenGL3.x" << std::endl;
+            return;
+        }
+        
         std::cout << "Loading Font: " << _fontPath << std::endl;
+        
+        CheckGLError("PreLoadFont");
+        
 		if (Filesystem::FileExists(_fontPath)) {
             long fileSize = 0;
             char* file = Filesystem::GetFileContent(_fontPath, fileSize);
@@ -361,6 +325,9 @@ namespace Engine {
 		} else {
 			std::cout << "Could not load font" << std::endl;
 		}
+        
+        CheckGLError("PostLoadFont");
+        
         std::cout << "Loaded Font" << std::endl;
 	}
 	
@@ -559,11 +526,11 @@ namespace Engine {
 	
 			JsDraw::Begin2d();
 	
-			if (!_drawFunc.IsEmpty()) {
+            if (!_drawFunc.IsEmpty()) {
 				CallFunction(_drawFunc);
 			}
-	
-			JsDraw::End2d();
+            
+            JsDraw::End2d();
 	
 			glfwSwapBuffers();
             

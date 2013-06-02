@@ -93,5 +93,20 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
+        
+#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+        
+        void InitFS(v8::Handle<v8::ObjectTemplate> fsTable) {
+            addItem(fsTable, "readFile", ReadFile);
+            addItem(fsTable, "writeFile", WriteFile);
+            addItem(fsTable, "fileExists", FileExists);
+            addItem(fsTable, "fileSize", FileSize);
+            addItem(fsTable, "mountFile", MountFile);
+            addItem(fsTable, "configDir", ConfigDir);
+            addItem(fsTable, "mkdir", Mkdir);
+        }
+        
+#undef addItem
+        
     }
 }

@@ -6,7 +6,7 @@
 namespace Engine {
     
 	namespace JsInput {
-		ENGINE_JS_METHOD(KeyDown);
+		void InitInput(v8::Handle<v8::ObjectTemplate> inputTable);
 	}
     
 }

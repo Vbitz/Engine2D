@@ -40,6 +40,8 @@
     #endif
 #endif
 
+#include <glm/glm.hpp>
+
 #include <FreeImage.h>
 
 #include "extern/GLFT_Font.hpp"

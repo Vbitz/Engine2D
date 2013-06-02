@@ -63,5 +63,15 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE(arr);
         }
+        
+#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+        
+        void InitDatabase(v8::Handle<v8::ObjectTemplate> dbTable) {
+            addItem(dbTable, "open", SetDatabaseFilename);
+            addItem(dbTable, "exec", Exec);
+            addItem(dbTable, "execPrepare", ExecPrepare);
+        }
+        
+#undef addItem
     }
 }

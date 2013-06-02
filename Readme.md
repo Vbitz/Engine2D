@@ -9,3 +9,14 @@ Todo
 - Create Compile Guide
 - Add sqlite3 to the repo
 - Update Documentation
+
+OpenGL3.2 Checklist
+--------------------
+- Starts (Done 30/05/2013)
+- Fonts (Broken, need a better way to render fonts)
+- Rectangles
+- Gradients
+- Grid
+- CreateImage
+- OpenImage
+- DrawImage

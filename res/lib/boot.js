@@ -2,7 +2,7 @@
 
 var str = fs.readFile("config/config.json");
 
-console.log(str);
+console.log("Current Config: " + str);
 
 var globalConfig = {};
 
