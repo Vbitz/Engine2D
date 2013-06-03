@@ -1,155 +1,8 @@
 #include "JSDraw.hpp"
 
-#define BUFFER_SIZE 256
-
 namespace Engine {
 
 	namespace JsDraw {
-        bool _drawOffScreen = true;
-		
-		double _currentColorR = 1.0f;
-		double _currentColorG = 1.0f;
-		double _currentColorB = 1.0f;
-        
-        int _polygons = 0;
-        int _drawCalls = 0;
-        
-        int _centerX = 0;
-        int _centerY = 0;
-        
-        int _currentVerts = 0;
-        
-        float _vertexBuffer[BUFFER_SIZE * 3];
-        float _colorBuffer[BUFFER_SIZE * 4];
-        float _texCoardBuffer[BUFFER_SIZE * 2];
-        
-        float clamp(float val, float min, float max) {
-            if (val != val) {
-                return 0.0f; // handle nan
-            } else if (val < min) {
-                return min;
-            } else if (val > max) {
-                return max;
-            }
-            return val;
-        }
-        
-        void resetMatrix() {
-            glPushMatrix();
-			glDisable(GL_DEPTH_TEST);
-			glLoadIdentity();
-			glOrtho(0, getScreenWidth(), getScreenHeight(), 0, 1, -1);
-        }
-        
-        bool isOffscreen(int x, int y, int w, int h) {
-            return false;
-        }
-        
-        void beginRendering(GLenum mode) {
-            if (usingGL3()) {
-                _currentVerts = 0;
-            } else {
-                glBegin(mode);
-                glColor3f(_currentColorR, _currentColorG, _currentColorB);
-            }
-        }
-        
-        void endRendering() {
-            if (usingGL3()) {
-                
-            } else {
-                glEnd();
-            }
-        }
-        
-        void addVert(float x, float y, float z);
-        void addVert(float x, float y, float z, double r, double g, double b);
-        void addVert(float x, float y, float z, float s, float t);
-        void addVert(float x, float y, float z, double r, double g, double b, float s, float t);
-        
-        void addVert(float x, float y, float z) {
-            if (usingGL3()) {
-                addVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, 0.0, 0.0);
-            } else {
-                glVertex3f(x - _centerX, y - _centerY, z);
-                _polygons++;
-            }
-        }
-        
-        void addVert(float x, float y, float z, double r, double g, double b) {
-            if (usingGL3()) {
-                addVert(x, y, z, r, g, b, 0.0, 0.0);
-            } else {
-                glColor3f(r, g, b);
-                addVert(x, y, z);
-            }
-        }
-        
-        void addVert(float x, float y, float z, float s, float t) {
-            if (usingGL3()) {
-                addVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, s, t);
-            } else {
-                glTexCoord2f(s, t);
-                addVert(x, y, z);
-            }
-        }
-        
-        void addVert(float x, float y, float z, double r, double g, double b, float s, float t) {
-            if (usingGL3()) {
-                _vertexBuffer[_currentVerts * 3 + 0] = x;
-                _vertexBuffer[_currentVerts * 3 + 1] = y;
-                _vertexBuffer[_currentVerts * 3 + 2] = z;
-                _colorBuffer[_currentVerts * 4 + 0] = r;
-                _colorBuffer[_currentVerts * 4 + 1] = g;
-                _colorBuffer[_currentVerts * 4 + 2] = b;
-                _colorBuffer[_currentVerts * 4 + 3] = 1.0f;
-                _texCoardBuffer[_currentVerts * 2 + 0] = s;
-                _texCoardBuffer[_currentVerts * 2 + 0] = t;
-                _currentVerts++;
-            } else {
-                glTexCoord2f(s, t);
-                addVert(x, y, z, r, g, b);
-            }
-        }
-        
-        void enableTexture(int texId) {
-            glEnable(GL_TEXTURE_2D);
-            
-            glBindTexture(GL_TEXTURE_2D, texId);
-        } 
-        
-        void disableTexture() {
-            glBindTexture(GL_TEXTURE_2D, 0);
-            
-            glDisable(GL_TEXTURE_2D);
-        }
-        
-        bool isValidTextureID(int texID) {
-            return glIsTexture(texID);
-        }
-        
-        void flushAll() {
-            
-        }
-		
-		void Begin2d() {
-            if (!usingGL3()) {
-                resetMatrix();
-            }
-		}
-		
-		void End2d() {
-			glEnable(GL_DEPTH_TEST);
-            
-            if (usingGL3()) {
-                flushAll();
-            } else {
-                glPopMatrix();
-            }
-            
-            _polygons = 0;
-            _drawCalls = 0;
-		}
 		
         ENGINE_JS_METHOD(LoadShader) {
             ENGINE_JS_SCOPE_OPEN;
@@ -179,16 +32,13 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
-            if (isOffscreen(x, y, w, h)) {
+            if (Draw2D::IsOffscreen(x, y, w, h)) {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            beginRendering(GL_QUADS);
-				addVert(x, y, 0);
-				addVert(x + w, y, 0);
-				addVert(x + w, y + h, 0);
-				addVert(x, y + h, 0);
-            endRendering();
+            Draw2D::Rect(x, y, w, h);
+            
+            Draw2D::CheckGLError("postRect");
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -210,17 +60,11 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
-            if (isOffscreen(x, y, w, h)) {
+            if (Draw2D::IsOffscreen(x, y, w, h)) {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            beginRendering(GL_LINE_LOOP);
-                addVert(x, y, 0);
-                addVert(x + w, y, 0);
-                addVert(x + w, y + h, 0);
-                addVert(x, y + h, 0);
-				addVert(x, y, 0);
-            endRendering();
+            Draw2D::Grid(x, y, w, h);
             
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -249,7 +93,7 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
-            if (isOffscreen(x, y, w, h)) {
+            if (Draw2D::IsOffscreen(x, y, w, h)) {
                 return scope.Close(v8::Undefined());
             }
 		
@@ -278,19 +122,19 @@ namespace Engine {
             float col2G = (float)((col2 & 0x00ff00) >> 8) / 255;
             float col2B = (float)(col2 & 0x0000ff) / 255;
             
-            beginRendering(GL_QUADS);
+            Draw2D::BeginRendering(GL_QUADS);
 				if (vert) {
-                    addVert(x, y, 0, col1R, col1G, col1B);
-                    addVert(x + w, y, 0, col1R, col1G, col1B);
-                    addVert(x + w, y + h, 0, col2R, col2G, col2B);
-                    addVert(x, y + h, 0, col2R, col2G, col2B);
+                    Draw2D::AddVert(x, y, 0, col1R, col1G, col1B);
+                    Draw2D::AddVert(x + w, y, 0, col1R, col1G, col1B);
+                    Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B);
+                    Draw2D::AddVert(x, y + h, 0, col2R, col2G, col2B);
 				} else {
-                    addVert(x, y, 0, col1R, col1G, col1B);
-                    addVert(x + w, y, 0, col2R, col2G, col2B);
-                    addVert(x + w, y + h, 0, col2R, col2G, col2B);
-                    addVert(x, y + h, 0, col1R, col1G, col1B);
+                    Draw2D::AddVert(x, y, 0, col1R, col1G, col1B);
+                    Draw2D::AddVert(x + w, y, 0, col2R, col2G, col2B);
+                    Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B);
+                    Draw2D::AddVert(x, y + h, 0, col1R, col1G, col1B);
 				}
-            endRendering();
+            Draw2D::EndRendering();
 		
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -303,10 +147,10 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Red Component between 0.0f and 1.0f");
             ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0.0f and 1.0f");
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0.0f and 1.0f");
-		
-			_currentColorR = ENGINE_GET_ARG_NUMBER_VALUE(0);
-			_currentColorG = ENGINE_GET_ARG_NUMBER_VALUE(1);
-			_currentColorB = ENGINE_GET_ARG_NUMBER_VALUE(2);
+            
+            Draw2D::SetColor(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                             ENGINE_GET_ARG_NUMBER_VALUE(1),
+                             ENGINE_GET_ARG_NUMBER_VALUE(2));
 		
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -326,9 +170,9 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 			}
 		
-			_currentColorR = (float)((col1 & 0xff0000) >> 16) / 255;
-			_currentColorG = (float)((col1 & 0x00ff00) >> 8) / 255;
-			_currentColorB = (float)(col1 & 0x0000ff) / 255;
+			Draw2D::SetColor((float)((col1 & 0xff0000) >> 16) / 255,
+                             (float)((col1 & 0x00ff00) >> 8) / 255,
+                             (float)(col1 & 0x0000ff) / 255);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -342,9 +186,9 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0 and 255");
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0 and 255");
 		
-			_currentColorR = ENGINE_GET_ARG_NUMBER_VALUE(0) / 255;
-			_currentColorG = ENGINE_GET_ARG_NUMBER_VALUE(1) / 255;
-			_currentColorB = ENGINE_GET_ARG_NUMBER_VALUE(2) / 255;
+			Draw2D::SetColor(ENGINE_GET_ARG_NUMBER_VALUE(0) / 255,
+                             ENGINE_GET_ARG_NUMBER_VALUE(1) / 255,
+                             ENGINE_GET_ARG_NUMBER_VALUE(2) / 255);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -394,34 +238,35 @@ namespace Engine {
                     ret->Set(v8::String::New("r"), v8::Number::New(value));
                     ret->Set(v8::String::New("g"), v8::Number::New(t));
                     ret->Set(v8::String::New("b"), v8::Number::New(p));
-                    ENGINE_JS_SCOPE_CLOSE(ret);
+                    break;
                 case 1:
                     ret->Set(v8::String::New("r"), v8::Number::New(q));
                     ret->Set(v8::String::New("g"), v8::Number::New(value));
                     ret->Set(v8::String::New("b"), v8::Number::New(p));
-                    ENGINE_JS_SCOPE_CLOSE(ret);
+                    break;
                 case 2:
                     ret->Set(v8::String::New("r"), v8::Number::New(p));
                     ret->Set(v8::String::New("g"), v8::Number::New(value));
                     ret->Set(v8::String::New("b"), v8::Number::New(t));
-                    ENGINE_JS_SCOPE_CLOSE(ret);
+                    break;
                 case 3:
                     ret->Set(v8::String::New("r"), v8::Number::New(p));
                     ret->Set(v8::String::New("g"), v8::Number::New(q));
                     ret->Set(v8::String::New("b"), v8::Number::New(value));
-                    ENGINE_JS_SCOPE_CLOSE(ret);
+                    break;
                 case 4:
                     ret->Set(v8::String::New("r"), v8::Number::New(t));
                     ret->Set(v8::String::New("g"), v8::Number::New(p));
                     ret->Set(v8::String::New("b"), v8::Number::New(value));
-                    ENGINE_JS_SCOPE_CLOSE(ret);
+                    break;
                 case 5:
                 default:
                     ret->Set(v8::String::New("r"), v8::Number::New(value));
                     ret->Set(v8::String::New("g"), v8::Number::New(p));
                     ret->Set(v8::String::New("b"), v8::Number::New(q));
-                    ENGINE_JS_SCOPE_CLOSE(ret);
+                    break;
             }
+            ENGINE_JS_SCOPE_CLOSE(ret);
         }
 		
 		ENGINE_JS_METHOD(ClearColor) {
@@ -439,6 +284,50 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
+        
+        ENGINE_JS_METHOD(LoadFont) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name you use to refer to the font");
+            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the filename of the font");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the size of the font to load");
+            
+            Draw2D::LoadFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                             ENGINE_GET_ARG_CPPSTRING_VALUE(1),
+                             ENGINE_GET_ARG_NUMBER_VALUE(2));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(GetAllFonts) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(SetFont) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to use");
+            
+            Draw2D::SetFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(IsFontLoaded) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to check");
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Draw2D::IsFontLoaded(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+        }
 		
 		ENGINE_JS_METHOD(Print) {
             ENGINE_JS_SCOPE_OPEN;
@@ -451,18 +340,7 @@ namespace Engine {
 
             const char* str = *ENGINE_GET_ARG_CSTRING_VALUE(2);
 		
-			// As it turns out calling glGetError here will cause the text not to draw, strange.
-            
-            glEnable(GL_TEXTURE_2D);
-            glColor3f(_currentColorR, _currentColorG, _currentColorB);
-            
-			getFont()->beginDraw(ENGINE_GET_ARG_NUMBER_VALUE(0) - _centerX,
-                                 ENGINE_GET_ARG_NUMBER_VALUE(1) - _centerY) << str << getFont()->endDraw();
-			glDisable(GL_TEXTURE_2D);
-            
-            CheckGLError("postPrint");
-            
-            _polygons += strlen(str) * 4;
+            Draw2D::Print(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), str);
 		
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -470,7 +348,7 @@ namespace Engine {
         ENGINE_JS_METHOD(Draw) {
             ENGINE_JS_SCOPE_OPEN;
             
-            CheckGLError("Pre Image Draw");
+            Draw2D::CheckGLError("Pre Image Draw");
             
             GLuint texId;
 			GLfloat x, y, w, h;
@@ -485,7 +363,7 @@ namespace Engine {
             
             texId = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(0);
             
-            if (!isValidTextureID(texId)) {
+            if (!Draw2D::IsValidTextureID(texId)) {
                 ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -495,20 +373,20 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
             
-            enableTexture(texId);
+            Draw2D::EnableTexture(texId);
             
-			beginRendering(GL_QUADS);
-            //      x         y         z   s     t
-            addVert(x,        y,        0,  0.0f, 0.0f);
-            addVert(x + w,    y,        0,  1.0f, 0.0f);
-            addVert(x + w,    y + h,    0,  1.0f, 1.0f);
-            addVert(x,        y + h,    0,  0.0f, 1.0f);
+            Draw2D::BeginRendering(GL_QUADS);
+            //              x         y         z   s     t
+            Draw2D::AddVert(x,        y,        0,  0.0f, 0.0f);
+            Draw2D::AddVert(x + w,    y,        0,  1.0f, 0.0f);
+            Draw2D::AddVert(x + w,    y + h,    0,  1.0f, 1.0f);
+            Draw2D::AddVert(x,        y + h,    0,  0.0f, 1.0f);
             
-			endRendering();
+            Draw2D::EndRendering();
             
-            disableTexture();
+            Draw2D::DisableTexture();
             
-            CheckGLError("Post Image Draw");
+            Draw2D::CheckGLError("Post Image Draw");
             
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -516,7 +394,7 @@ namespace Engine {
         ENGINE_JS_METHOD(DrawSub) {
             ENGINE_JS_SCOPE_OPEN;
             
-            CheckGLError("Pre Image Draw");
+            Draw2D::CheckGLError("Pre Image Draw");
             
             GLuint texId;
 			GLfloat x1, y1, w1, h1,
@@ -537,7 +415,7 @@ namespace Engine {
             
             texId = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(0);
             
-            if (!isValidTextureID(texId)) {
+            if (!Draw2D::IsValidTextureID(texId)) {
                 ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -551,23 +429,23 @@ namespace Engine {
 			w2 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(7);
 			h2 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(8);
             
-            enableTexture(texId);
+            Draw2D::EnableTexture(texId);
             
             glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &imageWidth);
             glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &imageHeight);
             
-			beginRendering(GL_QUADS);
+			Draw2D::BeginRendering(GL_QUADS);
             //      x           y           z       s                       t
-            addVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
-            addVert(x1 + w1,    y1,         0,      (x2 + w2) / imageWidth, y2 / imageHeight);
-            addVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
-            addVert(x1,         y1 + h1,    0,      x2 / imageWidth,        (y2 + h2) / imageHeight);
+            Draw2D::AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
+            Draw2D::AddVert(x1 + w1,    y1,         0,      (x2 + w2) / imageWidth, y2 / imageHeight);
+            Draw2D::AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
+            Draw2D::AddVert(x1,         y1 + h1,    0,      x2 / imageWidth,        (y2 + h2) / imageHeight);
             
-			endRendering();
+			Draw2D::EndRendering();
             
-            disableTexture();
+            Draw2D::DisableTexture();
             
-            CheckGLError("Post Image Draw");
+            Draw2D::CheckGLError("Post Image Draw");
             
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -580,7 +458,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the image to load");
             
-            CheckGLError("Pre Image Load");
+            Draw2D::CheckGLError("Pre Image Load");
 
 			if (!Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))) {
                 ENGINE_THROW_ARGERROR("File does not Exist");
@@ -600,7 +478,7 @@ namespace Engine {
             FIBITMAP *img = 0;
             
             if (FreeImage_GetBPP(lImg) == 24) {
-                std::cout << "Converting image to 32bit" << std::endl;
+                Logger::begin("JSDraw", Logger::LogLevel_Warning) << "Converting image to 32bit" << Logger::end();
                 img = FreeImage_ConvertTo32Bits(lImg);
             } else {
                 img = lImg;
@@ -624,7 +502,7 @@ namespace Engine {
                 }
             }
             
-            CheckGLError("Pre Image Load");
+            Draw2D::CheckGLError("Pre Image Load");
             
             glGenTextures(1, &text);
             
@@ -642,9 +520,9 @@ namespace Engine {
             
             glBindTexture(GL_TEXTURE_2D, 0);
 
-            CheckGLError("Post Image Load");
+            Draw2D::CheckGLError("Post Image Load");
             
-            std::cout << "Created Image from file: " << text << std::endl;
+            Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from file: " << text << Logger::end();
             
             FreeImage_CloseMemory(mem);
 		
@@ -676,9 +554,9 @@ namespace Engine {
             int i2 = 0;
             
             for (int i = 0; i < len * 4; i += 4) {
-                pixels[i + 0] = clamp((float) arr->Get(i2 + 0)->NumberValue(), 0.0f, 1.0f);
-                pixels[i + 1] = clamp((float) arr->Get(i2 + 1)->NumberValue(), 0.0f, 1.0f);
-                pixels[i + 2] = clamp((float) arr->Get(i2 + 2)->NumberValue(), 0.0f, 1.0f);
+                pixels[i + 0] = glm::clamp((float) arr->Get(i2 + 0)->NumberValue(), 0.0f, 1.0f);
+                pixels[i + 1] = glm::clamp((float) arr->Get(i2 + 1)->NumberValue(), 0.0f, 1.0f);
+                pixels[i + 2] = glm::clamp((float) arr->Get(i2 + 2)->NumberValue(), 0.0f, 1.0f);
                 pixels[i + 3] = 1.0f;
                 i2 += 3;
             }
@@ -705,7 +583,7 @@ namespace Engine {
             
             glDisable(GL_TEXTURE_2D);
             
-            std::cout << "Created Image from data: " << text << std::endl;
+            Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from data: " << text << Logger::end();
             
             ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
         }
@@ -719,7 +597,7 @@ namespace Engine {
             
             GLuint texture = ENGINE_GET_ARG_INT32_VALUE(0);
             
-            if (!isValidTextureID(texture)) {
+            if (!Draw2D::IsValidTextureID(texture)) {
                 ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -733,12 +611,7 @@ namespace Engine {
         ENGINE_JS_METHOD(CameraReset) {
             ENGINE_JS_SCOPE_OPEN;
             
-            int oldVertCount = _polygons;
-            
-            End2d();
-            Begin2d();
-            
-            _polygons = oldVertCount;
+            Draw2D::Reset();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -791,13 +664,13 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the string to return the width of");
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(getFont()->calcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Draw2D::CalcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(GetVerts) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(_polygons));
+            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(Draw2D::GetVerts()));
         }
         
         ENGINE_JS_METHOD(SetDrawOffscreen) {
@@ -807,7 +680,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_BOOLEAN(0, "Set Arg0 to false to disable drawing offscreen");
             
-            _drawOffScreen = ENGINE_GET_ARG_BOOLEAN_VALUE(0);
+            Draw2D::SetDrawOffscreen(ENGINE_GET_ARG_BOOLEAN_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -820,8 +693,8 @@ namespace Engine {
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the x to offset drawing by");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the y to offset drawing by");
             
-            _centerX = ENGINE_GET_ARG_INT32_VALUE(0);
-            _centerY = ENGINE_GET_ARG_INT32_VALUE(1);
+            Draw2D::SetCenter(ENGINE_GET_ARG_INT32_VALUE(0),
+                              ENGINE_GET_ARG_INT32_VALUE(1));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -853,6 +726,9 @@ namespace Engine {
             addItem(drawTable, "cameraRotate", CameraRotate);
             
             addItem(drawTable, "getTextWidth", GetTextWidth);
+            addItem(drawTable, "setFont", SetFont);
+            addItem(drawTable, "loadFont", LoadFont);
+            addItem(drawTable, "isFontLoaded", IsFontLoaded);
             
             addItem(drawTable, "getVerts", GetVerts);
             addItem(drawTable, "setDrawOffscreen", SetDrawOffscreen);

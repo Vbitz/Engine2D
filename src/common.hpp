@@ -15,6 +15,7 @@
 
 // system includes
 #ifdef _WIN32
+#error Windows build broken until GLFW3 works
     #include <GL\glew.h>
     #include <GL\glfw.h>
 	#include <sys\timeb.h>
@@ -23,7 +24,7 @@
 	#define _PLATFORM_WIN32
 #else
     #include <GL/glew.h>
-    #include <GL/glfw.h>
+    #include <GLFW/glfw3.h>
     #include <sys/time.h>
     #ifdef __APPLE__
         #ifdef __MACH__
@@ -45,6 +46,8 @@
 #include <FreeImage.h>
 
 #include "extern/GLFT_Font.hpp"
+
+#include "Logger.hpp"
 
 #include "Util.hpp"
 

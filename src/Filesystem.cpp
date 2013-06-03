@@ -10,7 +10,7 @@ namespace Engine {
 
 		void Init(const char* argv0) {
 			PHYSFS_init(argv0);
-			std::cout << "Filesystem Loaded" << std::endl;
+			Logger::begin("Filesystem", Logger::LogLevel_Error) << "Filesystem Loaded" << std::endl;
 			PHYSFS_mount("res", "/", 1);
 		}
 
@@ -20,19 +20,19 @@ namespace Engine {
         
         bool Mount(std::string path, std::string fsPath) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return false;
             }
             int result = PHYSFS_mount(path.c_str(), fsPath.c_str(), 1);
             if (result == 0) {
-                std::cout << "Error Mounting " << PHYSFS_getLastError() << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "Error Mounting " << PHYSFS_getLastError() << std::endl;
             }
             return result > 0;
         }
         
         void SetupUserDir(std::string path) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return;
             }
             PHYSFS_setSaneConfig("Engine2D", path.c_str(), NULL, 0, 0);
@@ -41,7 +41,7 @@ namespace Engine {
 
 		bool FileExists(std::string path) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return false;
             }
 			const char* pathC = path.c_str();
@@ -50,7 +50,7 @@ namespace Engine {
 
 		bool FolderExists(std::string path) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return false;
             }
 			const char* pathC = path.c_str();
@@ -59,7 +59,7 @@ namespace Engine {
         
         void Mkdir(std::string path) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return;
             }
             PHYSFS_mkdir(path.c_str());
@@ -68,7 +68,7 @@ namespace Engine {
 		std::vector<std::string> GetDirectoryContent(std::string path) {
 			std::vector<std::string> ret;
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return ret;
             }
 			char** list = PHYSFS_enumerateFiles(path.c_str());
@@ -82,7 +82,7 @@ namespace Engine {
 
 		long FileSize(std::string path) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return -1;
             }
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
@@ -98,11 +98,11 @@ namespace Engine {
         
 		char* GetFileContent(std::string path, long &fileSize) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return (char*) "";
             }
 			if (!PHYSFS_exists(path.c_str())) {
-				std::cout << "File does not exist" << std::endl;
+				Logger::begin("Filesystem", Logger::LogLevel_Error) << "File does not exist" << std::endl;
 				return (char*) "";
 			}
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
@@ -111,12 +111,12 @@ namespace Engine {
             int i = 0;
             while (!PHYSFS_eof(f)) {
                 if (PHYSFS_read(f, &fBuffer[i++], sizeof(char), 1) != 1) {
-                    std::cout << "File Read Failed" << std::endl;
+                    Logger::begin("Filesystem", Logger::LogLevel_Error) << "File Read Failed" << std::endl;
                     return (char*) "";
                 }
             }
 			PHYSFS_close(f);
-            //std::cout << fBuffer << std::endl;
+            //Logger::begin("Filesystem", Logger::LogLevel_Error) << fBuffer << std::endl;
             fBuffer[len] = 0x00;
             fileSize = len;
 			return fBuffer;
@@ -124,27 +124,27 @@ namespace Engine {
         
         void WriteFile(std::string path, char* content, long length) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return;
             }
             if (!hasSetUserDir) {
-                std::cout << "UserDir needs to be set to writefiles" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "UserDir needs to be set to writefiles" << std::endl;
                 return;
             }
             PHYSFS_File* f = PHYSFS_openWrite(path.c_str());
             if (!PHYSFS_write(f, content, sizeof(char), (unsigned int) length)) {
-                std::cout << "File Write Failed" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "File Write Failed" << std::endl;
             }
             PHYSFS_close(f);
         }
     
         void TouchFile(std::string path) {
             if (!IsLoaded()) {
-                std::cout << "FS not loaded" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << std::endl;
                 return;
             }
             if (!hasSetUserDir) {
-                std::cout << "UserDir needs to be set to touchFiles" << std::endl;
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "UserDir needs to be set to touchFiles" << std::endl;
                 return;
             }
             PHYSFS_File* f = PHYSFS_openWrite(path.c_str());

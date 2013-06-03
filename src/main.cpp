@@ -24,8 +24,10 @@ namespace Engine {
     std::string _fontPath = "fonts/OpenSans-Regular.ttf";
     
     bool isGL3Context;
+    
+    GLFWwindow* window = NULL;
 	
-	GLFT_Font _font;
+    std::map<std::string, GLFT_Font*> _fonts;
 	
 	std::map<std::string, std::string> _persists;
 
@@ -57,7 +59,7 @@ namespace Engine {
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
     
 	void InitScripting() {
-        std::cout << "Loading Scripting" << std::endl;
+        Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
         
 		_globalIsolate = v8::Isolate::New();
 		_globalIsolate->Enter();
@@ -116,7 +118,7 @@ namespace Engine {
 
 		runFile("lib/boot.js", true);
         
-        std::cout << "Loaded Scripting" << std::endl;
+        Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
 	}
 	
 #undef addItem
@@ -136,9 +138,9 @@ namespace Engine {
 	}
 	
 	void UpdateMousePos() {
-		int x = 0;
-		int y = 0;
-		glfwGetMousePos(&x, &y);
+		double x = 0;
+		double y = 0;
+		glfwGetCursorPos(window, &x, &y);
 	
 		v8::HandleScope scp;
 		v8::Context::Scope ctx_scope(_globalContext);
@@ -147,8 +149,8 @@ namespace Engine {
 		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("input")));
 		input_table->Set(v8::String::New("mouseX"), v8::Number::New(x));
 		input_table->Set(v8::String::New("mouseY"), v8::Number::New(y));
-		input_table->Set(v8::String::New("leftMouseButton"), v8::Boolean::New(glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS));
-		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(glfwGetMouseButton(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS));
+		input_table->Set(v8::String::New("leftMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS));
+		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS));
 	}
 	
 	void UpdateScreen() {
@@ -161,7 +163,8 @@ namespace Engine {
 		input_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
 	}
 	
-	void ResizeWindow(int w, int h) {
+	void ResizeWindow(GLFWwindow* window, int w, int h) {
+        Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
 		_screenWidth = w;
 		_screenHeight = h;
 		if (running)
@@ -169,10 +172,10 @@ namespace Engine {
 			UpdateScreen();
 		}
 		glViewport(0, 0, w, h);
-        CheckGLError("Post Viewpoint");
+        Draw2D::CheckGLError("Post Viewpoint");
     }
 	
-	void KeyPress(int key, int state) {
+	void KeyPress(GLFWwindow* window, int key, int state, int mods) {
         if (_keyboardFunc.IsEmpty()) {
             return;
         }
@@ -198,6 +201,10 @@ namespace Engine {
         
         real_func->Call(_globalContext->Global(), 3, argv);
 	}
+    
+    void OnGLFWError(int error, const char* msg) {
+        Logger::begin("Window", Logger::LogLevel_Error) << "GLFW Error : " << error << " : " << msg << Logger::end();
+    }
     
     ENGINE_JS_METHOD(SetWindowInitParams) {
         ENGINE_JS_SCOPE_OPEN;
@@ -231,45 +238,51 @@ namespace Engine {
         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
     }
     
-    void OpenWindow(int width, int height, int r, int g, int b, bool fullscreen, bool openGL3Context) {
-        std::cout << "Loading OpenGL : Init Window/Context" << std::endl;
+    void OpenWindow(int width, int height, bool fullscreen, bool openGL3Context) {
+        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Window/Context" << Logger::end();
         
         if (openGL3Context) {
-            glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-            glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
-            glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             
             isGL3Context = true;
         } else {
             isGL3Context = false;
         }
         
-        glfwEnable(GLFW_SYSTEM_KEYS);
+		window = glfwCreateWindow(width, height, "Engine2D", NULL, NULL); // you can resize how ever much you like
         
-		glfwOpenWindow(width, height, r, g, b, 1, 1, 1, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW); // you can resize how ever much you like
+        if (window == NULL) {
+            Logger::begin("Window", Logger::LogLevel_Error) << "Error Creating Window" << Logger::end();
+        }
         
-        std::cout << "Loading OpenGL : Init GLEW" << std::endl;
+        glfwMakeContextCurrent(window);
         
-        CheckGLError("PostCreateContext");
+        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init GLEW" << Logger::end();
+        
+        Draw2D::CheckGLError("PostCreateContext");
         
         glewExperimental = GL_TRUE;
         
         GLenum err = glewInit();
         
         if (err != GLEW_OK) {
-            std::cout << "Error starting GLEW: " << glewGetErrorString(err) << std::endl;
+            Logger::begin("Window", Logger::LogLevel_Error) << "Error starting GLEW: " << glewGetErrorString(err) << Logger::end();
         }
         
         glGetError();
         
-        std::cout << "Loading OpenGL : Init Callbacks" << std::endl;
+        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Callbacks" << Logger::end();
         
-        glfwSetWindowSizeCallback(ResizeWindow);
-		glfwSetKeyCallback(KeyPress);
+        ResizeWindow(window, width, height);
         
-        std::cout << "Loading OpenGL : Init OpenGL State" << std::endl;
+        glfwSetWindowSizeCallback(window, ResizeWindow);
+		glfwSetKeyCallback(window, KeyPress);
         
-        CheckGLError("PostSetCallback");
+        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init OpenGL State" << Logger::end();
+        
+        Draw2D::CheckGLError("PostSetCallback");
         
 		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
@@ -280,25 +293,27 @@ namespace Engine {
         
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
-        CheckGLError("PostSetupContext");
+        Draw2D::CheckGLError("PostSetupContext");
         
-        std::cout << "Loaded OpenGL" << std::endl;
+        Logger::begin("Window", Logger::LogLevel_Log) << "Loaded OpenGL" << Logger::end();
         
         InitFonts();
     }
     
     void CloseWindow() {
-        std::cout << "Terminating Window" << std::endl;
+        Logger::begin("Window", Logger::LogLevel_Log) << "Terminating Window" << Logger::end();
         ShutdownFonts();
-        glfwCloseWindow();
+        glfwDestroyWindow(window);
     }
 	
 	void InitOpenGL() {
-        std::cout << "Loading OpenGL : Init GLFW" << std::endl;
+        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init GLFW" << Logger::end();
+        
+        glfwSetErrorCallback(OnGLFWError);
         
 		glfwInit();
         
-        OpenWindow(_startingWidth, _startingHeight, 1, 1, 1, _startingFullscreen, _startingOpenGL3);
+        OpenWindow(_startingWidth, _startingHeight, _startingFullscreen, _startingOpenGL3);
 	}
 	
 	void ShutdownOpenGL() {
@@ -308,31 +323,47 @@ namespace Engine {
 	
 	// font rendering
 	
-	void InitFonts() {
+    void loadFont(std::string prettyName, std::string filename, int fontSize) {
         if (isGL3Context) {
-            std::cout << "Skip loading fonts on OpenGL3.x" << std::endl;
             return;
         }
         
-        std::cout << "Loading Font: " << _fontPath << std::endl;
+        Logger::begin("Font", Logger::LogLevel_Log)
+            << "Loading Font: " << filename << " with size " << fontSize << "px as " << prettyName
+            << Logger::end();
         
-        CheckGLError("PreLoadFont");
+        Draw2D::CheckGLError("PreLoadFont");
         
 		if (Filesystem::FileExists(_fontPath)) {
             long fileSize = 0;
             char* file = Filesystem::GetFileContent(_fontPath, fileSize);
-			_font.open(file, fileSize, 16);
+            GLFT_Font* newFont = new GLFT_Font();
+			newFont->open(file, fileSize, fontSize);
+            _fonts[prettyName] = newFont;
 		} else {
-			std::cout << "Could not load font" << std::endl;
+			Logger::begin("Font", Logger::LogLevel_Error) << "Could not load font" << Logger::end();
 		}
         
-        CheckGLError("PostLoadFont");
+        Draw2D::CheckGLError("PostLoadFont");
         
-        std::cout << "Loaded Font" << std::endl;
+        Logger::begin("Font", Logger::LogLevel_Log) << "Loaded Font" << Logger::end();
+    }
+    
+	void InitFonts() {
+        if (isGL3Context) {
+            Logger::begin("Font", Logger::LogLevel_Warning) << "Skip loading fonts on OpenGL3.x" << Logger::end();
+            return;
+        }
+        
+        loadFont("basic16px", _fontPath, 16);
+        loadFont("basic12px", _fontPath, 12);
 	}
 	
 	void ShutdownFonts() {
-        _font.release();
+        typedef std::map<std::string, GLFT_Font*>::iterator iter;
+        for (iter iterator = _fonts.begin(); iterator != _fonts.end(); iterator++) {
+            iterator->second->release();
+        }
 	}
 	
 	// semi-realtime time loading
@@ -357,8 +388,8 @@ namespace Engine {
 		return _screenHeight;
 	}
 	
-	GLFT_Font* getFont() {
-		return &_font;
+	GLFT_Font* getFont(std::string fontName) {
+        return _fonts[fontName];
 	}
 	
 	void setDrawFunction(v8::Persistent<v8::Function> func) {
@@ -376,7 +407,7 @@ namespace Engine {
 	bool _runFile(std::string path, bool persist) {
         v8::HandleScope handle_scope;
         
-		std::cout << "Loading File: " << path << std::endl;
+		Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading File: " << path << Logger::end();
 
 		v8::Context::Scope ctx_scope(_globalContext);
 
@@ -388,19 +419,19 @@ namespace Engine {
             v8::String::New(inputScript), v8::String::New(path.c_str()));
 
 		if (script.IsEmpty()) {
-			std::cout << "Could not Load file" << std::endl;
+			Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not Load file" << Logger::end();
 			v8::Handle<v8::Value> exception = tryCatch.Exception();
 			v8::String::AsciiValue exception_str(exception);
-			printf("Exception: %s\n", *exception_str);
+            Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
             return false;
 		} else {
 			script->Run();
             if (!tryCatch.Exception().IsEmpty()) {
                 v8::Handle<v8::Value> exception = tryCatch.Exception();
                 v8::String::AsciiValue exception_str(exception);
-                printf("Exception: %s\n", *exception_str);
+                Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
             }
-            std::cout << "Loaded File: " << path << std::endl;
+            Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded File: " << path << Logger::end();
             if (persist) {
                 _loadedFiles[path] = Filesystem::GetFileModifyTime(path);
             }
@@ -409,8 +440,12 @@ namespace Engine {
 	}
     
     void runFile(std::string path, bool persist) {
-        while (!_runFile(path, persist)) {
-            std::cout << "Could not load File" << std::endl;
+        if (!Filesystem::FileExists(path)) {
+            Logger::begin("Scripting", Logger::LogLevel_Error) << path << " Not Found" << Logger::end();
+        } else {
+            while (!_runFile(path, persist)) {
+                Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not load File" << Logger::end();
+            }
         }
     }
     
@@ -425,14 +460,13 @@ namespace Engine {
     void _toggleFullscreen() {
         if (isFullscreen) {
             CloseWindow();
-            OpenWindow(800, 600, 1, 1, 1, false, isGL3Context);
+            OpenWindow(_startingWidth, _startingHeight, false, isGL3Context);
             isFullscreen = false;
             UpdateScreen();
         } else {
-            GLFWvidmode desktopMode;
-            glfwGetDesktopMode(&desktopMode);
+            const GLFWvidmode* desktopMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             CloseWindow();
-            OpenWindow(desktopMode.Width, desktopMode.Height, desktopMode.RedBits, desktopMode.GreenBits, desktopMode.BlueBits, true, isGL3Context);
+            OpenWindow(desktopMode->width, desktopMode->height, true, isGL3Context);
             isFullscreen = true;
             UpdateScreen();
         }
@@ -445,7 +479,7 @@ namespace Engine {
     
     void _saveScreenshot() {
         int width, height;
-        glfwGetWindowSize(&width, &height);
+        glfwGetWindowSize(window, &width, &height);
         BYTE* pixels = new BYTE[3 * width * height];
         glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, pixels);
         
@@ -472,7 +506,9 @@ namespace Engine {
         
         Filesystem::WriteFile(_screenshotFilename, buffer, fileSize);
         
-        std::cout << "Saved Screenshot as: " << Filesystem::GetRealPath(_screenshotFilename) << std::endl;
+        Logger::begin("Screenshot", Logger::LogLevel_Log)
+            << "Saved Screenshot as: " << Filesystem::GetRealPath(_screenshotFilename)
+            << Logger::end();
         
         FreeImage_CloseMemory(mem);
         
@@ -482,19 +518,25 @@ namespace Engine {
     void upgradeGL3() {
         int width, height;
         
-        glfwGetWindowSize(&width, &height);
+        glfwGetWindowSize(window, &width, &height);
         
         CloseWindow();
-        OpenWindow(width, height, 1, 1, 1, isFullscreen, true);
+        OpenWindow(width, height, isFullscreen, true);
     }
     
     bool usingGL3() {
         return isGL3Context;
     }
     
+    GLFWwindow* getGLFWWindow() {
+        return window;
+    }
+    
 	// main function
 	
 	int main(int argc, char const *argv[]) {
+        Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
+        
 		Filesystem::Init(argv[0]);
         
         InitScripting();
@@ -510,7 +552,7 @@ namespace Engine {
 		UpdateScreen();
 	
 		while (running) {
-			if (!glfwGetWindowParam(GLFW_ACTIVE)) {
+			if (!glfwGetWindowAttrib(window, GLFW_FOCUSED)) {
 				glfwWaitEvents();
                 sleep(0);
 				continue;
@@ -520,27 +562,28 @@ namespace Engine {
             
             UpdateMousePos();
             
-            CheckGLError("startOfRendering");
+            Draw2D::CheckGLError("startOfRendering");
 	
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-			JsDraw::Begin2d();
+			Draw2D::Begin2d();
 	
             if (!_drawFunc.IsEmpty()) {
 				CallFunction(_drawFunc);
 			}
             
-            JsDraw::End2d();
+            Draw2D::End2d();
 	
-			glfwSwapBuffers();
+			glfwSwapBuffers(window);
+            glfwPollEvents();
             
-			if (!glfwGetWindowParam(GLFW_OPENED)) {
-				std::cout << "Exiting" << std::endl;
+			if (glfwWindowShouldClose(window)) {
+				Logger::begin("Window", Logger::LogLevel_Log) << "Exiting" << Logger::end();
 				running = false;
 				break;
 			}
 
-            CheckGLError("endOfRendering");
+            Draw2D::CheckGLError("endOfRendering");
             
             if (toggleNextframe) {
                 _toggleFullscreen();

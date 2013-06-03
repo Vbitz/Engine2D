@@ -54,7 +54,7 @@ namespace Engine {
         const char* fragShader = Filesystem::GetFileContent(fragShaderFilename);
         
         while (!this->compile(vertShader, fragShader)) {
-            std::cout << "Could not Compile Shader" << std::endl;
+            Logger::begin("Shader", Logger::LogLevel_Error) << "Could not Compile Shader" << Logger::end();
             vertShader = Filesystem::GetFileContent(vertShaderFilename);
             fragShader = Filesystem::GetFileContent(fragShaderFilename);
         }
@@ -73,7 +73,7 @@ namespace Engine {
         if (status != GL_TRUE) {
             char buffer[512];
             glGetShaderInfoLog(this->_vertPointer, 512, NULL, buffer);
-            std::cout << buffer << std::endl;
+            Logger::begin("Shader", Logger::LogLevel_Error) << buffer << Logger::end();
             glDeleteShader(this->_vertPointer);
             glDeleteShader(this->_fragPointer);
             return false;
@@ -87,7 +87,7 @@ namespace Engine {
         if (status != GL_TRUE) {
             char buffer[512];
             glGetShaderInfoLog(this->_fragPointer, 512, NULL, buffer);
-            std::cout << buffer << std::endl;
+            Logger::begin("Shader", Logger::LogLevel_Error) << buffer << Logger::end();
             glDeleteShader(this->_vertPointer);
             glDeleteShader(this->_fragPointer);
             return false;

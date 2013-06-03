@@ -44,7 +44,7 @@
 #ifdef _WIN32
 #include <GL\glfw.h>
 #else
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 #endif
 
 #include <ft2build.h>

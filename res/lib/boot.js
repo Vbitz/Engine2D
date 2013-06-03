@@ -2,6 +2,8 @@
 
 var str = fs.readFile("config/config.json");
 
+console.log("Booting JavaScript Phase 1");
+
 console.log("Current Config: " + str);
 
 var globalConfig = {};
@@ -29,5 +31,8 @@ for (var i = 0; i < libarys.length; i++) {
 }
 
 sys.onPostLoad(function () {
+	console.log("Booting JavaScript Phase 2");
+	var glInfo = sys.getGLVersion();
+	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
 	sys.runFile(getConfig("startup", "script/basic"), true);
 });

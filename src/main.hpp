@@ -12,7 +12,8 @@
 
 namespace Engine {
 
-	GLFT_Font* 					getFont();
+	GLFT_Font* 					getFont(std::string fontName);
+    void                        loadFont(std::string prettyName, std::string filename, int fontSize);
 
 	int 						getScreenWidth();
 	int 						getScreenHeight();
@@ -29,4 +30,6 @@ namespace Engine {
     void                        upgradeGL3();
     
     bool                        usingGL3();
+    
+    GLFWwindow*                 getGLFWWindow();
 }

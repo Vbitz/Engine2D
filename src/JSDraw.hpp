@@ -4,13 +4,11 @@
 #include "main.hpp"
 
 #include "Filesystem.hpp"
+#include "Draw2D.hpp"
 
 namespace Engine {
 
 	namespace JsDraw {
-
-		void Begin2d();
-		void End2d();
         
         void InitDraw(v8::Handle<v8::ObjectTemplate> obj);
          

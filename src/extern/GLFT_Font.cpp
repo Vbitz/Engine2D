@@ -85,7 +85,7 @@ GLFT_Font::~GLFT_Font()
 
 void GLFT_Font::open(char* file, long fileSize, unsigned int size)
 {
-    const size_t MARGIN = 3;
+    const size_t MARGIN = 5;
 
     // release the font if it already exists
     if(isValid())
@@ -126,7 +126,7 @@ void GLFT_Font::open(char* file, long fileSize, unsigned int size)
         charIndex = FT_Get_Char_Index(face, ch+SPACE);
 
         // Render the current glyph.
-        FT_Load_Glyph(face, charIndex, FT_LOAD_RENDER);
+        FT_Load_Glyph(face, charIndex, /*size > 8 ? FT_LOAD_RENDER : */FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
 
         widths_[ch] = (face->glyph->metrics.horiAdvance >> 6) + MARGIN;
         // If the line is full go to the next line

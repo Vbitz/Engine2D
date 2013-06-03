@@ -5,13 +5,13 @@ namespace Engine {
     
     Database::Database(std::string database) {
         if (!hasInited) {
-            std::cout << "Initalise SQLITE" << std::endl;
+            Logger::begin("Sqlite", Logger::LogLevel_Log) << "Initalise SQLITE" << Logger::end();
             sqlite3_initialize();
             hasInited = true;
         }
         int result = sqlite3_open_v2(database.c_str(), &this->_database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
         if (result != SQLITE_OK) {
-            std::cout << "Failed opening database: " << sqlite3_errmsg(this->_database) << std::endl;
+            Logger::begin("Sqlite", Logger::LogLevel_Error) << "Failed opening database: " << sqlite3_errmsg(this->_database) << Logger::end();
         }
     }
     
@@ -23,7 +23,7 @@ namespace Engine {
         char* errmsg = 0;
         int result = sqlite3_exec(this->_database, statement.c_str(), NULL, NULL, &errmsg);
         if (result != SQLITE_OK) {
-            std::cout << "SQL Error: " << errmsg << std::endl;
+            Logger::begin("Sqlite", Logger::LogLevel_Error) << "SQL Error : " << errmsg << Logger::end();
             return false;
         }
         return true;
@@ -34,7 +34,7 @@ namespace Engine {
         sqlite3_stmt *sql;
         int result = sqlite3_prepare_v2(this->_database, statement.c_str(), -1, &sql, 0);
         if (result != SQLITE_OK) {
-            std::cout << "SQL Error" << std::endl;
+            Logger::begin("Sqlite", Logger::LogLevel_Error) << "SQL Error" << Logger::end();
             return ret;
         }
         int cols = sqlite3_column_count(sql);
@@ -48,7 +48,7 @@ namespace Engine {
                 }
                 ret.push_back(row);
             } else if (result != SQLITE_DONE) {
-                std::cout << "A error occuured " << result << std::endl;
+                Logger::begin("Sqlite", Logger::LogLevel_Error) << "Sql Error : " << result << Logger::end();
             }
         }
         return ret;

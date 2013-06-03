@@ -7,20 +7,21 @@ namespace Engine {
 		ENGINE_JS_METHOD(Println) {
 			ENGINE_JS_SCOPE_OPEN;
             
+            std::string logStr = "";
+            
 			bool first = true;
 			for (int i = 0; i < args.Length(); i++) {
 				if (first) {
 					first = false;
 				} else {
-					printf(" ");
+					logStr += " ";
 				}
 				v8::String::Utf8Value str(args[i]->ToString());
 				const char* cstr = *str;
-				printf("%s", cstr);
+				logStr += cstr;
 			}
-			printf("\n");
-	
-			fflush(stdout);
+            
+            Logger::LogText("Script", Logger::LogLevel_User, logStr);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -86,13 +87,9 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New();
             
-            int glMajor, glMinor, glRev;
-            
-            glfwGetGLVersion(&glMajor, &glMinor, &glRev);
-            
-            ret->Set(v8::String::NewSymbol("major"), v8::Number::New(glMajor));
-            ret->Set(v8::String::NewSymbol("minor"), v8::Number::New(glMinor));
-            ret->Set(v8::String::NewSymbol("rev"), v8::Number::New(glRev));
+            ret->Set(v8::String::NewSymbol("major"), v8::Number::New(glfwGetWindowAttrib(getGLFWWindow(), GLFW_CONTEXT_VERSION_MAJOR)));
+            ret->Set(v8::String::NewSymbol("minor"), v8::Number::New(glfwGetWindowAttrib(getGLFWWindow(), GLFW_CONTEXT_VERSION_MINOR)));
+            ret->Set(v8::String::NewSymbol("rev"), v8::Number::New(glfwGetWindowAttrib(getGLFWWindow(), GLFW_CONTEXT_REVISION)));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
@@ -140,7 +137,8 @@ namespace Engine {
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the new X size of the window");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the new Y size of the window");
             
-            glfwSetWindowSize(ENGINE_GET_ARG_INT32_VALUE(0),
+            glfwSetWindowSize(getGLFWWindow(),
+                              ENGINE_GET_ARG_INT32_VALUE(0),
                               ENGINE_GET_ARG_INT32_VALUE(1));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
