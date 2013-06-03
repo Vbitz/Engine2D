@@ -251,7 +251,7 @@ namespace Engine {
             isGL3Context = false;
         }
         
-		window = glfwCreateWindow(width, height, "Engine2D", NULL, NULL); // you can resize how ever much you like
+		window = glfwCreateWindow(width, height, "Engine2D", fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL); // you can resize how ever much you like
         
         if (window == NULL) {
             Logger::begin("Window", Logger::LogLevel_Error) << "Error Creating Window" << Logger::end();
@@ -364,6 +364,7 @@ namespace Engine {
         for (iter iterator = _fonts.begin(); iterator != _fonts.end(); iterator++) {
             iterator->second->release();
         }
+        _fonts.clear();
 	}
 	
 	// semi-realtime time loading
@@ -454,6 +455,7 @@ namespace Engine {
     }
     
     void toggleFullscreen() {
+        Logger::begin("Window", Logger::LogLevel_Log) << "Switching to fullscreen on next frame" << Logger::end();
         toggleNextframe = true;
     }
     
@@ -552,7 +554,8 @@ namespace Engine {
 		UpdateScreen();
 	
 		while (running) {
-			if (!glfwGetWindowAttrib(window, GLFW_FOCUSED)) {
+			if (!isFullscreen && !glfwGetWindowAttrib(window, GLFW_FOCUSED)) {
+                std::cout << "Waiting" << std::endl;
 				glfwWaitEvents();
                 sleep(0);
 				continue;

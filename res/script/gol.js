@@ -76,6 +76,8 @@ sys.keyboardFunc(function (type, key, press) {
 		sys.exit();
 	} else if (press && key === "R") {
 		regen();
+	} else if (press && key === "F") {
+		sys.toggleFullscreen();
 	} else if (press && key === " ") {
 		paused = !paused;
 	} else if (press && key === "S") {
