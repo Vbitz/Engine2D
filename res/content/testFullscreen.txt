@@ -1,0 +1,59 @@
+4.05312e-06 : [Log] Application | Starting
+0.00774312 : [Log] Scripting | Loading Scripting
+0.0137141 : [Log] Scripting | Loading File: lib/boot.js
+0.017154 : [User] Script | Booting JavaScript Phase 1
+0.017195 : [User] Script | Current Config: {
+	"startup": "script/fullscreenFun",
+	"window": {
+		"width": 1000,
+		"height": 600,
+		"fullscreen": false,
+		"openGL3": false,
+		"fontPath": "fonts/OpenSans-Regular.ttf"
+	}
+}
+0.017714 : [Log] Scripting | Loading File: lib/ui.js
+0.030308 : [Log] Scripting | Loaded File: lib/ui.js
+0.030375 : [Log] Scripting | Loaded File: lib/boot.js
+0.0304341 : [Log] Scripting | Loaded Scripting
+0.030452 : [Log] Window | Loading OpenGL : Init GLFW
+0.046514 : [Log] Window | Loading OpenGL : Init Window/Context
+0.11773 : [Log] Window | Loading OpenGL : Init GLEW
+0.21688 : [Log] Window | Loading OpenGL : Init Callbacks
+0.216918 : [Verbose] Window | Resizing Window to 1000x600
+0.216935 : [Log] Window | Loading OpenGL : Init OpenGL State
+0.216964 : [Log] Window | Loaded OpenGL
+0.216981 : [Log] Font | Loading Font: fonts/OpenSans-Regular.ttf with size 16px as basic16px
+0.603254 : [Log] Font | Loaded Font
+0.603282 : [Log] Font | Loading Font: fonts/OpenSans-Regular.ttf with size 12px as basic12px
+0.986399 : [Log] Font | Loaded Font
+0.986531 : [User] Script | Booting JavaScript Phase 2
+0.986623 : [User] Script | Using OpenGL: 2.1.0
+0.9867 : [Log] Scripting | Loading File: script/fullscreenFun.js
+0.987883 : [Log] Scripting | Loaded File: script/fullscreenFun.js
+3.18292 : [Log] Window | Switching to fullscreen on next frame
+3.18308 : [Log] Window | Terminating Window
+3.18634 : [Log] Window | Loading OpenGL : Init Window/Context
+3.53616 : [Log] Window | Loading OpenGL : Init GLEW
+3.63516 : [Log] Window | Loading OpenGL : Init Callbacks
+3.63519 : [Verbose] Window | Resizing Window to 1280x800
+3.63521 : [Log] Window | Loading OpenGL : Init OpenGL State
+3.63522 : [Log] Window | Loaded OpenGL
+3.63524 : [Log] Font | Loading Font: fonts/OpenSans-Regular.ttf with size 16px as basic16px
+4.00683 : [Log] Font | Loaded Font
+4.00685 : [Log] Font | Loading Font: fonts/OpenSans-Regular.ttf with size 12px as basic12px
+4.37694 : [Log] Font | Loaded Font
+5.18831 : [Log] Window | Switching to fullscreen on next frame
+5.18848 : [Log] Window | Terminating Window
+5.79086 : [Log] Window | Loading OpenGL : Init Window/Context
+5.79904 : [Log] Window | Loading OpenGL : Init GLEW
+5.88768 : [Log] Window | Loading OpenGL : Init Callbacks
+5.88771 : [Verbose] Window | Resizing Window to 1000x600
+5.88774 : [Log] Window | Loading OpenGL : Init OpenGL State
+5.88775 : [Log] Window | Loaded OpenGL
+5.88775 : [Log] Font | Loading Font: fonts/OpenSans-Regular.ttf with size 16px as basic16px
+6.26364 : [Log] Font | Loaded Font
+6.26367 : [Log] Font | Loading Font: fonts/OpenSans-Regular.ttf with size 12px as basic12px
+6.64811 : [Log] Font | Loaded Font
+9.97396 : [Log] Window | Exiting
+9.974 : [Log] Window | Terminating Window

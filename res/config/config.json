@@ -1,5 +1,5 @@
 {
-	"startup": "script/gol",
+	"startup": "script/test",
 	"window": {
 		"width": 1000,
 		"height": 600,

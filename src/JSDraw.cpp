@@ -607,6 +607,16 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(IsTexture) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the textureID of the texture to check");
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Draw2D::IsValidTextureID(ENGINE_GET_ARG_INT32_VALUE(0))));
+        }
+        
         // basicly restarts 2d drawing
         ENGINE_JS_METHOD(CameraReset) {
             ENGINE_JS_SCOPE_OPEN;
@@ -719,6 +729,7 @@ namespace Engine {
             addItem(drawTable, "openImage", OpenImage);
             addItem(drawTable, "createImage", CreateImage);
             addItem(drawTable, "freeImage", FreeImage);
+            addItem(drawTable, "isTexture", IsTexture);
             
             addItem(drawTable, "cameraReset", CameraReset);
             addItem(drawTable, "cameraPan", CameraPan);

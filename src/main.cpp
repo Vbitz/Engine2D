@@ -22,6 +22,7 @@ namespace Engine {
     bool _startingFullscreen = false;
     bool _startingOpenGL3 = false;
     std::string _fontPath = "fonts/OpenSans-Regular.ttf";
+    std::string _consoleFontPath = "fonts/SourceSansPro-Regular.ttf";
     
     bool isGL3Context;
     
@@ -42,14 +43,13 @@ namespace Engine {
     
 	std::map<std::string, long> _loadedFiles;
     
-    std::string _keys[] = {"ESC","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12",
-                    "F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23",
-                    "F24","F25","UP","DOWN","LEFT","RIGHT","LSHIFT","RSHIFT","LCTRL",
-                    "RCTRL","LALT","RALT","TAB","ENTER","BACKSPACE","INSERT","DEL",
-                    "PAGEUP","PAGEDOWN","HOME","END","KP_0","KP_1","KP_2","KP_3",
-                    "KP_4","KP_5","KP_6","KP_7","KP_8","KP_9","KP_DIVIDE","KP_MULTIPLY",
-                    "KP_SUBTRACT","KP_ADD","KP_DECIMAL","KP_EQUAL","KP_ENTER","KP_NUM_LOCK",
-                    "CAPS_LOCK","SCROLL_LOCK","PAUSE","LSUPER","RSUPER","MENU"};
+    std::string _keys[] = { "ESCAPE", "ENTER", "TAB", "BACKSPACE", "INSERT", "DELETE", "RIGHT", "LEFT", "DOWN", "UP", "PAGE_UP",
+        "PAGE_DOWN", "HOME", "END", "270", "271", "272", "273", "274", "275", "276", "277", "278", "279", "CAPS_LOCK", "SCROLL_LOCK",
+        "NUM_LOCK", "PRINT_SCREEN", "PAUSE", "285", "286", "287", "288", "289" "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
+        "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "F24", "F25", "315", "316",
+        "317", "318", "319" "KP_0", "KP_1", "KP_2", "KP_3", "KP_4", "KP_5", "KP_6", "KP_7", "KP_8", "KP_9", "KP_DECIMAL", "KP_DIVIDE",
+        "KP_MULTIPLY", "KP_SUBTRACT", "KP_ADD", "KP_ENTER", "KP_EQUAL", "337", "338", "339" "LEFT_SHIFT", "LEFT_CONTROL", "LEFT_ALT",
+        "LEFT_SUPER", "RIGHT_SHIFT", "RIGHT_CONTROL", "RIGHT_ALT", "RIGHT_SUPER", "MENU" };
     
     void InitFonts();
     void ShutdownFonts();
@@ -179,6 +179,10 @@ namespace Engine {
         if (_keyboardFunc.IsEmpty()) {
             return;
         }
+        
+        if (!glfwGetWindowAttrib(window, GLFW_FOCUSED) && !isFullscreen) {
+            return;
+        }
 	
         v8::HandleScope scp;
         v8::Context::Scope ctx_scope(_globalContext);
@@ -194,6 +198,8 @@ namespace Engine {
 			str[0] = (char) key;
 			str[1] = 0x00;
         }
+        
+        EngineUI::OnKeyPress(key, state == GLFW_PRESS);
         
         argv[0] = v8::String::NewSymbol(key < 256 ? "char" : "special");
         argv[1] = v8::String::NewSymbol(str);
@@ -233,6 +239,10 @@ namespace Engine {
         
         if (obj->Has(v8::String::NewSymbol("fontPath")) && obj->Get(v8::String::NewSymbol("fontPath"))->IsString()) {
             _fontPath = std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("fontPath"))->ToString()));
+        }
+        
+        if (obj->Has(v8::String::NewSymbol("consoleFontPath")) && obj->Get(v8::String::NewSymbol("consoleFontPath"))->IsString()) {
+            _consoleFontPath = std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("consoleFontPath"))->ToString()));
         }
         
         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -279,6 +289,8 @@ namespace Engine {
         
         glfwSetWindowSizeCallback(window, ResizeWindow);
 		glfwSetKeyCallback(window, KeyPress);
+        
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         
         Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init OpenGL State" << Logger::end();
         
@@ -357,6 +369,7 @@ namespace Engine {
         
         loadFont("basic16px", _fontPath, 16);
         loadFont("basic12px", _fontPath, 12);
+        loadFont("monospace8px", _consoleFontPath, 8);
 	}
 	
 	void ShutdownFonts() {
@@ -555,7 +568,6 @@ namespace Engine {
 	
 		while (running) {
 			if (!isFullscreen && !glfwGetWindowAttrib(window, GLFW_FOCUSED)) {
-                std::cout << "Waiting" << std::endl;
 				glfwWaitEvents();
                 sleep(0);
 				continue;
@@ -574,6 +586,8 @@ namespace Engine {
             if (!_drawFunc.IsEmpty()) {
 				CallFunction(_drawFunc);
 			}
+            
+            EngineUI::Draw();
             
             Draw2D::End2d();
 	

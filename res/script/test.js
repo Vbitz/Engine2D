@@ -28,15 +28,11 @@ for (var i in tests) {
 
 draw.clearColor(0.01, 0.01, 0.01);
 
-var img = img ? img : draw.openImage("image/testing.png");
-
 var pix = [];
 
 for (var i = 0; i < 100 * 100 * 3; i++) {
 	pix[i] = Math.cos(i);
 }
-
-var img2 = img2 ? img2 : draw.createImage(pix, 100, 100);
 
 var hsv = [];
 
@@ -51,22 +47,38 @@ for (var x = 0; x < 360; x++) {
 	}
 }
 
+var img = img ? img : draw.openImage("image/testing.png");
+var img2 = img2 ? img2 : draw.createImage(pix, 100, 100);
 var img3 = img3 ? img3 : draw.createImage(hsv, 360, 100);
-
-if (!draw.isFontLoaded("light8px")) {
-	draw.loadFont("light8px", "fonts/OpenSans-Light.ttf", 8);
-}
 
 var t = 0;
 
+console.log("Loading Test Suite");
+
 sys.drawFunc(function () {
-	draw.grad(0, 5, 600, 35, 0xfafafa, 0x000000, false);
+	if (!draw.isTexture(img)) {
+		img = draw.openImage("image/testing.png");
+	}
+
+	if (!draw.isTexture(img2)) {
+		img2 = draw.createImage(pix, 100, 100);
+	}
+
+	if (!draw.isTexture(img3)) {
+		img3 = draw.createImage(hsv, 360, 100);
+	}
+
+	if (!draw.isFontLoaded("light8px")) {
+		draw.loadFont("light8px", "fonts/OpenSans-Light.ttf", 8);
+	}
+
+	draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
 	draw.setColor(0x000000);
 	draw.setFont("basic16px");
-	draw.print(10, 15, "Engine2D Test Suite");
+	draw.print(10, 35, "Engine2D Test Suite");
 	draw.setColor(0xffffff);
-	draw.print(10, 50, "Automated Tests");
-	draw.print(400, 50, "Rendering Tests");
+	draw.print(10, 70, "Automated Tests");
+	draw.print(400, 70, "Rendering Tests");
 	draw.setFont("basic12px");
 	var x = 2;
 	for (var i in testResults) {
@@ -75,38 +87,40 @@ sys.drawFunc(function () {
 		} else {
 			draw.setColor(0xff0000);
 		}
-		draw.rect(15, x * 30 + 15, 220, 20);
+		draw.rect(15, x * 30 + 35, 220, 20);
 		draw.setColor(0x000000);
-		draw.print(20, x * 30 + 20, i);
+		draw.print(20, x * 30 + 40, i);
 		x++;
 	}
 	draw.setColor(0xffffff);
-	draw.print(10, x++ * 30 + 20, "Supports Framebuffer: " + sys.hasExtention("GL_ARB_framebuffer_object"));
+	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + sys.hasExtention("GL_ARB_framebuffer_object"));
 	draw.setFont("light8px");
-	draw.print(20, x * 30 + 20, "Custom Loaded Font");
+	draw.print(20, x * 30 + 40, "Custom Loaded Font");
 	draw.setFont("basic12px");
-	draw.print(420, 80, "Rect");
-	draw.rect(410, 100, 100, 100);
-	draw.print(540, 80, "Grid");
-	draw.grid(530, 100, 100, 100);
-	draw.print(650, 80, "Gradents");
-	draw.grad(650, 100, 100, 100, 0xffffff, 0x000000, true);
-	draw.grad(770, 100, 100, 100, 0xffffff, 0x000000, false);
-	draw.print(400, 220, "PNG Image");
+	draw.print(420, 100, "Rect");
+	draw.rect(410, 120, 100, 100);
+	draw.print(540, 100, "Grid");
+	draw.grid(530, 120, 100, 100);
+	draw.print(650, 100, "Gradents");
+	draw.grad(650, 120, 100, 100, 0xffffff, 0x000000, true);
+	draw.grad(770, 120, 100, 100, 0xffffff, 0x000000, false);
+	draw.print(400, 240, "PNG Image");
 	draw.setColor(0xffffff);
-	draw.draw(img, 410, 250, 100, 100);
-	draw.print(520, 220, "Gen Image");
-	draw.drawSub(img2, 530, 250, 100, 100, t, t += 0.1, 16, 16);
-	draw.print(640, 220, "Tinted Image");
+	draw.draw(img, 410, 270, 100, 100);
+	draw.print(520, 240, "Gen Image");
+	draw.drawSub(img2, 530, 270, 100, 100, t, t += 0.1, 16, 16);
+	draw.print(640, 240, "Tinted Image");
 	draw.setColor(Math.floor(Math.random() * 255 * 255 * 255));
-	draw.draw(img, 650, 250, 100, 100);
+	draw.draw(img, 650, 270, 100, 100);
 	draw.setColor(0xffffff);
-	draw.print(400, 380, "HSV Image");
-	draw.draw(img3, 410, 400, 360, 100);
+	draw.print(400, 400, "HSV Image");
+	draw.draw(img3, 410, 420, 360, 100);
 });
 
 sys.keyboardFunc(function (type, key, press) {
 	if (key === "S" && press) {
 		sys.saveScreenshot("testing.png");
+	} else if (key === "F" && press) {
+		sys.toggleFullscreen();
 	}
 });

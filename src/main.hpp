@@ -10,6 +10,8 @@
 #include "JSFS.hpp"
 #include "JSDatabase.hpp"
 
+#include "EngineUI.hpp"
+
 namespace Engine {
 
 	GLFT_Font* 					getFont(std::string fontName);
