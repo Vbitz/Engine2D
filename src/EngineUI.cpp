@@ -21,7 +21,10 @@ namespace Engine {
             typedef std::vector<Logger::LogEvent>::iterator iter;
             int i = 0;
             for (iter iterator = logEvents->begin(); iterator < logEvents->end(); iterator++) {
-                if (Logger::GetTime() < iterator->time + 2.0) {
+                double timeSince = Logger::GetTime() - iterator->time;
+                timeSince = std::log(timeSince);
+                timeSince = std::pow(timeSince, 2);
+                if (timeSince < 3.0) {
                     switch (iterator->Level) {
                         case Logger::LogLevel_Verbose:
                             Draw2D::SetColor(105 / 255.0f, 105 / 255.0f, 105 / 255.0f);
