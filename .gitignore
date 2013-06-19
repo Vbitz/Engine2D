@@ -1,5 +1,6 @@
 bin/Engine
 bin/Engine.dSYM
+release
 res/fonts
 .depend
 .tags*

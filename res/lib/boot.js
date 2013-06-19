@@ -32,7 +32,8 @@ for (var i = 0; i < libarys.length; i++) {
 
 sys.onPostLoad(function () {
 	console.log("Booting JavaScript Phase 2");
+	var argv = sys.argv();
 	var glInfo = sys.getGLVersion();
 	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
-	sys.runFile(getConfig("startup", "script/basic"), true);
+	sys.runFile(argv.length > 1 ? argv[1] : getConfig("startup", "script/basic"), true);
 });

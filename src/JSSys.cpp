@@ -25,6 +25,23 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
+        
+        ENGINE_JS_METHOD(ArgV) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(0);
+            
+            v8::Local<v8::Array> argvArray = v8::Array::New();
+            
+            int argc = getCommandLineArgCount();
+            const char** argv = getCommandLineArgs();
+            
+            for (int i = 0; i < argc; i++) {
+                argvArray->Set(i, v8::String::New(argv[i]));
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE(argvArray);
+        }
 
         ENGINE_JS_METHOD(RunFile) {
             ENGINE_JS_SCOPE_OPEN;
@@ -181,6 +198,9 @@ namespace Engine {
         
         void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {
 			addItem(sysTable, "println", Println);
+            
+            addItem(sysTable, "argv", ArgV);
+            
 			addItem(sysTable, "runFile", RunFile);
             
 			addItem(sysTable, "drawFunc", Drawfunc);

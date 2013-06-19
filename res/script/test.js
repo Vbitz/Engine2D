@@ -118,6 +118,7 @@ sys.drawFunc(function () {
 });
 
 sys.keyboardFunc(function (type, key, press) {
+	console.log("[" + type + "] : " + key + " : " + press);
 	if (key === "S" && press) {
 		sys.saveScreenshot("testing.png");
 	} else if (key === "F" && press) {

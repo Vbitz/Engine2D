@@ -16,6 +16,10 @@ namespace Engine {
 
 	GLFT_Font* 					getFont(std::string fontName);
     void                        loadFont(std::string prettyName, std::string filename, int fontSize);
+    
+    int                         getCommandLineArgCount();
+    
+    const char**                getCommandLineArgs();
 
 	int 						getScreenWidth();
 	int 						getScreenHeight();

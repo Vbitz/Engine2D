@@ -31,4 +31,17 @@ clean:
 dist-clean: clean
 	$(RM) *~ .dependtool
 
+release: clean all
+	rm -rf release
+	mkdir -p release
+	mkdir -p release/bin
+	mkdir -p release/res
+	mkdir -p release/res/config
+	cp -R res/lib release/res/lib
+	cp -R res/fonts release/res/fonts
+	cp res/config/config.json release/res/config/config.json
+	cp bin/Engine release/bin/Engine
+	cp run.sh release/run.sh
+	chmod +x release/run.sh
+
 include .depend

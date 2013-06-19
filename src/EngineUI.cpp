@@ -18,12 +18,11 @@ namespace Engine {
                 return;
             }
             std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
-            typedef std::vector<Logger::LogEvent>::iterator iter;
+            typedef std::vector<Logger::LogEvent>::reverse_iterator iter;
             int i = 0;
-            for (iter iterator = logEvents->begin(); iterator < logEvents->end(); iterator++) {
+            for (iter iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
                 double timeSince = Logger::GetTime() - iterator->time;
-                timeSince = std::log(timeSince);
-                timeSince = std::pow(timeSince, 2);
+                timeSince = std::pow(std::log(timeSince), i);
                 if (timeSince < 3.0) {
                     switch (iterator->Level) {
                         case Logger::LogLevel_Verbose:

@@ -24,6 +24,9 @@ namespace Engine {
     std::string _fontPath = "fonts/OpenSans-Regular.ttf";
     std::string _consoleFontPath = "fonts/SourceSansPro-Regular.ttf";
     
+    int _argc;
+    const char** _argv;
+    
     bool isGL3Context;
     
     GLFWwindow* window = NULL;
@@ -115,7 +118,7 @@ namespace Engine {
 		global->Set("input", inputTable);
 
 		_globalContext = v8::Context::New(NULL, global);
-
+        
 		runFile("lib/boot.js", true);
         
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
@@ -176,14 +179,18 @@ namespace Engine {
     }
 	
 	void KeyPress(GLFWwindow* window, int key, int state, int mods) {
+        if (!glfwGetWindowAttrib(window, GLFW_FOCUSED) && !isFullscreen) {
+            return;
+        }
+        
+        EngineUI::OnKeyPress(key, state == GLFW_PRESS);
+	
+        // everything after this is to handle the JS Function.
+        
         if (_keyboardFunc.IsEmpty()) {
             return;
         }
         
-        if (!glfwGetWindowAttrib(window, GLFW_FOCUSED) && !isFullscreen) {
-            return;
-        }
-	
         v8::HandleScope scp;
         v8::Context::Scope ctx_scope(_globalContext);
         
@@ -198,8 +205,6 @@ namespace Engine {
 			str[0] = (char) key;
 			str[1] = 0x00;
         }
-        
-        EngineUI::OnKeyPress(key, state == GLFW_PRESS);
         
         argv[0] = v8::String::NewSymbol(key < 256 ? "char" : "special");
         argv[1] = v8::String::NewSymbol(str);
@@ -405,6 +410,14 @@ namespace Engine {
 	GLFT_Font* getFont(std::string fontName) {
         return _fonts[fontName];
 	}
+    
+    int getCommandLineArgCount() {
+        return _argc;
+    }
+    
+    const char** getCommandLineArgs() {
+        return _argv;
+    }
 	
 	void setDrawFunction(v8::Persistent<v8::Function> func) {
 		_drawFunc = func;
@@ -553,6 +566,9 @@ namespace Engine {
         Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
         
 		Filesystem::Init(argv[0]);
+        
+        _argc = argc;
+        _argv = argv;
         
         InitScripting();
 		InitOpenGL();

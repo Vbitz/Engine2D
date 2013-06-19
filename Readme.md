@@ -3,6 +3,9 @@ Engine2D
 
 Todo
 -----
+- Move to entity/component based system
+- Improve console with commands (maybe just a JS interpreter)
+- Add missing texture support
 - Add OpenAL Sound Support
 - Finish moving to default OpenGL 3.2
 - Fixed Textures on Windows
