@@ -108,12 +108,9 @@ namespace Engine {
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
             long len = PHYSFS_fileLength(f);
 			char* fBuffer = new char[len + 1];
-            int i = 0;
-            while (!PHYSFS_eof(f)) {
-                if (PHYSFS_read(f, &fBuffer[i++], sizeof(char), 1) != 1) {
-                    Logger::begin("Filesystem", Logger::LogLevel_Error) << "File Read Failed" << std::endl;
-                    return (char*) "";
-                }
+            if (PHYSFS_read(f, fBuffer, sizeof(char), (PHYSFS_uint32) len) != len) {
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "File Read Failed" << std::endl;
+                return (char*) "";
             }
 			PHYSFS_close(f);
             //Logger::begin("Filesystem", Logger::LogLevel_Error) << fBuffer << std::endl;

@@ -45,9 +45,9 @@
 
 #include <FreeImage.h>
 
-#include "extern/GLFT_Font.hpp"
-
 #include "Logger.hpp"
+
+#include "Profiler.hpp"
 
 #include "Util.hpp"
 

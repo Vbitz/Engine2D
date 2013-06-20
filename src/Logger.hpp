@@ -2,6 +2,9 @@
 
 #include "common.hpp"
 
+#include <vector>
+#include <sstream>
+
 namespace Engine {
     namespace Logger {
         class StreamFlusher { };

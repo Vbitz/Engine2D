@@ -3,6 +3,8 @@
 #include "common.hpp"
 #include "main.hpp"
 
+#include "extern/GLFT_Font.hpp"
+
 #define BUFFER_SIZE 256
 
 namespace Engine {

@@ -9,6 +9,7 @@ namespace Engine {
     
     bool toggleNextframe = false;
     bool screenshotNextframe = false;
+    bool _dumpProfileAtFrameEnd = false;
     
     std::string _screenshotFilename;
 	
@@ -355,7 +356,9 @@ namespace Engine {
             long fileSize = 0;
             char* file = Filesystem::GetFileContent(_fontPath, fileSize);
             GLFT_Font* newFont = new GLFT_Font();
-			newFont->open(file, fileSize, fontSize);
+            Profiler::Begin("OpenFont_" + prettyName);
+                newFont->open(file, fileSize, fontSize);
+            Profiler::End("OpenFont_" + prettyName);
             _fonts[prettyName] = newFont;
 		} else {
 			Logger::begin("Font", Logger::LogLevel_Error) << "Could not load font" << Logger::end();
@@ -372,14 +375,15 @@ namespace Engine {
             return;
         }
         
-        loadFont("basic16px", _fontPath, 16);
-        loadFont("basic12px", _fontPath, 12);
-        loadFont("monospace8px", _consoleFontPath, 8);
+        Profiler::ProfileZone("LoadFonts", []() {
+            loadFont("basic16px", _fontPath, 16);
+            loadFont("basic12px", _fontPath, 12);
+            loadFont("monospace8px", _consoleFontPath, 8);
+        });
 	}
 	
 	void ShutdownFonts() {
-        typedef std::map<std::string, GLFT_Font*>::iterator iter;
-        for (iter iterator = _fonts.begin(); iterator != _fonts.end(); iterator++) {
+        for (auto iterator = _fonts.begin(); iterator != _fonts.end(); iterator++) {
             iterator->second->release();
         }
         _fonts.clear();
@@ -388,8 +392,7 @@ namespace Engine {
 	// semi-realtime time loading
 	
 	void CheckUpdate() {
-		typedef std::map<std::string, long>::iterator it_type;
-		for(it_type iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
+		for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
 			long lastMod = Filesystem::GetFileModifyTime(iterator->first);
 			if (lastMod > iterator->second) {
                 runFile(iterator->first, true);
@@ -560,6 +563,14 @@ namespace Engine {
         return window;
     }
     
+    void dumpProfile() {
+        _dumpProfileAtFrameEnd = true;
+    }
+    
+    void _dumpProfile() {
+        Profiler::DumpProfile();
+    }
+    
 	// main function
 	
 	int main(int argc, char const *argv[]) {
@@ -570,8 +581,14 @@ namespace Engine {
         _argc = argc;
         _argv = argv;
         
-        InitScripting();
-		InitOpenGL();
+        Profiler::ProfileZone("InitScripting", []() {
+            InitScripting();
+        });
+        
+        Profiler::ProfileZone("InitOpenGL", []() {
+            InitOpenGL();
+        });
+        
         if (!_onPostLoadFunc.IsEmpty()) {
             CallFunction(_onPostLoadFunc);
         }
@@ -589,26 +606,39 @@ namespace Engine {
 				continue;
 			}
             
-            CheckUpdate();
+            Profiler::ProfileZone("Draw", []() {
             
-            UpdateMousePos();
+                CheckUpdate();
             
-            Draw2D::CheckGLError("startOfRendering");
+                UpdateMousePos();
+                
+                Draw2D::CheckGLError("startOfRendering");
 	
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                Profiler::ProfileZone("GLClear", []() {
+                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                });
+                
+                Draw2D::Begin2d();
 	
-			Draw2D::Begin2d();
-	
-            if (!_drawFunc.IsEmpty()) {
-				CallFunction(_drawFunc);
-			}
+                if (!_drawFunc.IsEmpty()) {
+                    Profiler::ProfileZone("JSDraw", []() {
+                        CallFunction(_drawFunc);
+                    });
+                }
             
-            EngineUI::Draw();
+                Profiler::ProfileZone("EngineUI", []() {
+                    EngineUI::Draw();
+                });
             
-            Draw2D::End2d();
-	
-			glfwSwapBuffers(window);
-            glfwPollEvents();
+                Draw2D::End2d();
+                
+                Profiler::ProfileZone("SwapBuffers", []() {
+                    glfwSwapBuffers(window);
+                });
+                
+                glfwPollEvents();
+                
+            });
             
 			if (glfwWindowShouldClose(window)) {
 				Logger::begin("Window", Logger::LogLevel_Log) << "Exiting" << Logger::end();
@@ -619,13 +649,22 @@ namespace Engine {
             Draw2D::CheckGLError("endOfRendering");
             
             if (toggleNextframe) {
-                _toggleFullscreen();
+                Profiler::ProfileZone("ToggleFullscreen", []() {
+                    _toggleFullscreen();
+                });
                 toggleNextframe = false;
             }
             
             if (screenshotNextframe) {
-                _saveScreenshot();
+                Profiler::ProfileZone("SaveScreenshot", []() {
+                    _saveScreenshot();
+                });
                 screenshotNextframe = false;
+            }
+            
+            if (_dumpProfileAtFrameEnd) {
+                _dumpProfile();
+                _dumpProfileAtFrameEnd = false;
             }
 		}
 	

@@ -12,6 +12,8 @@
 
 #include "EngineUI.hpp"
 
+#include "extern/GLFT_Font.hpp"
+
 namespace Engine {
 
 	GLFT_Font* 					getFont(std::string fontName);
@@ -33,6 +35,7 @@ namespace Engine {
     void                        exit();
     void                        toggleFullscreen();
     void                        saveScreenshot(std::string filename);
+    void                        dumpProfile();
     void                        upgradeGL3();
     
     bool                        usingGL3();
