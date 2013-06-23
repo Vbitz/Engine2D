@@ -21,23 +21,24 @@ namespace Engine {
         float _texCoardBuffer[BUFFER_SIZE * 2];
         
         std::string _currentFontName = "basic16px";
+        int _currentFontSize = 16;
+        
+        std::string GLErrorString(GLenum error) {
+            switch (error) {
+                case GL_INVALID_ENUM:       return "Invalid Enum";
+                case GL_INVALID_VALUE:      return "Invalid Value";
+                case GL_INVALID_OPERATION:  return "Invalid Operation";
+                case GL_OUT_OF_MEMORY:      return "Out of Memory";
+                default:                    return "Unknown Error: " + std::to_string(error);
+            }
+        };
         
         bool CheckGLError(std::string source) {
             GLenum err;
             bool oneError = false;
             while ((err = glGetError()) != GL_NO_ERROR) {
                 oneError = true;
-                if (err == GL_INVALID_ENUM) {
-                    Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : Invalid Enum!" << Logger::end();
-                } else if (err == GL_INVALID_VALUE) {
-                    Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : Invalid value!" << Logger::end();
-                } else if (err == GL_INVALID_OPERATION) {
-                    Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : Invalid operation!" << Logger::end();
-                } else if (err == GL_OUT_OF_MEMORY) {
-                    Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : Out of Memory!" << Logger::end();
-                } else {
-                    Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : Unknown Error: " << err << Logger::end();
-                }
+                Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : " << GLErrorString(err) << Logger::end();
             }
             return oneError;
         }
@@ -133,7 +134,7 @@ namespace Engine {
             
             GLSetColor();
             
-            GLFT_Font* drawingFont = getFont(_currentFontName);
+            GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
             
 			drawingFont->beginDraw(x - _centerX,
                                    y - _centerY) << string << drawingFont->endDraw();
@@ -146,20 +147,21 @@ namespace Engine {
         }
         
         float CalcStringWidth(std::string str) {
-            return getFont(_currentFontName)->calcStringWidth(str);
+            return getFont(_currentFontName, _currentFontSize)->calcStringWidth(str);
         }
         
-        void SetFont(std::string name) {
+        void SetFont(std::string name, int size) {
             _currentFontName = name;
+            _currentFontSize = size;
         }
         
-        void LoadFont(std::string prettyName, std::string filename, int fontSize) {
-            loadFont(prettyName, filename, fontSize);
+        void LoadFont(std::string prettyName, std::string filename) {
+            loadFont(prettyName, filename);
             _currentFontName = prettyName;
         }
         
         bool IsFontLoaded(std::string name) {
-            return getFont(name) != NULL;
+            return isFontLoaded(name);
         }
         
         bool IsValidTextureID(int texID) {

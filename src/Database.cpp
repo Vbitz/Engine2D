@@ -5,7 +5,7 @@ namespace Engine {
     
     Database::Database(std::string database) {
         if (!hasInited) {
-            Logger::begin("Sqlite", Logger::LogLevel_Log) << "Initalise SQLITE" << Logger::end();
+            Logger::begin("Sqlite", Logger::LogLevel_Verbose) << "Initalise SQLITE" << Logger::end();
             sqlite3_initialize();
             hasInited = true;
         }

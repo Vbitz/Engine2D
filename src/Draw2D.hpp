@@ -29,8 +29,8 @@ namespace Engine {
         
         void Print(float x, float y, const char* string);
         float CalcStringWidth(std::string str);
-        void SetFont(std::string name);
-        void LoadFont(std::string prettyName, std::string filename, int fontSize);
+        void SetFont(std::string name, int fontSize);
+        void LoadFont(std::string prettyName, std::string filename);
         bool IsFontLoaded(std::string name);
         
         bool IsValidTextureID(int texID);

@@ -3,6 +3,8 @@
 #include "common.hpp"
 #include "main.hpp"
 
+#include <FreeImage.h>
+
 #include "Filesystem.hpp"
 #include "Draw2D.hpp"
 

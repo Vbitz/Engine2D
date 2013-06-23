@@ -113,7 +113,6 @@ namespace Engine {
                 return (char*) "";
             }
 			PHYSFS_close(f);
-            //Logger::begin("Filesystem", Logger::LogLevel_Error) << fBuffer << std::endl;
             fBuffer[len] = 0x00;
             fileSize = len;
 			return fBuffer;

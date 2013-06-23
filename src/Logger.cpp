@@ -4,6 +4,8 @@ namespace Engine {
     namespace Logger {
         std::vector<LogEvent> _logEvents;
         
+        bool _enableColor = false;
+        
         std::ostringstream _ss;
         
         std::string _currentDomain;
@@ -13,6 +15,25 @@ namespace Engine {
         
         std::ostream& operator<<(std::ostream& os, const StreamFlusher& rhs) {
             return os.flush();
+        }
+        
+        std::string getEscapeCode(int color, bool bold) {
+            return "\x1b[" + std::to_string(color + 30) + (bold ? ";1m| " : "m| ");
+        }
+        
+        std::string GetLevelColor(LogLevel level) {
+            switch (level) {
+                case LogLevel_Verbose:
+                    return getEscapeCode(0, true);
+                case LogLevel_User:
+                    return getEscapeCode(7, true);
+                case LogLevel_Log:
+                    return getEscapeCode(7, false);
+                case LogLevel_Warning:
+                    return getEscapeCode(3, true);
+                case LogLevel_Error:
+                    return getEscapeCode(1, true);
+            }
         }
         
         std::string GetLevelString(LogLevel level) {
@@ -49,7 +70,7 @@ namespace Engine {
         
         void LogText(std::string domain, LogLevel level, std::string str) {
             _logEvents.push_back(LogEvent(domain, level, str));
-            std::cout << GetTime() << " : [" << GetLevelString(level) << "] " << domain << " | " << str << std::endl;
+            std::cout << GetLevelColor(level) << GetTime() << " : [" << GetLevelString(level) << "] " << domain << " | " << str << std::endl;
         }
         
         std::ostream& begin(std::string domain, LogLevel level) {

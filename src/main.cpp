@@ -32,7 +32,7 @@ namespace Engine {
     
     GLFWwindow* window = NULL;
 	
-    std::map<std::string, GLFT_Font*> _fonts;
+    std::map<std::string, ResourceManager::FontResource*> _fonts;
 	
 	std::map<std::string, std::string> _persists;
 
@@ -132,13 +132,23 @@ namespace Engine {
 		_globalIsolate->Dispose();
 	}
 	
-	void CallFunction(v8::Handle<v8::Value> func) {
+	bool CallFunction(v8::Handle<v8::Value> func) {
 		v8::HandleScope scp;
 		v8::Context::Scope ctx_scope(_globalContext);
 	
 		v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(func);
-	
+        
+		v8::TryCatch tryCatch;
+        
 		real_func->Call(_globalContext->Global(), 0, NULL);
+        
+        if (!tryCatch.Exception().IsEmpty()) {
+            v8::Handle<v8::Value> exception = tryCatch.Exception();
+            v8::String::AsciiValue exception_str(exception);
+            Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
+            return false;
+        }
+        return true;
 	}
 	
 	void UpdateMousePos() {
@@ -195,6 +205,8 @@ namespace Engine {
         v8::HandleScope scp;
         v8::Context::Scope ctx_scope(_globalContext);
         
+        v8::TryCatch tryCatch;
+        
         v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(_keyboardFunc);
 
         v8::Handle<v8::Value> argv[3];
@@ -212,6 +224,13 @@ namespace Engine {
         argv[2] = v8::Boolean::New(state == GLFW_PRESS);
         
         real_func->Call(_globalContext->Global(), 3, argv);
+        
+        if (!tryCatch.Exception().IsEmpty()) {
+            v8::Handle<v8::Value> exception = tryCatch.Exception();
+            v8::String::AsciiValue exception_str(exception);
+            Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
+            _keyboardFunc.Clear();
+        }
 	}
     
     void OnGLFWError(int error, const char* msg) {
@@ -275,7 +294,7 @@ namespace Engine {
         
         glfwMakeContextCurrent(window);
         
-        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init GLEW" << Logger::end();
+        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLEW" << Logger::end();
         
         Draw2D::CheckGLError("PostCreateContext");
         
@@ -289,7 +308,7 @@ namespace Engine {
         
         glGetError();
         
-        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Callbacks" << Logger::end();
+        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init Callbacks" << Logger::end();
         
         ResizeWindow(window, width, height);
         
@@ -298,7 +317,7 @@ namespace Engine {
         
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         
-        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init OpenGL State" << Logger::end();
+        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init OpenGL State" << Logger::end();
         
         Draw2D::CheckGLError("PostSetCallback");
         
@@ -321,11 +340,12 @@ namespace Engine {
     void CloseWindow() {
         Logger::begin("Window", Logger::LogLevel_Log) << "Terminating Window" << Logger::end();
         ShutdownFonts();
+        ResourceManager::UnloadAll();
         glfwDestroyWindow(window);
     }
 	
 	void InitOpenGL() {
-        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init GLFW" << Logger::end();
+        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLFW" << Logger::end();
         
         glfwSetErrorCallback(OnGLFWError);
         
@@ -341,25 +361,20 @@ namespace Engine {
 	
 	// font rendering
 	
-    void loadFont(std::string prettyName, std::string filename, int fontSize) {
+    void loadFont(std::string prettyName, std::string filename) {
         if (isGL3Context) {
             return;
         }
         
         Logger::begin("Font", Logger::LogLevel_Log)
-            << "Loading Font: " << filename << " with size " << fontSize << "px as " << prettyName
+            << "Loading Font: " << filename << " as " << prettyName
             << Logger::end();
         
         Draw2D::CheckGLError("PreLoadFont");
         
-		if (Filesystem::FileExists(_fontPath)) {
-            long fileSize = 0;
-            char* file = Filesystem::GetFileContent(_fontPath, fileSize);
-            GLFT_Font* newFont = new GLFT_Font();
-            Profiler::Begin("OpenFont_" + prettyName);
-                newFont->open(file, fileSize, fontSize);
-            Profiler::End("OpenFont_" + prettyName);
-            _fonts[prettyName] = newFont;
+		if (Filesystem::FileExists(filename)) {
+            ResourceManager::Load(filename);
+            _fonts[prettyName] = new ResourceManager::FontResource(filename);
 		} else {
 			Logger::begin("Font", Logger::LogLevel_Error) << "Could not load font" << Logger::end();
 		}
@@ -376,16 +391,12 @@ namespace Engine {
         }
         
         Profiler::ProfileZone("LoadFonts", []() {
-            loadFont("basic16px", _fontPath, 16);
-            loadFont("basic12px", _fontPath, 12);
-            loadFont("monospace8px", _consoleFontPath, 8);
+            loadFont("basic", _fontPath);
+            loadFont("monospace", _consoleFontPath);
         });
 	}
 	
 	void ShutdownFonts() {
-        for (auto iterator = _fonts.begin(); iterator != _fonts.end(); iterator++) {
-            iterator->second->release();
-        }
         _fonts.clear();
 	}
 	
@@ -410,9 +421,13 @@ namespace Engine {
 		return _screenHeight;
 	}
 	
-	GLFT_Font* getFont(std::string fontName) {
-        return _fonts[fontName];
+	GLFT_Font* getFont(std::string fontName, int size) {
+        return _fonts[fontName]->GetFont(size);
 	}
+    
+    bool isFontLoaded(std::string fontName) {
+        return _fonts.count(fontName) != 0;
+    }
     
     int getCommandLineArgCount() {
         return _argc;
@@ -460,6 +475,7 @@ namespace Engine {
                 v8::Handle<v8::Value> exception = tryCatch.Exception();
                 v8::String::AsciiValue exception_str(exception);
                 Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
+                return false;
             }
             Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded File: " << path << Logger::end();
             if (persist) {
@@ -473,7 +489,7 @@ namespace Engine {
         if (!Filesystem::FileExists(path)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << path << " Not Found" << Logger::end();
         } else {
-            while (!_runFile(path, persist)) {
+            if (!_runFile(path, persist)) {
                 Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not load File" << Logger::end();
             }
         }
@@ -606,37 +622,45 @@ namespace Engine {
 				continue;
 			}
             
-            Profiler::ProfileZone("Draw", []() {
+            Profiler::ProfileZone("Frame", []() {
             
                 CheckUpdate();
             
                 UpdateMousePos();
                 
-                Draw2D::CheckGLError("startOfRendering");
-	
-                Profiler::ProfileZone("GLClear", []() {
-                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                });
+                Profiler::ProfileZone("Draw", []() {
                 
-                Draw2D::Begin2d();
+                    Draw2D::CheckGLError("startOfRendering");
 	
-                if (!_drawFunc.IsEmpty()) {
-                    Profiler::ProfileZone("JSDraw", []() {
-                        CallFunction(_drawFunc);
+                    Profiler::ProfileZone("GLClear", []() {
+                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                     });
-                }
-            
-                Profiler::ProfileZone("EngineUI", []() {
-                    EngineUI::Draw();
-                });
-            
-                Draw2D::End2d();
                 
+                    Draw2D::Begin2d();
+	
+                    if (!_drawFunc.IsEmpty()) {
+                        Profiler::Begin("JSDraw");
+                        if (!CallFunction(_drawFunc)) {
+                            _drawFunc.Clear();
+                        }
+                        Profiler::End("JSDraw");
+                    }
+            
+                    Profiler::ProfileZone("EngineUI", []() {
+                        EngineUI::Draw();
+                    });
+            
+                    Draw2D::End2d();
+                
+                });
+                    
                 Profiler::ProfileZone("SwapBuffers", []() {
                     glfwSwapBuffers(window);
                 });
                 
-                glfwPollEvents();
+                Profiler::ProfileZone("PollEvents", []() {
+                    glfwPollEvents();
+                });
                 
             });
             

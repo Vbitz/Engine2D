@@ -85,7 +85,7 @@ GLFT_Font::~GLFT_Font()
 
 void GLFT_Font::open(char* file, long fileSize, unsigned int size)
 {
-    const size_t MARGIN = 5;
+    const size_t MARGIN = 2;
 
     // release the font if it already exists
     if(isValid())

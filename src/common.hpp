@@ -43,12 +43,12 @@
 
 #include <glm/glm.hpp>
 
-#include <FreeImage.h>
-
 #include "Logger.hpp"
 
 #include "Profiler.hpp"
 
 #include "Util.hpp"
+
+#include "ResourceManager.hpp"
 
 #endif

@@ -288,15 +288,13 @@ namespace Engine {
         ENGINE_JS_METHOD(LoadFont) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
+            ENGINE_CHECK_ARGS_LENGTH(2);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name you use to refer to the font");
             ENGINE_CHECK_ARG_STRING(1, "Arg1 is the filename of the font");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the size of the font to load");
             
             Draw2D::LoadFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
-                             ENGINE_GET_ARG_CPPSTRING_VALUE(1),
-                             ENGINE_GET_ARG_NUMBER_VALUE(2));
+                             ENGINE_GET_ARG_CPPSTRING_VALUE(1));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -310,11 +308,13 @@ namespace Engine {
         ENGINE_JS_METHOD(SetFont) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            ENGINE_CHECK_ARGS_LENGTH(2);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to use");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the size of the font to use");
             
-            Draw2D::SetFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            Draw2D::SetFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                            ENGINE_GET_ARG_NUMBER_VALUE(1));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -450,7 +450,6 @@ namespace Engine {
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		// TODO: add support for this function to open anything ( or just png\jpg\gif )
 		ENGINE_JS_METHOD(OpenImage) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -464,69 +463,17 @@ namespace Engine {
                 ENGINE_THROW_ARGERROR("File does not Exist");
 				ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 			}
-		
-			GLuint text = 0;
             
-            long fileSize = 0;
+            std::string filename = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
             
-            const char* file = Filesystem::GetFileContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0), fileSize);
-            
-            FIMEMORY* mem = FreeImage_OpenMemory((BYTE*) file, (unsigned int)fileSize);
-            
-            FIBITMAP *lImg = FreeImage_LoadFromMemory(FreeImage_GetFileTypeFromMemory(mem), mem);
-            
-            FIBITMAP *img = 0;
-            
-            if (FreeImage_GetBPP(lImg) == 24) {
-                Logger::begin("JSDraw", Logger::LogLevel_Warning) << "Converting image to 32bit" << Logger::end();
-                img = FreeImage_ConvertTo32Bits(lImg);
-            } else {
-                img = lImg;
+            if (!ResourceManager::HasSource(filename)) {
+                ResourceManager::Load(filename);
             }
             
-            int width = FreeImage_GetWidth(img);
-            int height = FreeImage_GetHeight(img);
-            
-            unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
-            unsigned char* texture = new unsigned char[4 * width * height];
-
-            int pos = 0;
-            
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    texture[pos + 0] = pixel[pos + 2];
-                    texture[pos + 1] = pixel[pos + 1];
-                    texture[pos + 2] = pixel[pos + 0];
-                    texture[pos + 3] = pixel[pos + 3];
-                    pos += 4;
-                }
-            }
-            
-            Draw2D::CheckGLError("Pre Image Load");
-            
-            glGenTextures(1, &text);
-            
-			glBindTexture(GL_TEXTURE_2D, text);
-            
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                            GL_NEAREST_MIPMAP_NEAREST );
-            
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                            GL_NEAREST );
-            
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
-            
-            glGenerateMipmap(GL_TEXTURE_2D);
-            
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            Draw2D::CheckGLError("Post Image Load");
-            
-            Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from file: " << text << Logger::end();
-            
-            FreeImage_CloseMemory(mem);
+            ResourceManager::ImageResource* img = new ResourceManager::ImageResource(filename);
+            img->Load();
 		
-			ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
+			ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(img->GetTextureID()));
 		}
         
         ENGINE_JS_METHOD(CreateImage) {

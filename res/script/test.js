@@ -68,18 +68,18 @@ sys.drawFunc(function () {
 		img3 = draw.createImage(hsv, 360, 100);
 	}
 
-	if (!draw.isFontLoaded("light8px")) {
-		draw.loadFont("light8px", "fonts/OpenSans-Light.ttf", 8);
+	if (!draw.isFontLoaded("light")) {
+		draw.loadFont("light", "fonts/OpenSans-Light.ttf");
 	}
 
 	draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
 	draw.setColor(0x000000);
-	draw.setFont("basic16px");
+	draw.setFont("basic", 16);
 	draw.print(10, 35, "Engine2D Test Suite");
 	draw.setColor(0xffffff);
 	draw.print(10, 70, "Automated Tests");
 	draw.print(400, 70, "Rendering Tests");
-	draw.setFont("basic12px");
+	draw.setFont("basic", 12);
 	var x = 2;
 	for (var i in testResults) {
 		if (testResults[i]) {
@@ -94,9 +94,9 @@ sys.drawFunc(function () {
 	}
 	draw.setColor(0xffffff);
 	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + sys.hasExtention("GL_ARB_framebuffer_object"));
-	draw.setFont("light8px");
+	draw.setFont("light", 8);
 	draw.print(20, x * 30 + 40, "Custom Loaded Font");
-	draw.setFont("basic12px");
+	draw.setFont("basic", 12);
 	draw.print(420, 100, "Rect");
 	draw.rect(410, 120, 100, 100);
 	draw.print(540, 100, "Grid");

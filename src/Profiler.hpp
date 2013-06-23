@@ -12,5 +12,7 @@ namespace Engine {
         void ProfileZone(std::string zone, std::function<void()> func);
         
         void DumpProfile();
+        
+        double GetTime(std::string zone);
     }
 }

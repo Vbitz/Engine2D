@@ -16,8 +16,9 @@
 
 namespace Engine {
 
-	GLFT_Font* 					getFont(std::string fontName);
-    void                        loadFont(std::string prettyName, std::string filename, int fontSize);
+	GLFT_Font* 					getFont(std::string fontName, int fontSize);
+    void                        loadFont(std::string prettyName, std::string filename);
+    bool                        isFontLoaded(std::string fontName);
     
     int                         getCommandLineArgCount();
     
