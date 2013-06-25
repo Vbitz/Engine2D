@@ -683,7 +683,7 @@ namespace Engine {
     void runCommand(std::string str) {
         v8::HandleScope handle_scope;
         
-		Logger::begin("Console", Logger::LogLevel_Log) << "> " << str << Logger::end();
+		Logger::begin("Console", Logger::LogLevel_ConsoleInput) << "> " << str << Logger::end();
         
 		v8::Context::Scope ctx_scope(_globalContext);
         

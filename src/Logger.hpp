@@ -23,7 +23,8 @@ namespace Engine {
             LogLevel_Warning,
             LogLevel_Log,
             LogLevel_User,
-            LogLevel_Verbose
+            LogLevel_Verbose,
+            LogLevel_ConsoleInput
         };
         
         class LogEvent {

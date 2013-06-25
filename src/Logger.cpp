@@ -23,21 +23,19 @@ namespace Engine {
         
         std::string GetLevelColor(LogLevel level) {
             switch (level) {
-                case LogLevel_Verbose:
-                    return getEscapeCode(0, true);
-                case LogLevel_User:
-                    return getEscapeCode(7, true);
-                case LogLevel_Log:
-                    return getEscapeCode(7, false);
-                case LogLevel_Warning:
-                    return getEscapeCode(3, true);
-                case LogLevel_Error:
-                    return getEscapeCode(1, true);
+                case LogLevel_Verbose:      return getEscapeCode(0, true);
+                case LogLevel_User:         return getEscapeCode(5, true);
+                case LogLevel_ConsoleInput: return getEscapeCode(6, true);
+                case LogLevel_Log:          return getEscapeCode(7, false);
+                case LogLevel_Warning:      return getEscapeCode(3, true);
+                case LogLevel_Error:        return getEscapeCode(1, true);
             }
         }
         
         std::string GetLevelString(LogLevel level) {
             switch (level) {
+                case LogLevel_ConsoleInput:
+                    return "ConsoleInput";
                 case LogLevel_Verbose:
                     return "Verbose";
                 case LogLevel_User:
@@ -69,8 +67,27 @@ namespace Engine {
         }
         
         void LogText(std::string domain, LogLevel level, std::string str) {
-            _logEvents.push_back(LogEvent(domain, level, str));
-            std::cout << GetLevelColor(level) << GetTime() << " : [" << GetLevelString(level) << "] " << domain << " | " << str << std::endl;
+            if (str.find('\n') == -1) {
+                _logEvents.push_back(LogEvent(domain, level, str));
+                std::cout << GetLevelColor(level) << GetTime()
+                    << " : [" << GetLevelString(level) << "] "
+                    << domain << " | " << str << std::endl;
+            } else {
+                std::string strCopy = str;
+                std::size_t newLinePos = strCopy.find('\n');
+                while (newLinePos != std::string::npos) {
+                    _logEvents.push_back(LogEvent(domain, level, strCopy.substr(0, newLinePos - 1)));
+                    std::cout << GetLevelColor(level) << GetTime()
+                        << " : [" << GetLevelString(level) << "] "
+                        << domain << " | " << strCopy.substr(0, newLinePos) << std::endl;
+                    strCopy.erase(0, newLinePos + 1);
+                    newLinePos = strCopy.find('\n');
+                }
+                _logEvents.push_back(LogEvent(domain, level, strCopy));
+                std::cout << GetLevelColor(level) << GetTime()
+                    << " : [" << GetLevelString(level) << "] "
+                    << domain << " | " << strCopy << std::endl;
+            }
         }
         
         std::ostream& begin(std::string domain, LogLevel level) {

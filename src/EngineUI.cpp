@@ -61,7 +61,7 @@ namespace Engine {
                 return;
             }
             std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
-            bool showVerbose = Config::GetBoolean("cl_showVerboseLog");
+            bool showVerbose = Config::GetBoolean("cl_showVerboseLog"); // pretty cheap
             int i = getScreenHeight() - 40;
             for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
                 if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
@@ -77,10 +77,13 @@ namespace Engine {
                             Draw2D::SetColor(205 / 255.0f, 205 / 255.0f, 205 / 255.0f);
                             break;
                         case Logger::LogLevel_User:
-                            Draw2D::SetColor(34 / 255.0f, 139 / 255.0f, 34 / 255.0f);
+                            Draw2D::SetColor(255 / 255.0f, 0 / 255.0f, 255 / 255.0f);
+                            break;
+                        case Logger::LogLevel_ConsoleInput:
+                            Draw2D::SetColor(0 / 255.0f, 191 / 255.0f, 255 / 255.0f);
                             break;
                         case Logger::LogLevel_Log:
-                            Draw2D::SetColor(192 / 255.0f, 192 / 255.0f, 192 / 255.0f);
+                            Draw2D::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
                             break;
                         case Logger::LogLevel_Warning:
                             Draw2D::SetColor(255 / 255.0f, 165 / 255.0f, 0 / 255.0f);
@@ -99,9 +102,10 @@ namespace Engine {
                 }
             }
             Draw2D::SetColor(0.0f, 0.0f, 0.0f, 0.85f);
-            Draw2D::Rect(5, getScreenHeight() - 30, getScreenWidth() - 10, 20);
+            Draw2D::Rect(5, getScreenHeight() - 30, getScreenWidth() - 10, 25);
             Draw2D::SetColor(1.0f, 1.0f, 1.0f);
-            Draw2D::Print(10, getScreenHeight() - 25, (currentConsoleInput.str() + "_").c_str());
+            Draw2D::SetFont("basic", 12);
+            Draw2D::Print(10, getScreenHeight() - 22, (currentConsoleInput.str() + "_").c_str());
         }
         
         void OnKeyPress(int key, int press, bool shift) {
