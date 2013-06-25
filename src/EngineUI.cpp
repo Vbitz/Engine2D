@@ -7,7 +7,6 @@ namespace Engine {
         std::stringstream currentConsoleInput;
         
         bool _active = true;
-        bool _showVerbose = false;
         bool _showConsole = false;
         
         char getSpecialChars(int key) {
@@ -62,9 +61,10 @@ namespace Engine {
                 return;
             }
             std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
+            bool showVerbose = Config::GetBoolean("cl_showVerboseLog");
             int i = getScreenHeight() - 40;
             for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
-                if (iterator->Level == Logger::LogLevel_Verbose && !_showVerbose) {
+                if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
                     i -= 6; // add some padding to show that a message is there, just hidden
                     Draw2D::SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
                     Draw2D::Rect(0, i + 2, getScreenWidth(), 2);
@@ -130,10 +130,6 @@ namespace Engine {
         
         void SetActive(bool active) {
             _active = active;
-        }
-        
-        void SetShowVerbose(bool show) {
-            _showVerbose = show;
         }
         
         void ToggleConsole() {

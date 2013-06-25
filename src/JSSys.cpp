@@ -186,6 +186,14 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(RestartRenderer) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            restartRenderer();
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(Exit) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -238,13 +246,13 @@ namespace Engine {
                 // set config option
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Config Key to Get");
                 if (args[1]->IsString()) {
-                    Config::Set(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+                    Config::SetString(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
                 } else if (args[1]->IsBoolean()) {
-                    Config::Set(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_BOOLEAN_VALUE(1));
+                    Config::SetBoolean(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_BOOLEAN_VALUE(1));
                 } else if (args[1]->IsNumber()) {
-                    Config::Set(ENGINE_GET_ARG_CPPSTRING_VALUE(0), (float) ENGINE_GET_ARG_NUMBER_VALUE(1));
+                    Config::SetNumber(ENGINE_GET_ARG_CPPSTRING_VALUE(0), (float) ENGINE_GET_ARG_NUMBER_VALUE(1));
                 } else {
-                    Config::Set(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+                    Config::SetString(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
                 }
             } else {
                 ENGINE_THROW_ARGERROR("sys.config accepts 0(listAll), 1(get) or 2(set) args");
@@ -279,6 +287,7 @@ namespace Engine {
             
             addItem(sysTable, "resizeWindow", ResizeWindow);
             addItem(sysTable, "toggleFullscreen", ToggleFullscreen);
+            addItem(sysTable, "restartRenderer", RestartRenderer);
             
             addItem(sysTable, "perf", PerfZone);
             

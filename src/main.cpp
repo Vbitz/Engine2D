@@ -10,6 +10,7 @@ namespace Engine {
     bool toggleNextframe = false;
     bool screenshotNextframe = false;
     bool _dumpProfileAtFrameEnd = false;
+    bool _restartNextFrame = false;
     
     std::string _screenshotFilename;
 	
@@ -17,13 +18,6 @@ namespace Engine {
 	
 	int _screenWidth = 0;
 	int _screenHeight = 0;
-    
-    int _startingWidth = 800;
-    int _startingHeight = 600;
-    bool _startingFullscreen = false;
-    bool _startingOpenGL3 = false;
-    std::string _fontPath = "fonts/OpenSans-Regular.ttf";
-    std::string _consoleFontPath = "fonts/SourceSansPro-Regular.ttf";
     
     int _argc;
     const char** _argv;
@@ -252,6 +246,16 @@ namespace Engine {
 		input_table->Set(v8::String::New("screenWidth"), v8::Number::New(_screenWidth));
 		input_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
 	}
+
+    void LoadBasicConfigs() {
+        Config::SetNumber("cl_width", 800);
+        Config::SetNumber("cl_height", 800);
+        Config::SetBoolean("cl_fullscreen", false);
+        Config::SetBoolean("cl_openGL3", false);
+        Config::SetString("cl_fontPath", "fonts/OpenSans-Regular.ttf");
+        Config::SetString("cl_consoleFontPath", "fonts/SourceSansPro-Regular.ttf");
+        Config::SetBoolean("cl_showVerboseLog", false);
+    }
 	
 	void ResizeWindow(GLFWwindow* window, int w, int h) {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
@@ -317,27 +321,29 @@ namespace Engine {
         v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
         
         if (obj->Has(v8::String::NewSymbol("width")) && obj->Get(v8::String::NewSymbol("width"))->IsInt32()) {
-            _startingWidth = obj->Get(v8::String::NewSymbol("width"))->Int32Value();
+            Config::SetNumber("cl_width", obj->Get(v8::String::NewSymbol("width"))->Int32Value());
         }
         
         if (obj->Has(v8::String::NewSymbol("height")) && obj->Get(v8::String::NewSymbol("height"))->IsInt32()) {
-            _startingHeight = obj->Get(v8::String::NewSymbol("height"))->Int32Value();
+            Config::SetNumber("cl_height", obj->Get(v8::String::NewSymbol("height"))->Int32Value());
         }
         
         if (obj->Has(v8::String::NewSymbol("fullscreen")) && obj->Get(v8::String::NewSymbol("fullscreen"))->IsBoolean()) {
-            _startingFullscreen = obj->Get(v8::String::NewSymbol("fullscreen"))->BooleanValue();
+            Config::SetBoolean("cl_fullscreen", obj->Get(v8::String::NewSymbol("fullscreen"))->BooleanValue());
         }
         
         if (obj->Has(v8::String::NewSymbol("openGL3")) && obj->Get(v8::String::NewSymbol("openGL3"))->IsBoolean()) {
-            _startingOpenGL3 = obj->Get(v8::String::NewSymbol("openGL3"))->BooleanValue();
+            Config::SetBoolean("cl_openGL3", obj->Get(v8::String::NewSymbol("openGL3"))->BooleanValue());
         }
         
         if (obj->Has(v8::String::NewSymbol("fontPath")) && obj->Get(v8::String::NewSymbol("fontPath"))->IsString()) {
-            _fontPath = std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("fontPath"))->ToString()));
+            Config::SetString("cl_fontPath",
+                        std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("fontPath"))->ToString())));
         }
         
         if (obj->Has(v8::String::NewSymbol("consoleFontPath")) && obj->Get(v8::String::NewSymbol("consoleFontPath"))->IsString()) {
-            _consoleFontPath = std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("consoleFontPath"))->ToString()));
+            Config::SetString("cl_consoleFontPath",
+                        std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("consoleFontPath"))->ToString())));
         }
         
         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -421,7 +427,8 @@ namespace Engine {
         
 		glfwInit();
         
-        OpenWindow(_startingWidth, _startingHeight, _startingFullscreen, _startingOpenGL3);
+        OpenWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"),
+                   Config::GetBoolean("cl_fullscreen"), Config::GetBoolean("cl_openGL3"));
 	}
 	
 	void ShutdownOpenGL() {
@@ -461,8 +468,8 @@ namespace Engine {
         }
         
         Profiler::ProfileZone("LoadFonts", []() {
-            loadFont("basic", _fontPath);
-            loadFont("monospace", _consoleFontPath);
+            loadFont("basic", Config::GetString("cl_fontPath"));
+            loadFont("monospace", Config::GetString("cl_consoleFontPath"));
         });
 	}
 	
@@ -573,6 +580,18 @@ namespace Engine {
         running = false;
     }
     
+    void restartRenderer() {
+        Logger::begin("Window", Logger::LogLevel_Log) << "Restarting renderer on next frame" << Logger::end();
+        _restartNextFrame = true;
+    }
+    
+    void _restartRenderer() {
+        CloseWindow();
+        OpenWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"),
+                   Config::GetBoolean("cl_fullscreen"), Config::GetBoolean("cl_openGL3"));
+        UpdateScreen();
+    }
+    
     void toggleFullscreen() {
         Logger::begin("Window", Logger::LogLevel_Log) << "Switching to fullscreen on next frame" << Logger::end();
         toggleNextframe = true;
@@ -581,7 +600,7 @@ namespace Engine {
     void _toggleFullscreen() {
         if (isFullscreen) {
             CloseWindow();
-            OpenWindow(_startingWidth, _startingHeight, false, isGL3Context);
+            OpenWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"), false, isGL3Context);
             isFullscreen = false;
             UpdateScreen();
         } else {
@@ -696,6 +715,8 @@ namespace Engine {
 	int main(int argc, char const *argv[]) {
         Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
         
+        LoadBasicConfigs();
+        
 		Filesystem::Init(argv[0]);
         
         _argc = argc;
@@ -781,6 +802,13 @@ namespace Engine {
                     _toggleFullscreen();
                 });
                 toggleNextframe = false;
+            }
+            
+            if (_restartNextFrame) {
+                Profiler::ProfileZone("RestartRenderer", []() {
+                    _restartRenderer();
+                });
+                _restartNextFrame = false;
             }
             
             if (screenshotNextframe) {

@@ -6,19 +6,19 @@ namespace Engine {
         std::map<std::string, bool> _boolCvars;
         std::map<std::string, std::string> _stringCvars;
         
-        void Set(std::string key, int value) {
+        void SetNumber(std::string key, int value) {
             _numberCvars[key] = value;
         }
         
-        void Set(std::string key, float value) {
+        void SetNumber(std::string key, float value) {
             _numberCvars[key] = value;
         }
         
-        void Set(std::string key, bool value) {
+        void SetBoolean(std::string key, bool value) {
             _boolCvars[key] = value;
         }
         
-        void Set(std::string key, std::string value) {
+        void SetString(std::string key, std::string value) {
             _stringCvars[key] = value;
         }
         
@@ -59,13 +59,33 @@ namespace Engine {
             return _stringCvars[key];
         }
         
+        bool HasConfig(std::string key) {
+            for (auto iter = _numberCvars.begin(); iter != _numberCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return true;
+                }
+            }
+            for (auto iter = _boolCvars.begin(); iter != _boolCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return true;
+                }
+            }
+            for (auto iter = _stringCvars.begin(); iter != _stringCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return true;
+                }
+            }
+            
+            return true;
+        }
+        
         std::vector<std::string> GetAll() {
             std::vector<std::string> ret;
             for (auto iter = _numberCvars.begin(); iter != _numberCvars.end(); iter++) {
                 ret.push_back("number : " + iter->first + " : " + std::to_string(iter->second));
             }
             for (auto iter = _boolCvars.begin(); iter != _boolCvars.end(); iter++) {
-                ret.push_back("bool : " + iter->first + " : " + std::to_string(iter->second));
+                ret.push_back("bool : " + iter->first + " : " + (iter->second ? "true" : "false"));
             }
             for (auto iter = _stringCvars.begin(); iter != _stringCvars.end(); iter++) {
                 ret.push_back("string : " + iter->first + " : " + iter->second);

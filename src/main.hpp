@@ -40,6 +40,7 @@ namespace Engine {
     void                        saveScreenshot(std::string filename);
     void                        dumpProfile();
     void                        upgradeGL3();
+    void                        restartRenderer();
     
     bool                        usingGL3();
     
