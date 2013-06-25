@@ -49,6 +49,8 @@
 
 #include "Util.hpp"
 
+#include "Config.hpp"
+
 #include "ResourceManager.hpp"
 
 #endif

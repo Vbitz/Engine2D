@@ -23,6 +23,26 @@ namespace Engine {
         }
         
         
+        std::string Get(std::string key) {
+            for (auto iter = _numberCvars.begin(); iter != _numberCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return std::to_string(iter->second);
+                }
+            }
+            for (auto iter = _boolCvars.begin(); iter != _boolCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return std::to_string(iter->second);
+                }
+            }
+            for (auto iter = _stringCvars.begin(); iter != _stringCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return iter->second;
+                }
+            }
+            
+            return "undefined";
+        }
+        
         int GetInt(std::string key) {
             return (int) _numberCvars[key];
         }
@@ -37,6 +57,20 @@ namespace Engine {
         
         std::string GetString(std::string key) {
             return _stringCvars[key];
+        }
+        
+        std::vector<std::string> GetAll() {
+            std::vector<std::string> ret;
+            for (auto iter = _numberCvars.begin(); iter != _numberCvars.end(); iter++) {
+                ret.push_back("number : " + iter->first + " : " + std::to_string(iter->second));
+            }
+            for (auto iter = _boolCvars.begin(); iter != _boolCvars.end(); iter++) {
+                ret.push_back("bool : " + iter->first + " : " + std::to_string(iter->second));
+            }
+            for (auto iter = _stringCvars.begin(); iter != _stringCvars.end(); iter++) {
+                ret.push_back("string : " + iter->first + " : " + iter->second);
+            }
+            return ret;
         }
     }
 }

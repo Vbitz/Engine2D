@@ -221,6 +221,38 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(ConfigOptions) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            if (args.Length() == 0) {
+                // print all config options
+                std::vector<std::string> items = Config::GetAll();
+                for (auto iter = items.begin(); iter != items.end(); iter++) {
+                    Logger::begin("Config", Logger::LogLevel_Log) << *iter << Logger::end();
+                }
+            } else if (args.Length() == 1) {
+                // get config option
+                ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Config Key to Get");
+                ENGINE_JS_SCOPE_CLOSE(v8::String::New(Config::Get(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str()));
+            } else if (args.Length() == 2) {
+                // set config option
+                ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Config Key to Get");
+                if (args[1]->IsString()) {
+                    Config::Set(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+                } else if (args[1]->IsBoolean()) {
+                    Config::Set(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_BOOLEAN_VALUE(1));
+                } else if (args[1]->IsNumber()) {
+                    Config::Set(ENGINE_GET_ARG_CPPSTRING_VALUE(0), (float) ENGINE_GET_ARG_NUMBER_VALUE(1));
+                } else {
+                    Config::Set(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+                }
+            } else {
+                ENGINE_THROW_ARGERROR("sys.config accepts 0(listAll), 1(get) or 2(set) args");
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
         
         void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {
@@ -249,6 +281,8 @@ namespace Engine {
             addItem(sysTable, "toggleFullscreen", ToggleFullscreen);
             
             addItem(sysTable, "perf", PerfZone);
+            
+            addItem(sysTable, "config", ConfigOptions);
         }
         
 #undef addItem
