@@ -20,9 +20,9 @@ namespace Engine {
         void EndRendering();
         
         void AddVert(float x, float y, float z);
-        void AddVert(float x, float y, float z, double r, double g, double b);
+        void AddVert(float x, float y, float z, double r, double g, double b, double a);
         void AddVert(float x, float y, float z, float s, float t);
-        void AddVert(float x, float y, float z, double r, double g, double b, float s, float t);
+        void AddVert(float x, float y, float z, double r, double g, double b, double a, float s, float t);
         
         void EnableTexture(int texId);
         void DisableTexture();
@@ -43,6 +43,7 @@ namespace Engine {
         void Reset();
         
         void SetColor(float r, float g, float b);
+        void SetColor(float r, float g, float b, float a);
         void GLSetColor();
         
         int GetVerts();

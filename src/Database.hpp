@@ -1,6 +1,9 @@
 #pragma once
 
-#include "common.hpp"
+#include <vector>
+#include <map>
+
+#include "Logger.hpp"
 
 #ifdef _PLATFORM_WIN32
 // TODO: Fix this

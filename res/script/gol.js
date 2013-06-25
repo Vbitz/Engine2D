@@ -8,6 +8,8 @@ var paused = false;
 var items = [];
 
 function regen() {
+	width = sys.screenWidth / 4;
+	height = sys.screenHeight / 4;
 	for (var x = 0; x < width; x++) {
 		items[x] = [];
 		for (var y = 0; y < height; y++) {

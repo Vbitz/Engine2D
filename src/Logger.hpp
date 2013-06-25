@@ -1,9 +1,15 @@
 #pragma once
 
-#include "common.hpp"
-
+#include <string>
+#include <iostream>
 #include <vector>
 #include <sstream>
+
+#ifdef _WIN32
+	#include <sys\timeb.h>
+#else
+    #include <sys/time.h>
+#endif
 
 namespace Engine {
     namespace Logger {

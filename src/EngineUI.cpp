@@ -15,7 +15,7 @@ namespace Engine {
             if (!_showConsole) {
                 Draw2D::SetColor(25 / 255.0f, 25 / 255.0f, 25 / 255.0f);
             } else {
-                Draw2D::SetColor(40 / 255.0f, 40 / 255.0f, 40 / 255.0f);
+                Draw2D::SetColor(40 / 255.0f, 40 / 255.0f, 40 / 255.0f, 0.95f);
             }
             Draw2D::Rect(0.0f, 0.0f, getScreenWidth(), _showConsole ? getScreenHeight() : 14);
             Draw2D::SetFont("basic", 10);
@@ -26,20 +26,22 @@ namespace Engine {
             }
             Draw2D::Print(10, 4, "-- Engine2D --");
             ss.str("");
+            ss.precision(4);
             ss << "DrawTime: " << Profiler::GetTime("Draw");
-            Draw2D::Print(getScreenWidth() - 240, 4, ss.str().c_str());
+            Draw2D::Print(getScreenWidth() - 150, 4, ss.str().c_str());
             if (!_showConsole) {
                 return;
             }
             std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
-            int i = 20;
+            int i = getScreenHeight() - 40;
             for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
                 if (iterator->Level == Logger::LogLevel_Verbose && !_showVerbose) {
+                    i -= 6; // add some padding to show that a message is there, just hidden
                     Draw2D::SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
                     Draw2D::Rect(0, i + 2, getScreenWidth(), 2);
-                    i += 6; // add some padding to show that a message is there, just hidden
                 } else {
-                    Draw2D::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f);
+                    i -= 22;
+                    Draw2D::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
                     Draw2D::Rect(60, i + 1, getScreenWidth() - 60, 20);
                     switch (iterator->Level) {
                         case Logger::LogLevel_Verbose:
@@ -62,9 +64,8 @@ namespace Engine {
                     time.resize(6, '0');
                     Draw2D::Print(5, i + 7, (time + "s").c_str());
                     Draw2D::Print(65, i + 7, iterator->Event.c_str());
-                    i += 22;
                 }
-                if (i > getScreenHeight()) {
+                if (i < 30) {
                     break;
                 }
             }
@@ -72,12 +73,15 @@ namespace Engine {
         
         void OnKeyPress(int key, bool press) {
             if (key == 161 && press) {
-                _showConsole = !_showConsole;
+                ToggleConsole();
             } else if (key == 299 && press) {
                 dumpProfile();
             }
             if (!_active) {
                 return;
+            }
+            if (!_showConsole) {
+                
             }
         }
         

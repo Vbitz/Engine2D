@@ -12,5 +12,7 @@ namespace Engine {
         void OnKeyPress(int key, bool press);
         
         void SetActive(bool active);
+        
+        void ToggleConsole();
     }
 }

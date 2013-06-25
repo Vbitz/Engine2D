@@ -124,15 +124,15 @@ namespace Engine {
             
             Draw2D::BeginRendering(GL_QUADS);
 				if (vert) {
-                    Draw2D::AddVert(x, y, 0, col1R, col1G, col1B);
-                    Draw2D::AddVert(x + w, y, 0, col1R, col1G, col1B);
-                    Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B);
-                    Draw2D::AddVert(x, y + h, 0, col2R, col2G, col2B);
+                    Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
+                    Draw2D::AddVert(x + w, y, 0, col1R, col1G, col1B, 1.0f);
+                    Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
+                    Draw2D::AddVert(x, y + h, 0, col2R, col2G, col2B, 1.0f);
 				} else {
-                    Draw2D::AddVert(x, y, 0, col1R, col1G, col1B);
-                    Draw2D::AddVert(x + w, y, 0, col2R, col2G, col2B);
-                    Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B);
-                    Draw2D::AddVert(x, y + h, 0, col1R, col1G, col1B);
+                    Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
+                    Draw2D::AddVert(x + w, y, 0, col2R, col2G, col2B, 1.0f);
+                    Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
+                    Draw2D::AddVert(x, y + h, 0, col1R, col1G, col1B, 1.0f);
 				}
             Draw2D::EndRendering();
 		

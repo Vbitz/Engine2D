@@ -429,6 +429,10 @@ namespace Engine {
         return _fonts.count(fontName) != 0;
     }
     
+    v8::Persistent<v8::Context> getGlobalContext() {
+        return _globalContext;
+    }
+    
     int getCommandLineArgCount() {
         return _argc;
     }

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "common.hpp"
+#include <v8.h>
+#include <string>
 
 #ifdef _WIN32
 #define sleep Sleep

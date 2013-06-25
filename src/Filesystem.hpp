@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.hpp"
+#include "Logger.hpp"
 
 #include <string>
 #include <vector>

@@ -7,6 +7,7 @@ namespace Engine {
 		double _currentColorR = 1.0f;
 		double _currentColorG = 1.0f;
 		double _currentColorB = 1.0f;
+        double _currentColorA = 1.0f;
         
         int _polygons = 0;
         int _drawCalls = 0;
@@ -59,7 +60,7 @@ namespace Engine {
                 _currentVerts = 0;
             } else {
                 glBegin(mode);
-                glColor3f(_currentColorR, _currentColorG, _currentColorB);
+                glColor4f(_currentColorR, _currentColorG, _currentColorB, _currentColorA);
             }
         }
         
@@ -74,16 +75,16 @@ namespace Engine {
         
         void AddVert(float x, float y, float z) {
             if (usingGL3()) {
-                AddVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, 0.0, 0.0);
+                AddVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, _currentColorA, 0.0, 0.0);
             } else {
                 glVertex3f(x - _centerX, y - _centerY, z);
                 _polygons++;
             }
         }
         
-        void AddVert(float x, float y, float z, double r, double g, double b) {
+        void AddVert(float x, float y, float z, double r, double g, double b, double a) {
             if (usingGL3()) {
-                AddVert(x, y, z, r, g, b, 0.0, 0.0);
+                AddVert(x, y, z, r, g, b, a, 0.0, 0.0);
             } else {
                 glColor3f(r, g, b);
                 AddVert(x, y, z);
@@ -92,14 +93,14 @@ namespace Engine {
         
         void AddVert(float x, float y, float z, float s, float t) {
             if (usingGL3()) {
-                AddVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, s, t);
+                AddVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, _currentColorA, s, t);
             } else {
                 glTexCoord2f(s, t);
                 AddVert(x, y, z);
             }
         }
         
-        void AddVert(float x, float y, float z, double r, double g, double b, float s, float t) {
+        void AddVert(float x, float y, float z, double r, double g, double b, double a, float s, float t) {
             if (usingGL3()) {
                 _vertexBuffer[_currentVerts * 3 + 0] = x;
                 _vertexBuffer[_currentVerts * 3 + 1] = y;
@@ -113,7 +114,7 @@ namespace Engine {
                 _currentVerts++;
             } else {
                 glTexCoord2f(s, t);
-                AddVert(x, y, z, r, g, b);
+                AddVert(x, y, z, r, g, b, a);
             }
         }
         
@@ -201,13 +202,18 @@ namespace Engine {
         }
         
         void SetColor(float r, float g, float b) {
+            SetColor(r, g, b, 1.0f);
+        }
+        
+        void SetColor(float r, float g, float b, float a) {
             _currentColorR = r;
             _currentColorG = g;
             _currentColorB = b;
+            _currentColorA = a;
         }
         
         void GLSetColor() {
-            glColor3f(_currentColorR, _currentColorG, _currentColorB);
+            glColor4f(_currentColorR, _currentColorG, _currentColorB, _currentColorA);
         }
         
         int GetVerts() {

@@ -20,7 +20,9 @@ var testResults = {};
 
 for (var i in tests) {
 	try {
-		testResults[i] = tests[i]();
+		sys.perf(i + "_test", function () {
+			testResults[i] = tests[i]();
+		});
 	} catch (e) {
 		testResults[i] = false;
 	}
@@ -76,9 +78,11 @@ sys.drawFunc(function () {
 	draw.setColor(0x000000);
 	draw.setFont("basic", 16);
 	draw.print(10, 35, "Engine2D Test Suite");
+
 	draw.setColor(0xffffff);
 	draw.print(10, 70, "Automated Tests");
 	draw.print(400, 70, "Rendering Tests");
+
 	draw.setFont("basic", 12);
 	var x = 2;
 	for (var i in testResults) {
@@ -92,26 +96,35 @@ sys.drawFunc(function () {
 		draw.print(20, x * 30 + 40, i);
 		x++;
 	}
+
 	draw.setColor(0xffffff);
 	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + sys.hasExtention("GL_ARB_framebuffer_object"));
+
 	draw.setFont("light", 8);
 	draw.print(20, x * 30 + 40, "Custom Loaded Font");
+
 	draw.setFont("basic", 12);
 	draw.print(420, 100, "Rect");
 	draw.rect(410, 120, 100, 100);
+
 	draw.print(540, 100, "Grid");
 	draw.grid(530, 120, 100, 100);
+
 	draw.print(650, 100, "Gradents");
 	draw.grad(650, 120, 100, 100, 0xffffff, 0x000000, true);
 	draw.grad(770, 120, 100, 100, 0xffffff, 0x000000, false);
+
 	draw.print(400, 240, "PNG Image");
 	draw.setColor(0xffffff);
 	draw.draw(img, 410, 270, 100, 100);
+
 	draw.print(520, 240, "Gen Image");
 	draw.drawSub(img2, 530, 270, 100, 100, t, t += 0.1, 16, 16);
+
 	draw.print(640, 240, "Tinted Image");
 	draw.setColor(Math.floor(Math.random() * 255 * 255 * 255));
 	draw.draw(img, 650, 270, 100, 100);
+
 	draw.setColor(0xffffff);
 	draw.print(400, 400, "HSV Image");
 	draw.draw(img3, 410, 420, 360, 100);

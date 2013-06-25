@@ -194,6 +194,33 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(PerfZone) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the Profile Zone");
+            ENGINE_CHECK_ARG_FUNCTION(1, "Arg1 is the function to profile");
+            
+            Profiler::Begin(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            
+            v8::Context::Scope ctx_scope(getGlobalContext());
+            
+            v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
+            
+            v8::TryCatch tryCatch;
+            
+            real_func->Call(getGlobalContext()->Global(), 0, NULL);
+            
+            if (!tryCatch.Exception().IsEmpty()) {
+                v8::ThrowException(tryCatch.Exception());
+            }
+            
+            Profiler::End(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
         
         void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {
@@ -220,6 +247,8 @@ namespace Engine {
             
             addItem(sysTable, "resizeWindow", ResizeWindow);
             addItem(sysTable, "toggleFullscreen", ToggleFullscreen);
+            
+            addItem(sysTable, "perf", PerfZone);
         }
         
 #undef addItem
