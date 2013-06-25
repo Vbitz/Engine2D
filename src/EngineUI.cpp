@@ -4,9 +4,38 @@ namespace Engine {
     namespace EngineUI {
         std::stringstream ss;
         
+        std::stringstream currentConsoleInput;
+        
         bool _active = true;
         bool _showVerbose = false;
         bool _showConsole = false;
+        
+        char getSpecialChars(int key) {
+            switch (key) {
+                case '[':       return '{';
+                case ']':       return '}';
+                case '-':       return '_';
+                case '=':       return '+';
+                case '\\':      return '|';
+                case '`':       return '~';
+                case '1':       return '!';
+                case '2':       return '@';
+                case '3':       return '#';
+                case '4':       return '$';
+                case '5':       return '%';
+                case '6':       return '^';
+                case '7':       return '&';
+                case '8':       return '*';
+                case '9':       return '(';
+                case '0':       return ')';
+                case ',':       return '<';
+                case '.':       return '>';
+                case ';':       return ':';
+                case '\'':      return '"';
+                case '/':       return '?';
+                default:        return key;
+            }
+        }
         
         void Draw() {
             if (!_active) {
@@ -65,23 +94,37 @@ namespace Engine {
                     Draw2D::Print(5, i + 7, (time + "s").c_str());
                     Draw2D::Print(65, i + 7, iterator->Event.c_str());
                 }
-                if (i < 30) {
+                if (i < 35) {
                     break;
                 }
             }
+            Draw2D::SetColor(0.0f, 0.0f, 0.0f, 0.85f);
+            Draw2D::Rect(5, getScreenHeight() - 30, getScreenWidth() - 10, 20);
+            Draw2D::SetColor(1.0f, 1.0f, 1.0f);
+            Draw2D::Print(10, getScreenHeight() - 25, (currentConsoleInput.str() + "_").c_str());
         }
         
-        void OnKeyPress(int key, bool press) {
-            if (key == 161 && press) {
+        void OnKeyPress(int key, int press, bool shift) {
+            if (key == 161 && press == GLFW_PRESS) { // `
                 ToggleConsole();
-            } else if (key == 299 && press) {
+            } else if (key == 299 && press == GLFW_PRESS) { // f10
                 dumpProfile();
             }
-            if (!_active) {
+            if (!_showConsole) {
                 return;
             }
-            if (!_showConsole) {
-                
+            if (key < 256 && (press == GLFW_PRESS || press == GLFW_REPEAT) && key != '\n' && key != 161) {
+                currentConsoleInput << (char) (shift ? getSpecialChars(key) : (char) std::tolower(key));
+            } else if (key == GLFW_KEY_BACKSPACE && (press == GLFW_PRESS || press == GLFW_REPEAT)) {
+                std::string str = currentConsoleInput.str();
+                if (str.length() > 0) {
+                    str.resize(str.length() - 1);
+                    currentConsoleInput.str(str);
+                    currentConsoleInput.seekp(str.length());
+                }
+            } else if (key == GLFW_KEY_ENTER && press == GLFW_PRESS) {
+                runCommand(currentConsoleInput.str());
+                currentConsoleInput.str("");
             }
         }
         
@@ -95,6 +138,10 @@ namespace Engine {
         
         void ToggleConsole() {
             _showConsole = !_showConsole;
+        }
+        
+        bool ConsoleActive() {
+            return _showConsole;
         }
     }
 }

@@ -43,5 +43,7 @@ namespace Engine {
     
     bool                        usingGL3();
     
+    void                        runCommand(std::string str);
+    
     GLFWwindow*                 getGLFWWindow();
 }

@@ -137,8 +137,7 @@ namespace Engine {
             
             GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
             
-			drawingFont->beginDraw(x - _centerX,
-                                   y - _centerY) << string << drawingFont->endDraw();
+			drawingFont->drawText(x - _centerX, y - _centerY, string);
             
 			glDisable(GL_TEXTURE_2D);
             

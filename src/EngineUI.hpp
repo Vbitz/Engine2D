@@ -9,10 +9,12 @@
 namespace Engine {
     namespace EngineUI {
         void Draw();
-        void OnKeyPress(int key, bool press);
+        void OnKeyPress(int key, int press, bool shift);
         
         void SetActive(bool active);
         
         void ToggleConsole();
+        
+        bool ConsoleActive();
     }
 }

@@ -47,13 +47,89 @@ namespace Engine {
     
 	std::map<std::string, long> _loadedFiles;
     
-    std::string _keys[] = { "ESCAPE", "ENTER", "TAB", "BACKSPACE", "INSERT", "DELETE", "RIGHT", "LEFT", "DOWN", "UP", "PAGE_UP",
-        "PAGE_DOWN", "HOME", "END", "270", "271", "272", "273", "274", "275", "276", "277", "278", "279", "CAPS_LOCK", "SCROLL_LOCK",
-        "NUM_LOCK", "PRINT_SCREEN", "PAUSE", "285", "286", "287", "288", "289" "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
-        "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "F24", "F25", "315", "316",
-        "317", "318", "319" "KP_0", "KP_1", "KP_2", "KP_3", "KP_4", "KP_5", "KP_6", "KP_7", "KP_8", "KP_9", "KP_DECIMAL", "KP_DIVIDE",
-        "KP_MULTIPLY", "KP_SUBTRACT", "KP_ADD", "KP_ENTER", "KP_EQUAL", "337", "338", "339" "LEFT_SHIFT", "LEFT_CONTROL", "LEFT_ALT",
-        "LEFT_SUPER", "RIGHT_SHIFT", "RIGHT_CONTROL", "RIGHT_ALT", "RIGHT_SUPER", "MENU" };
+    // from https://github.com/glfw/glfw/blob/master/tests/events.c
+    static std::string GLFW_GetKeyName(int key)
+    {
+        if (key < 256) {
+            return std::string(new char[2] { (char) key, '\0'});
+        }
+        switch (key)
+        {
+                // Function keys
+            case GLFW_KEY_ESCAPE:       return "ESCAPE";
+            case GLFW_KEY_F1:           return "F1";
+            case GLFW_KEY_F2:           return "F2";
+            case GLFW_KEY_F3:           return "F3";
+            case GLFW_KEY_F4:           return "F4";
+            case GLFW_KEY_F5:           return "F5";
+            case GLFW_KEY_F6:           return "F6";
+            case GLFW_KEY_F7:           return "F7";
+            case GLFW_KEY_F8:           return "F8";
+            case GLFW_KEY_F9:           return "F9";
+            case GLFW_KEY_F10:          return "F10";
+            case GLFW_KEY_F11:          return "F11";
+            case GLFW_KEY_F12:          return "F12";
+            case GLFW_KEY_F13:          return "F13";
+            case GLFW_KEY_F14:          return "F14";
+            case GLFW_KEY_F15:          return "F15";
+            case GLFW_KEY_F16:          return "F16";
+            case GLFW_KEY_F17:          return "F17";
+            case GLFW_KEY_F18:          return "F18";
+            case GLFW_KEY_F19:          return "F19";
+            case GLFW_KEY_F20:          return "F20";
+            case GLFW_KEY_F21:          return "F21";
+            case GLFW_KEY_F22:          return "F22";
+            case GLFW_KEY_F23:          return "F23";
+            case GLFW_KEY_F24:          return "F24";
+            case GLFW_KEY_F25:          return "F25";
+            case GLFW_KEY_UP:           return "UP";
+            case GLFW_KEY_DOWN:         return "DOWN";
+            case GLFW_KEY_LEFT:         return "LEFT";
+            case GLFW_KEY_RIGHT:        return "RIGHT";
+            case GLFW_KEY_LEFT_SHIFT:   return "LEFT SHIFT";
+            case GLFW_KEY_RIGHT_SHIFT:  return "RIGHT SHIFT";
+            case GLFW_KEY_LEFT_CONTROL: return "LEFT CONTROL";
+            case GLFW_KEY_RIGHT_CONTROL: return "RIGHT CONTROL";
+            case GLFW_KEY_LEFT_ALT:     return "LEFT ALT";
+            case GLFW_KEY_RIGHT_ALT:    return "RIGHT ALT";
+            case GLFW_KEY_TAB:          return "TAB";
+            case GLFW_KEY_ENTER:        return "ENTER";
+            case GLFW_KEY_BACKSPACE:    return "BACKSPACE";
+            case GLFW_KEY_INSERT:       return "INSERT";
+            case GLFW_KEY_DELETE:       return "DELETE";
+            case GLFW_KEY_PAGE_UP:      return "PAGE UP";
+            case GLFW_KEY_PAGE_DOWN:    return "PAGE DOWN";
+            case GLFW_KEY_HOME:         return "HOME";
+            case GLFW_KEY_END:          return "END";
+            case GLFW_KEY_KP_0:         return "KEYPAD 0";
+            case GLFW_KEY_KP_1:         return "KEYPAD 1";
+            case GLFW_KEY_KP_2:         return "KEYPAD 2";
+            case GLFW_KEY_KP_3:         return "KEYPAD 3";
+            case GLFW_KEY_KP_4:         return "KEYPAD 4";
+            case GLFW_KEY_KP_5:         return "KEYPAD 5";
+            case GLFW_KEY_KP_6:         return "KEYPAD 6";
+            case GLFW_KEY_KP_7:         return "KEYPAD 7";
+            case GLFW_KEY_KP_8:         return "KEYPAD 8";
+            case GLFW_KEY_KP_9:         return "KEYPAD 9";
+            case GLFW_KEY_KP_DIVIDE:    return "KEYPAD DIVIDE";
+            case GLFW_KEY_KP_MULTIPLY:  return "KEYPAD MULTPLY";
+            case GLFW_KEY_KP_SUBTRACT:  return "KEYPAD SUBTRACT";
+            case GLFW_KEY_KP_ADD:       return "KEYPAD ADD";
+            case GLFW_KEY_KP_DECIMAL:   return "KEYPAD DECIMAL";
+            case GLFW_KEY_KP_EQUAL:     return "KEYPAD EQUAL";
+            case GLFW_KEY_KP_ENTER:     return "KEYPAD ENTER";
+            case GLFW_KEY_PRINT_SCREEN: return "PRINT SCREEN";
+            case GLFW_KEY_NUM_LOCK:     return "NUM LOCK";
+            case GLFW_KEY_CAPS_LOCK:    return "CAPS LOCK";
+            case GLFW_KEY_SCROLL_LOCK:  return "SCROLL LOCK";
+            case GLFW_KEY_PAUSE:        return "PAUSE";
+            case GLFW_KEY_LEFT_SUPER:   return "LEFT SUPER";
+            case GLFW_KEY_RIGHT_SUPER:  return "RIGHT SUPER";
+            case GLFW_KEY_MENU:         return "MENU";
+                
+            default:                    return NULL;
+        }
+    }
     
     void InitFonts();
     void ShutdownFonts();
@@ -189,16 +265,18 @@ namespace Engine {
         Draw2D::CheckGLError("Post Viewpoint");
     }
 	
-	void KeyPress(GLFWwindow* window, int key, int state, int mods) {
+	void KeyPress(GLFWwindow* window, int rawKey, int state, int mods) {
         if (!glfwGetWindowAttrib(window, GLFW_FOCUSED) && !isFullscreen) {
             return;
         }
         
-        EngineUI::OnKeyPress(key, state == GLFW_PRESS);
+        std::string key = GLFW_GetKeyName(rawKey);
+        
+        EngineUI::OnKeyPress(rawKey, state, mods & GLFW_MOD_SHIFT);
 	
         // everything after this is to handle the JS Function.
         
-        if (_keyboardFunc.IsEmpty()) {
+        if (_keyboardFunc.IsEmpty() || EngineUI::ConsoleActive()) {
             return;
         }
         
@@ -211,16 +289,8 @@ namespace Engine {
 
         v8::Handle<v8::Value> argv[3];
         
-        char* str = (char*)_keys[key - 257].c_str();
-        
-        if (key < 256) {
-			str = (char*) malloc(sizeof(char) * 2);
-			str[0] = (char) key;
-			str[1] = 0x00;
-        }
-        
-        argv[0] = v8::String::NewSymbol(key < 256 ? "char" : "special");
-        argv[1] = v8::String::NewSymbol(str);
+        argv[0] = v8::String::NewSymbol(key.length() > 1 ? "special" : "char");
+        argv[1] = v8::String::NewSymbol(key.c_str());
         argv[2] = v8::Boolean::New(state == GLFW_PRESS);
         
         real_func->Call(_globalContext->Global(), 3, argv);
@@ -589,6 +659,36 @@ namespace Engine {
     
     void _dumpProfile() {
         Profiler::DumpProfile();
+    }
+    
+    void runCommand(std::string str) {
+        v8::HandleScope handle_scope;
+        
+		Logger::begin("Console", Logger::LogLevel_Log) << "> " << str << Logger::end();
+        
+		v8::Context::Scope ctx_scope(_globalContext);
+        
+		v8::TryCatch tryCatch;
+        
+		v8::Handle<v8::Script> script = v8::Script::Compile(
+                                                            v8::String::New(str.c_str()),
+                                                            v8::String::NewSymbol("Console"));
+        
+		if (script.IsEmpty()) {
+			v8::Handle<v8::Value> exception = tryCatch.Exception();
+			v8::String::AsciiValue exception_str(exception);
+            Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
+		} else {
+            v8::Local<v8::Value> result = script->Run();
+            if (*result != NULL) { // well it works
+                Logger::begin("Console", Logger::LogLevel_Log) << (result->IsNull() ? "null" : *v8::String::Utf8Value(result->ToString())) << Logger::end();
+            }
+            if (!tryCatch.Exception().IsEmpty()) {
+                v8::Handle<v8::Value> exception = tryCatch.Exception();
+                v8::String::AsciiValue exception_str(exception);
+                Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
+            }
+		}
     }
     
 	// main function
