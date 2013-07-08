@@ -53,4 +53,6 @@
 
 #include "ResourceManager.hpp"
 
+#include "LogGraphEvents.hpp"
+
 #endif

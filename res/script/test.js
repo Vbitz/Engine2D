@@ -28,7 +28,7 @@ for (var i in tests) {
 	}
 }
 
-draw.clearColor(0.01, 0.01, 0.01);
+draw.clearColor(0x010101);
 
 var pix = [];
 
@@ -55,22 +55,28 @@ var img3 = img3 ? img3 : draw.createImage(hsv, 360, 100);
 
 var t = 0;
 
+var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object");
+
 console.log("Loading Test Suite");
 
 sys.drawFunc(function () {
 	if (!draw.isTexture(img)) {
+		console.log("Loading Image 1");
 		img = draw.openImage("image/testing.png");
 	}
 
 	if (!draw.isTexture(img2)) {
+		console.log("Loading Image 2");
 		img2 = draw.createImage(pix, 100, 100);
 	}
 
 	if (!draw.isTexture(img3)) {
+		console.log("Loading Image 3");
 		img3 = draw.createImage(hsv, 360, 100);
 	}
 
 	if (!draw.isFontLoaded("light")) {
+		console.log("Loading Font");
 		draw.loadFont("light", "fonts/OpenSans-Light.ttf");
 	}
 
@@ -98,7 +104,7 @@ sys.drawFunc(function () {
 	}
 
 	draw.setColor(0xffffff);
-	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + sys.hasExtention("GL_ARB_framebuffer_object"));
+	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + supportsFramebuffer);
 
 	draw.setFont("light", 8);
 	draw.print(20, x * 30 + 40, "Custom Loaded Font");
@@ -115,7 +121,7 @@ sys.drawFunc(function () {
 	draw.grad(770, 120, 100, 100, 0xffffff, 0x000000, false);
 
 	draw.print(400, 240, "PNG Image");
-	draw.setColor(0xffffff);
+	draw.setColor("white");
 	draw.draw(img, 410, 270, 100, 100);
 
 	draw.print(520, 240, "Gen Image");
@@ -125,7 +131,14 @@ sys.drawFunc(function () {
 	draw.setColor(Math.floor(Math.random() * 255 * 255 * 255));
 	draw.draw(img, 650, 270, 100, 100);
 
-	draw.setColor(0xffffff);
+	draw.setColor("white");
+	draw.print(760, 240, "Circle");
+	draw.circle(770 + 50, 270 + 50, 50, 40, 200, 0.1, 1.0, true);
+
+	for (var i = 0; i < 20; i++) {
+		draw.curve(i * 100, 500, i * 100, 600, 850, 600, input.mouseX, input.mouseY);
+	}
+
 	draw.print(400, 400, "HSV Image");
 	draw.draw(img3, 410, 420, 360, 100);
 });

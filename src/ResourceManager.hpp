@@ -16,8 +16,10 @@ namespace Engine {
     namespace ResourceManager {
         class Source {
         public:
-            ~Source() {
-                std::cout << "Source: " << this->GetName() << " Getting Killed" << std::endl;
+            void Unload() {
+                if (this->_savedData != NULL) {
+                    std::free(this->_savedData);
+                }
             }
             
             virtual bool NeedsUpdate();

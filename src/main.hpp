@@ -46,5 +46,7 @@ namespace Engine {
     
     void                        runCommand(std::string str);
     
+    void                        detailProfile(int frames, std::string filename);
+    
     GLFWwindow*                 getGLFWWindow();
 }

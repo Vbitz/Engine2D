@@ -27,6 +27,9 @@ namespace Engine {
         void EnableTexture(int texId);
         void DisableTexture();
         
+        void EnableSmooth();
+        void DisableSmooth();
+        
         void Print(float x, float y, const char* string);
         float CalcStringWidth(std::string str);
         void SetFont(std::string name, int fontSize);
@@ -42,6 +45,11 @@ namespace Engine {
         
         void Reset();
         
+        void ClearColor(int col);
+        void ClearColor(std::string colorName);
+        
+        void SetColor(int col);
+        void SetColor(std::string colorName);
         void SetColor(float r, float g, float b);
         void SetColor(float r, float g, float b, float a);
         void GLSetColor();
@@ -54,5 +62,23 @@ namespace Engine {
         
         void Rect(float x, float y, float w, float h);
         void Grid(float x, float y, float w, float h);
+        
+        void Grad(float x, float y, float w, float h, int col1, int col2, bool vert);
+        
+        void Lines(float* points, unsigned int count);
+        void LineGraph(float xOff, float yOff, float xScale, float yScale, float* points, unsigned int count);
+        
+        void Circle(float xCenter, float yCenter, float radius);
+        void Circle(float xCenter, float yCenter, float radius, bool fill);
+        void Circle(float xCenter, float yCenter, float radius, int segments, bool fill);
+        void Circle(float xCenter, float yCenter, float radius, int segments, float start, float end, bool fill);
+        void Circle(float xCenter, float yCenter, float radius, float innerRadius,
+                    int segments, float start, float end, bool fill);
+        
+        void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4);
+        void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int segments);
+        void BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments);
+        
+        void Line(float x1, float y1, float x2, float y2);
     }
 }

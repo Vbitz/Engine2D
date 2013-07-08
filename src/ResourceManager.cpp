@@ -284,8 +284,7 @@ namespace Engine {
                 
                 FreeImage_CloseMemory(mem);
                 
-                //std::free(pixel); // that should fix some anoying memory leaks
-                //std::free(texture); // plenty so
+                std::free(texture); // that should fix some anoying memory leaks
             } else {
                 Logger::begin("ResourceManager", Logger::LogLevel_Warning) << "Manual Texture's can't be loaded" << Logger::end();
             }
@@ -357,6 +356,9 @@ namespace Engine {
                 res->Unload();
             }
             _resources.clear();
+            for (auto iter2 = _sources.begin(); iter2 != _sources.end(); iter2++) {
+                iter2->second->Unload();
+            }
             _sources.clear();
         }
         

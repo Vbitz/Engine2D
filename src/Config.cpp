@@ -2,9 +2,9 @@
 
 namespace Engine {
     namespace Config {
-        std::map<std::string, float> _numberCvars;
-        std::map<std::string, bool> _boolCvars;
-        std::map<std::string, std::string> _stringCvars;
+        std::unordered_map<std::string, float> _numberCvars;
+        std::unordered_map<std::string, bool> _boolCvars;
+        std::unordered_map<std::string, std::string> _stringCvars;
         
         void SetNumber(std::string key, int value) {
             _numberCvars[key] = value;

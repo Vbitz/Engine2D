@@ -3,6 +3,13 @@
 namespace Engine {
 
 	namespace JsSys {
+        
+        Logger::LogLevel _getLevelFromStr(std::string str) {
+            if (str == "warning") return Logger::LogLevel_Warning;
+            if (str == "verbose") return Logger::LogLevel_Verbose;
+            if (str == "error") return Logger::LogLevel_Error;
+            return Logger::LogLevel_User;
+        }
 
 		ENGINE_JS_METHOD(Println) {
 			ENGINE_JS_SCOPE_OPEN;
@@ -10,7 +17,7 @@ namespace Engine {
             std::string logStr = "";
             
 			bool first = true;
-			for (int i = 0; i < args.Length(); i++) {
+			for (int i = 1; i < args.Length(); i++) {
 				if (first) {
 					first = false;
 				} else {
@@ -21,7 +28,7 @@ namespace Engine {
 				logStr += cstr;
 			}
             
-            Logger::LogText("Script", Logger::LogLevel_User, logStr);
+            Logger::LogText("Script", _getLevelFromStr(ENGINE_GET_ARG_CPPSTRING_VALUE(0)), logStr);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -119,6 +126,16 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of a GL Extention to check for");
             
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(glewGetExtension(*ENGINE_GET_ARG_CSTRING_VALUE(0))));
+        }
+        
+        ENGINE_JS_METHOD(GetMaxTextureSize) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            GLint result = 0;
+            
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &result);
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(result));
         }
         
         ENGINE_JS_METHOD(SaveScreenshot) {
@@ -229,6 +246,34 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(TimeZone) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the zone to time");
+            ENGINE_CHECK_ARG_FUNCTION(1, "Arg1 is the function to time");
+            
+            double startTime = Logger::GetTime();
+            
+            v8::Context::Scope ctx_scope(getGlobalContext());
+            
+            v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
+            
+            v8::TryCatch tryCatch;
+            
+            real_func->Call(getGlobalContext()->Global(), 0, NULL);
+            
+            if (!tryCatch.Exception().IsEmpty()) {
+                v8::ThrowException(tryCatch.Exception());
+            }
+            
+            Logger::begin("JSSys", Logger::LogLevel_User) << "Timed: " << ENGINE_GET_ARG_CPPSTRING_VALUE(0) << " at "
+                << (Logger::GetTime() - startTime) << "s" << Logger::end();
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(ConfigOptions) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -261,6 +306,41 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(GC) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            v8::V8::IdleNotification(200); // recomend a full GC (the internals which I've gone through
+                // say that at the moment this will recomend a full GC but the value is just a hint.)
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(Profile) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Number of franes to profiler for");
+            ENGINE_CHECK_ARG_STRING(1, "Filename to save report to");
+            
+            if (!Filesystem::HasSetUserDir()) {
+                ENGINE_THROW_ARGERROR("You need to call fs.configDir before you can call sys.profile");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            detailProfile(ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(TestGraph) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            Logger::LogGraph("Testing", Logger::LogLevel_Log, new LogGraphEvents::TestingEvent());
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
         
         void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {
@@ -282,6 +362,7 @@ namespace Engine {
             
             addItem(sysTable, "getGLVersion", GetGLVersion);
             addItem(sysTable, "hasExtention", HasExtention);
+            addItem(sysTable, "getMaxTextureSize", GetMaxTextureSize);
             
             addItem(sysTable, "saveScreenshot", SaveScreenshot);
             
@@ -290,8 +371,14 @@ namespace Engine {
             addItem(sysTable, "restartRenderer", RestartRenderer);
             
             addItem(sysTable, "perf", PerfZone);
+            addItem(sysTable, "time", TimeZone);
             
             addItem(sysTable, "config", ConfigOptions);
+            
+            addItem(sysTable, "gc", GC);
+            addItem(sysTable, "profile", Profile);
+            
+            //addItem(sysTable, "testGraph", TestGraph);
         }
         
 #undef addItem

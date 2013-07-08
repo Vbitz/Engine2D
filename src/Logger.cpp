@@ -1,5 +1,7 @@
 #include "Logger.hpp"
 
+#include "Config.hpp"
+
 namespace Engine {
     namespace Logger {
         std::vector<LogEvent> _logEvents;
@@ -51,7 +53,7 @@ namespace Engine {
         
         double GetTime() {
 #ifdef _PLATFORM_WIN32
-            double time = GetTickCount();
+            double time = GetTickCount() / 1000; // it's really bad compared to unix but it will do.
 #else
             timeval _time;
             gettimeofday(&_time, NULL);
@@ -66,27 +68,71 @@ namespace Engine {
             }
         }
         
+        std::string cleanString(std::string str) {
+            std::size_t lastPos = 0;
+            while (str.find('\t', lastPos) != std::string::npos) {
+                std::size_t pos = str.find('\t', lastPos);
+                str.replace(pos, 1, "    "); // replace tabs with 4 spaces
+                lastPos = pos + 1;
+            }
+            return str;
+        }
+        
         void LogText(std::string domain, LogLevel level, std::string str) {
+            bool logConsole = Config::GetBoolean("log_console")
+                && (level != LogLevel_Verbose || Config::GetBoolean("log_consoleVerbose"));
+            std::string colorCode = Config::GetBoolean("log_colors") ? GetLevelColor(level) : "";
+            
             if (str.find('\n') == -1) {
-                _logEvents.push_back(LogEvent(domain, level, str));
-                std::cout << GetLevelColor(level) << GetTime()
+                std::string newStr = cleanString(str);
+                
+                _logEvents.push_back(LogEvent(domain, level, newStr));
+                
+                if (logConsole) {
+                    std::cout << colorCode << GetTime()
                     << " : [" << GetLevelString(level) << "] "
-                    << domain << " | " << str << std::endl;
+                    << domain << " | " << newStr << std::endl;
+                }
             } else {
                 std::string strCopy = str;
                 std::size_t newLinePos = strCopy.find('\n');
+                
                 while (newLinePos != std::string::npos) {
-                    _logEvents.push_back(LogEvent(domain, level, strCopy.substr(0, newLinePos - 1)));
-                    std::cout << GetLevelColor(level) << GetTime()
-                        << " : [" << GetLevelString(level) << "] "
-                        << domain << " | " << strCopy.substr(0, newLinePos) << std::endl;
+                    std::string newStr = cleanString(strCopy.substr(0, newLinePos));
+                    
+                    _logEvents.push_back(LogEvent(domain, level, newStr));
+                    
+                    if (logConsole) {
+                        std::cout << colorCode << GetTime()
+                            << " : [" << GetLevelString(level) << "] "
+                            << domain << " | " << newStr << std::endl;
+                    }
+                    
                     strCopy.erase(0, newLinePos + 1);
                     newLinePos = strCopy.find('\n');
                 }
+                
                 _logEvents.push_back(LogEvent(domain, level, strCopy));
-                std::cout << GetLevelColor(level) << GetTime()
-                    << " : [" << GetLevelString(level) << "] "
-                    << domain << " | " << strCopy << std::endl;
+                
+                if (logConsole) {
+                    std::cout << colorCode << GetTime()
+                        << " : [" << GetLevelString(level) << "] "
+                        << domain << " | " << strCopy << std::endl;
+                }
+            }
+        }
+        
+        void LogGraph(std::string domain, LogLevel level, LogGraphEvent* event) {
+            bool logConsole = Config::GetBoolean("log_console")
+                && (level != LogLevel_Verbose || Config::GetBoolean("log_consoleVerbose"));
+            std::string colorCode = Config::GetBoolean("log_colors") ? GetLevelColor(level) : "";
+            
+            _logEvents.push_back(LogEvent(domain, level, event));
+            
+            if (logConsole) {
+                std::cout << colorCode << GetTime()
+                << " : [" << GetLevelString(level) << "] "
+                << domain << " | Graphical" << std::endl;
             }
         }
         

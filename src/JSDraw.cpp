@@ -38,8 +38,6 @@ namespace Engine {
             
             Draw2D::Rect(x, y, w, h);
             
-            Draw2D::CheckGLError("postRect");
-            
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
@@ -101,43 +99,91 @@ namespace Engine {
 			col2 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(5);
 		
 			vert = ENGINE_GET_ARG_BOOLEAN_VALUE(6);
-		
-			if (col1 > 256 * 256 * 256)
-			{
-				// TODO : Error
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-			}
-		
-			if (col2 > 256 * 256 * 256)
-			{
-				// TODO : Error
-				ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-			}
             
-            float col1R = (float)((col1 & 0xff0000) >> 16) / 255;
-            float col1G = (float)((col1 & 0x00ff00) >> 8) / 255;
-            float col1B = (float)(col1 & 0x0000ff) / 255;
-            
-            float col2R = (float)((col2 & 0xff0000) >> 16) / 255;
-            float col2G = (float)((col2 & 0x00ff00) >> 8) / 255;
-            float col2B = (float)(col2 & 0x0000ff) / 255;
-            
-            Draw2D::BeginRendering(GL_QUADS);
-				if (vert) {
-                    Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
-                    Draw2D::AddVert(x + w, y, 0, col1R, col1G, col1B, 1.0f);
-                    Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
-                    Draw2D::AddVert(x, y + h, 0, col2R, col2G, col2B, 1.0f);
-				} else {
-                    Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
-                    Draw2D::AddVert(x + w, y, 0, col2R, col2G, col2B, 1.0f);
-                    Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
-                    Draw2D::AddVert(x, y + h, 0, col1R, col1G, col1B, 1.0f);
-				}
-            Draw2D::EndRendering();
+            Draw2D::Grad(x, y, w, h, col1, col2, vert);
 		
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
+        
+        ENGINE_JS_METHOD(Circle) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X center of the circle");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y center of the circle");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the radius of the circle");
+            
+            if (args.Length() == 4) {
+                ENGINE_CHECK_ARG_BOOLEAN(3, "Arg4 sets the fill style of the circle");
+                Draw2D::Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                               ENGINE_GET_ARG_NUMBER_VALUE(1),
+                               ENGINE_GET_ARG_NUMBER_VALUE(2),
+                               ENGINE_GET_ARG_BOOLEAN_VALUE(3));
+            } else if (args.Length() == 5) {
+                ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the number of sides to the circle");
+                ENGINE_CHECK_ARG_BOOLEAN(4, "Arg4 sets the fill style of the circle");
+                Draw2D::Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                               ENGINE_GET_ARG_NUMBER_VALUE(1),
+                               ENGINE_GET_ARG_NUMBER_VALUE(2),
+                               ENGINE_GET_ARG_NUMBER_VALUE(3),
+                               ENGINE_GET_ARG_BOOLEAN_VALUE(4));
+            } else if (args.Length() == 7) {
+                ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the number of sides to the circle");
+                ENGINE_CHECK_ARG_NUMBER(4, "Arg4 is the start % of the circle");
+                ENGINE_CHECK_ARG_NUMBER(5, "Arg5 is the end % of the circle");
+                ENGINE_CHECK_ARG_BOOLEAN(6, "Arg6 sets the fill style of the circle");
+                Draw2D::Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                               ENGINE_GET_ARG_NUMBER_VALUE(1),
+                               ENGINE_GET_ARG_NUMBER_VALUE(2),
+                               ENGINE_GET_ARG_NUMBER_VALUE(3),
+                               ENGINE_GET_ARG_NUMBER_VALUE(4),
+                               ENGINE_GET_ARG_NUMBER_VALUE(5),
+                               ENGINE_GET_ARG_BOOLEAN_VALUE(6));
+            } else if (args.Length() == 8) {
+                ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the inner radius of the circle");
+                ENGINE_CHECK_ARG_NUMBER(4, "Arg3 is the number of sides to the circle");
+                ENGINE_CHECK_ARG_NUMBER(5, "Arg4 is the start % of the circle");
+                ENGINE_CHECK_ARG_NUMBER(6, "Arg5 is the end % of the circle");
+                ENGINE_CHECK_ARG_BOOLEAN(7, "Arg6 sets the fill style of the circle");
+                Draw2D::Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                               ENGINE_GET_ARG_NUMBER_VALUE(1),
+                               ENGINE_GET_ARG_NUMBER_VALUE(2),
+                               ENGINE_GET_ARG_NUMBER_VALUE(3),
+                               ENGINE_GET_ARG_NUMBER_VALUE(4),
+                               ENGINE_GET_ARG_NUMBER_VALUE(5),
+                               ENGINE_GET_ARG_NUMBER_VALUE(6),
+                               ENGINE_GET_ARG_BOOLEAN_VALUE(7));
+            } else {
+                ENGINE_THROW_ARGERROR("");
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(Curve) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(8);
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "");
+            ENGINE_CHECK_ARG_NUMBER(1, "");
+            ENGINE_CHECK_ARG_NUMBER(2, "");
+            ENGINE_CHECK_ARG_NUMBER(3, "");
+            ENGINE_CHECK_ARG_NUMBER(4, "");
+            ENGINE_CHECK_ARG_NUMBER(5, "");
+            ENGINE_CHECK_ARG_NUMBER(6, "");
+            ENGINE_CHECK_ARG_NUMBER(7, "");
+            
+            Draw2D::BezierCurve(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                                ENGINE_GET_ARG_NUMBER_VALUE(1),
+                                ENGINE_GET_ARG_NUMBER_VALUE(2),
+                                ENGINE_GET_ARG_NUMBER_VALUE(3),
+                                ENGINE_GET_ARG_NUMBER_VALUE(4),
+                                ENGINE_GET_ARG_NUMBER_VALUE(5),
+                                ENGINE_GET_ARG_NUMBER_VALUE(6),
+                                ENGINE_GET_ARG_NUMBER_VALUE(7));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
 		
 		ENGINE_JS_METHOD(SetColorF) {
 			ENGINE_JS_SCOPE_OPEN;
@@ -159,20 +205,22 @@ namespace Engine {
             ENGINE_JS_SCOPE_OPEN;
             
             ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_INT32(0, "Arg0 is a color between 0x000000 and 0xffffff");
 		
-			int col1 = ENGINE_GET_ARG_INT32_VALUE(0);
+            if (args[0]->IsNumber()) {
+                int col = ENGINE_GET_ARG_INT32_VALUE(0);
 		
-			if (col1 > (256 * 256 * 256))
-			{
-                // TODO : Error
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-			}
+                if (col > (256 * 256 * 256))
+                {
+                    ENGINE_THROW_ARGERROR("Arg0 is beyond 0xffffff");
+                    ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                }
 		
-			Draw2D::SetColor((float)((col1 & 0xff0000) >> 16) / 255,
-                             (float)((col1 & 0x00ff00) >> 8) / 255,
-                             (float)(col1 & 0x0000ff) / 255);
+                Draw2D::SetColor(col); // yay now draw2d handles it
+            } else if (args[0]->IsString()) {
+                Draw2D::SetColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            } else {
+                ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb)");
+            }
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -213,15 +261,15 @@ namespace Engine {
             
             if(saturation <= 0.0) {       // < is bogus, just shuts up warnings
                 if(std::isnan(hue)) {   // in.h == NAN
-                    ret->Set(v8::String::New("r"), v8::Number::New(value));
-                    ret->Set(v8::String::New("g"), v8::Number::New(value));
-                    ret->Set(v8::String::New("b"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
                     ENGINE_JS_SCOPE_CLOSE(ret);
                 }
                 // error - should never happen
-                ret->Set(v8::String::New("r"), v8::Number::New(0.0f));
-                ret->Set(v8::String::New("g"), v8::Number::New(0.0f));
-                ret->Set(v8::String::New("b"), v8::Number::New(0.0f));
+                ret->Set(v8::String::NewSymbol("r"), v8::Number::New(0.0f));
+                ret->Set(v8::String::NewSymbol("g"), v8::Number::New(0.0f));
+                ret->Set(v8::String::NewSymbol("b"), v8::Number::New(0.0f));
                 ENGINE_JS_SCOPE_CLOSE(ret);
             }
             hh = hue;
@@ -235,35 +283,35 @@ namespace Engine {
             
             switch(i) {
                 case 0:
-                    ret->Set(v8::String::New("r"), v8::Number::New(value));
-                    ret->Set(v8::String::New("g"), v8::Number::New(t));
-                    ret->Set(v8::String::New("b"), v8::Number::New(p));
+                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(t));
+                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(p));
                     break;
                 case 1:
-                    ret->Set(v8::String::New("r"), v8::Number::New(q));
-                    ret->Set(v8::String::New("g"), v8::Number::New(value));
-                    ret->Set(v8::String::New("b"), v8::Number::New(p));
+                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(q));
+                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(p));
                     break;
                 case 2:
-                    ret->Set(v8::String::New("r"), v8::Number::New(p));
-                    ret->Set(v8::String::New("g"), v8::Number::New(value));
-                    ret->Set(v8::String::New("b"), v8::Number::New(t));
+                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(p));
+                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(t));
                     break;
                 case 3:
-                    ret->Set(v8::String::New("r"), v8::Number::New(p));
-                    ret->Set(v8::String::New("g"), v8::Number::New(q));
-                    ret->Set(v8::String::New("b"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(p));
+                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(q));
+                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
                     break;
                 case 4:
-                    ret->Set(v8::String::New("r"), v8::Number::New(t));
-                    ret->Set(v8::String::New("g"), v8::Number::New(p));
-                    ret->Set(v8::String::New("b"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(t));
+                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(p));
+                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
                     break;
                 case 5:
                 default:
-                    ret->Set(v8::String::New("r"), v8::Number::New(value));
-                    ret->Set(v8::String::New("g"), v8::Number::New(p));
-                    ret->Set(v8::String::New("b"), v8::Number::New(q));
+                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
+                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(p));
+                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(q));
                     break;
             }
             ENGINE_JS_SCOPE_CLOSE(ret);
@@ -272,15 +320,23 @@ namespace Engine {
 		ENGINE_JS_METHOD(ClearColor) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
-            
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Red Component between 0.0f and 1.0f");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0.0f and 1.0f");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0.0f and 1.0f");
+            ENGINE_CHECK_ARGS_LENGTH(1);
 		
-			glClearColor(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                         ENGINE_GET_ARG_NUMBER_VALUE(1),
-                         ENGINE_GET_ARG_NUMBER_VALUE(2), 1.0f);
+            if (args[0]->IsNumber()) {
+                int col = ENGINE_GET_ARG_INT32_VALUE(0);
+                
+                if (col > (256 * 256 * 256))
+                {
+                    ENGINE_THROW_ARGERROR("Arg0 is beyond 0xffffff");
+                    ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                }
+                
+                Draw2D::ClearColor(col); // yay now draw2d handles it
+            } else if (args[0]->IsString()) {
+                Draw2D::ClearColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            } else {
+                ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb)");
+            }
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -530,6 +586,8 @@ namespace Engine {
             
             glDisable(GL_TEXTURE_2D);
             
+            free(pixels);
+            
             Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from data: " << text << Logger::end();
             
             ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
@@ -664,6 +722,8 @@ namespace Engine {
             addItem(drawTable, "rect", Rect);
             addItem(drawTable, "grid", Grid);
             addItem(drawTable, "grad", Grad);
+            addItem(drawTable, "circle", Circle);
+            addItem(drawTable, "curve", Curve);
             addItem(drawTable, "setColorF", SetColorF);
             addItem(drawTable, "setColor", SetColor);
             addItem(drawTable, "setColorI", SetColorI);

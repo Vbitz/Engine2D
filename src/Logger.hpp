@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <functional>
 
 #ifdef _WIN32
 	#include <sys\timeb.h>
@@ -27,15 +28,41 @@ namespace Engine {
             LogLevel_ConsoleInput
         };
         
+        enum LogType {
+            LogType_Text,
+            LogType_Graphical
+        };
+        
+        class LogGraphEvent {
+        public:
+            LogGraphEvent() {};
+            ~LogGraphEvent() {};
+            
+            virtual int Run(int x, int y) {
+                return 0;
+            }
+            
+            int operator()(int x, int y) {
+                return this->Run(x, y);
+            }
+        };
+        
         class LogEvent {
         public:
             LogEvent(std::string domain, LogLevel level, std::string event)
-            :   Domain(domain), Level(level), Event(event) {
+            :   Domain(domain), Level(level), Type(LogType_Text), GraphEvent(NULL), Event(event) {
+                this->time = GetTime();
+            }
+            
+            LogEvent(std::string domain, LogLevel level, LogGraphEvent* event)
+            :   Domain(domain), Level(level), Type(LogType_Graphical), GraphEvent(event), Event("") {
                 this->time = GetTime();
             }
             
             std::string Domain;
             LogLevel Level;
+            LogType Type;
+            LogGraphEvent* GraphEvent;
             std::string Event;
             double time;
         };
@@ -43,6 +70,7 @@ namespace Engine {
         std::string GetLevelString(LogLevel level);
         
         void LogText(std::string domain, LogLevel level, std::string str);
+        void LogGraph(std::string domain, LogLevel level, LogGraphEvent* event);
         
         std::ostream& begin(std::string domain, LogLevel level);
         StreamFlusher end();

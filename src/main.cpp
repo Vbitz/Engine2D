@@ -41,11 +41,16 @@ namespace Engine {
     
 	std::map<std::string, long> _loadedFiles;
     
+    bool _developerMode = true;
+    
+    int _detailFrames = 0;
+    std::string _detailFilename = "";
+    
     // from https://github.com/glfw/glfw/blob/master/tests/events.c
     static std::string GLFW_GetKeyName(int key)
     {
         if (key < 256) {
-            return std::string(new char[2] { (char) key, '\0'});
+            return std::string({ (char) key, '\0'});
         }
         switch (key)
         {
@@ -132,7 +137,7 @@ namespace Engine {
 	
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
     
-	void InitScripting() {
+	void InitScripting(bool developerMode) {
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
         
 		_globalIsolate = v8::Isolate::New();
@@ -145,7 +150,7 @@ namespace Engine {
         // consoleTable
         v8::Handle<v8::ObjectTemplate> consoleTable = v8::ObjectTemplate::New();
         
-            addItem(consoleTable, "log", JsSys::Println);
+            addItem(consoleTable, "_log", JsSys::Println);
         
         global->Set("console", consoleTable);
         
@@ -157,6 +162,7 @@ namespace Engine {
             addItem(sysTable, "setWindowCreateParams", SetWindowInitParams);
         
             sysTable->Set("platform", v8::String::New(_PLATFORM));
+            sysTable->Set("devMode", v8::Boolean::New(developerMode));
 	
 		global->Set("sys", sysTable);
         
@@ -190,7 +196,7 @@ namespace Engine {
 
 		_globalContext = v8::Context::New(NULL, global);
         
-		runFile("lib/boot.js", true);
+		runFile(Config::GetString("script_bootloader"), true);
         
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
 	}
@@ -212,8 +218,8 @@ namespace Engine {
         
 		real_func->Call(_globalContext->Global(), 0, NULL);
         
-        if (!tryCatch.Exception().IsEmpty()) {
-            v8::Handle<v8::Value> exception = tryCatch.Exception();
+        if (!tryCatch.StackTrace().IsEmpty()) {
+            v8::Handle<v8::Value> exception = tryCatch.StackTrace();
             v8::String::AsciiValue exception_str(exception);
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
             return false;
@@ -247,14 +253,25 @@ namespace Engine {
 		input_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
 	}
 
-    void LoadBasicConfigs() {
+    void LoadBasicConfigs(bool developerMode) {
         Config::SetNumber("cl_width", 800);
         Config::SetNumber("cl_height", 800);
+        Config::SetBoolean("cl_aa", true);
         Config::SetBoolean("cl_fullscreen", false);
         Config::SetBoolean("cl_openGL3", false);
         Config::SetString("cl_fontPath", "fonts/OpenSans-Regular.ttf");
         Config::SetString("cl_consoleFontPath", "fonts/SourceSansPro-Regular.ttf");
         Config::SetBoolean("cl_showVerboseLog", false);
+        Config::SetBoolean("cl_runOnIdle", false);
+        Config::SetBoolean("cl_engineUI", developerMode);
+        Config::SetBoolean("cl_profiler", developerMode);
+        Config::SetBoolean("cl_scriptedDraw", true);
+        Config::SetBoolean("script_reload", developerMode);
+        Config::SetBoolean("script_gcFrame", true);
+        Config::SetString("script_bootloader", "lib/boot.js");
+        Config::SetBoolean("log_console", true);
+        Config::SetBoolean("log_consoleVerbose", developerMode);
+        Config::SetBoolean("log_colors", true);
     }
 	
 	void ResizeWindow(GLFWwindow* window, int w, int h) {
@@ -295,12 +312,12 @@ namespace Engine {
         
         argv[0] = v8::String::NewSymbol(key.length() > 1 ? "special" : "char");
         argv[1] = v8::String::NewSymbol(key.c_str());
-        argv[2] = v8::Boolean::New(state == GLFW_PRESS);
+        argv[2] = v8::Boolean::New(state == GLFW_PRESS || state == GLFW_REPEAT);
         
         real_func->Call(_globalContext->Global(), 3, argv);
         
-        if (!tryCatch.Exception().IsEmpty()) {
-            v8::Handle<v8::Value> exception = tryCatch.Exception();
+        if (!tryCatch.StackTrace().IsEmpty()) {
+            v8::Handle<v8::Value> exception = tryCatch.StackTrace();
             v8::String::AsciiValue exception_str(exception);
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
             _keyboardFunc.Clear();
@@ -360,6 +377,10 @@ namespace Engine {
             isGL3Context = true;
         } else {
             isGL3Context = false;
+        }
+        
+        if (Config::GetBoolean("cl_aa")) {
+            glfwWindowHint(GLFW_SAMPLES, 4);
         }
         
 		window = glfwCreateWindow(width, height, "Engine2D", fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL); // you can resize how ever much you like
@@ -467,10 +488,10 @@ namespace Engine {
             return;
         }
         
-        Profiler::ProfileZone("LoadFonts", []() {
+        Profiler::Begin("LoadFonts");
             loadFont("basic", Config::GetString("cl_fontPath"));
             loadFont("monospace", Config::GetString("cl_consoleFontPath"));
-        });
+        Profiler::End("LoadFonts");
 	}
 	
 	void ShutdownFonts() {
@@ -537,7 +558,7 @@ namespace Engine {
 
 		v8::Context::Scope ctx_scope(_globalContext);
 
-		const char* inputScript = Filesystem::GetFileContent(path);
+		char* inputScript = Filesystem::GetFileContent(path);
 
 		v8::TryCatch tryCatch;
 
@@ -546,22 +567,25 @@ namespace Engine {
 
 		if (script.IsEmpty()) {
 			Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not Load file" << Logger::end();
-			v8::Handle<v8::Value> exception = tryCatch.Exception();
+			v8::Handle<v8::Value> exception = tryCatch.StackTrace();
 			v8::String::AsciiValue exception_str(exception);
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
+            std::free(inputScript);
             return false;
 		} else {
 			script->Run();
-            if (!tryCatch.Exception().IsEmpty()) {
-                v8::Handle<v8::Value> exception = tryCatch.Exception();
+            if (!tryCatch.StackTrace().IsEmpty()) {
+                v8::Handle<v8::Value> exception = tryCatch.StackTrace();
                 v8::String::AsciiValue exception_str(exception);
                 Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
+                std::free(inputScript);
                 return false;
             }
             Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded File: " << path << Logger::end();
             if (persist) {
                 _loadedFiles[path] = Filesystem::GetFileModifyTime(path);
             }
+            std::free(inputScript);
             return true;
 		}
 	}
@@ -652,7 +676,7 @@ namespace Engine {
         
         FreeImage_CloseMemory(mem);
         
-        delete [] pixels;
+        std::free(pixels);
     }
     
     void upgradeGL3() {
@@ -694,7 +718,7 @@ namespace Engine {
                                                             v8::String::NewSymbol("Console"));
         
 		if (script.IsEmpty()) {
-			v8::Handle<v8::Value> exception = tryCatch.Exception();
+			v8::Handle<v8::Value> exception = tryCatch.StackTrace();
 			v8::String::AsciiValue exception_str(exception);
             Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
 		} else {
@@ -702,119 +726,111 @@ namespace Engine {
             if (*result != NULL) { // well it works
                 Logger::begin("Console", Logger::LogLevel_Log) << (result->IsNull() ? "null" : *v8::String::Utf8Value(result->ToString())) << Logger::end();
             }
-            if (!tryCatch.Exception().IsEmpty()) {
-                v8::Handle<v8::Value> exception = tryCatch.Exception();
+            if (!tryCatch.StackTrace().IsEmpty()) {
+                v8::Handle<v8::Value> exception = tryCatch.StackTrace();
                 v8::String::AsciiValue exception_str(exception);
                 Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
             }
 		}
     }
     
-	// main function
-	
-	int main(int argc, char const *argv[]) {
-        Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
+    void detailProfile(int frames, std::string filename) {
+        Profiler::ResetDetail();
+        _detailFrames = frames;
+        _detailFilename = filename;
+    }
+    
+    void MainLoop() {
+        running = true;
         
-        LoadBasicConfigs();
-        
-		Filesystem::Init(argv[0]);
-        
-        _argc = argc;
-        _argv = argv;
-        
-        Profiler::ProfileZone("InitScripting", []() {
-            InitScripting();
-        });
-        
-        Profiler::ProfileZone("InitOpenGL", []() {
-            InitOpenGL();
-        });
-        
-        if (!_onPostLoadFunc.IsEmpty()) {
-            CallFunction(_onPostLoadFunc);
-        }
-        
-        FreeImage_Initialise();
-	
-		running = true;
-	
-		UpdateScreen();
-	
 		while (running) {
-			if (!isFullscreen && !glfwGetWindowAttrib(window, GLFW_FOCUSED)) {
+            Profiler::StartProfileFrame();
+            
+			if (!isFullscreen &&
+                    !glfwGetWindowAttrib(window, GLFW_FOCUSED) &&
+                    !Config::GetBoolean("cl_runOnIdle") &&
+                    !glfwWindowShouldClose(window)) {
 				glfwWaitEvents();
                 sleep(0);
 				continue;
 			}
             
-            Profiler::ProfileZone("Frame", []() {
-            
+            if (Config::GetBoolean("script_reload")) {
                 CheckUpdate();
+            }
             
-                UpdateMousePos();
-                
-                Profiler::ProfileZone("Draw", []() {
-                
-                    Draw2D::CheckGLError("startOfRendering");
-	
-                    Profiler::ProfileZone("GLClear", []() {
-                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                    });
-                
-                    Draw2D::Begin2d();
-	
-                    if (!_drawFunc.IsEmpty()) {
-                        Profiler::Begin("JSDraw");
-                        if (!CallFunction(_drawFunc)) {
-                            _drawFunc.Clear();
-                        }
-                        Profiler::End("JSDraw");
-                    }
+            Profiler::Begin("Frame");
             
-                    Profiler::ProfileZone("EngineUI", []() {
-                        EngineUI::Draw();
-                    });
+            UpdateMousePos();
             
-                    Draw2D::End2d();
-                
-                });
-                    
-                Profiler::ProfileZone("SwapBuffers", []() {
-                    glfwSwapBuffers(window);
-                });
-                
-                Profiler::ProfileZone("PollEvents", []() {
-                    glfwPollEvents();
-                });
-                
-            });
+            Profiler::Begin("Draw");
+            
+            Draw2D::CheckGLError("startOfRendering");
+            
+            Profiler::Begin("glClear");
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Profiler::End("glClear");
+            
+            Draw2D::Begin2d();
+            
+            if (!_drawFunc.IsEmpty() && Config::GetBoolean("cl_scriptedDraw")) {
+                Profiler::Begin("JSDraw");
+                if (!CallFunction(_drawFunc)) {
+                    _drawFunc.Clear();
+                }
+                Profiler::End("JSDraw");
+            }
+            
+            Profiler::Begin("EngineUI");
+            EngineUI::Draw();
+            Profiler::End("EngineUI");
+            
+            Draw2D::End2d();
+            
+            Profiler::End("Draw");
+            
+            Profiler::Begin("SwapBuffers");
+            glfwSwapBuffers(window);
+            Profiler::End("SwapBuffers");
+            
+            Profiler::Begin("PollEvents");
+            glfwPollEvents();
+            Profiler::End("PollEvents");
+            
+            Profiler::End("Frame");
             
 			if (glfwWindowShouldClose(window)) {
 				Logger::begin("Window", Logger::LogLevel_Log) << "Exiting" << Logger::end();
 				running = false;
 				break;
 			}
-
+            
             Draw2D::CheckGLError("endOfRendering");
             
+            if (Config::GetBoolean("script_gcFrame")) {
+                Profiler::Begin("ScriptGC");
+                v8::V8::IdleNotification();
+                Profiler::End("ScriptGC");
+            }
+            
             if (toggleNextframe) {
-                Profiler::ProfileZone("ToggleFullscreen", []() {
-                    _toggleFullscreen();
-                });
+                Profiler::Begin("ToggleFullscreen");
+                _toggleFullscreen();
+                Profiler::End("ToggleFullscreen");
                 toggleNextframe = false;
             }
             
             if (_restartNextFrame) {
-                Profiler::ProfileZone("RestartRenderer", []() {
-                    _restartRenderer();
-                });
+                Profiler::Begin("RestartRenderer");
+                _restartRenderer();
+                Profiler::End("RestartRenderer");
                 _restartNextFrame = false;
             }
             
             if (screenshotNextframe) {
-                Profiler::ProfileZone("SaveScreenshot", []() {
-                    _saveScreenshot();
-                });
+                Profiler::Begin("SaveScreenshot");
+                _saveScreenshot();
+                Profiler::End("SaveScreenshot");
                 screenshotNextframe = false;
             }
             
@@ -822,8 +838,52 @@ namespace Engine {
                 _dumpProfile();
                 _dumpProfileAtFrameEnd = false;
             }
+            
+            if (_detailFrames > 0) {
+                Profiler::CaptureDetail();
+                _detailFrames--;
+                if (_detailFrames <= 0) {
+                    std::string detailData = Profiler::GetDetailProfile();
+                    Filesystem::WriteFile(_detailFilename, (char*) detailData.c_str(), sizeof(char) * detailData.length());
+                    Logger::begin("Profiler", Logger::LogLevel_Log)
+                    << "Saved Profiler Report as: " << Filesystem::GetRealPath(_detailFilename) << Logger::end();
+                }
+            }
 		}
+    }
+    
+	// main function
 	
+	int main(int argc, char const *argv[]) {
+        LoadBasicConfigs(_developerMode);
+        
+        Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
+        
+		Filesystem::Init(argv[0]);
+        
+        _argc = argc;
+        _argv = argv;
+        
+        Profiler::Begin("InitScripting");
+            InitScripting(_developerMode);
+        Profiler::End("InitScripting");
+        
+        Profiler::Begin("InitOpenGL");
+            InitOpenGL();
+        Profiler::End("InitOpenGL");
+        
+        if (!_onPostLoadFunc.IsEmpty()) {
+            CallFunction(_onPostLoadFunc);
+        }
+        
+        FreeImage_Initialise();
+        
+        UpdateScreen();
+        
+        Logger::begin("Application", Logger::LogLevel_Log) << "Loaded" << Logger::end();
+        
+        MainLoop();
+        
 		ShutdownOpenGL();
 		ShutdownScripting();
 

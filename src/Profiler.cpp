@@ -3,14 +3,20 @@
 namespace Engine {
     namespace Profiler {
         
+        std::stringstream _detail;
+        std::vector<std::string> _detailCapturePoints;
+        
         struct ProfileEvent {
             std::string prettyName;
             double time;
             double lastTime;
+            double min;
+            double max;
             bool ended;
+            bool thisFrame;
         };
         
-        std::map<std::string, ProfileEvent> _zones;
+        std::unordered_map<std::string, ProfileEvent> _zones;
 
         std::vector<std::string> _names;
         
@@ -18,7 +24,18 @@ namespace Engine {
             return _names[_names.size() - 1] + "::" + zoneName;
         }
         
+        inline double _min(double num1, double num2) {
+            return num1 > num2 ? num2 : num1;
+        }
+        
+        inline double _max(double num1, double num2) {
+            return num1 > num2 ? num1 : num2;
+        }
+        
         void Begin(std::string zone) {
+            if (!Config::GetBoolean("cl_profiler")) {
+                return;
+            }
             if (_names.size() == 0) {
                 _names.push_back("Root");
             }
@@ -29,32 +46,77 @@ namespace Engine {
                 ProfileEvent newEvent;
                 newEvent.prettyName = _getPrettyName(zone);
                 newEvent.time = Logger::GetTime();
-                newEvent.lastTime = 0;
-                newEvent.ended = false;
+                newEvent.min = 99999999999;
+                newEvent.lastTime = newEvent.max = 0;
+                newEvent.ended = newEvent.thisFrame = false;
                 _zones[zone] = newEvent;
             }
             _names.push_back(_getPrettyName(zone));
         }
         
         void End(std::string zone) {
-            _zones[zone].time = (Logger::GetTime() - _zones[zone].time);
-            _zones[zone].lastTime = _zones[zone].time;
-            _zones[zone].ended = true;
+            if (!Config::GetBoolean("cl_profiler")) {
+                return;
+            }
+            ProfileEvent& e = _zones[zone];
+            e.time = (Logger::GetTime() - e.time);
+            e.lastTime = e.time;
+            e.ended = true;
+            e.max = _max(e.max, e.lastTime);
+            e.min = _min(e.min, e.lastTime);
+            e.thisFrame = true;
             _names.pop_back();
-        }
-        
-        void ProfileZone(std::string zone, std::function<void()> func) {
-            Begin(zone);
-            func();
-            End(zone);
         }
         
         void DumpProfile() {
             for (auto iter = _zones.begin(); iter != _zones.end(); iter++) {
-                if (iter->second.ended) {
-                    Logger::begin("Profiler", Logger::LogLevel_Verbose) << "ProfileEvent : " <<  iter->second.prettyName << " : " << iter->second.lastTime << "s" << Logger::end();
+                Logger::begin("Profiler", Logger::LogLevel_Verbose)
+                    << "ProfileEvent : " << iter->second.prettyName
+                    << " : last: " << iter->second.lastTime << "s"
+                    << " : min: " << iter->second.min << "s"
+                    << " : max: " << iter->second.max << "s"
+                    << Logger::end();
+            }
+        }
+        
+        
+        void ResetDetail() {
+            _detail.str("");
+            _detailCapturePoints.clear();
+            _detail << "time";
+            for (auto iter = _zones.begin(); iter != _zones.end(); iter++) {
+                _detailCapturePoints.push_back(iter->first);
+                _detail << ',' << iter->second.prettyName;
+            }
+        }
+        
+        void CaptureDetail() {
+            _detail << std::endl;
+            _detail << Logger::GetTime();
+            for (auto iter = _detailCapturePoints.begin(); iter != _detailCapturePoints.end(); iter++) {
+                _detail << ',';
+                if (GetEndedThisFrame(*iter)) {
+                    _detail << GetTime(*iter);
                 }
             }
+        }
+        
+        std::string GetDetailProfile() {
+            return _detail.str();
+        }
+        
+        void StartProfileFrame() {
+            if (!Config::GetBoolean("cl_profiler")) {
+                return;
+            }
+            
+            for (auto iter = _zones.begin(); iter != _zones.end(); iter++) {
+                iter->second.thisFrame = false;
+            }
+        }
+        
+        bool GetEndedThisFrame(std::string zone) {
+            return _zones[zone].thisFrame && _zones[zone].ended;
         }
         
         double GetTime(std::string zone) {

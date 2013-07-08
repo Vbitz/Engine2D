@@ -1,5 +1,20 @@
 // TODO: Make a better loader
 
+function makeLog(type) {
+	return function () {
+		var args = [type];
+		for (var i = 0; i < arguments.length; i++) {
+			args.push(arguments[i]);
+		}
+		console._log.apply(null, args);
+	};
+}
+
+console.log = makeLog("log");
+console.warn = makeLog("warning");
+console.error = makeLog("error");
+console.verbose = makeLog("verbose");
+
 var str = fs.readFile("config/config.json");
 
 console.log("Booting JavaScript Phase 1");
