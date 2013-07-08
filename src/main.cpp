@@ -872,6 +872,8 @@ namespace Engine {
             InitOpenGL();
         Profiler::End("InitOpenGL");
         
+        engine::EnableGLContext();
+        
         if (!_onPostLoadFunc.IsEmpty()) {
             CallFunction(_onPostLoadFunc);
         }
@@ -883,6 +885,8 @@ namespace Engine {
         Logger::begin("Application", Logger::LogLevel_Log) << "Loaded" << Logger::end();
         
         MainLoop();
+        
+        engine::DisableGLContext();
         
 		ShutdownOpenGL();
 		ShutdownScripting();

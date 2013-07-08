@@ -7,6 +7,8 @@ namespace Engine {
         ENGINE_JS_METHOD(LoadShader) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(1);
             ENGINE_CHECK_ARG_STRING(0, "Arg0 has to be a filename pointing to a shader");
             
@@ -17,6 +19,8 @@ namespace Engine {
         
 		ENGINE_JS_METHOD(Rect) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
 
 			GLfloat x, y, w, h;
             
@@ -44,6 +48,8 @@ namespace Engine {
 		ENGINE_JS_METHOD(Grid) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
 			GLfloat x, y, w, h;
             
             ENGINE_CHECK_ARGS_LENGTH(4);
@@ -69,6 +75,8 @@ namespace Engine {
 		
 		ENGINE_JS_METHOD(Grad) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
 			GLfloat x, y, w, h;
             
@@ -107,6 +115,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(Circle) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X center of the circle");
             ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y center of the circle");
@@ -161,6 +171,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(Curve) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             ENGINE_CHECK_ARGS_LENGTH(8);
             
@@ -320,6 +332,8 @@ namespace Engine {
 		ENGINE_JS_METHOD(ClearColor) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(1);
 		
             if (args[0]->IsNumber()) {
@@ -344,6 +358,8 @@ namespace Engine {
         ENGINE_JS_METHOD(LoadFont) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(2);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name you use to refer to the font");
@@ -364,6 +380,8 @@ namespace Engine {
         ENGINE_JS_METHOD(SetFont) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(2);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to use");
@@ -378,6 +396,8 @@ namespace Engine {
         ENGINE_JS_METHOD(IsFontLoaded) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(1);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to check");
@@ -387,6 +407,8 @@ namespace Engine {
 		
 		ENGINE_JS_METHOD(Print) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             ENGINE_CHECK_ARGS_LENGTH(3);
             
@@ -403,6 +425,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(Draw) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             Draw2D::CheckGLError("Pre Image Draw");
             
@@ -449,6 +473,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(DrawSub) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             Draw2D::CheckGLError("Pre Image Draw");
             
@@ -509,6 +535,8 @@ namespace Engine {
 		ENGINE_JS_METHOD(OpenImage) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(1);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the image to load");
@@ -534,6 +562,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(CreateImage) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             ENGINE_CHECK_ARGS_LENGTH(3);
             
@@ -596,6 +626,8 @@ namespace Engine {
         ENGINE_JS_METHOD(FreeImage) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(1);
             
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the textureID of the texture to free");
@@ -615,6 +647,8 @@ namespace Engine {
         ENGINE_JS_METHOD(IsTexture) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(1);
             
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the textureID of the texture to check");
@@ -626,6 +660,8 @@ namespace Engine {
         ENGINE_JS_METHOD(CameraReset) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             Draw2D::Reset();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -633,6 +669,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(CameraPan) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             ENGINE_CHECK_ARGS_LENGTH(2);
             
@@ -646,6 +684,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(CameraZoom) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
@@ -661,6 +701,8 @@ namespace Engine {
         ENGINE_JS_METHOD(CameraRotate) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_GL;
+            
             ENGINE_CHECK_ARGS_LENGTH(1);
             
             ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to rotate the camera");
@@ -674,6 +716,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(GetTextWidth) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
