@@ -40,6 +40,9 @@ namespace Engine {
         float lastDrawTimes[100];
         int currentLastDrawTimePos = 0;
         
+        float fpsTimer = 0.0f;
+        float currentFPS = 0;
+        
         void Draw() {
             if (!Config::GetBoolean("cl_engineUI")) {
                 return;
@@ -66,15 +69,25 @@ namespace Engine {
                 currentLastDrawTimePos = 0;
             }
             
+            float fps = 1000 / (Profiler::GetTime("Frame") * 1000);
+            
+            fpsTimer += Profiler::GetTime("Frame");
+            
+            if (fpsTimer > 0.1f) {
+                currentFPS = glm::floor(fps);
+                fpsTimer = 0;
+            }
+            
             Draw2D::Print(10, 4, "-- Engine2D --");
             ss.str("");
             ss.precision(4);
-            ss << "DrawTime: " << drawTime;
-            Draw2D::Print(getScreenWidth() - 150, 4, ss.str().c_str());
+            ss << "FPS: " << currentFPS;
+            ss << " | DrawTime: " << drawTime;
+            Draw2D::Print(getScreenWidth() - 220, 4, ss.str().c_str());
             
             Draw2D::DisableSmooth();
             
-            Draw2D::LineGraph(getScreenWidth() - 360, 14, 2, 200, lastDrawTimes, 100);
+            Draw2D::LineGraph(getScreenWidth() - 430, 14, 2, 200, lastDrawTimes, 100);
             
             Draw2D::EnableSmooth();
             
