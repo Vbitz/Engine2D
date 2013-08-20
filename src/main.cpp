@@ -194,7 +194,7 @@ namespace Engine {
         
 		global->Set("input", inputTable);
 
-		_globalContext = v8::Context::New(NULL, global);
+		_globalContext = v8::Persistent<v8::Context>::New(_globalIsolate, v8::Context::New(_globalIsolate, NULL, global));
         
 		runFile(Config::GetString("script_bootloader"), true);
         

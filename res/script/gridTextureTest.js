@@ -1,4 +1,5 @@
-var img = img ? img : -1;
+var img = img ? img : draw.createImage([0.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+								1.0, 1.0, 1.0, 0.0, 0.0, 0.0], 2, 2);
 
 var scale = 1.0;
 
