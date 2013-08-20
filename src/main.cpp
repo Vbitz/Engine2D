@@ -272,6 +272,7 @@ namespace Engine {
         Config::SetBoolean("log_console", true);
         Config::SetBoolean("log_consoleVerbose", developerMode);
         Config::SetBoolean("log_colors", true);
+        Config::SetBoolean("log_script_undefined", developerMode);
     }
 	
 	void ResizeWindow(GLFWwindow* window, int w, int h) {
@@ -724,7 +725,11 @@ namespace Engine {
 		} else {
             v8::Local<v8::Value> result = script->Run();
             if (*result != NULL) { // well it works
-                Logger::begin("Console", Logger::LogLevel_Log) << (result->IsNull() ? "null" : *v8::String::Utf8Value(result->ToString())) << Logger::end();
+                if (result->IsUndefined() && !Config::GetBoolean("log_script_undefined")) {
+                    
+                } else {
+                    Logger::begin("Console", Logger::LogLevel_Log) << (result->IsNull() ? "null" : *v8::String::Utf8Value(result->ToString())) << Logger::end();
+                }
             }
             if (!tryCatch.StackTrace().IsEmpty()) {
                 v8::Handle<v8::Value> exception = tryCatch.StackTrace();
