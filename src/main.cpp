@@ -266,6 +266,8 @@ namespace Engine {
         Config::SetBoolean("cl_engineUI", developerMode);
         Config::SetBoolean("cl_profiler", developerMode);
         Config::SetBoolean("cl_scriptedDraw", true);
+        Config::SetBoolean("draw_clampCreateTexture", true);
+        Config::SetBoolean("draw_createImageMipmap", true);
         Config::SetBoolean("script_reload", developerMode);
         Config::SetBoolean("script_gcFrame", true);
         Config::SetString("script_bootloader", "lib/boot.js");
@@ -274,6 +276,7 @@ namespace Engine {
         Config::SetBoolean("log_colors", true);
         Config::SetBoolean("log_script_undefined", developerMode);
         Config::SetBoolean("log_profiler_maxTime", developerMode);
+        Config::SetBoolean("log_createImage", true);
     }
 	
 	void ResizeWindow(GLFWwindow* window, int w, int h) {

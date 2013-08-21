@@ -560,6 +560,38 @@ namespace Engine {
 			ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(img->GetTextureID()));
 		}
         
+        ENGINE_JS_METHOD(CreateImageArray) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the width of the new Image Array");
+            ENGINE_CHECK_ARG_INT32(1, "Arg1 is the height of the new Image Array");
+            
+            int arraySize = ENGINE_GET_ARG_INT32_VALUE(0) * ENGINE_GET_ARG_INT32_VALUE(1) * 4;
+            
+            v8::Handle<v8::Object> array = v8::Object::New();
+            
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            
+            float* rawArray = new float[arraySize]; // sadly this is a memory leak right now
+            
+            for (int i = 0; i < arraySize; i += 4) {
+                rawArray[i] = 1.0f;
+                rawArray[i + 1] = 1.0f;
+                rawArray[i + 2] = 1.0f;
+                rawArray[i + 3] = 1.0f;
+            }
+            
+            v8::Persistent<v8::Object> persistent_array = v8::Persistent<v8::Object>::New(isolate, array);
+            persistent_array.MarkIndependent(isolate);
+            isolate->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
+            
+            array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));
+            
+            ENGINE_JS_SCOPE_CLOSE(array);
+        }
+        
         ENGINE_JS_METHOD(CreateImage) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -567,7 +599,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(3);
             
-            ENGINE_CHECK_ARG_ARRAY(0, "Arg0 is a a");
+            ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is a Object");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the width of the new image");
             ENGINE_CHECK_ARG_INT32(2, "Arg2 is the height of the new image");
             
@@ -575,23 +607,39 @@ namespace Engine {
             
             int width = ENGINE_GET_ARG_INT32_VALUE(1);
             int height = ENGINE_GET_ARG_INT32_VALUE(2);
-            int len = width * height;
             
-            if (arr->Length() != width * height * 3) {
-                ENGINE_THROW_ARGERROR("Array size != width * height * 3");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
+            float* pixels = NULL;
             
-            float* pixels = (float*) malloc(sizeof(float) * len * 4);
-            
-            int i2 = 0;
-            
-            for (int i = 0; i < len * 4; i += 4) {
-                pixels[i + 0] = glm::clamp((float) arr->Get(i2 + 0)->NumberValue(), 0.0f, 1.0f);
-                pixels[i + 1] = glm::clamp((float) arr->Get(i2 + 1)->NumberValue(), 0.0f, 1.0f);
-                pixels[i + 2] = glm::clamp((float) arr->Get(i2 + 2)->NumberValue(), 0.0f, 1.0f);
-                pixels[i + 3] = 1.0f;
-                i2 += 3;
+            if (arr->HasIndexedPropertiesInExternalArrayData()) {
+                pixels = (float*) arr->GetIndexedPropertiesExternalArrayData();
+            } else {
+                int len = width * height;
+                
+                bool noClamp = !Config::GetBoolean("draw_clampCreateTexture");
+                
+                if (arr->Length() != width * height * 3) {
+                    ENGINE_THROW_ARGERROR("Array size != width * height * 3");
+                    ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                }
+                
+                pixels = (float*) malloc(sizeof(float) * len * 4);
+                
+                int i2 = 0;
+                
+                for (int i = 0; i < len * 4; i += 4) {
+                    if (noClamp) {
+                        pixels[i + 0] = (float) arr->Get(i2 + 0)->NumberValue();
+                        pixels[i + 1] = (float) arr->Get(i2 + 1)->NumberValue();
+                        pixels[i + 2] = (float) arr->Get(i2 + 2)->NumberValue();
+                        pixels[i + 3] = 1.0f;
+                    } else {
+                        pixels[i + 0] = glm::clamp((float) arr->Get(i2 + 0)->NumberValue(), 0.0f, 1.0f);
+                        pixels[i + 1] = glm::clamp((float) arr->Get(i2 + 1)->NumberValue(), 0.0f, 1.0f);
+                        pixels[i + 2] = glm::clamp((float) arr->Get(i2 + 2)->NumberValue(), 0.0f, 1.0f);
+                        pixels[i + 3] = 1.0f;
+                    }
+                    i2 += 3;
+                }
             }
             
 			GLuint text = 0;
@@ -602,23 +650,33 @@ namespace Engine {
             
 			glBindTexture(GL_TEXTURE_2D, text);
             
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+            if (Config::GetBoolean("draw_createImageMipmap")) {
+                glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                             GL_NEAREST_MIPMAP_NEAREST );
+            } else {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            }
             
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                             GL_NEAREST );
             
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, pixels);
             
-            glGenerateMipmap(GL_TEXTURE_2D);
+            if (Config::GetBoolean("draw_createImageMipmap")) {
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
             
 			glBindTexture(GL_TEXTURE_2D, 0);
             
             glDisable(GL_TEXTURE_2D);
             
-            free(pixels);
+            if (!arr->HasIndexedPropertiesInExternalArrayData()) {
+                free(pixels);
+            }
             
-            Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from data: " << text << Logger::end();
+            if (Config::GetBoolean("log_createImage")) {
+                Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from data: " << text << Logger::end();
+            }
             
             ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
         }
@@ -778,6 +836,7 @@ namespace Engine {
             addItem(drawTable, "draw", Draw);
             addItem(drawTable, "drawSub", DrawSub);
             addItem(drawTable, "openImage", OpenImage);
+            addItem(drawTable, "createImageArray", CreateImageArray);
             addItem(drawTable, "createImage", CreateImage);
             addItem(drawTable, "freeImage", FreeImage);
             addItem(drawTable, "isTexture", IsTexture);
