@@ -14,6 +14,8 @@ namespace Engine {
             double max;
             bool ended;
             bool thisFrame;
+            double maxTime = 0;
+            bool reportLong = false;
         };
         
         std::unordered_map<std::string, ProfileEvent> _zones;
@@ -33,6 +35,10 @@ namespace Engine {
         }
         
         void Begin(std::string zone) {
+            Begin(zone, -1);
+        }
+        
+        void Begin(std::string zone, double maxTime) {
             if (!Config::GetBoolean("cl_profiler")) {
                 return;
             }
@@ -49,6 +55,8 @@ namespace Engine {
                 newEvent.min = 99999999999;
                 newEvent.lastTime = newEvent.max = 0;
                 newEvent.ended = newEvent.thisFrame = false;
+                newEvent.maxTime = maxTime;
+                newEvent.reportLong = maxTime > -1;
                 _zones[zone] = newEvent;
             }
             _names.push_back(_getPrettyName(zone));
@@ -65,6 +73,13 @@ namespace Engine {
             e.max = _max(e.max, e.lastTime);
             e.min = _min(e.min, e.lastTime);
             e.thisFrame = true;
+            if (e.reportLong && e.time > e.maxTime && Config::GetBoolean("log_profiler_maxTime")) {
+                Logger::begin("Profiler", Logger::LogLevel_Warning)
+                    << "ProfileEvent: " << e.prettyName << " : "
+                    << "Exceeded Max Time: " << e.maxTime << " : "
+                    << "By: " << ((e.time / e.maxTime * 100) - 100) << "%"
+                    << Logger::end();
+            }
             _names.pop_back();
         }
         
@@ -121,6 +136,27 @@ namespace Engine {
         
         double GetTime(std::string zone) {
             return _zones[zone].lastTime;
+        }
+        
+        std::vector<std::string> GetZones() {
+            std::vector<std::string> ret;
+            for (auto iter = _zones.begin(); iter != _zones.end(); iter++) {
+                ret.push_back(iter->second.prettyName);
+            }
+            return ret;
+        }
+        
+        void SetMaxTime(std::string zone, double time) {
+            _zones[zone].maxTime = time;
+        }
+        
+        void EnableMaxTime(std::string zone, double time) {
+            _zones[zone].reportLong = true;
+            _zones[zone].maxTime = time;
+        }
+        
+        void DisableMaxTime(std::string zone) {
+            _zones[zone].reportLong = false;
         }
     }
 }

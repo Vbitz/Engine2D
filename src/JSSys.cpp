@@ -333,6 +333,28 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(ProfileSet) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Zone to set profile info on");
+            
+            if (args[1]->IsBoolean()) {
+                if (ENGINE_GET_ARG_BOOLEAN_VALUE(1)) {
+                    ENGINE_THROW_ARGERROR("Arg1 needs to be a number to enable MaxTime");
+                } else {
+                    Profiler::DisableMaxTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                }
+            } else if (args[1]->IsNumber()) {
+                Profiler::EnableMaxTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                                        ENGINE_GET_ARG_NUMBER_VALUE(1));
+            } else {
+                ENGINE_THROW_ARGERROR("sys.profileSet accepts a boolean or a number for the second arg");
+            }
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(TestGraph) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -377,6 +399,8 @@ namespace Engine {
             
             addItem(sysTable, "gc", GC);
             addItem(sysTable, "profile", Profile);
+            
+            addItem(sysTable, "profileSet", ProfileSet);
             
             //addItem(sysTable, "testGraph", TestGraph);
         }

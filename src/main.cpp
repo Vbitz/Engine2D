@@ -273,6 +273,7 @@ namespace Engine {
         Config::SetBoolean("log_consoleVerbose", developerMode);
         Config::SetBoolean("log_colors", true);
         Config::SetBoolean("log_script_undefined", developerMode);
+        Config::SetBoolean("log_profiler_maxTime", developerMode);
     }
 	
 	void ResizeWindow(GLFWwindow* window, int w, int h) {
@@ -779,14 +780,14 @@ namespace Engine {
             Draw2D::Begin2d();
             
             if (!_drawFunc.IsEmpty() && Config::GetBoolean("cl_scriptedDraw")) {
-                Profiler::Begin("JSDraw");
+                Profiler::Begin("JSDraw", 0.04);
                 if (!CallFunction(_drawFunc)) {
                     _drawFunc.Clear();
                 }
                 Profiler::End("JSDraw");
             }
             
-            Profiler::Begin("EngineUI");
+            Profiler::Begin("EngineUI", 0.03);
             EngineUI::Draw();
             Profiler::End("EngineUI");
             
