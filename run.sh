@@ -1,3 +1,5 @@
 #!/bin/bash
-
-bin/Engine
+cd "${0%/*}"
+pwd
+cd ../Resources
+../MacOS/Engine

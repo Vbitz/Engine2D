@@ -398,9 +398,9 @@ namespace Engine {
             Logger::begin("Window", Logger::LogLevel_Error) << "Error Creating Window" << Logger::end();
         }
         
-        glfwSwapInterval(Config::GetBoolean("cl_vsync") ? 1 : 0);
-        
         glfwMakeContextCurrent(window);
+        
+        glfwSwapInterval(Config::GetBoolean("cl_vsync") ? 1 : 0);
         
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLEW" << Logger::end();
         
@@ -577,7 +577,7 @@ namespace Engine {
             v8::String::New(inputScript), v8::String::New(path.c_str()));
 
 		if (script.IsEmpty()) {
-			Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not Load file" << Logger::end();
+			Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not Load file: " << path << Logger::end();
 			v8::Handle<v8::Value> exception = tryCatch.StackTrace();
 			v8::String::AsciiValue exception_str(exception);
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
@@ -606,7 +606,7 @@ namespace Engine {
             Logger::begin("Scripting", Logger::LogLevel_Error) << path << " Not Found" << Logger::end();
         } else {
             if (!_runFile(path, persist)) {
-                Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not load File" << Logger::end();
+                Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not load File : " << path << Logger::end();
             }
         }
     }

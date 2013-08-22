@@ -2,6 +2,7 @@ bin/Engine
 bin/Engine.dSYM
 
 release
+release-osx
 
 res/fonts
 
