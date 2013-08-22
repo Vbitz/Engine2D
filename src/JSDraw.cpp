@@ -584,7 +584,7 @@ namespace Engine {
             }
             
             v8::Persistent<v8::Object> persistent_array = v8::Persistent<v8::Object>::New(isolate, array);
-            persistent_array.MarkIndependent(isolate);
+            persistent_array.MarkIndependent(isolate); // and this is also a bad memory leak
             isolate->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
             
             array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));

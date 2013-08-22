@@ -254,29 +254,33 @@ namespace Engine {
 	}
 
     void LoadBasicConfigs(bool developerMode) {
-        Config::SetNumber("cl_width", 800);
-        Config::SetNumber("cl_height", 800);
-        Config::SetBoolean("cl_aa", true);
-        Config::SetBoolean("cl_fullscreen", false);
-        Config::SetBoolean("cl_openGL3", false);
-        Config::SetString("cl_fontPath", "fonts/OpenSans-Regular.ttf");
-        Config::SetString("cl_consoleFontPath", "fonts/SourceSansPro-Regular.ttf");
-        Config::SetBoolean("cl_showVerboseLog", false);
-        Config::SetBoolean("cl_runOnIdle", false);
-        Config::SetBoolean("cl_engineUI", developerMode);
-        Config::SetBoolean("cl_profiler", developerMode);
-        Config::SetBoolean("cl_scriptedDraw", true);
-        Config::SetBoolean("draw_clampCreateTexture", true);
-        Config::SetBoolean("draw_createImageMipmap", true);
-        Config::SetBoolean("script_reload", developerMode);
-        Config::SetBoolean("script_gcFrame", true);
-        Config::SetString("script_bootloader", "lib/boot.js");
-        Config::SetBoolean("log_console", true);
-        Config::SetBoolean("log_consoleVerbose", developerMode);
-        Config::SetBoolean("log_colors", true);
-        Config::SetBoolean("log_script_undefined", developerMode);
-        Config::SetBoolean("log_profiler_maxTime", developerMode);
-        Config::SetBoolean("log_createImage", true);
+        Config::SetNumber(  "cl_width",                 800);
+        Config::SetNumber(  "cl_height",                600);
+        Config::SetBoolean( "cl_aa",                    true);
+        Config::SetBoolean( "cl_vsync",                 false);
+        Config::SetBoolean( "cl_fullscreen",            false);
+        Config::SetBoolean( "cl_openGL3",               false);
+        Config::SetString(  "cl_fontPath",              "fonts/OpenSans-Regular.ttf");
+        Config::SetString(  "cl_consoleFontPath",       "fonts/SourceSansPro-Regular.ttf");
+        Config::SetBoolean( "cl_showVerboseLog",        false);
+        Config::SetBoolean( "cl_runOnIdle",             false);
+        Config::SetBoolean( "cl_engineUI",              developerMode);
+        Config::SetBoolean( "cl_profiler",              developerMode);
+        Config::SetBoolean( "cl_scriptedDraw",          true);
+        
+        Config::SetBoolean( "draw_clampCreateTexture",  true);
+        Config::SetBoolean( "draw_createImageMipmap",   true);
+        
+        Config::SetBoolean( "script_reload",            developerMode);
+        Config::SetBoolean( "script_gcFrame",           true);
+        Config::SetString(  "script_bootloader",        "lib/boot.js");
+        
+        Config::SetBoolean( "log_console",              true);
+        Config::SetBoolean( "log_consoleVerbose",       developerMode);
+        Config::SetBoolean( "log_colors",               true);
+        Config::SetBoolean( "log_script_undefined",     developerMode);
+        Config::SetBoolean( "log_profiler_maxTime",     developerMode);
+        Config::SetBoolean( "log_createImage",          true);
     }
 	
 	void ResizeWindow(GLFWwindow* window, int w, int h) {
@@ -393,6 +397,8 @@ namespace Engine {
         if (window == NULL) {
             Logger::begin("Window", Logger::LogLevel_Error) << "Error Creating Window" << Logger::end();
         }
+        
+        glfwSwapInterval(Config::GetBoolean("cl_vsync") ? 1 : 0);
         
         glfwMakeContextCurrent(window);
         
