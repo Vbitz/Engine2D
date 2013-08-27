@@ -1,6 +1,3 @@
-Engine2D
-========
-
 OSX Build Guide
 -------------------
 - Install xcode or xcode Command Line Tools
