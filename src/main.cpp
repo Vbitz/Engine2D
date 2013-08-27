@@ -1,5 +1,7 @@
 #include "main.hpp"
-	
+
+#include "extern/OpenSans-Regular.ttf.hpp"
+
 namespace Engine {
 	
 	// state
@@ -196,7 +198,10 @@ namespace Engine {
 
 		_globalContext = v8::Persistent<v8::Context>::New(_globalIsolate, v8::Context::New(_globalIsolate, NULL, global));
         
-		runFile(Config::GetString("script_bootloader"), true);
+		if (!runFile(Config::GetString("script_bootloader"), true)) {
+            Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();
+            EngineUI::ToggleConsole();
+        }
         
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
 	}
@@ -261,7 +266,7 @@ namespace Engine {
         Config::SetBoolean( "cl_fullscreen",            false);
         Config::SetBoolean( "cl_openGL3",               false);
         Config::SetString(  "cl_fontPath",              "fonts/OpenSans-Regular.ttf");
-        Config::SetString(  "cl_consoleFontPath",       "fonts/SourceSansPro-Regular.ttf");
+        //Config::SetString(  "cl_consoleFontPath",       "fonts/SourceSansPro-Regular.ttf");
         Config::SetBoolean( "cl_showVerboseLog",        false);
         Config::SetBoolean( "cl_runOnIdle",             false);
         Config::SetBoolean( "cl_engineUI",              developerMode);
@@ -470,9 +475,9 @@ namespace Engine {
 	
 	// font rendering
 	
-    void loadFont(std::string prettyName, std::string filename) {
+    bool loadFont(std::string prettyName, std::string filename) {
         if (isGL3Context) {
-            return;
+            return false;
         }
         
         Logger::begin("Font", Logger::LogLevel_Log)
@@ -486,11 +491,14 @@ namespace Engine {
             _fonts[prettyName] = new ResourceManager::FontResource(filename);
 		} else {
 			Logger::begin("Font", Logger::LogLevel_Error) << "Could not load font" << Logger::end();
+            return false;
 		}
         
         Draw2D::CheckGLError("PostLoadFont");
         
         Logger::begin("Font", Logger::LogLevel_Log) << "Loaded Font" << Logger::end();
+        
+        return true;
     }
     
 	void InitFonts() {
@@ -500,8 +508,12 @@ namespace Engine {
         }
         
         Profiler::Begin("LoadFonts");
-            loadFont("basic", Config::GetString("cl_fontPath"));
-            loadFont("monospace", Config::GetString("cl_consoleFontPath"));
+        if (!loadFont("basic", Config::GetString("cl_fontPath"))) {
+            Logger::begin("Font", Logger::LogLevel_Warning) << "Font not found: " << Config::GetString("cl_fontPath") << " falling back to inbuilt font" << Logger::end();
+            ResourceManager::Load("basicFont", new ResourceManager::RawSource(OpenSans_Regular, sizeof(OpenSans_Regular)));
+            _fonts["basic"] = new ResourceManager::FontResource("basicFont");
+        }
+            //loadFont("monospace", Config::GetString("cl_consoleFontPath"));
         Profiler::End("LoadFonts");
 	}
 	
@@ -601,12 +613,16 @@ namespace Engine {
 		}
 	}
     
-    void runFile(std::string path, bool persist) {
+    bool runFile(std::string path, bool persist) {
         if (!Filesystem::FileExists(path)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << path << " Not Found" << Logger::end();
+            return false;
         } else {
             if (!_runFile(path, persist)) {
                 Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not load File : " << path << Logger::end();
+                return false;
+            } else {
+                return true;
             }
         }
     }

@@ -16,7 +16,7 @@ namespace Engine {
     namespace ResourceManager {
         class Source {
         public:
-            void Unload() {
+            virtual void Unload() {
                 if (this->_savedData != NULL) {
                     std::free(this->_savedData);
                 }
@@ -79,6 +79,30 @@ namespace Engine {
             
         private:
             std::string _webRoot, _path;
+        };
+        
+        class RawSource : public Source {
+        public:
+            RawSource(const unsigned char* data, long fileLength);
+            
+            void Unload() {
+                // we don't want to free a rawsource
+            }
+            
+            bool NeedsUpdate() {
+                return false;
+            }
+            
+            std::string GetName() {
+                return "raw:///";
+            }
+            
+        protected:
+            unsigned char* _getData(long& len) override;
+        
+        private:
+            unsigned char* data;
+            long fileLength;
         };
         
         class Resource {
@@ -167,7 +191,7 @@ namespace Engine {
         };
         
         void Load(std::string path);
-        void Load(std::string resourceID, Source src);
+        void Load(std::string resourceID, Source* src);
         void UnloadAll();
         bool HasSource(std::string sourceID);
     }

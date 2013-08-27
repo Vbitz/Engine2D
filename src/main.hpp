@@ -17,7 +17,7 @@
 namespace Engine {
 
 	GLFT_Font* 					getFont(std::string fontName, int fontSize);
-    void                        loadFont(std::string prettyName, std::string filename);
+    bool                        loadFont(std::string prettyName, std::string filename);
     bool                        isFontLoaded(std::string fontName);
     
     v8::Persistent<v8::Context> getGlobalContext();
@@ -33,7 +33,7 @@ namespace Engine {
     void                        setKeyFunction(v8::Persistent<v8::Function> func);
     void                        setPostLoadFunction(v8::Persistent<v8::Function> func);
     
-	void						runFile(std::string path, bool persist);
+	bool						runFile(std::string path, bool persist);
     
     void                        exit();
     void                        toggleFullscreen();

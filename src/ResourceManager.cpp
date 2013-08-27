@@ -64,6 +64,17 @@ namespace Engine {
         }
         
         
+        // RawSource
+        RawSource::RawSource(const unsigned char* data, long fileLength) {
+            this->data = (unsigned char*) data;
+            this->fileLength = fileLength;
+        }
+        
+        unsigned char* RawSource::_getData(long &len) {
+            len = this->fileLength;
+            return this->data;
+        }
+        
         // Resource
         Resource::Resource() {
             Logger::LogText("ResourceManager", Logger::LogLevel_Error, "Invalid Resource Created");
@@ -296,6 +307,7 @@ namespace Engine {
         
         
         // FontResource
+        
         bool FontResource::IsCritical() {
             return false;
         }
@@ -345,9 +357,9 @@ namespace Engine {
             _sources[path] = new FileSource(path);
         }
         
-        void Load(std::string resourceID, Source src) {
-            Logger::begin("ResourceMamager", Logger::LogLevel_Verbose) << "Loading Source: " << resourceID << " with name " << src.GetName() << Logger::end();
-            _sources[resourceID] = &src;
+        void Load(std::string resourceID, Source* src) {
+            Logger::begin("ResourceMamager", Logger::LogLevel_Verbose) << "Loading Source: " << resourceID << " with name " << src->GetName() << Logger::end();
+            _sources[resourceID] = src;
         }
         
         void UnloadAll() {
