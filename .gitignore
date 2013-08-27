@@ -4,8 +4,6 @@ bin/Engine.dSYM
 release
 release-osx
 
-res/fonts
-
 .depend
 
 .tags*
@@ -15,7 +13,5 @@ res/fonts
 SmallGames-Engine2D
 
 *.o
-*.png
-*.bmp
 
 Internal*

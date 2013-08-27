@@ -295,7 +295,7 @@ namespace Engine {
         Draw2D::CheckGLError("Post Viewpoint");
     }
 	
-	void KeyPress(GLFWwindow* window, int rawKey, int state, int mods) {
+	void KeyPress(GLFWwindow* window, int rawKey, int scanCode, int state, int mods) {
         if (!glfwGetWindowAttrib(window, GLFW_FOCUSED) && !isFullscreen) {
             return;
         }
@@ -796,7 +796,7 @@ namespace Engine {
                 Profiler::End("JSDraw");
             }
             
-            Profiler::Begin("EngineUI", 0.03);
+            Profiler::Begin("EngineUI", 0.04);
             EngineUI::Draw();
             Profiler::End("EngineUI");
             
