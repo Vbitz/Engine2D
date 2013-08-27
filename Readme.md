@@ -1,25 +1,27 @@
 Engine2D
 ========
 
-Todo
------
-- Move to entity/component based system
-- Improve console with commands (maybe just a JS interpreter)
-- Add missing texture support
-- Add OpenAL Sound Support
-- Finish moving to default OpenGL 3.2
-- Fixed Textures on Windows
-- Create Compile Guide
-- Add sqlite3 to the repo
-- Update Documentation
+OSX Build Guide
+-------------------
+- Install xcode or xcode Command Line Tools
+- Install Homebrew
+- Clone the project to a directory of your choice
+- Install '''glew physfs v8 freeimage glm freetype''' using Homebrew
+- Clone and install https://github.com/glfw/glfw
+- Run '''make run''' in the project directory
 
-OpenGL3.2 Checklist
---------------------
-- Starts (Done 30/05/2013)
-- Fonts (Broken, need a better way to render fonts)
-- Rectangles
-- Gradients
-- Grid
-- CreateImage
-- OpenImage
-- DrawImage
+Sample Code
+-------------------
+javascript'''
+sys.drawFunc(function () {
+	draw.setColor("blue");
+	draw.rect(100, 100, 100, 100);
+});
+'''
+
+Getting Started
+-------------------
+Right now the engine is in beta but if you want to try it out then you can start writing JS code by
+- Creating a JS file with the sample code
+- Editing the startup key in res/config/config.json with your own script filename
+- Run the engine with '''make run'''

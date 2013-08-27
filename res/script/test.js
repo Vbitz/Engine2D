@@ -59,6 +59,8 @@ var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object");
 
 console.log("Loading Test Suite");
 
+var firstDraw = true;
+
 sys.drawFunc(function () {
 	if (!draw.isTexture(img)) {
 		console.log("Loading Image 1");
@@ -78,6 +80,11 @@ sys.drawFunc(function () {
 	if (!draw.isFontLoaded("light")) {
 		console.log("Loading Font");
 		draw.loadFont("light", "fonts/OpenSans-Light.ttf");
+	}
+
+	if (firstDraw) {
+		console.log("Finished Loading");
+		firstDraw = false;
 	}
 
 	draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
