@@ -15,6 +15,8 @@ namespace Engine {
         
         void ToggleConsole();
         
+        void ClearConsole();
+        
         bool ConsoleActive();
     }
 }

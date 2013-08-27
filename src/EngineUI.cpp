@@ -102,6 +102,10 @@ namespace Engine {
             int i = getScreenHeight() - 40;
             
             for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
+                if (iterator->Hidden) {
+                    continue; // don't show it if it's hidden
+                }
+                
                 if (iterator->Type == Logger::LogType_Text) {
                     if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
                         i -= 6; // add some padding to show that a message is there, just hidden
@@ -197,6 +201,10 @@ namespace Engine {
         
         void ToggleConsole() {
             _showConsole = !_showConsole;
+        }
+        
+        void ClearConsole() {
+            Logger::HideAllEvents();
         }
         
         bool ConsoleActive() {

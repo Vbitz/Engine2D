@@ -355,6 +355,14 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(ClearConsole) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            EngineUI::ClearConsole();
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(TestGraph) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -401,6 +409,8 @@ namespace Engine {
             addItem(sysTable, "profile", Profile);
             
             addItem(sysTable, "profileSet", ProfileSet);
+            
+            addItem(sysTable, "clearConsole", ClearConsole);
             
             //addItem(sysTable, "testGraph", TestGraph);
         }

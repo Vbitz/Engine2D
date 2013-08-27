@@ -154,5 +154,11 @@ namespace Engine {
         std::vector<LogEvent>* GetEvents() {
             return &_logEvents;
         }
+        
+        void HideAllEvents() {
+            for (auto iterator = _logEvents.begin(); iterator != _logEvents.end(); iterator++) {
+                iterator->Hidden = true;
+            }
+        }
     }
 }

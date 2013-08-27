@@ -257,7 +257,7 @@ namespace Engine {
         Config::SetNumber(  "cl_width",                 800);
         Config::SetNumber(  "cl_height",                600);
         Config::SetBoolean( "cl_aa",                    true);
-        Config::SetBoolean( "cl_vsync",                 false);
+        Config::SetBoolean( "cl_vsync",                 true); // lack of vsync causes FPS issues
         Config::SetBoolean( "cl_fullscreen",            false);
         Config::SetBoolean( "cl_openGL3",               false);
         Config::SetString(  "cl_fontPath",              "fonts/OpenSans-Regular.ttf");

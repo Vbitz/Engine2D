@@ -50,12 +50,14 @@ namespace Engine {
         class LogEvent {
         public:
             LogEvent(std::string domain, LogLevel level, std::string event)
-            :   Domain(domain), Level(level), Type(LogType_Text), GraphEvent(NULL), Event(event) {
+            :   Domain(domain), Level(level), Type(LogType_Text),
+                GraphEvent(NULL), Event(event), Hidden(false) {
                 this->time = GetTime();
             }
             
             LogEvent(std::string domain, LogLevel level, LogGraphEvent* event)
-            :   Domain(domain), Level(level), Type(LogType_Graphical), GraphEvent(event), Event("") {
+            :   Domain(domain), Level(level), Type(LogType_Graphical),
+                GraphEvent(event), Event(""), Hidden(false) {
                 this->time = GetTime();
             }
             
@@ -64,6 +66,7 @@ namespace Engine {
             LogType Type;
             LogGraphEvent* GraphEvent;
             std::string Event;
+            bool Hidden;
             double time;
         };
         
@@ -74,6 +77,8 @@ namespace Engine {
         
         std::ostream& begin(std::string domain, LogLevel level);
         StreamFlusher end();
+        
+        void HideAllEvents();
         
         std::vector<LogEvent>* GetEvents();
     }
