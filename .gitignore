@@ -10,7 +10,7 @@ release-osx
 
 .DS_Store
 
-SmallGames-Engine2D
+Engine2D.xcodeproj
 
 *.o
 
