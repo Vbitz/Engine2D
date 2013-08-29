@@ -167,27 +167,41 @@ namespace Engine {
             Draw2D::Print(10, getScreenHeight() - 22, (currentConsoleInput.str() + "_").c_str());
         }
         
+#ifndef _PLATFORM_WIN32
+#define KEY_CONSOLE 161
+#else
+#define KEY_CONSOLE 96
+#endif
+
         void OnKeyPress(int key, int press, bool shift) {
             if (!Config::GetBoolean("cl_engineUI")) {
                 return;
             }
-            
-            if (key == 161 && press == GLFW_PRESS) { // `
+
+			if (key == KEY_CONSOLE && press == GLFW_PRESS) { // `
                 ToggleConsole();
-            } else if (key == 299 && press == GLFW_PRESS) { // f10
-                dumpProfile();
+			} else if (key == GLFW_KEY_F10 && press == GLFW_PRESS) { // f10
+				dumpProfile();
             }
+
             if (!_showConsole) {
                 return;
             }
-            if (key < 256 && (press == GLFW_PRESS || press == GLFW_REPEAT) && key != '\n' && key != 161) {
-                currentConsoleInput << (char) (shift ? getSpecialChars(key) : (char) std::tolower(key));
+
+			if (key < 256 && (press == GLFW_PRESS || press == GLFW_REPEAT) && key != KEY_CONSOLE && key != GLFW_KEY_ENTER) {
+#ifndef _PLATFORM_WIN32
+				currentConsoleInput << (char) (shift ? getSpecialChars(key) : (char) std::tolower(key));
+#else
+				currentConsoleInput << (char) (shift ? getSpecialChars(key) : tolower(key));
+#endif
             } else if (key == GLFW_KEY_BACKSPACE && (press == GLFW_PRESS || press == GLFW_REPEAT)) {
                 std::string str = currentConsoleInput.str();
                 if (str.length() > 0) {
                     str.resize(str.length() - 1);
                     currentConsoleInput.str(str);
-                    currentConsoleInput.seekp(str.length());
+					if (str.length() != 0) {
+						currentConsoleInput.seekp(str.length());
+					}
                 }
             } else if (key == GLFW_KEY_ENTER && press == GLFW_PRESS) {
                 runCommand(currentConsoleInput.str());

@@ -52,7 +52,10 @@ namespace Engine {
     static std::string GLFW_GetKeyName(int key)
     {
         if (key < 256) {
-            return std::string({ (char) key, '\0'});
+			char* string = new char[2];
+			string[0] = (char) key;
+			string[1] = '\0';
+            return std::string(string);
         }
         switch (key)
         {

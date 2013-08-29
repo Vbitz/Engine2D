@@ -16,6 +16,10 @@ namespace Engine {
         double _startTime = -1;
         
         std::ostream& operator<<(std::ostream& os, const StreamFlusher& rhs) {
+			LogText(_currentDomain, _currentLogLevel, _ss.str());
+            _ss.str("");
+            _currentDomain = "";
+            _currentLogLevel = LogLevel_Error;
             return os.flush();
         }
         
@@ -24,6 +28,7 @@ namespace Engine {
         }
         
         std::string GetLevelColor(LogLevel level) {
+#ifndef _PLATFORM_WIN32
             switch (level) {
                 case LogLevel_Verbose:      return getEscapeCode(0, true);
                 case LogLevel_User:         return getEscapeCode(5, true);
@@ -31,7 +36,11 @@ namespace Engine {
                 case LogLevel_Log:          return getEscapeCode(7, false);
                 case LogLevel_Warning:      return getEscapeCode(3, true);
                 case LogLevel_Error:        return getEscapeCode(1, true);
+				default:					return "";
             }
+#else
+			return ""; // windows is not a very sane OS
+#endif
         }
         
         std::string GetLevelString(LogLevel level) {
@@ -48,18 +57,22 @@ namespace Engine {
                     return "Warning";
                 case LogLevel_Error:
                     return "Error";
+				default:
+					return "Unknown";
             }
         }
         
         double GetTime() {
 #ifdef _PLATFORM_WIN32
-            double time = GetTickCount() / 1000; // it's really bad compared to unix but it will do.
+			// TODO : Switch to GetPreformanceCounter
+			double time = (double) timeGetTime() / 1000.0;
 #else
             timeval _time;
             gettimeofday(&_time, NULL);
             
             double time = _time.tv_sec + (_time.tv_usec * 0.000001);
 #endif
+
             if (_startTime < 0) {
                 _startTime = time;
                 return 0;
@@ -140,14 +153,10 @@ namespace Engine {
             _ss.str("");
             _currentDomain = domain;
             _currentLogLevel = level;
-            return _ss;
+			return _ss;
         }
         
         StreamFlusher end() {
-            LogText(_currentDomain, _currentLogLevel, _ss.str());
-            _ss.str("");
-            _currentDomain = "";
-            _currentLogLevel = LogLevel_Error;
             return StreamFlusher();
         }
         

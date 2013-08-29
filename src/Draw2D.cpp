@@ -24,148 +24,154 @@ namespace Engine {
         std::string _currentFontName = "basic16px";
         int _currentFontSize = 16;
         
-        std::map<std::string, int> _predefinedColors = {
-            {"pink", 0xFFC0CB},
-            {"lightPink", 0xFFB6C1},
-            {"hotPink", 0xFF69B4},
-            {"deepPink", 0xFF1493},
-            {"paleVioletRed", 0xDB7093},
-            {"mediumVioletRed", 0xC71585},
-            {"lightSalmon", 0xFFA07A},
-            {"salmon", 0xFA8072},
-            {"darkSalmon", 0xE9967A},
-            {"lightCoral", 0xF08080},
-            {"indianRed", 0xCD5C5C},
-            {"crimson", 0xDC143C},
-            {"fireBrick", 0xB22222},
-            {"darkRed", 0x8B0000},
-            {"red", 0xFF0000},
-            {"orangeRed", 0xFF4500},
-            {"tomato", 0xFF6347},
-            {"coral", 0xFF7F50},
-            {"darkOrange", 0xFF8C00},
-            {"orange", 0xFFA500},
-            {"gold", 0xFFD700},
-            {"yellow", 0xFFFF00},
-            {"lightYellow", 0xFFFFE0},
-            {"lemonChiffon", 0xFFFACD},
-            {"lightGoldenrodYellow", 0xFAFAD2},
-            {"papayaWhip", 0xFFEFD5},
-            {"moccasin", 0xFFE4B5},
-            {"peachPuff", 0xFFDAB9},
-            {"paleGoldenrod", 0xEEE8AA},
-            {"khaki", 0xF0E68C},
-            {"darkKhaki", 0xBDB76B},
-            {"cornsilk", 0xFFF8DC},
-            {"blanchedAlmond", 0xFFEBCD},
-            {"bisque", 0xFFE4C4},
-            {"navajoWhite", 0xFFDEAD},
-            {"wheat", 0xF5DEB3},
-            {"burlyWood", 0xDEB887},
-            {"tan", 0xD2B48C},
-            {"rosyBrown", 0xBC8F8F},
-            {"sandyBrown", 0xF4A460},
-            {"goldenrod", 0xDAA520},
-            {"darkGoldenrod", 0xB8860B},
-            {"peru", 0xCD853F},
-            {"chocolate", 0xD2691E},
-            {"saddleBrown", 0x8B4513},
-            {"sienna", 0xA0522D},
-            {"brown", 0xA52A2A},
-            {"maroon", 0x800000},
-            {"darkOliveGreen", 0x556B2F},
-            {"olive", 0x808000},
-            {"oliveDrab", 0x6B8E23},
-            {"yellowGreen", 0x9ACD32},
-            {"limeGreen", 0x32CD32},
-            {"lime", 0x00FF00},
-            {"lawnGreen", 0x7CFC00},
-            {"chartreuse", 0x7FFF00},
-            {"greenYellow", 0xADFF2F},
-            {"springGreen", 0x00FF7F},
-            {"nediumSpringGreen", 0x00FA9A},
-            {"lightGreen", 0x90EE90},
-            {"paleGreen", 0x98FB98},
-            {"darkSeaGreen", 0x8FBC8F},
-            {"mediumSeaGreen", 0x3CB371},
-            {"seaGreen", 0x2E8B57},
-            {"forestGreen", 0x228B22},
-            {"green", 0x008000},
-            {"darkGreen", 0x006400},
-            {"mediumAquamarine", 0x66CDAA},
-            {"aqua", 0x00FFFF},
-            {"cyan", 0x00FFFF},
-            {"lightCyan", 0xE0FFFF},
-            {"paleTurquoise", 0xAFEEEE},
-            {"aquamarine", 0x7FFFD4},
-            {"turquoise", 0x40E0D0},
-            {"mediumTurquoise", 0x48D1CC},
-            {"darkTurquoise", 0x00CED1},
-            {"lightSeaGreen", 0x20B2AA},
-            {"cadetBlue", 0x5F9EA0},
-            {"darkCyan", 0x008B8B},
-            {"teal", 0x008080},
-            {"lightSteelBlue", 0xB0C4DE},
-            {"powderBlue", 0xB0E0E6},
-            {"lightBlue", 0xADD8E6},
-            {"skyBlue", 0x87CEEB},
-            {"lightSkyBlue", 0x87CEFA},
-            {"deepSkyBlue", 0x00BFFF},
-            {"dodgerBlue", 0x1E90FF},
-            {"dornflowerBlue", 0x6495ED},
-            {"steelBlue", 0x4682B4},
-            {"royalBlue", 0x4169E1},
-            {"blue", 0x0000FF},
-            {"mediumBlue", 0x0000CD},
-            {"darkBlue", 0x00008B},
-            {"navy", 0x000080},
-            {"midnightBlue", 0x191970},
-            {"lavender", 0xE6E6FA},
-            {"thistle", 0xD8BFD8},
-            {"plum", 0xDDA0DD},
-            {"violet", 0xEE82EE},
-            {"orchid", 0xDA70D6},
-            {"fuchsia", 0xFF00FF},
-            {"magenta", 0xFF00FF},
-            {"mediumOrchid", 0xBA55D3},
-            {"mediumPurple", 0x9370DB},
-            {"blueViolet", 0x8A2BE2},
-            {"darkViolet", 0x9400D3},
-            {"darkOrchid", 0x9932CC},
-            {"darkMagenta", 0x8B008B},
-            {"purple", 0x800080},
-            {"indigo", 0x4B0082},
-            {"darkSlateBlue", 0x483D8B},
-            {"slateBlue", 0x6A5ACD},
-            {"mediumSlateBlue", 0x7B68EE},
-            {"white", 0xFFFFFF},
-            {"snow", 0xFFFAFA},
-            {"honeydew", 0xF0FFF0},
-            {"mintCream", 0xF5FFFA},
-            {"azure", 0xF0FFFF},
-            {"aliceBlue", 0xF0F8FF},
-            {"ghostWhite", 0xF8F8FF},
-            {"whiteSmoke", 0xF5F5F5},
-            {"seashell", 0xFFF5EE},
-            {"beige", 0xF5F5DC},
-            {"oldLace", 0xFDF5E6},
-            {"floralWhite", 0xFFFAF0},
-            {"ivory", 0xFFFFF0},
-            {"antiqueWhite", 0xFAEBD7},
-            {"linen", 0xFAF0E6},
-            {"lavenderBlush", 0xFFF0F5},
-            {"mistyRose", 0xFFE4E1},
-            {"gainsboro", 0xDCDCDC},
-            {"lightGray", 0xD3D3D3},
-            {"silver", 0xC0C0C0},
-            {"darkGrey", 0xA9A9A9},
-            {"grey", 0x808080},
-            {"dimGrey", 0x696969},
-            {"lightSlateGrey", 0x778899},
-            {"slateGrey", 0x708090},
-            {"darkSlateGrey", 0x2F4F4F},
-            {"black", 0x000000}
-        };
+		// fuuuu visual studio
+
+		std::map<std::string, int> _predefinedColors;
+
+		bool _predefFilled = false;
+
+		void _initPredefinedColors() {
+			_predefinedColors["pink"] = 0xFFC0CB;
+            _predefinedColors["lightPink"] = 0xFFB6C1;
+            _predefinedColors["hotPink"] = 0xFF69B4;
+            _predefinedColors["deepPink"] = 0xFF1493;
+            _predefinedColors["paleVioletRed"] = 0xDB7093;
+            _predefinedColors["mediumVioletRed"] = 0xC71585;
+            _predefinedColors["lightSalmon"] = 0xFFA07A;
+            _predefinedColors["salmon"] = 0xFA8072;
+            _predefinedColors["darkSalmon"] = 0xE9967A;
+            _predefinedColors["lightCoral"] = 0xF08080;
+            _predefinedColors["indianRed"] = 0xCD5C5C;
+            _predefinedColors["crimson"] = 0xDC143C;
+            _predefinedColors["fireBrick"] = 0xB22222;
+            _predefinedColors["darkRed"] = 0x8B0000;
+            _predefinedColors["red"] = 0xFF0000;
+            _predefinedColors["orangeRed"] = 0xFF4500;
+            _predefinedColors["tomato"] = 0xFF6347;
+            _predefinedColors["coral"] = 0xFF7F50;
+            _predefinedColors["darkOrange"] = 0xFF8C00;
+            _predefinedColors["orange"] = 0xFFA500;
+            _predefinedColors["gold"] = 0xFFD700;
+            _predefinedColors["yellow"] = 0xFFFF00;
+            _predefinedColors["lightYellow"] = 0xFFFFE0;
+            _predefinedColors["lemonChiffon"] = 0xFFFACD;
+            _predefinedColors["lightGoldenrodYellow"] = 0xFAFAD2;
+            _predefinedColors["papayaWhip"] = 0xFFEFD5;
+            _predefinedColors["moccasin"] = 0xFFE4B5;
+            _predefinedColors["peachPuff"] = 0xFFDAB9;
+            _predefinedColors["paleGoldenrod"] = 0xEEE8AA;
+            _predefinedColors["khaki"] = 0xF0E68C;
+            _predefinedColors["darkKhaki"] = 0xBDB76B;
+            _predefinedColors["cornsilk"] = 0xFFF8DC;
+            _predefinedColors["blanchedAlmond"] = 0xFFEBCD;
+            _predefinedColors["bisque"] = 0xFFE4C4;
+            _predefinedColors["navajoWhite"] = 0xFFDEAD;
+            _predefinedColors["wheat"] = 0xF5DEB3;
+            _predefinedColors["burlyWood"] = 0xDEB887;
+            _predefinedColors["tan"] = 0xD2B48C;
+            _predefinedColors["rosyBrown"] = 0xBC8F8F;
+            _predefinedColors["sandyBrown"] = 0xF4A460;
+            _predefinedColors["goldenrod"] = 0xDAA520;
+            _predefinedColors["darkGoldenrod"] = 0xB8860B;
+            _predefinedColors["peru"] = 0xCD853F;
+            _predefinedColors["chocolate"] = 0xD2691E;
+            _predefinedColors["saddleBrown"] = 0x8B4513;
+            _predefinedColors["sienna"] = 0xA0522D;
+            _predefinedColors["brown"] = 0xA52A2A;
+            _predefinedColors["maroon"] = 0x800000;
+            _predefinedColors["darkOliveGreen"] = 0x556B2F;
+            _predefinedColors["olive"] = 0x808000;
+            _predefinedColors["oliveDrab"] = 0x6B8E23;
+            _predefinedColors["yellowGreen"] = 0x9ACD32;
+            _predefinedColors["limeGreen"] = 0x32CD32;
+            _predefinedColors["lime"] = 0x00FF00;
+            _predefinedColors["lawnGreen"] = 0x7CFC00;
+            _predefinedColors["chartreuse"] = 0x7FFF00;
+            _predefinedColors["greenYellow"] = 0xADFF2F;
+            _predefinedColors["springGreen"] = 0x00FF7F;
+            _predefinedColors["nediumSpringGreen"] = 0x00FA9A;
+            _predefinedColors["lightGreen"] = 0x90EE90;
+            _predefinedColors["paleGreen"] = 0x98FB98;
+            _predefinedColors["darkSeaGreen"] = 0x8FBC8F;
+            _predefinedColors["mediumSeaGreen"] = 0x3CB371;
+            _predefinedColors["seaGreen"] = 0x2E8B57;
+            _predefinedColors["forestGreen"] = 0x228B22;
+            _predefinedColors["green"] = 0x008000;
+            _predefinedColors["darkGreen"] = 0x006400;
+            _predefinedColors["mediumAquamarine"] = 0x66CDAA;
+            _predefinedColors["aqua"] = 0x00FFFF;
+            _predefinedColors["cyan"] = 0x00FFFF;
+            _predefinedColors["lightCyan"] = 0xE0FFFF;
+            _predefinedColors["paleTurquoise"] = 0xAFEEEE;
+            _predefinedColors["aquamarine"] = 0x7FFFD4;
+            _predefinedColors["turquoise"] = 0x40E0D0;
+            _predefinedColors["mediumTurquoise"] = 0x48D1CC;
+            _predefinedColors["darkTurquoise"] = 0x00CED1;
+            _predefinedColors["lightSeaGreen"] = 0x20B2AA;
+            _predefinedColors["cadetBlue"] = 0x5F9EA0;
+            _predefinedColors["darkCyan"] = 0x008B8B;
+            _predefinedColors["teal"] = 0x008080;
+            _predefinedColors["lightSteelBlue"] = 0xB0C4DE;
+            _predefinedColors["powderBlue"] = 0xB0E0E6;
+            _predefinedColors["lightBlue"] = 0xADD8E6;
+            _predefinedColors["skyBlue"] = 0x87CEEB;
+            _predefinedColors["lightSkyBlue"] = 0x87CEFA;
+            _predefinedColors["deepSkyBlue"] = 0x00BFFF;
+            _predefinedColors["dodgerBlue"] = 0x1E90FF;
+            _predefinedColors["dornflowerBlue"] = 0x6495ED;
+            _predefinedColors["steelBlue"] = 0x4682B4;
+            _predefinedColors["royalBlue"] = 0x4169E1;
+            _predefinedColors["blue"] = 0x0000FF;
+            _predefinedColors["mediumBlue"] = 0x0000CD;
+            _predefinedColors["darkBlue"] = 0x00008B;
+            _predefinedColors["navy"] = 0x000080;
+            _predefinedColors["midnightBlue"] = 0x191970;
+            _predefinedColors["lavender"] = 0xE6E6FA;
+            _predefinedColors["thistle"] = 0xD8BFD8;
+            _predefinedColors["plum"] = 0xDDA0DD;
+            _predefinedColors["violet"] = 0xEE82EE;
+            _predefinedColors["orchid"] = 0xDA70D6;
+            _predefinedColors["fuchsia"] = 0xFF00FF;
+            _predefinedColors["magenta"] = 0xFF00FF;
+            _predefinedColors["mediumOrchid"] = 0xBA55D3;
+            _predefinedColors["mediumPurple"] = 0x9370DB;
+            _predefinedColors["blueViolet"] = 0x8A2BE2;
+            _predefinedColors["darkViolet"] = 0x9400D3;
+            _predefinedColors["darkOrchid"] = 0x9932CC;
+            _predefinedColors["darkMagenta"] = 0x8B008B;
+            _predefinedColors["purple"] = 0x800080;
+            _predefinedColors["indigo"] = 0x4B0082;
+            _predefinedColors["darkSlateBlue"] = 0x483D8B;
+            _predefinedColors["slateBlue"] = 0x6A5ACD;
+            _predefinedColors["mediumSlateBlue"] = 0x7B68EE;
+            _predefinedColors["white"] = 0xFFFFFF;
+            _predefinedColors["snow"] = 0xFFFAFA;
+            _predefinedColors["honeydew"] = 0xF0FFF0;
+            _predefinedColors["mintCream"] = 0xF5FFFA;
+            _predefinedColors["azure"] = 0xF0FFFF;
+            _predefinedColors["aliceBlue"] = 0xF0F8FF;
+            _predefinedColors["ghostWhite"] = 0xF8F8FF;
+            _predefinedColors["whiteSmoke"] = 0xF5F5F5;
+            _predefinedColors["seashell"] = 0xFFF5EE;
+            _predefinedColors["beige"] = 0xF5F5DC;
+            _predefinedColors["oldLace"] = 0xFDF5E6;
+            _predefinedColors["floralWhite"] = 0xFFFAF0;
+            _predefinedColors["ivory"] = 0xFFFFF0;
+            _predefinedColors["antiqueWhite"] = 0xFAEBD7;
+            _predefinedColors["linen"] = 0xFAF0E6;
+            _predefinedColors["lavenderBlush"] = 0xFFF0F5;
+            _predefinedColors["mistyRose"] = 0xFFE4E1;
+            _predefinedColors["gainsboro"] = 0xDCDCDC;
+            _predefinedColors["lightGray"] = 0xD3D3D3;
+            _predefinedColors["silver"] = 0xC0C0C0;
+            _predefinedColors["darkGrey"] = 0xA9A9A9;
+            _predefinedColors["grey"] = 0x808080;
+            _predefinedColors["dimGrey"] = 0x696969;
+            _predefinedColors["lightSlateGrey"] = 0x778899;
+            _predefinedColors["slateGrey"] = 0x708090;
+            _predefinedColors["darkSlateGrey"] = 0x2F4F4F;
+            _predefinedColors["black"] = 0x000000;
+		}
         
         std::string GLErrorString(GLenum error) {
             switch (error) {
@@ -291,7 +297,7 @@ namespace Engine {
             GLSetColor();
             
             GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
-            
+
 			drawingFont->drawText(x - _centerX, y - _centerY, string);
             
 			glDisable(GL_TEXTURE_2D);
@@ -375,6 +381,10 @@ namespace Engine {
         }
         
         void SetColor(std::string colorName) {
+			if (!_predefFilled) {
+				_initPredefinedColors();
+				_predefFilled = true;
+			}
             SetColor(_predefinedColors[colorName]);
         }
         

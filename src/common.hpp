@@ -17,9 +17,8 @@
 
 // system includes
 #ifdef _WIN32
-#error Windows build broken until GLFW3 works
     #include <GL\glew.h>
-    #include <GL\glfw.h>
+    #include <GLFW\glfw3.h>
 	#include <sys\timeb.h>
 	#include <Windows.h>
     #define _PLATFORM "Windows"

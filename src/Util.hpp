@@ -32,8 +32,8 @@ namespace engine {
 #define ENGINE_CHECK_ARG_FUNCTION(num, errStr) if (!args[num]->IsFunction()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
 
 #define ENGINE_CHECK_ARG_STRING(num, errStr) if (!args[num]->IsString()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
-#define ENGINE_GET_ARG_CSTRING_VALUE(num) v8::String::AsciiValue(args[num])
-#define ENGINE_GET_ARG_CPPSTRING_VALUE(num) std::string(*v8::String::AsciiValue(args[num]))
+#define ENGINE_GET_ARG_CSTRING_VALUE(num) v8::String::Utf8Value(args[num])
+#define ENGINE_GET_ARG_CPPSTRING_VALUE(num) std::string(*v8::String::Utf8Value(args[num]))
 
 #define ENGINE_CHECK_ARG_BOOLEAN(num, errStr) if (!args[num]->IsBoolean()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
 #define ENGINE_GET_ARG_BOOLEAN_VALUE(num) args[num]->ToBoolean()->Value()

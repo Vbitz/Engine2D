@@ -31,8 +31,8 @@ namespace Engine {
         protected:
             virtual unsigned char* _getData(long& len);
             
-            unsigned char* _savedData = NULL;
-            long _savedDataLength = 0;
+            unsigned char* _savedData;
+            long _savedDataLength;
         };
         
         class DummySource : public Source {

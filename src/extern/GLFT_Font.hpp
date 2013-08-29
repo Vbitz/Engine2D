@@ -42,7 +42,7 @@
 
 // opengl includes
 #ifdef _WIN32
-#include <GL\glfw.h>
+#include <GLFW\glfw3.h>
 #else
 #include <GLFW/glfw3.h>
 #endif

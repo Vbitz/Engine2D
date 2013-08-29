@@ -5,12 +5,8 @@
 
 #include "Logger.hpp"
 
-#ifdef _PLATFORM_WIN32
-// TODO: Fix this
-#include "../../../org/sqlite-amalgamation-3071700/sqlite3.h"
-#else
+// TODO: use extern/sqlite3 insteed
 #include <sqlite3.h>
-#endif
 
 namespace Engine {
     class Database {

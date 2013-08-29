@@ -14,8 +14,8 @@ namespace Engine {
             double max;
             bool ended;
             bool thisFrame;
-            double maxTime = 0;
-            bool reportLong = false;
+            double maxTime;
+            bool reportLong;
         };
         
         std::unordered_map<std::string, ProfileEvent> _zones;

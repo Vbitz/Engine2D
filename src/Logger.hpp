@@ -8,6 +8,8 @@
 
 #ifdef _WIN32
 	#include <sys\timeb.h>
+#include <Windows.h>
+#define _PLATFORM_WIN32
 #else
     #include <sys/time.h>
 #endif

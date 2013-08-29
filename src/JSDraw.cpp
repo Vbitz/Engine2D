@@ -272,7 +272,11 @@ namespace Engine {
             long i;
             
             if(saturation <= 0.0) {       // < is bogus, just shuts up warnings
+#ifndef _PLATFORM_WIN32
                 if(std::isnan(hue)) {   // in.h == NAN
+#else
+				if (hue != hue) {
+#endif
                     ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
                     ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
                     ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
@@ -416,9 +420,9 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y position of Arg2");
             ENGINE_CHECK_ARG_STRING(2, "Arg2 is the string to print");
 
-            const char* str = *ENGINE_GET_ARG_CSTRING_VALUE(2);
-		
-            Draw2D::Print(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), str);
+            std::string str = ENGINE_GET_ARG_CPPSTRING_VALUE(2);
+
+			Draw2D::Print(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), (const char*) str.c_str());
 		
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
