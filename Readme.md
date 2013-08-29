@@ -11,10 +11,10 @@ OSX Build Guide
 Windows Build Guide
 -------------------
 Windows binarys are avalible from: http://vbitz.com/public/engine2d-bins-win32-01.zip
-This is not for the fait of heart. In the future I will provide project files or some kind of binary dependancys.
+This is not for the faint of heart. In the future I will provide project files or some kind of binary dependancys.
 - Install Visual Studio (Express 2012 for Windows Desktop) is what I tested the compile on)
 - Install CMake (For GLFW and PhysFS)
-- Install Git for Windows (Or any github client)
+- Install Git for Windows (Or any git client)
 - Clone the project into an empty directory, any directory works
 - Make a new directory to store collected libs and headers
 - Create a new C++ Console Application Project and add all the files in src and src/extern
