@@ -10,7 +10,7 @@ var player = {
 	y: -40,
 	width: 20,
 	height: 60,
-	color: 0xffffff,
+	color: 0xabcdef,
 
 	xSpeed: 0,
 	ySpeed: 0,
@@ -38,7 +38,7 @@ function rectColCheck(rect1, rect2) {
 	return true;
 }
 
-draw.clearColor(0.2, 0.3, 0.6);
+draw.clearColor(0xffffff);
 
 sys.drawFunc(function () {
 	draw.cameraPan(sys.screenWidth / 2 - player.width - player.x, sys.screenHeight / 2 - player.height - player.y);
@@ -123,13 +123,14 @@ sys.drawFunc(function () {
 	draw.rect(player.x, player.y, player.width, player.height);
 
 	draw.cameraReset();
-	draw.setColor(0xdffabf);
-	draw.print(10, 10, "x: " + player.x.toFixed(2));
+	draw.setColor("black");
+	draw.setFont("basic", 10);
+	draw.print(10, 20, "x: " + player.x.toFixed(2));
 	draw.print(10, 40, "y: " + player.y.toFixed(2));
-	draw.print(10, 70, "xSpeed: " + player.xSpeed.toFixed(2));
-	draw.print(10, 100, "ySpeed: " + player.ySpeed.toFixed(2));
-	draw.print(10, 130, "xAccel: " + player.xAccel.toFixed(2));
-	draw.print(10, 160, "yAccel: " + player.yAccel.toFixed(2));
+	draw.print(10, 60, "xSpeed: " + player.xSpeed.toFixed(2));
+	draw.print(10, 80, "ySpeed: " + player.ySpeed.toFixed(2));
+	draw.print(10, 100, "xAccel: " + player.xAccel.toFixed(2));
+	draw.print(10, 120, "yAccel: " + player.yAccel.toFixed(2));
 });
 
 sys.keyboardFunc(function (type, key, press) {

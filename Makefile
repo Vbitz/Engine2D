@@ -4,10 +4,10 @@ RM=rm -f
 OPTIMISE=
 CXXFLAGS= $(OPTIMISE) -g -std=gnu++11 -stdlib=libc++ -Wall -I/usr/local/include/freetype2 -I/usr/local/include
 LDFLAGS= $(OPTIMISE) -g -std=gnu++11 -stdlib=libc++ -L/usr/local/lib/ -lfreetype
-LDLIBS= -framework Cocoa -framework OpenGL -framework IOKit -lglew -lglfw3 -lphysfs -lv8 -lsqlite3 -lfreeimage
+LDLIBS= -framework Cocoa -framework OpenGL -framework IOKit -lglew -lglfw3 -lphysfs -lv8 -lfreeimage
 
 SRCS= src/main.cpp src/JSInput.cpp src/JSDraw.cpp src/JSSys.cpp src/JSFS.cpp src/JSDatabase.cpp src/Database.cpp src/Filesystem.cpp src/extern/GLFT_Font.cpp src/Shader.cpp src/EngineUI.cpp src/Draw2D.cpp src/Logger.cpp src/Profiler.cpp src/ResourceManager.cpp src/Config.cpp src/LogGraphEvents.cpp src/Util.cpp
-OBJS=$(subst .cpp,.o,$(SRCS))
+OBJS=$(subst .cpp,.o,$(SRCS)) src/extern/sqlite3.o
 
 gdb: all
 	gdb bin/Engine
@@ -17,13 +17,13 @@ run: all
 
 all: Engine
 
-Engine: $(OBJS)
-	clang++ $(LDFLAGS) -o bin/Engine $(OBJS) $(LDLIBS)
+Engine: $(OBJS) src/extern/sqlite3.o
+	$(CXX) $(LDFLAGS) -o bin/Engine $(OBJS) $(LDLIBS)
 
 depend: .depend
 
 .depend: $(SRCS)
-	rm -f ./.depend
+	$(RM) ./.depend
 	$(CXX) $(CXXFLAGS) -MM $^>>./.depend;
 
 clean:

@@ -1,10 +1,12 @@
 {
 	"startup": "script/test",
-	"window": {
-		"width": 1000,
-		"height": 600,
-		"fullscreen": false,
-		"openGL3": false,
-		"fontPath": "fonts/OpenSans-Regular.ttf"
+	"config": {
+		"cl_width": 1000,
+		"cl_height": 600,
+		"cl_fullscreen": false,
+		"cl_openGL3": false,
+		"cl_aa": true,
+		"cl_vsync": true,
+		"cl_fontPath": "fonts/OpenSans-Regular.ttf"
 	}
 }

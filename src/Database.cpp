@@ -1,6 +1,10 @@
 #include "Database.hpp"
 
+#include "extern/sqlite3.h"
+
 namespace Engine {
+    sqlite3* _database;
+    
     bool hasInited = false;
     
     Database::Database(std::string database) {
@@ -9,19 +13,19 @@ namespace Engine {
             sqlite3_initialize();
             hasInited = true;
         }
-        int result = sqlite3_open_v2(database.c_str(), &this->_database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+        int result = sqlite3_open_v2(database.c_str(), &_database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
         if (result != SQLITE_OK) {
-            Logger::begin("Sqlite", Logger::LogLevel_Error) << "Failed opening database: " << sqlite3_errmsg(this->_database) << Logger::end();
+            Logger::begin("Sqlite", Logger::LogLevel_Error) << "Failed opening database: " << sqlite3_errmsg(_database) << Logger::end();
         }
     }
     
     Database::~Database() {
-        sqlite3_close(this->_database);
+        sqlite3_close(_database);
     }
     
     bool Database::Execute(std::string statement) {
         char* errmsg = 0;
-        int result = sqlite3_exec(this->_database, statement.c_str(), NULL, NULL, &errmsg);
+        int result = sqlite3_exec(_database, statement.c_str(), NULL, NULL, &errmsg);
         if (result != SQLITE_OK) {
             Logger::begin("Sqlite", Logger::LogLevel_Error) << "SQL Error : " << errmsg << Logger::end();
             return false;
@@ -32,7 +36,7 @@ namespace Engine {
     std::vector< std::map<std::string, std::string> > Database::ExecutePrepare(std::string statement) {
         std::vector< std::map<std::string, std::string> > ret;
         sqlite3_stmt *sql;
-        int result = sqlite3_prepare_v2(this->_database, statement.c_str(), -1, &sql, 0);
+        int result = sqlite3_prepare_v2(_database, statement.c_str(), -1, &sql, 0);
         if (result != SQLITE_OK) {
             Logger::begin("Sqlite", Logger::LogLevel_Error) << "SQL Error" << Logger::end();
             return ret;

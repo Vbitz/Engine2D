@@ -9,6 +9,10 @@
 
 namespace Engine {
     namespace Draw2D {
+        typedef struct _Color3f {
+            float r, g, b;
+        } Color3f;
+        
         bool CheckGLError(std::string source);
         
         void ResetMatrix();
@@ -47,6 +51,8 @@ namespace Engine {
         
         void ClearColor(int col);
         void ClearColor(std::string colorName);
+        
+        Color3f GetColor();
         
         void SetColor(int col);
         void SetColor(std::string colorName);

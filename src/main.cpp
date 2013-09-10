@@ -269,7 +269,6 @@ namespace Engine {
         Config::SetBoolean( "cl_fullscreen",            false);
         Config::SetBoolean( "cl_openGL3",               false);
         Config::SetString(  "cl_fontPath",              "fonts/OpenSans-Regular.ttf");
-        //Config::SetString(  "cl_consoleFontPath",       "fonts/SourceSansPro-Regular.ttf");
         Config::SetBoolean( "cl_showVerboseLog",        false);
         Config::SetBoolean( "cl_runOnIdle",             false);
         Config::SetBoolean( "cl_engineUI",              developerMode);
@@ -327,7 +326,7 @@ namespace Engine {
 
         v8::Handle<v8::Value> argv[3];
         
-        argv[0] = v8::String::NewSymbol(key.length() > 1 ? "special" : "char");
+        argv[0] = v8::String::NewSymbol("");
         argv[1] = v8::String::NewSymbol(key.c_str());
         argv[2] = v8::Boolean::New(state == GLFW_PRESS || state == GLFW_REPEAT);
         
@@ -354,30 +353,23 @@ namespace Engine {
         
         v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
         
-        if (obj->Has(v8::String::NewSymbol("width")) && obj->Get(v8::String::NewSymbol("width"))->IsInt32()) {
-            Config::SetNumber("cl_width", obj->Get(v8::String::NewSymbol("width"))->Int32Value());
-        }
+        v8::Local<v8::Array> objNames = obj->GetPropertyNames();
         
-        if (obj->Has(v8::String::NewSymbol("height")) && obj->Get(v8::String::NewSymbol("height"))->IsInt32()) {
-            Config::SetNumber("cl_height", obj->Get(v8::String::NewSymbol("height"))->Int32Value());
-        }
-        
-        if (obj->Has(v8::String::NewSymbol("fullscreen")) && obj->Get(v8::String::NewSymbol("fullscreen"))->IsBoolean()) {
-            Config::SetBoolean("cl_fullscreen", obj->Get(v8::String::NewSymbol("fullscreen"))->BooleanValue());
-        }
-        
-        if (obj->Has(v8::String::NewSymbol("openGL3")) && obj->Get(v8::String::NewSymbol("openGL3"))->IsBoolean()) {
-            Config::SetBoolean("cl_openGL3", obj->Get(v8::String::NewSymbol("openGL3"))->BooleanValue());
-        }
-        
-        if (obj->Has(v8::String::NewSymbol("fontPath")) && obj->Get(v8::String::NewSymbol("fontPath"))->IsString()) {
-            Config::SetString("cl_fontPath",
-                        std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("fontPath"))->ToString())));
-        }
-        
-        if (obj->Has(v8::String::NewSymbol("consoleFontPath")) && obj->Get(v8::String::NewSymbol("consoleFontPath"))->IsString()) {
-            Config::SetString("cl_consoleFontPath",
-                        std::string(*v8::String::AsciiValue(obj->Get(v8::String::NewSymbol("consoleFontPath"))->ToString())));
+        for (int i = 0; i < objNames->Length(); i++) {
+            v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
+            v8::Local<v8::Value> objItem = obj->Get(objKey);
+            if (objItem->IsString()) {
+                Config::SetString(std::string(*v8::String::Utf8Value(objKey)),
+                                  std::string(*v8::String::Utf8Value(objItem)));
+            } else if (objItem->IsNumber()) {
+                Config::SetNumber(std::string(*v8::String::Utf8Value(objKey)),
+                                  (float) objItem->NumberValue());
+            } else if (objItem->IsBoolean()) {
+                Config::SetBoolean(std::string(*v8::String::Utf8Value(objKey)),
+                                  (float) objItem->BooleanValue());
+            } else {
+                ENGINE_THROW_ARGERROR("Invalid value, values must be a number, string or boolean");
+            }
         }
         
         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -387,6 +379,7 @@ namespace Engine {
         Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Window/Context" << Logger::end();
         
         if (openGL3Context) {
+            Logger::begin("Window", Logger::LogLevel_Warning) << "Loading OpenGL 3.2" << Logger::end();
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);

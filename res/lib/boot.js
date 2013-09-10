@@ -1,5 +1,3 @@
-// TODO: Make a better loader
-
 function makeLog(type) {
 	return function () {
 		var args = [type];
@@ -37,7 +35,7 @@ function getConfig(str, def) {
 	}
 }
 
-sys.setWindowCreateParams(getConfig("window", {}));
+sys.setWindowCreateParams(getConfig("config", {}));
 
 var libarys = ["ui"];
 
