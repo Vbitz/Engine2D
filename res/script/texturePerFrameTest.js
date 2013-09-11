@@ -20,13 +20,14 @@ var drawArray = draw.createImageArray(IMAGE_WIDTH, IMAGE_HEIGHT);
 
 drawArray[0] = 1;
 
+var tmpTexture = 99999999;
+
 sys.drawFunc(function () {
 	draw.setColor("white");
 	for (var i = 0; i < 600; i++) {
 		setXY(drawArray, rand(IMAGE_WIDTH), rand(IMAGE_HEIGHT), rand(3), Math.random());
 	}
 
-	var tmpTexture = draw.createImage(drawArray, IMAGE_WIDTH, IMAGE_HEIGHT);
+	tmpTexture = draw.createImage(drawArray, IMAGE_WIDTH, IMAGE_HEIGHT, tmpTexture);
 	draw.draw(tmpTexture, 0, 0, sys.screenWidth, sys.screenHeight);
-	draw.freeImage(tmpTexture);
 });

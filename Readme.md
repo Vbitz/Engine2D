@@ -30,7 +30,6 @@ This is not for the faint of heart. In the future I will provide project files o
 - Do the same with PhysFS
 - FreeImage, Glew and FreeType all come in binary forms so just download those and copy the DLL's and other files into the collected folders
 - GLM is header only so just download it and copy the files into your collected Include directory
-- SQLite is distributed as source files so just download sqlite 2.0.3 and copy the files into your project
 - That should be all the dependancys sorted so now you need to configure the VS project
 - Engine2D only compiles in release mode right now so switch it now
 - You need to change the Code Generation Setting in visual stuido for Engine2D from `/MD` to `/MT`
@@ -60,6 +59,6 @@ Getting Started
 -------------------
 Right now the engine is in beta but if you want to try it out then you can start writing JS code by
 - Creating a JS file with the sample code
-- Editing the startup key in res/config/config.json with your own script filename
+- Editing the js_startupScript key in res/config/config.json with your own script filename
 - Run the engine with `make run`
 - If you want to edit your script then just change the file and save, the engine reloads automaticly by default

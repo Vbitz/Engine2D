@@ -27,15 +27,9 @@ try {
 	console.log("Error Loading config: " + e);
 }
 
-function getConfig(str, def) {
-	if (globalConfig[str]) {
-		return globalConfig[str];
-	} else {
-		return def;
-	}
-}
+sys.config("js_startupScript", "script/test");
 
-sys.setWindowCreateParams(getConfig("config", {}));
+sys.setWindowCreateParams(globalConfig);
 
 var libarys = ["ui"];
 
@@ -48,5 +42,5 @@ sys.onPostLoad(function () {
 	var argv = sys.argv();
 	var glInfo = sys.getGLVersion();
 	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
-	sys.runFile(argv.length > 1 ? argv[1] : getConfig("startup", "script/basic"), true);
+	sys.runFile(argv.length > 1 ? argv[1] : sys.config("js_startupScript"), true);
 });

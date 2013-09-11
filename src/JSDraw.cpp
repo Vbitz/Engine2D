@@ -601,11 +601,20 @@ namespace Engine {
             
             ENGINE_CHECK_GL;
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
+            if (args.Length() < 3) {
+                ENGINE_THROW_ARGERROR("Wrong number of args draw.createImage takes 3 or 4 args");
+            }
             
             ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is a Object");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the width of the new image");
             ENGINE_CHECK_ARG_INT32(2, "Arg2 is the height of the new image");
+            
+            GLuint texID = 0;
+            
+            if (args.Length() == 4) {
+                ENGINE_CHECK_ARG_INT32(3, "Arg3 is the texture ID to reuse");
+                texID = ENGINE_GET_ARG_INT32_VALUE(3);
+            }
             
             v8::Local<v8::Array> arr = ENGINE_GET_ARG_ARRAY(0);
             
@@ -615,7 +624,7 @@ namespace Engine {
             float* pixels = NULL;
             
             if (arr->HasIndexedPropertiesInExternalArrayData()) {
-                pixels = (float*) arr->GetIndexedPropertiesExternalArrayData();
+                pixels = (float*) arr->GetIndexedPropertiesExternalArrayData(); // yay fast
             } else {
                 int len = width * height;
                 
@@ -646,23 +655,25 @@ namespace Engine {
                 }
             }
             
-			GLuint text = 0;
-            
             glEnable(GL_TEXTURE_2D);
             
-			glGenTextures(1, &text);
-            
-			glBindTexture(GL_TEXTURE_2D, text);
-            
-            if (Config::GetBoolean("draw_createImageMipmap")) {
-                glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                            GL_NEAREST_MIPMAP_NEAREST );
+            if (glIsTexture(texID)) { // if the texture is fine then just keep using it, no need to free
+                glBindTexture(GL_TEXTURE_2D, texID);
             } else {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            }
+                glGenTextures(1, &texID);
             
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                            GL_NEAREST );
+                glBindTexture(GL_TEXTURE_2D, texID);
+            
+                if (Config::GetBoolean("draw_createImageMipmap")) {
+                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                                GL_NEAREST_MIPMAP_NEAREST );
+                } else {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                }
+            
+                glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                                GL_NEAREST );
+            }
             
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, pixels);
             
@@ -670,7 +681,7 @@ namespace Engine {
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
             
-			glBindTexture(GL_TEXTURE_2D, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
             
             glDisable(GL_TEXTURE_2D);
             
@@ -679,10 +690,10 @@ namespace Engine {
             }
             
             if (Config::GetBoolean("log_createImage")) {
-                Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from data: " << text << Logger::end();
+                Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from data: " << texID << Logger::end();
             }
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(text));
+            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(texID));
         }
         
         ENGINE_JS_METHOD(FreeImage) {
