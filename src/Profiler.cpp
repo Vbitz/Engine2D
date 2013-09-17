@@ -66,6 +66,9 @@ namespace Engine {
             if (!Config::GetBoolean("cl_profiler")) {
                 return;
             }
+            if (_zones.count(zone) == 0) {
+                return;
+            }
             ProfileEvent& e = _zones[zone];
             e.time = (Logger::GetTime() - e.time);
             e.lastTime = e.time;

@@ -228,8 +228,12 @@ namespace Engine {
         
         if (!tryCatch.StackTrace().IsEmpty()) {
             v8::Handle<v8::Value> exception = tryCatch.StackTrace();
-            v8::String::AsciiValue exception_str(exception);
-            Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
+            v8::String::Utf8Value exception_str(exception);
+            if (!exception->IsUndefined() && !exception->IsNull() && !(*exception_str == NULL)) {
+                Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
+            } else {
+                Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: Unknown" << Logger::end();
+            }
             return false;
         }
         return true;
@@ -383,6 +387,7 @@ namespace Engine {
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
             
             isGL3Context = true;
         } else {
@@ -415,7 +420,7 @@ namespace Engine {
             Logger::begin("Window", Logger::LogLevel_Error) << "Error starting GLEW: " << glewGetErrorString(err) << Logger::end();
         }
         
-        glGetError();
+        Draw2D::CheckGLError("Ignore Me, Mostly");
         
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init Callbacks" << Logger::end();
         
@@ -905,9 +910,13 @@ namespace Engine {
             CallFunction(_onPostLoadFunc);
         }
         
+        Draw2D::CheckGLError("On JS Post Load");
+        
         FreeImage_Initialise();
         
         UpdateScreen();
+        
+        Draw2D::CheckGLError("Post Finish Loading");
         
         Logger::begin("Application", Logger::LogLevel_Log) << "Loaded" << Logger::end();
         

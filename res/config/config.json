@@ -1,10 +1,12 @@
 {
-	"js_startupScript": "script/test",
+	"js_startupScript": "script/basic",
 	"cl_width": 1000,
 	"cl_height": 600,
 	"cl_fullscreen": false,
 	"cl_openGL3": false,
 	"cl_aa": true,
 	"cl_vsync": true,
-	"cl_fontPath": "fonts/OpenSans-Regular.ttf"
+	"cl_fontPath": "fonts/OpenSans-Regular.ttf",
+	"__comment": "just for openGL3",
+	"cl_engineUI": true
 }

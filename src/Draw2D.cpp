@@ -17,11 +17,17 @@ namespace Engine {
         
         int _currentVerts = 0;
         
-        float _vertexBuffer[BUFFER_SIZE * 3];
-        float _colorBuffer[BUFFER_SIZE * 4];
-        float _texCoardBuffer[BUFFER_SIZE * 2];
+        /*
+         Buffer format
+         (x, y, z)      Position
+         (r, g, b, a)   Color
+         (u, v)         TexCourd
+         */
+        float _buffer[BUFFER_SIZE * 9];
         
-        std::string _currentFontName = "basic16px";
+        GLenum _currentMode = 0;
+        
+        std::string _currentFontName = "basic"; // ah there we are fonts fixed
         int _currentFontSize = 16;
         
 		// fuuuu visual studio
@@ -206,7 +212,10 @@ namespace Engine {
         
         void BeginRendering(GLenum mode) {
             if (usingGL3()) {
-                _currentVerts = 0;
+                if (_currentMode != mode) {
+                    FlushAll();
+                    _currentMode = mode;
+                }
             } else {
                 glBegin(mode);
                 glColor4f(_currentColorR, _currentColorG, _currentColorB, _currentColorA);
@@ -251,15 +260,17 @@ namespace Engine {
         
         void AddVert(float x, float y, float z, double r, double g, double b, double a, float s, float t) {
             if (usingGL3()) {
-                _vertexBuffer[_currentVerts * 3 + 0] = x;
-                _vertexBuffer[_currentVerts * 3 + 1] = y;
-                _vertexBuffer[_currentVerts * 3 + 2] = z;
-                _colorBuffer[_currentVerts * 4 + 0] = r;
-                _colorBuffer[_currentVerts * 4 + 1] = g;
-                _colorBuffer[_currentVerts * 4 + 2] = b;
-                _colorBuffer[_currentVerts * 4 + 3] = 1.0f;
-                _texCoardBuffer[_currentVerts * 2 + 0] = s;
-                _texCoardBuffer[_currentVerts * 2 + 0] = t;
+                _buffer[_currentVerts * 9 + 0] = x;
+                _buffer[_currentVerts * 9 + 1] = y;
+                _buffer[_currentVerts * 9 + 2] = z;
+                
+                _buffer[_currentVerts * 9 + 3] = r;
+                _buffer[_currentVerts * 9 + 4] = g;
+                _buffer[_currentVerts * 9 + 5] = b;
+                _buffer[_currentVerts * 9 + 6] = a;
+                
+                _buffer[_currentVerts * 9 + 7] = s;
+                _buffer[_currentVerts * 9 + 8] = t;
                 _currentVerts++;
             } else {
                 glTexCoord2f(s, t);
@@ -292,6 +303,10 @@ namespace Engine {
         }
         
         void Print(float x, float y, const char* string) {
+            if (usingGL3()) {
+                return;
+            }
+            
             glEnable(GL_TEXTURE_2D);
             
             GLSetColor();
@@ -336,7 +351,9 @@ namespace Engine {
 		void Begin2d() {
             EnableSmooth();
             
-            if (!usingGL3()) {
+            if (usingGL3()) {
+                
+            } else {
                 ResetMatrix();
             }
 		}
