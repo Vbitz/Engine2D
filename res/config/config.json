@@ -1,5 +1,5 @@
 {
-	"js_startupScript": "script/basic",
+	"js_startupScript": "script/mlggj",
 	"cl_width": 1000,
 	"cl_height": 600,
 	"cl_fullscreen": false,
@@ -8,5 +8,6 @@
 	"cl_vsync": true,
 	"cl_fontPath": "fonts/OpenSans-Regular.ttf",
 	"__comment": "just for openGL3",
-	"cl_engineUI": true
+	"cl_engineUI": true,
+	"cl_profiler": true
 }

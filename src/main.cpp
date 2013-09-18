@@ -229,11 +229,7 @@ namespace Engine {
         if (!tryCatch.StackTrace().IsEmpty()) {
             v8::Handle<v8::Value> exception = tryCatch.StackTrace();
             v8::String::Utf8Value exception_str(exception);
-            if (!exception->IsUndefined() && !exception->IsNull() && !(*exception_str == NULL)) {
-                Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
-            } else {
-                Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: Unknown" << Logger::end();
-            }
+            Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
             return false;
         }
         return true;
