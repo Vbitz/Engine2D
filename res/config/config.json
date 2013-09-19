@@ -3,7 +3,7 @@
 	"cl_width": 1000,
 	"cl_height": 600,
 	"cl_fullscreen": false,
-	"cl_openGL3": true,
+	"cl_openGL3": false,
 	"cl_aa": false,
 	"cl_vsync": false,
 	"cl_fontPath": "fonts/OpenSans-Regular.ttf",
