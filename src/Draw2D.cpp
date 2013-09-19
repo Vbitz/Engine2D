@@ -385,6 +385,14 @@ namespace Engine {
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
             buf.Draw(_currentMode, _currentVerts);
             
+            /* I think this line here needs a story. What happens when you forget it?
+               Well as it turns out it will eat though the buffer growing ever bigger until
+               it starts ruining C++ like a fucking pacman. I got 2 lovely crashes because I
+               forgot this line. The first was caused when any std::unordered_map tries to
+               rehash somehing, the second was the slow and painful death as a std::vector
+               exceptions it's self to death over the span of 3 frames. This was my best line
+               that day.
+            */
             _currentVerts = 0;
 
             // maybe zero the buffer
