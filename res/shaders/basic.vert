@@ -1,9 +1,15 @@
 #version 150
 in vec3 vertex;
-in vec3 color;
-out vec3 postColor;
+in vec4 color;
+in vec2 texCoard;
+
+uniform mat4 projection;
+
+out vec4 postColor;
+out vec2 postTexCoard;
 
 void main() {
 	postColor = color;
-	gl_Position = vec4(vertex, 1.0);
+	postTexCoard = texCoard;
+	gl_Position = projection * vec4(vertex, 1.0);
 }

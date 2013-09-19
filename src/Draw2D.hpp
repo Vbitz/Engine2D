@@ -5,7 +5,7 @@
 
 #include "extern/GLFT_Font.hpp"
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 4096
 
 namespace Engine {
     namespace Draw2D {
@@ -44,6 +44,8 @@ namespace Engine {
         
         void FlushAll();
 		
+        void Init2d();
+        
 		void Begin2d();
 		void End2d();
         

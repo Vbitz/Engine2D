@@ -128,6 +128,42 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(glewGetExtension(*ENGINE_GET_ARG_CSTRING_VALUE(0))));
         }
         
+        ENGINE_JS_METHOD(GetExtentions) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
+            
+            v8::Handle<v8::Array> arr = v8::Array::New();
+            
+            if (usingGL3()) {
+                int extentionCount;
+                glGetIntegerv(GL_NUM_EXTENSIONS, &extentionCount);
+            
+                for (int i = 0; i < extentionCount; i++) {
+                    const GLubyte* str = glGetStringi(GL_EXTENSIONS, i);
+                    if (str != NULL) {
+                        arr->Set(i, v8::String::New((const char*) str));
+                    }
+                }
+            } else {
+                std::string extentionList = std::string((const char*) glGetString(GL_EXTENSIONS));
+                size_t currentPos = 0;
+                int currentIndex = 0;
+                while (currentPos < extentionList.length() && currentPos != std::string::npos) {
+                    size_t nextPos = extentionList.find(' ', currentPos);
+                    if (nextPos == std::string::npos) {
+                        break;
+                    }
+                    arr->Set(currentIndex++, v8::String::New(extentionList.substr(currentPos, nextPos - currentPos).c_str()));
+                    currentPos = extentionList.find(' ', currentPos) + 1;
+                }
+            }
+            
+            Draw2D::CheckGLError("GetExtentions");
+            
+            ENGINE_JS_SCOPE_CLOSE(arr);
+        }
+        
         ENGINE_JS_METHOD(GetMaxTextureSize) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -392,6 +428,7 @@ namespace Engine {
             
             addItem(sysTable, "getGLVersion", GetGLVersion);
             addItem(sysTable, "hasExtention", HasExtention);
+            addItem(sysTable, "getExtentions", GetExtentions);
             addItem(sysTable, "getMaxTextureSize", GetMaxTextureSize);
             
             addItem(sysTable, "saveScreenshot", SaveScreenshot);

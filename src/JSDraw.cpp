@@ -432,6 +432,10 @@ namespace Engine {
             
             ENGINE_CHECK_GL;
             
+            if (usingGL3()) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
             Draw2D::CheckGLError("Pre Image Draw");
             
             GLuint texId;
@@ -479,6 +483,10 @@ namespace Engine {
             ENGINE_JS_SCOPE_OPEN;
             
             ENGINE_CHECK_GL;
+            
+            if (usingGL3()) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
             
             Draw2D::CheckGLError("Pre Image Draw");
             

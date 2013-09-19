@@ -1,8 +1,21 @@
 #include "Shader.hpp"
 
 namespace Engine {
-    Shader::Shader(std::string shaderFilename) {
-        this->init("shaders/" + shaderFilename + ".vert", "shaders/" + shaderFilename + ".frag");
+    Shader::Shader() : _loaded(false) {
+        
+    }
+    
+    Shader::Shader(std::string shaderFilename) : _loaded(false) {
+        this->Init("shaders/" + shaderFilename + ".vert", "shaders/" + shaderFilename + ".frag");
+    }
+    
+    Shader::~Shader() {
+        if (!this->_loaded) {
+            this->End();
+            glDeleteShader(this->_vertPointer);
+            glDeleteShader(this->_fragPointer);
+            glDeleteProgram(this->_programPointer);
+        }
     }
     
     void Shader::Begin() {
@@ -23,33 +36,49 @@ namespace Engine {
         }
     }
     
+    void Shader::UploadUniform(std::string token, GLfloat x, GLfloat y) {
+        if (this->checkProgramPointer()) {
+            glUniform2f(this->_uniforms[token], x, y);
+        }
+    }
+    
+    void Shader::UploadUniform(std::string token, glm::mat4 matrix) {
+        if (this->checkProgramPointer()) {
+            glUniformMatrix4fv(this->_uniforms[token], 1, GL_FALSE, &matrix[0][0]);
+        }
+    }
+    
     void Shader::UploadUniform(std::string token, GLfloat* data, int verts) {
         if (this->checkProgramPointer()) {
-            this->Begin();
             glUniform2fv(this->_uniforms[token], verts, data);
-            this->End();
         }
     }
     
-    void Shader::BindAttrib(std::string token) {
-        if (this->checkProgramPointer()) {
-            this->Begin();
-            GLint arrayPointer = glGetAttribLocation(this->_programPointer, token.c_str());
-            glVertexAttribPointer(arrayPointer, 2, GL_FLOAT, true, 0, 0);
-            this->_attribs[token] = arrayPointer;
-            this->End();
+    void Shader::BindVertexAttrib(std::string token, int attribSize, int totalSize, int stride) {
+        if (!this->checkProgramPointer()) {
+            return;
         }
+        
+        GLuint attribPos = glGetAttribLocation(_programPointer, token.c_str());
+        
+        if ((int) attribPos == -1) {
+            Logger::begin("Shader", Logger::LogLevel_Error) << "Bad token name: " << token << Logger::end();
+        }
+        
+        Draw2D::CheckGLError("Shader::BindVertexAttrib::PostGetAttribLocation");
+        
+        glVertexAttribPointer(attribPos, attribSize, GL_FLOAT, GL_FALSE,
+                              totalSize * sizeof(float),
+                              stride == 0 ? NULL : (void*)(stride * sizeof(float)));
+        
+        Draw2D::CheckGLError("Shader::BindVertexAttrib::PostVertexAttribPointer");
+        
+        glEnableVertexAttribArray(attribPos);
+        
+        Draw2D::CheckGLError("Shader::BindVertexAttrib::PostEnable");
     }
     
-    void Shader::UploadAttrib(std::string token, GLfloat* data, int items) {
-        if (this->checkProgramPointer()) {
-            this->Begin();
-            glUniform2fv(this->_attribs[token], items, data);
-            this->End();
-        }
-    }
-    
-    void Shader::init(std::string vertShaderFilename, std::string fragShaderFilename) {
+    void Shader::Init(std::string vertShaderFilename, std::string fragShaderFilename) {
         const char* vertShader = Filesystem::GetFileContent(vertShaderFilename);
         const char* fragShader = Filesystem::GetFileContent(fragShaderFilename);
         
@@ -58,6 +87,7 @@ namespace Engine {
             vertShader = Filesystem::GetFileContent(vertShaderFilename);
             fragShader = Filesystem::GetFileContent(fragShaderFilename);
         }
+        this->_loaded = true;
     }
     
     bool Shader::compile(const char* vertSource, const char* fragSource) {

@@ -1,5 +1,7 @@
 #include "Config.hpp"
 
+#include <iostream>
+
 namespace Engine {
     namespace Config {
         std::unordered_map<std::string, float> _numberCvars;
@@ -44,18 +46,22 @@ namespace Engine {
         }
         
         int GetInt(std::string key) {
+            //std::cout << "Get Int: " << key << std::endl;
             return (int) _numberCvars[key];
         }
         
         float GetFloat(std::string key) {
+            //std::cout << "Get Float: " << key << std::endl;
             return _numberCvars[key];
         }
         
         bool GetBoolean(std::string key) {
+            //std::cout << "Get Bool: " << key << std::endl;
             return _boolCvars[key];
         }
         
         std::string GetString(std::string key) {
+            //std::cout << "Get String: " << key << std::endl;
             return _stringCvars[key];
         }
         

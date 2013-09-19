@@ -56,6 +56,12 @@ namespace Engine {
         public:
             FileSource(std::string path);
             
+            void Unload() override {
+                if (this->_lastModify != -1 && this->_savedData != NULL) {
+                    std::free(this->_savedData);
+                }
+            };
+
             bool NeedsUpdate() override;
             std::string GetName() override;
             

@@ -1,13 +1,14 @@
 {
-	"js_startupScript": "script/mlggj",
+	"js_startupScript": "script/test",
 	"cl_width": 1000,
 	"cl_height": 600,
 	"cl_fullscreen": false,
-	"cl_openGL3": false,
-	"cl_aa": true,
-	"cl_vsync": true,
+	"cl_openGL3": true,
+	"cl_aa": false,
+	"cl_vsync": false,
 	"cl_fontPath": "fonts/OpenSans-Regular.ttf",
 	"__comment": "just for openGL3",
 	"cl_engineUI": true,
-	"cl_profiler": true
+	"cl_profiler": true,
+	"cl_debugContext": false
 }

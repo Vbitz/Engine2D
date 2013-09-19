@@ -274,6 +274,8 @@ namespace Engine {
         Config::SetBoolean( "cl_engineUI",              developerMode);
         Config::SetBoolean( "cl_profiler",              developerMode);
         Config::SetBoolean( "cl_scriptedDraw",          true);
+        Config::SetString(  "cl_title",                 "Engine2D");
+        Config::SetBoolean( "cl_debugContext",          developerMode);
         
         Config::SetBoolean( "draw_clampCreateTexture",  true);
         Config::SetBoolean( "draw_createImageMipmap",   true);
@@ -344,6 +346,11 @@ namespace Engine {
         Logger::begin("Window", Logger::LogLevel_Error) << "GLFW Error : " << error << " : " << msg << Logger::end();
     }
     
+    void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, void* userParam) {
+        Logger::begin("OpenGL", Logger::LogLevel_Error) << source << " : " << type << " : " <<
+            id << " : " << severity << " : " << message << Logger::end();
+    }
+    
     ENGINE_JS_METHOD(SetWindowInitParams) {
         ENGINE_JS_SCOPE_OPEN;
         
@@ -394,7 +401,11 @@ namespace Engine {
             glfwWindowHint(GLFW_SAMPLES, 4);
         }
         
-		window = glfwCreateWindow(width, height, "Engine2D", fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL); // you can resize how ever much you like
+        if (Config::GetBoolean("cl_debugContext")) {
+            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+        }
+        
+		window = glfwCreateWindow(width, height, Config::GetString("cl_title").c_str(), fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL); // you can resize how ever much you like
         
         if (window == NULL) {
             Logger::begin("Window", Logger::LogLevel_Error) << "Error Creating Window" << Logger::end();
@@ -440,11 +451,16 @@ namespace Engine {
         
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
+        if (Config::GetBoolean("cl_debugContext")) {
+            glDebugMessageCallback(DebugMessageCallback, NULL);
+        }
+        
         Draw2D::CheckGLError("PostSetupContext");
         
         Logger::begin("Window", Logger::LogLevel_Log) << "Loaded OpenGL" << Logger::end();
         
         InitFonts();
+        Draw2D::Init2d();
     }
     
     void CloseWindow() {

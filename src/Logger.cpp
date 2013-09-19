@@ -99,8 +99,12 @@ namespace Engine {
             if (str.find('\n') == -1) {
                 std::string newStr = cleanString(str);
                 
-                _logEvents.push_back(LogEvent(domain, level, newStr));
-                
+                try {
+                    _logEvents.push_back(LogEvent(domain, level, newStr));
+                } catch (std::exception e) {
+                    std::cout << "Could not log: " << e.what() << std::endl;
+                }
+
                 if (logConsole) {
                     std::cout << colorCode << GetTime()
                     << " : [" << GetLevelString(level) << "] "
@@ -112,7 +116,7 @@ namespace Engine {
                 
                 while (newLinePos != std::string::npos) {
                     std::string newStr = cleanString(strCopy.substr(0, newLinePos));
-                    
+
                     _logEvents.push_back(LogEvent(domain, level, newStr));
                     
                     if (logConsole) {

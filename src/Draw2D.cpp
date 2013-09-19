@@ -1,5 +1,7 @@
 #include "Draw2D.hpp"
 
+#include "GL3Buffer.hpp"
+
 namespace Engine {
     namespace Draw2D {
         bool _drawOffScreen = true;
@@ -29,6 +31,8 @@ namespace Engine {
         
         std::string _currentFontName = "basic"; // ah there we are fonts fixed
         int _currentFontSize = 16;
+        
+        Shader _currentShader;
         
 		// fuuuu visual studio
 
@@ -187,7 +191,23 @@ namespace Engine {
                 case GL_OUT_OF_MEMORY:      return "Out of Memory";
                 default:                    return "Unknown Error: " + std::to_string(error);
             }
-        };
+        }
+        
+        std::string GLModeToString(GLenum mode) {
+            switch (mode) {
+                case GL_POINTS:         return "GL_POINTS";
+                case GL_LINE_STRIP:     return "GL_LINE_STRIP";
+                case GL_LINE_LOOP:      return "GL_LINE_LOOP";
+                case GL_LINES:          return "GL_LINES";
+                case GL_TRIANGLE_STRIP: return "GL_TRIANGLE_STRIP";
+                case GL_TRIANGLE_FAN:   return "GL_TRIANGLE_FAN";
+                case GL_TRIANGLES:      return "GL_TRIANGLES";
+                case GL_QUAD_STRIP:     return "GL_QUAD_STRIP";
+                case GL_QUADS:          return "GL_QUADS";
+                case GL_POLYGON:        return "GL_POLYGON";
+                default:                return "Unknown";
+            }
+        }
         
         bool CheckGLError(std::string source) {
             GLenum err;
@@ -212,7 +232,7 @@ namespace Engine {
         
         void BeginRendering(GLenum mode) {
             if (usingGL3()) {
-                if (_currentMode != mode) {
+                if (_currentMode != mode || _currentMode == GL_LINE_STRIP) {
                     FlushAll();
                     _currentMode = mode;
                 }
@@ -224,7 +244,10 @@ namespace Engine {
         
         void EndRendering() {
             if (usingGL3()) {
-                
+                if (_currentVerts > BUFFER_SIZE - 256) {
+                    FlushAll();
+                    BeginRendering(_currentMode);
+                }
             } else {
                 glEnd();
                 _drawCalls++;
@@ -345,14 +368,34 @@ namespace Engine {
         }
         
         void FlushAll() {
+            if (!usingGL3()) {
+                throw "That's a bug";
+            }
             
+            if (_currentVerts == 0) {
+                return; // nothing to draw
+            }
+
+            GL3Buffer buf(_currentShader);
+            buf.Upload(_buffer, _currentVerts * 9 * sizeof(float));
+            //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
+            buf.Draw(_currentMode, _currentVerts);
+            
+            _currentVerts = 0;
+
+            // maybe zero the buffer
+        }
+
+        void Init2d() {
+            if (usingGL3()) {
+                _currentShader.Init("shaders/basic.vert", "shaders/basic.frag");
+            }
         }
 		
 		void Begin2d() {
             EnableSmooth();
             
             if (usingGL3()) {
-                
             } else {
                 ResetMatrix();
             }
@@ -434,11 +477,13 @@ namespace Engine {
         }
         
         void Rect(float x, float y, float w, float h) {
-            BeginRendering(GL_QUADS);
+            BeginRendering(GL_TRIANGLES);
                 AddVert(x, y, 0);
                 AddVert(x + w, y, 0);
                 AddVert(x + w, y + h, 0);
+                AddVert(x, y, 0);
                 AddVert(x, y + h, 0);
+                AddVert(x + w, y + h, 0);
             EndRendering();
         }
         
@@ -465,17 +510,21 @@ namespace Engine {
             float col2G = (float)((col2 & 0x00ff00) >> 8) / 255;
             float col2B = (float)(col2 & 0x0000ff) / 255;
             
-            Draw2D::BeginRendering(GL_QUADS);
+            Draw2D::BeginRendering(GL_TRIANGLES);
             if (vert) {
                 Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
                 Draw2D::AddVert(x + w, y, 0, col1R, col1G, col1B, 1.0f);
                 Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
+                Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
                 Draw2D::AddVert(x, y + h, 0, col2R, col2G, col2B, 1.0f);
+                Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
             } else {
                 Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
                 Draw2D::AddVert(x + w, y, 0, col2R, col2G, col2B, 1.0f);
                 Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
+                Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
                 Draw2D::AddVert(x, y + h, 0, col1R, col1G, col1B, 1.0f);
+                Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
             }
             Draw2D::EndRendering();
         }
