@@ -6,7 +6,9 @@ namespace Engine {
     }
     
     Shader::Shader(std::string shaderFilename) : _loaded(false) {
-        this->Init("shaders/" + shaderFilename + ".vert", "shaders/" + shaderFilename + ".frag");
+        this->_vertFilename = "shaders/" + shaderFilename + ".vert";
+        this->_fragFilename = "shaders/" + shaderFilename + ".frag";
+        this->Init(this->_vertFilename, this->_fragFilename);
     }
     
     Shader::~Shader() {
@@ -26,6 +28,24 @@ namespace Engine {
     
     void Shader::End() {
         glUseProgram(0);
+    }
+    
+    bool Shader::Update() {
+        if (this->NeedsUpdate()) {
+            glDeleteShader(this->_vertPointer);
+            glDeleteShader(this->_fragPointer);
+            glDeleteProgram(this->_programPointer);
+            this->_loaded = false;
+            this->Init(this->_vertFilename, this->_fragFilename);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    bool Shader::NeedsUpdate() {
+        return Filesystem::GetFileModifyTime(this->_vertFilename) > this->_vertLastModify
+            || Filesystem::GetFileModifyTime(this->_fragFilename) > this->_fragLastModify;
     }
     
     void Shader::BindUniform(std::string token) {
@@ -79,11 +99,21 @@ namespace Engine {
     }
     
     void Shader::Init(std::string vertShaderFilename, std::string fragShaderFilename) {
+        this->_vertFilename = vertShaderFilename;
+        this->_fragFilename = fragShaderFilename;
         const char* vertShader = Filesystem::GetFileContent(vertShaderFilename);
         const char* fragShader = Filesystem::GetFileContent(fragShaderFilename);
         
+        this->_vertLastModify = Filesystem::GetFileModifyTime(vertShaderFilename);
+        this->_fragLastModify = Filesystem::GetFileModifyTime(fragShaderFilename);
+        
+        bool firstTime = true;
+        
         while (!this->compile(vertShader, fragShader)) {
-            Logger::begin("Shader", Logger::LogLevel_Error) << "Could not Compile Shader" << Logger::end();
+            if (firstTime) {
+                Logger::begin("Shader", Logger::LogLevel_Error) << "Could not Compile Shader" << Logger::end();
+                firstTime = false;
+            }
             vertShader = Filesystem::GetFileContent(vertShaderFilename);
             fragShader = Filesystem::GetFileContent(fragShaderFilename);
         }

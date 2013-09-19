@@ -7,9 +7,11 @@ uniform mat4 projection;
 
 out vec4 postColor;
 out vec2 postTexCoard;
+out vec4 postVertex;
 
 void main() {
 	postColor = color;
 	postTexCoard = texCoard;
-	gl_Position = projection * vec4(vertex, 1.0);
+	postVertex = projection * vec4(vertex, 1.0);
+	gl_Position = postVertex;
 }

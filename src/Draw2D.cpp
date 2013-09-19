@@ -232,7 +232,7 @@ namespace Engine {
         
         void BeginRendering(GLenum mode) {
             if (usingGL3()) {
-                if (_currentMode != mode || _currentMode == GL_LINE_STRIP) {
+                if (_currentMode != mode || _currentMode == GL_LINE_STRIP) { // it's a hack, I really need to fix this
                     FlushAll();
                     _currentMode = mode;
                 }
@@ -374,6 +374,10 @@ namespace Engine {
             
             if (_currentVerts == 0) {
                 return; // nothing to draw
+            }
+            
+            if (_currentShader.Update()) {
+                Logger::begin("Draw2D", Logger::LogLevel_Log) << "Shader Reloaded" << Logger::end();
             }
 
             GL3Buffer buf(_currentShader);

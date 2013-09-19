@@ -19,6 +19,9 @@ namespace Engine {
         void Begin();
         void End();
         
+        bool Update();
+        bool NeedsUpdate();
+        
         void BindUniform(std::string token);
         void UploadUniform(std::string token, GLfloat* data, int verts);
         void UploadUniform(std::string token, glm::mat4 matrix);
@@ -43,5 +46,7 @@ namespace Engine {
         std::map<std::string, GLuint> _attribs;
         
         GLuint _programPointer, _vertPointer, _fragPointer;
+        std::string _vertFilename, _fragFilename;
+        unsigned long _vertLastModify, _fragLastModify;
     };
 }
