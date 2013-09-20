@@ -276,6 +276,7 @@ namespace Engine {
         Config::SetBoolean( "cl_scriptedDraw",          true);
         Config::SetString(  "cl_title",                 "Engine2D");
         Config::SetBoolean( "cl_debugContext",          developerMode);
+        Config::SetString(  "cl_gl3Shader",             "shaders/basic");
         
         Config::SetBoolean( "draw_clampCreateTexture",  true);
         Config::SetBoolean( "draw_createImageMipmap",   true);

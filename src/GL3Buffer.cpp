@@ -1,7 +1,7 @@
 #include "GL3Buffer.hpp"
 
 namespace Engine {
-    GL3Buffer::GL3Buffer(Shader shader) : _currentShader(shader) {
+    GL3Buffer::GL3Buffer(Shader shader) : _currentShader(shader), _shaderBound(false) {
         glGenVertexArrays(1, &this->_vertexArrayPointer);
         glGenBuffers(1, &this->_vertexBufferPointer);
     }
@@ -19,21 +19,10 @@ namespace Engine {
         
         Draw2D::CheckGLError("GL3Buffer::Upload::PostUploadBufferData");
         
-        this->_currentShader.Begin();
-        
-        Draw2D::CheckGLError("GL3Buffer::Upload::PostBeginShader");
-        
-        this->_currentShader.BindUniform("projection");
-        
-        Draw2D::CheckGLError("GL3Buffer::Upload::PostBindViewpointSize");
-        
-        this->_currentShader.BindVertexAttrib("vertex", 3, 9, 0);
-        this->_currentShader.BindVertexAttrib("color", 4, 9, 3);
-        this->_currentShader.BindVertexAttrib("texCoard", 2, 9, 7);
-        
-        Draw2D::CheckGLError("GL3Buffer::Upload::PostBindVertexAttributes");
-    
-        this->_currentShader.End();
+        if (!this->_shaderBound) {
+            this->bindShader();
+            this->_shaderBound = true;
+        }
         
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -61,5 +50,23 @@ namespace Engine {
         
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+    }
+    
+    void GL3Buffer::bindShader() {
+        this->_currentShader.Begin();
+        
+        Draw2D::CheckGLError("GL3Buffer::Upload::PostBeginShader");
+        
+        this->_currentShader.BindUniform("projection");
+        
+        Draw2D::CheckGLError("GL3Buffer::Upload::PostBindViewpointSize");
+        
+        this->_currentShader.BindVertexAttrib("vertex", 3, 9, 0);
+        this->_currentShader.BindVertexAttrib("color", 4, 9, 3);
+        this->_currentShader.BindVertexAttrib("texCoard", 2, 9, 7);
+        
+        Draw2D::CheckGLError("GL3Buffer::Upload::PostBindVertexAttributes");
+        
+        this->_currentShader.End();
     }
 }

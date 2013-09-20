@@ -432,11 +432,7 @@ namespace Engine {
             
             ENGINE_CHECK_GL;
             
-            if (usingGL3()) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
-            
-            Draw2D::CheckGLError("Pre Image Draw");
+            Draw2D::CheckGLError("JSDraw::Draw::PreDraw");
             
             GLuint texId;
 			GLfloat x, y, w, h;
@@ -463,18 +459,27 @@ namespace Engine {
             
             Draw2D::EnableTexture(texId);
             
-            Draw2D::BeginRendering(GL_QUADS);
+            Draw2D::BeginRendering(GL_TRIANGLES);
+            
+            if (usingGL3()) {
+                Draw2D::CheckGLError("JSDraw::Draw::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
+            }
+                
             //              x         y         z   s     t
             Draw2D::AddVert(x,        y,        0,  0.0f, 0.0f);
             Draw2D::AddVert(x + w,    y,        0,  1.0f, 0.0f);
             Draw2D::AddVert(x + w,    y + h,    0,  1.0f, 1.0f);
+            Draw2D::AddVert(x,        y,        0,  0.0f, 0.0f);
             Draw2D::AddVert(x,        y + h,    0,  0.0f, 1.0f);
+            Draw2D::AddVert(x + w,    y + h,    0,  1.0f, 1.0f);
             
             Draw2D::EndRendering();
             
+            Draw2D::CheckGLError("JSDraw::Draw::PostEnd");
+            
             Draw2D::DisableTexture();
             
-            Draw2D::CheckGLError("Post Image Draw");
+            Draw2D::CheckGLError("JSDraw::Draw::PostDraw");
             
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -483,10 +488,6 @@ namespace Engine {
             ENGINE_JS_SCOPE_OPEN;
             
             ENGINE_CHECK_GL;
-            
-            if (usingGL3()) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
             
             Draw2D::CheckGLError("Pre Image Draw");
             
@@ -525,15 +526,25 @@ namespace Engine {
             
             Draw2D::EnableTexture(texId);
             
+            if (usingGL3()) {
+                glBindTexture(GL_TEXTURE_2D, texId);
+            }
+                
             glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &imageWidth);
             glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &imageHeight);
             
-			Draw2D::BeginRendering(GL_QUADS);
+            if (usingGL3()) {
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
+            
+			Draw2D::BeginRendering(GL_TRIANGLES);
             //      x           y           z       s                       t
             Draw2D::AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
             Draw2D::AddVert(x1 + w1,    y1,         0,      (x2 + w2) / imageWidth, y2 / imageHeight);
             Draw2D::AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
+            Draw2D::AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
             Draw2D::AddVert(x1,         y1 + h1,    0,      x2 / imageWidth,        (y2 + h2) / imageHeight);
+            Draw2D::AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
             
 			Draw2D::EndRendering();
             

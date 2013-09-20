@@ -12,10 +12,18 @@ namespace Engine {
 
 		void Upload(float* buffer, int count);
 		void Draw(GLenum mode, int vertexCount);
+        
+        void Invalidate() {
+            this->_shaderBound = false;
+        }
 
 	private:
-		GLuint _vertexArrayPointer, _vertexBufferPointer;
+		void bindShader();
+        
+        GLuint _vertexArrayPointer, _vertexBufferPointer;
         
         Shader _currentShader;
+        
+        bool _shaderBound = false;
 	};
 }

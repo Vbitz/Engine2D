@@ -34,6 +34,10 @@ namespace Engine {
         
         Shader _currentShader;
         
+        GLuint _defaultTexture;
+        
+        GLuint _currentTexture;
+        
 		// fuuuu visual studio
 
 		std::map<std::string, int> _predefinedColors;
@@ -302,15 +306,25 @@ namespace Engine {
         }
         
         void EnableTexture(int texId) {
-            glEnable(GL_TEXTURE_2D);
+            if (!usingGL3()) {
+                glEnable(GL_TEXTURE_2D);
             
-            glBindTexture(GL_TEXTURE_2D, texId);
+                glBindTexture(GL_TEXTURE_2D, texId);
+            } else {
+                FlushAll();
+                _currentTexture = texId;
+            }
         }
         
         void DisableTexture() {
-            glBindTexture(GL_TEXTURE_2D, 0);
+            if (!usingGL3()) {
+                glBindTexture(GL_TEXTURE_2D, 0);
             
-            glDisable(GL_TEXTURE_2D);
+                glDisable(GL_TEXTURE_2D);
+            } else {
+                FlushAll();
+                _currentTexture = _defaultTexture;
+            }
         }
         
         void EnableSmooth() {
@@ -328,21 +342,21 @@ namespace Engine {
         void Print(float x, float y, const char* string) {
             if (usingGL3()) {
                 return;
-            }
+            } else {
+                glEnable(GL_TEXTURE_2D);
             
-            glEnable(GL_TEXTURE_2D);
+                GLSetColor();
             
-            GLSetColor();
-            
-            GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
+                GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
 
-			drawingFont->drawText(x - _centerX, y - _centerY, string);
+                drawingFont->drawText(x - _centerX, y - _centerY, string);
             
-			glDisable(GL_TEXTURE_2D);
+                glDisable(GL_TEXTURE_2D);
             
-            CheckGLError("postPrint");
-            
-            _polygons += strlen(string) * 4;
+                CheckGLError("postPrint");
+                
+                _polygons += strlen(string) * 4;
+            }
         }
         
         float CalcStringWidth(std::string str) {
@@ -367,7 +381,42 @@ namespace Engine {
             return glIsTexture(texID);
         }
         
+        GLuint GenerateDefaultTexture() {
+            
+            GLuint tex;
+            glGenTextures(1, &tex);
+            
+            CheckGLError("Draw2D::GenerateDefaultTexture::PostGenTexture");
+            
+            glBindTexture(GL_TEXTURE_2D, tex);
+            
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                            GL_NEAREST);
+            
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            
+            float color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+            glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color );
+            
+            float pixels[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+            
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_FLOAT, pixels);
+            
+            CheckGLError("Draw2D::GenerateDefaultTexture::PostUploadTexture");
+            
+            glBindTexture(GL_TEXTURE_2D, 0);
+            
+            CheckGLError("Draw2D::GenerateDefaultTexture::PostCreateTexture");
+            
+            return tex;
+        }
+        
         void FlushAll() {
+            static GL3Buffer buf(_currentShader); // temporory
+            
             if (!usingGL3()) {
                 throw "That's a bug";
             }
@@ -378,12 +427,16 @@ namespace Engine {
             
             if (_currentShader.Update()) {
                 Logger::begin("Draw2D", Logger::LogLevel_Log) << "Shader Reloaded" << Logger::end();
+                buf.Invalidate();
             }
 
-            GL3Buffer buf(_currentShader);
+            glBindTexture(GL_TEXTURE_2D, _currentTexture);
+            
             buf.Upload(_buffer, _currentVerts * 9 * sizeof(float));
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
             buf.Draw(_currentMode, _currentVerts);
+            
+            glBindTexture(GL_TEXTURE_2D, 0);
             
             /* I think this line here needs a story. What happens when you forget it?
                Well as it turns out it will eat though the buffer growing ever bigger until
@@ -400,7 +453,12 @@ namespace Engine {
 
         void Init2d() {
             if (usingGL3()) {
-                _currentShader.Init("shaders/basic.vert", "shaders/basic.frag");
+                std::string gl3Shader = Config::GetString("cl_gl3Shader");
+                _currentShader.Init(gl3Shader + ".vert", gl3Shader + ".frag");
+                if (!IsValidTextureID(_defaultTexture)) {
+                    _defaultTexture = GenerateDefaultTexture();
+                }
+                _currentTexture = _defaultTexture;
             }
         }
 		
@@ -408,14 +466,14 @@ namespace Engine {
             EnableSmooth();
             
             if (usingGL3()) {
+                _currentTexture = _defaultTexture;
             } else {
+                glDisable(GL_TEXTURE_2D);
                 ResetMatrix();
             }
 		}
 		
 		void End2d() {
-			glEnable(GL_DEPTH_TEST);
-            
             if (usingGL3()) {
                 FlushAll();
             } else {

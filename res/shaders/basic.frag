@@ -5,6 +5,8 @@ in vec4 postVertex;
 
 out vec4 outColor;
 
+uniform sampler2D tex;
+
 void main() {
-	outColor = postColor + sin(postVertex / 2);
+	outColor = texture(tex, postTexCoard) * postColor;
 }
