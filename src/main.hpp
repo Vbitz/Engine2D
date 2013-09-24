@@ -48,5 +48,7 @@ namespace Engine {
     
     void                        detailProfile(int frames, std::string filename);
     
+    void                        invalidateScript(std::string filename);
+    
     GLFWwindow*                 getGLFWWindow();
 }

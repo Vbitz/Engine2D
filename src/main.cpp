@@ -168,6 +168,7 @@ namespace Engine {
         
             sysTable->Set("platform", v8::String::New(_PLATFORM));
             sysTable->Set("devMode", v8::Boolean::New(developerMode));
+            sysTable->Set("preload", v8::Boolean::New(true));
 	
 		global->Set("sys", sysTable);
         
@@ -203,7 +204,7 @@ namespace Engine {
         
 		if (!runFile(Config::GetString("script_bootloader"), true)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();
-            EngineUI::ToggleConsole();
+            EngineUI::ToggleConsole(); // give them something to debug using
         }
         
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
@@ -260,6 +261,14 @@ namespace Engine {
 		input_table->Set(v8::String::New("screenWidth"), v8::Number::New(_screenWidth));
 		input_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
 	}
+    
+    void DisablePreload() {
+        v8::HandleScope scp;v8::Context::Scope ctx_scope(_globalContext);
+        
+		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
+		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
+        sys_table->Set(v8::String::New("preload"), v8::Boolean::New(false));
+    }
 
     void LoadBasicConfigs(bool developerMode) {
         Config::SetNumber(  "cl_width",                 800);
@@ -527,7 +536,6 @@ namespace Engine {
             ResourceManager::Load("basicFont", new ResourceManager::RawSource(OpenSans_Regular, sizeof(OpenSans_Regular)));
             _fonts["basic"] = new ResourceManager::FontResource("basicFont");
         }
-            //loadFont("monospace", Config::GetString("cl_consoleFontPath"));
         Profiler::End("LoadFonts");
 	}
 	
@@ -785,6 +793,10 @@ namespace Engine {
         _detailFilename = filename;
     }
     
+    void invalidateScript(std::string scriptName) {
+        _loadedFiles[scriptName] = 0;
+    }
+    
     void MainLoop() {
         running = true;
         
@@ -918,6 +930,8 @@ namespace Engine {
         Profiler::End("InitOpenGL");
         
         engine::EnableGLContext();
+        
+        DisablePreload();
         
         if (!_onPostLoadFunc.IsEmpty()) {
             CallFunction(_onPostLoadFunc);

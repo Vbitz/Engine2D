@@ -37,10 +37,18 @@ for (var i = 0; i < libarys.length; i++) {
 	sys.runFile("lib/" + libarys[i], false);
 }
 
-sys.onPostLoad(function () {
+function onPostLoad() {
 	console.log("Booting JavaScript Phase 2");
 	var argv = sys.argv();
 	var glInfo = sys.getGLVersion();
 	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
 	sys.runFile(argv.length > 1 ? argv[1] : sys.config("js_startupScript"), true);
-});
+}
+
+if (sys.preload) {
+	sys.onPostLoad(onPostLoad);
+} else {
+	console.log("Rebooting");
+	sys.restartRenderer();
+	onPostLoad();
+}

@@ -399,6 +399,26 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(ReloadRootScript) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            invalidateScript(Config::GetString("script_bootloader"));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        };
+        
+        ENGINE_JS_METHOD(ForceReload) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the script to reload");
+            
+            invalidateScript(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        };
+        
         ENGINE_JS_METHOD(TestGraph) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -448,6 +468,9 @@ namespace Engine {
             addItem(sysTable, "profileSet", ProfileSet);
             
             addItem(sysTable, "clearConsole", ClearConsole);
+            
+            addItem(sysTable, "reloadRootScript", ReloadRootScript);
+            addItem(sysTable, "forceReload", ForceReload);
             
             //addItem(sysTable, "testGraph", TestGraph);
         }

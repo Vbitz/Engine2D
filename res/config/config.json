@@ -8,7 +8,7 @@
 	"cl_vsync": false,
 	"cl_fontPath": "fonts/OpenSans-Regular.ttf",
 	"__comment": "just for openGL3",
-	"cl_engineUI": false,
+	"cl_engineUI": true,
 	"cl_profiler": true,
 	"cl_debugContext": false
 }
