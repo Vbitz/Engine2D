@@ -22,6 +22,7 @@
 	#include <sys\timeb.h>
 	#include <Windows.h>
     #define _PLATFORM "Windows"
+    #define _PLATFORM_DYLINK ".dll"
 	#define _PLATFORM_WIN32
 #else
     #include <GL/glew.h>
@@ -30,12 +31,14 @@
     #ifdef __APPLE__
         #ifdef __MACH__
             #define _PLATFORM "Darwin (OSX)"
+            #define _PLATFORM_DYLINK ".dylib"
 			#define _PLATFORM_OSX
         #else
             #error Unknown Platform
         #endif
     #elif __linux__
         #define _PLATFORM "Linux"
+        #define _PLATFORM_DYLINK ".so"
 		#define _PLATFORM_LINUX
     #else
         #error Unknown Platform

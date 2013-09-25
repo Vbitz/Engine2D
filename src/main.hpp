@@ -4,12 +4,6 @@
 
 #include "Filesystem.hpp"
 
-#include "JSSys.hpp"
-#include "JSDraw.hpp"
-#include "JSInput.hpp"
-#include "JSFS.hpp"
-#include "JSDatabase.hpp"
-
 #include "EngineUI.hpp"
 
 #include "extern/GLFT_Font.hpp"

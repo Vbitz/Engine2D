@@ -2,6 +2,13 @@
 
 #include "extern/OpenSans-Regular.ttf.hpp"
 
+#include "JSSys.hpp"
+#include "JSDraw.hpp"
+#include "JSInput.hpp"
+#include "JSFS.hpp"
+#include "JSDatabase.hpp"
+#include "JSMod.hpp"
+
 namespace Engine {
 	
 	// state
@@ -199,7 +206,14 @@ namespace Engine {
             JsInput::InitInput(inputTable);
         
 		global->Set("input", inputTable);
+        
+        // moduleTable
+        v8::Handle<v8::ObjectTemplate> moduleTable = v8::ObjectTemplate::New();
+        
+            JSMod::InitMod(moduleTable);
 
+        global->Set("mod", moduleTable);
+        
 		_globalContext = v8::Persistent<v8::Context>::New(_globalIsolate, v8::Context::New(_globalIsolate, NULL, global));
         
 		if (!runFile(Config::GetString("script_bootloader"), true)) {
@@ -955,6 +969,8 @@ namespace Engine {
 		ShutdownScripting();
 
 		Filesystem::Destroy();
+        
+        JSMod::CloseAllOpenModules();
 
 		return 0;
 	}

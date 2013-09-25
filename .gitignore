@@ -1,6 +1,11 @@
 bin/Engine
 bin/Engine.dSYM
 
+*.dylib
+*.dll
+*.exe
+*.so
+
 release
 release-osx
 

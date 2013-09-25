@@ -13,6 +13,13 @@ var tests = {
 		db.exec("INSERT INTO testing VALUES('hello world')");
 
 		return db.execPrepare("SELECT * FROM testing")[0].t1 === "hello world";
+	},
+	"Module": function () {
+		var m = mod.open("modules/testing");
+
+		mod.call(m, "testing");
+
+		return true;
 	}
 };
 
