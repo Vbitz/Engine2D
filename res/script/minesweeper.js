@@ -1,3 +1,5 @@
+fs.configDir("minesweeper");
+
 var levelWidth = 30,
 	levelHeight = 20,
 	bombs = Math.floor((levelWidth * levelHeight) / 8),
@@ -49,9 +51,11 @@ function rand(min, max) {
 function genLevel() {
 	level = [];
 	drawLevel = [];
+
 	for (var x = 0; x < levelWidth; x++) {
 		level[x] = [];
 		drawLevel[x] = [];
+	
 		for (var y = 0; y < levelHeight; y++) {
 			level[x][y] = 0;
 			drawLevel[x][y] = 0x5ee2;
@@ -60,10 +64,12 @@ function genLevel() {
 	for (var x = 0; x < bombs; x++) {
 		var posX = rand(levelWidth);
 		var posY = rand(levelHeight);
+	
 		if (getBlock(false, posX, posY) == 0xb077b) {
 			x--;
 		} else {
 			level[posX][posY] = 0xb077b;
+	
 			incBlock(posX - 1, posY    );
 			incBlock(posX + 1, posY    );
 			incBlock(posX    , posY - 1);
@@ -85,8 +91,8 @@ function getBlock(draw, x, y) {
 }
 
 function incBlock(x, y) {
-	if (x < 0 || x > levelWidth) return;
-	if (y < 0 || y > levelHeight) return;
+	if (x < 0 || x >= levelWidth) return;
+	if (y < 0 || y >= levelHeight) return;
 	
 	if (level[x][y] === 0xb077b) return;
 	
@@ -94,8 +100,8 @@ function incBlock(x, y) {
 }
 
 function setBlock(x, y, value) {
-	if (x < 0 || x > levelWidth) return;
-	if (y < 0 || y > levelHeight) return;
+	if (x < 0 || x >= levelWidth) return;
+	if (y < 0 || y >= levelHeight) return;
 	
 	level[x][y] = value;
 }
@@ -133,6 +139,7 @@ function clickBlock(x, y) {
 function clickBlockMouse(x, y) {
 	if (x < xOff || x > levelDrawWidth) return;
 	if (y < yOff || y > levelDrawHeight) return;
+
 	clickBlock(Math.floor((x - xOff) / (tileSize + 1)), Math.floor((y - yOff) / (tileSize + 1)));
 }
 
@@ -150,14 +157,18 @@ sys.drawFunc(function () {
 	draw.setFont("basic", 12);
 	draw.setColor(colorPalate.text);
 	draw.print(5, 20, "Bombs left: " + bombs);
+
 	for (var x = 0; x < levelWidth; x++) {
 		for (var y = 0; y < levelHeight; y++) {
 			var xLoc = xOff + (x * (tileSize + 1));
 			var yLoc = yOff + (y * (tileSize + 1));
+
 			var b = getBlock(true, x, y); 
+			
 			if (b > 0 && b < 9) {
 				draw.setColor(colorPalate[0]);
 				draw.rect(xLoc, yLoc, tileSize, tileSize);
+
 				draw.setColor(colorPalate[b]);
 				draw.print(xLoc + 2, yLoc + 2, b.toString(10));
 			} else {
@@ -166,7 +177,9 @@ sys.drawFunc(function () {
 			}
 		}
 	}
+
 	drawCursor(input.mouseX, input.mouseY);
+	
 	if (input.leftMouseButton && !lastMouse) {
 		clickBlockMouse(input.mouseX, input.mouseY);
 		lastMouse = true;
@@ -178,5 +191,7 @@ sys.drawFunc(function () {
 sys.keyboardFunc(function (action, key, press) {
 	if (key === "R" && press) {
 		genLevel();
+	} else if (key === "S" && press) {
+		sys.saveScreenshot("screen.png");
 	}
 });

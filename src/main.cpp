@@ -712,7 +712,7 @@ namespace Engine {
         
         FIMEMORY* mem = FreeImage_OpenMemory();
         
-        FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, 3 * width,
+        FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, ((((24 * width) + 23) / 24) * 3),
                                                        24, 0xFF0000, 0x00FF00, 0x0000FF, false);
         
         FREE_IMAGE_FORMAT format = FreeImage_GetFIFFromFilename(_screenshotFilename.c_str());
