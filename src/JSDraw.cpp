@@ -714,6 +714,69 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(texID));
         }
+            
+        ENGINE_JS_METHOD(SaveImage) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the index of the image returned from draw.createImage or draw.openImage");
+            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the filename to save the image as");
+            
+            GLuint texId = ENGINE_GET_ARG_INT32_VALUE(0);
+            
+            if (!Draw2D::IsValidTextureID(texId)) {
+                ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            GLint imageWidth, imageHeight;
+            
+            glBindTexture(GL_TEXTURE_2D, texId);
+            
+            glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &imageWidth);
+            glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &imageHeight);
+            
+            BYTE* pixels = new BYTE[4 * imageWidth * imageHeight];
+            glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+            
+            glBindTexture(GL_TEXTURE_2D, 0);
+            
+            FIMEMORY* mem = FreeImage_OpenMemory();
+                
+            FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, imageWidth, imageHeight, ((((32 * imageWidth) + 31) / 32) * 4),
+                                                               32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+                
+            FREE_IMAGE_FORMAT format = FreeImage_GetFIFFromFilename(*ENGINE_GET_ARG_CSTRING_VALUE(1));
+                
+            if (format == FIF_UNKNOWN) {
+                format = FIF_BMP;
+            }
+                
+            FreeImage_SaveToMemory(format, image, mem);
+                
+            long fileSize = FreeImage_TellMemory(mem);
+                
+            FreeImage_SeekMemory(mem, 0, SEEK_SET);
+                
+            char* buffer = (char*)malloc(sizeof(char) * fileSize);
+            
+            FreeImage_ReadMemory(buffer, sizeof(char), (unsigned int) fileSize, mem);
+                
+            Filesystem::WriteFile(ENGINE_GET_ARG_CPPSTRING_VALUE(1), buffer, fileSize);
+                
+            Logger::begin("SaveImage", Logger::LogLevel_Log)
+                << "Saved image:" << texId << " as: " << Filesystem::GetRealPath(ENGINE_GET_ARG_CPPSTRING_VALUE(1))
+                << Logger::end();
+                
+            FreeImage_CloseMemory(mem);
+            
+            std::free(buffer);
+            std::free(pixels);
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
         
         ENGINE_JS_METHOD(FreeImage) {
             ENGINE_JS_SCOPE_OPEN;
@@ -872,6 +935,7 @@ namespace Engine {
             addItem(drawTable, "openImage", OpenImage);
             addItem(drawTable, "createImageArray", CreateImageArray);
             addItem(drawTable, "createImage", CreateImage);
+            addItem(drawTable, "saveImage", SaveImage);
             addItem(drawTable, "freeImage", FreeImage);
             addItem(drawTable, "isTexture", IsTexture);
             
