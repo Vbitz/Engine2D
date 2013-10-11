@@ -1,5 +1,7 @@
 #include "Draw2D.hpp"
 
+#include "main.hpp"
+
 #include "GL3Buffer.hpp"
 
 namespace Engine {
@@ -341,7 +343,14 @@ namespace Engine {
         
         void Print(float x, float y, const char* string) {
             if (usingGL3()) {
-                return;
+                FlushAll();
+                
+                GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
+                
+                drawingFont->drawTextGL3(x, y, &_currentShader, string);
+                
+                CheckGLError("Post GL3 Print");
+                
             } else {
                 glEnable(GL_TEXTURE_2D);
             

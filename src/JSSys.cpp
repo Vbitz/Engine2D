@@ -1,5 +1,7 @@
 #include "JSSys.hpp"
 
+#include "LogGraphEvents.hpp"
+
 namespace Engine {
 
 	namespace JsSys {
@@ -125,7 +127,11 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of a GL Extention to check for");
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(glewGetExtension(*ENGINE_GET_ARG_CSTRING_VALUE(0))));
+            bool has = glewGetExtension(*ENGINE_GET_ARG_CSTRING_VALUE(0));
+            
+            Draw2D::CheckGLError("Post Has Extention");
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(has));
         }
         
         ENGINE_JS_METHOD(GetExtentions) {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.hpp"
-#include "main.hpp"
 
 #include "extern/GLFT_Font.hpp"
 

@@ -1,5 +1,7 @@
 #include "GL3Buffer.hpp"
 
+#include "Draw2D.hpp"
+
 namespace Engine {
     GL3Buffer::GL3Buffer(Shader shader) : _currentShader(shader), _shaderBound(false) {
         glGenVertexArrays(1, &this->_vertexArrayPointer);
@@ -36,7 +38,11 @@ namespace Engine {
         
         Draw2D::CheckGLError("GL3Buffer::Draw::PostBindShader");
         
-        glm::mat4 proj = glm::ortho(0.0f, (float) getScreenWidth(), (float) getScreenHeight(), 0.0f, 1.0f, -1.0f);
+        GLint viewpoint[4];
+        
+        glGetIntegerv(GL_VIEWPORT, viewpoint);
+        
+        glm::mat4 proj = glm::ortho(0.0f, (float) viewpoint[2], (float) viewpoint[3], 0.0f, 1.0f, -1.0f);
         
         this->_currentShader.UploadUniform("projection", proj);
         

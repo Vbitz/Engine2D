@@ -1,5 +1,7 @@
 #include "Shader.hpp"
 
+#include "Draw2D.hpp"
+
 namespace Engine {
     Shader::Shader() : _loaded(false) {
         

@@ -1,6 +1,7 @@
 // GLFT_Font (http://polimath.com/blog/code/glft_font/)
 //  by James Turk (james.p.turk@gmail.com)
 //  Based on work by Marijn Haverbeke (http://marijn.haverbeke.nl)
+//  Modifyed to support OpenGL 3.2 for Engine2D by Vbitz (http://vbitz.com)
 //
 // Version 0.2.2 - Released 28 February 2011 - Fixed linux compilation.
 // Version 0.2.1 - Released 2 March 2008 - Updated contact information.
@@ -39,6 +40,19 @@
 #ifndef GLFT_FONT_HPP
 #define GLFT_FONT_HPP
 
+#include <map>
+
+#include "../common.hpp"
+
+class GLFT_Font;
+
+namespace Engine {
+    class Shader;
+    class GL3Buffer;
+}
+
+#include "../Shader.hpp"
+#include "../GL3Buffer.hpp"
 
 // opengl includes
 #ifdef _WIN32
@@ -71,11 +85,26 @@ private:
 class StreamFlusher { };
 std::ostream& operator<<(std::ostream& os, const StreamFlusher& rhs);
 
+class FontChar {
+public:
+    FontChar() {
+        
+    }
+    
+    FontChar(float width, float height,
+             float tex1, float tex2, float tex3, float tex4) :
+            Width(width), Height(height),
+            Tex1(tex1), Tex2(tex2), Tex3(tex3), Tex4(tex4) {
+    }
+    
+    float Width, Height;
+    float Tex1, Tex2, Tex3, Tex4;
+};
+
 class GLFT_Font
 {
 public:
     GLFT_Font();
-
     ~GLFT_Font();
 
     void open(char* filename, long fileSize, unsigned int size);
@@ -85,6 +114,8 @@ public:
 
     void drawText(float x, float y, const char *str, ...) const;
     void drawText(float x, float y, const std::string& str) const;
+    
+    void drawTextGL3(float x, float y, Engine::Shader* shader, const std::string& str) const;
     
     std::ostream& beginDraw(float x, float y);
     StreamFlusher endDraw();
@@ -107,7 +138,11 @@ private:
     std::ostringstream ss_;
     float drawX_;
     float drawY_;
-
+    
+    bool _usingGL3;
+    
+    std::map<char, FontChar> _chars;
+    
     static const unsigned int SPACE = 32;
     static const unsigned int NUM_CHARS = 96;
 

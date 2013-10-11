@@ -2,6 +2,8 @@
 
 #include <dlfcn.h>
 
+#include "Filesystem.hpp"
+
 namespace Engine {
     
 	namespace JSMod {

@@ -1,5 +1,14 @@
 #include "JSDraw.hpp"
 
+#include "main.hpp"
+
+#include <FreeImage.h>
+
+#include "Filesystem.hpp"
+#include "Draw2D.hpp"
+
+#include "ResourceManager.hpp"
+
 namespace Engine {
 
 	namespace JsDraw {

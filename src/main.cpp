@@ -2,6 +2,8 @@
 
 #include "extern/OpenSans-Regular.ttf.hpp"
 
+#include "ResourceManager.hpp"
+
 #include "JSSys.hpp"
 #include "JSDraw.hpp"
 #include "JSInput.hpp"
@@ -513,10 +515,6 @@ namespace Engine {
 	// font rendering
 	
     bool loadFont(std::string prettyName, std::string filename) {
-        if (isGL3Context) {
-            return false;
-        }
-        
         Logger::begin("Font", Logger::LogLevel_Log)
             << "Loading Font: " << filename << " as " << prettyName
             << Logger::end();
@@ -539,11 +537,6 @@ namespace Engine {
     }
     
 	void InitFonts() {
-        if (isGL3Context) {
-            Logger::begin("Font", Logger::LogLevel_Warning) << "Skip loading fonts on OpenGL3.x" << Logger::end();
-            return;
-        }
-        
         Profiler::Begin("LoadFonts");
         if (!loadFont("basic", Config::GetString("cl_fontPath"))) {
             Logger::begin("Font", Logger::LogLevel_Warning) << "Font not found: " << Config::GetString("cl_fontPath") << " falling back to inbuilt font" << Logger::end();
@@ -942,6 +935,8 @@ namespace Engine {
         Profiler::Begin("InitOpenGL");
             InitOpenGL();
         Profiler::End("InitOpenGL");
+        
+        Draw2D::CheckGLError("Post InitOpenGL");
         
         engine::EnableGLContext();
         

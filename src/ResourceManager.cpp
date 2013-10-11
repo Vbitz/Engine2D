@@ -321,6 +321,7 @@ namespace Engine {
                 long fileLen = 0;
                 unsigned char* fileData = this->_source->GetData(fileLen);
                 newFont->open((char*) fileData, fileLen, fontSize);
+                
                 this->_fonts[fontSize] = newFont;
                 Logger::begin("ResourceManager", Logger::LogLevel_Verbose) << "Loaded Font: " << this->_source->GetName() << " with size " << fontSize << Logger::end();
             }
