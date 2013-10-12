@@ -14,6 +14,8 @@ namespace Engine {
         
         bool CheckGLError(std::string source);
         
+        void SetDefinedColor(std::string name, int col);
+        
         void ResetMatrix();
         
         bool IsOffscreen(int x, int y, int w, int h);

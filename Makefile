@@ -13,6 +13,14 @@ SRCS= src/main.cpp src/JSInput.cpp src/JSDraw.cpp src/JSSys.cpp src/JSFS.cpp src
 OBJS=$(subst .cpp,.o,$(SRCS)) src/extern/sqlite3.o
 OUTPUT=bin/Engine
 
+doc: doc/include.pdf
+
+doc/include.pdf: doc/include.dot
+	neato -Tpdf doc/include.dot > doc/include.pdf
+
+doc/include.dot: $(SRCS)
+	cinclude2dot --src src/  > doc/include.dot
+
 modTest: src/modTest.o
 	$(CXX) -shared -o res/modules/testing.dylib src/modTest.o
 

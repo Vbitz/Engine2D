@@ -206,6 +206,35 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
 		
+        ENGINE_JS_METHOD(ColorPalette) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            if (args.Length() == 2) {
+                ENGINE_CHECK_ARG_STRING(0, "Arg0 is a name for the color");
+                ENGINE_CHECK_ARG_INT32(1, "Arg1 is the color to associate the name with");
+                
+                Draw2D::SetDefinedColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1));
+            } else if (args.Length() == 1) {
+                ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is an object containing a list of colors");
+                
+                v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
+                
+                v8::Local<v8::Array> objNames = obj->GetPropertyNames();
+                
+                for (int i = 0; i < objNames->Length(); i++) {
+                    v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
+                    v8::Local<v8::Value> objItem = obj->Get(objKey);
+                    
+                    Draw2D::SetDefinedColor(std::string(*v8::String::Utf8Value(objKey)),
+                                            (int) objItem->NumberValue());
+                }
+            } else {
+                ENGINE_THROW_ARGERROR("draw.colorPalette takes 1 or 2 args");
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
 		ENGINE_JS_METHOD(SetColorF) {
 			ENGINE_JS_SCOPE_OPEN;
             
@@ -932,11 +961,14 @@ namespace Engine {
             addItem(drawTable, "grad", Grad);
             addItem(drawTable, "circle", Circle);
             addItem(drawTable, "curve", Curve);
+            
+            addItem(drawTable, "colorPalette", ColorPalette);
             addItem(drawTable, "setColorF", SetColorF);
             addItem(drawTable, "setColor", SetColor);
             addItem(drawTable, "setColorI", SetColorI);
             addItem(drawTable, "clearColor", ClearColor);
             addItem(drawTable, "getRGBFromHSV", GetRGBFromHSV);
+            
             addItem(drawTable, "print", Print);
             
             addItem(drawTable, "draw", Draw);

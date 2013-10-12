@@ -20,3 +20,6 @@ Engine2D.xcodeproj
 *.o
 
 Internal*
+
+*.dot
+*.ps

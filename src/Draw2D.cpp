@@ -232,6 +232,10 @@ namespace Engine {
 			glOrtho(0, getScreenWidth(), getScreenHeight(), 0, 1, -1);
         }
         
+        void SetDefinedColor(std::string name, int col) {
+            _predefinedColors[name] = col;
+        }
+        
         bool IsOffscreen(int x, int y, int w, int h) {
             return false;
         }
@@ -530,7 +534,12 @@ namespace Engine {
 				_initPredefinedColors();
 				_predefFilled = true;
 			}
-            SetColor(_predefinedColors[colorName]);
+            if (_predefinedColors.count(colorName) == 0) {
+                Logger::begin("Draw2D", Logger::LogLevel_Error) << "Color not found: " << colorName << Logger::end();
+                SetColor(0x123456);
+            } else {
+                SetColor(_predefinedColors[colorName]);
+            }
         }
         
         void SetColor(float r, float g, float b) {
