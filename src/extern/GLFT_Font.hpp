@@ -115,7 +115,7 @@ public:
     void drawText(float x, float y, const char *str, ...) const;
     void drawText(float x, float y, const std::string& str) const;
     
-    void drawTextGL3(float x, float y, Engine::Shader* shader, const std::string& str) const;
+    void drawTextGL3(float x, float y, Engine::Shader* shader, float colR, float colG, float colB, const std::string& str) const;
     
     std::ostream& beginDraw(float x, float y);
     StreamFlusher endDraw();

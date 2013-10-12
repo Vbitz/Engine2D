@@ -246,15 +246,23 @@ void GLFT_Font::open(char* file, long fileSize, unsigned int size)
         // alright so the format for gl_alpha8 is a 8 bit alpha chaneal and nothing else, I can work with that
         // I just need to convert it to something like rgba then send it off
         unsigned char* gl3Image = new unsigned char[imageWidth * imageHeight * 4];
-        for (int x = 0; x < imageWidth; x++)
+        
+        for (int x = 0; x < imageWidth; x++) {
             for (int y = 0; y < imageHeight; y++) {
-                gl3Image[0] = 1.0f;
-                gl3Image[0] = 1.0f;
-                gl3Image[0] = 1.0f;
-                gl3Image[0] = image[x * imageWidth + y * imageHeight];
+                int baseIndex = 0;
+                baseIndex += x * imageHeight * 4;
+                baseIndex += y * 4;
+                gl3Image[baseIndex + 0] = 0xff;
+                gl3Image[baseIndex + 1] = 0xff;
+                gl3Image[baseIndex + 2] = 0xff;
+                gl3Image[baseIndex + 3] = image[x * imageHeight + y];
             }
+        }
+        
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int) imageWidth, (int) imageHeight, 0, // fu warnings
-                     GL_RGBA, GL_UNSIGNED_BYTE, image);
+                     GL_RGBA, GL_UNSIGNED_BYTE, gl3Image);
+        
+        delete[] gl3Image;
     } else {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA8, (int) imageWidth, (int) imageHeight, 0, // fu warnings
                      GL_ALPHA, GL_UNSIGNED_BYTE, image);
@@ -352,21 +360,21 @@ void GLFT_Font::drawText(float x, float y, const std::string& str) const
     glPopMatrix();
 }
 
-void AddVert(float* _buffer, int _currentVerts, float x, float y, float s, float t) {
+void AddVert(float* _buffer, int _currentVerts, float x, float y, float r, float g, float b, float s, float t) {
     _buffer[_currentVerts * 9 + 0] = x;
     _buffer[_currentVerts * 9 + 1] = y;
     _buffer[_currentVerts * 9 + 2] = 0.0f;
     
-    _buffer[_currentVerts * 9 + 3] = 1.0f;
-    _buffer[_currentVerts * 9 + 4] = 1.0f;
-    _buffer[_currentVerts * 9 + 5] = 1.0f;
+    _buffer[_currentVerts * 9 + 3] = r;
+    _buffer[_currentVerts * 9 + 4] = g;
+    _buffer[_currentVerts * 9 + 5] = b;
     _buffer[_currentVerts * 9 + 6] = 1.0f;
         
     _buffer[_currentVerts * 9 + 7] = s;
     _buffer[_currentVerts * 9 + 8] = t;
 }
 
-void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, const std::string& str) const {
+void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, float colR, float colG, float colB, const std::string& str) const {
     
     if (!isValid()) {
         throw std::logic_error("Invalid GLFT_Font::drawTextGL3 call.");
@@ -376,7 +384,7 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, const std:
         throw std::logic_error("Call drawText to use GL2.x rendering");
     }
     
-    return; // just until it's fixed
+    //return; // just until it's fixed
     
     static Engine::GL3Buffer buf(*shader);
     
@@ -396,25 +404,23 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, const std:
     
     for (auto i = str.begin(); i != str.end(); ++i) {
         unsigned char ch( *i - SPACE );
-        FontChar c = _chars.at(ch);
+        FontChar c;
+        if (_chars.count(ch) == 0) {
+            c = _chars.at(' ' - SPACE);
+        } else {
+            c = _chars.at(ch);
+        }
         
-        /*
-         glTexCoord2f(texX1,texY1);  glVertex2i(0,0);
-         glTexCoord2f(texX2,texY1);  glVertex2i(widths_[ch],0);
-         glTexCoord2f(texX2,texY2);  glVertex2i(widths_[ch],height_);
-         glTexCoord2f(texX1,texY2);  glVertex2i(0,height_);
-         */
-        
-        AddVert(dbuf, verts++, xPos,            y,              c.Tex1, c.Tex3);
-        AddVert(dbuf, verts++, xPos + c.Width,  y,              c.Tex2, c.Tex3);
-        AddVert(dbuf, verts++, xPos + c.Width,  y + c.Height,   c.Tex2, c.Tex4);
-        AddVert(dbuf, verts++, xPos,            y,              c.Tex1, c.Tex3);
-        AddVert(dbuf, verts++, xPos,            y + c.Height,   c.Tex1, c.Tex4);
-        AddVert(dbuf, verts++, xPos + c.Width,  y + c.Height,   c.Tex2, c.Tex4);
+        AddVert(dbuf, verts++, xPos,            y,            colR, colG, colB, c.Tex1, c.Tex3);
+        AddVert(dbuf, verts++, xPos + c.Width,  y,            colR, colG, colB, c.Tex2, c.Tex3);
+        AddVert(dbuf, verts++, xPos + c.Width,  y + c.Height, colR, colG, colB, c.Tex2, c.Tex4);
+        AddVert(dbuf, verts++, xPos,            y,            colR, colG, colB, c.Tex1, c.Tex3);
+        AddVert(dbuf, verts++, xPos,            y + c.Height, colR, colG, colB, c.Tex1, c.Tex4);
+        AddVert(dbuf, verts++, xPos + c.Width,  y + c.Height, colR, colG, colB, c.Tex2, c.Tex4);
         xPos += c.Width;
     }
     
-    buf.Upload(dbuf, verts);
+    buf.Upload(dbuf, verts * 9 * sizeof(float));
     buf.Draw(GL_TRIANGLES, verts);
     
     glBindTexture(GL_TEXTURE_2D, 0);

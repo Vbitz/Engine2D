@@ -37,7 +37,7 @@ namespace Engine {
         bool compile(const char* vertSource, const char* fragSource);
         
         inline bool checkProgramPointer() {
-            return this->_programPointer != 0 && this->_loaded;
+            return this->_programPointer != 0 && this->_loaded && glIsProgram(this->_programPointer);
         }
         
         bool _loaded;

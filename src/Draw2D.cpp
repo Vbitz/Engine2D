@@ -347,7 +347,8 @@ namespace Engine {
                 
                 GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
                 
-                drawingFont->drawTextGL3(x, y, &_currentShader, string);
+                drawingFont->drawTextGL3(x, y, &_currentShader, _currentColorR,
+                                         _currentColorG, _currentColorB, string);
                 
                 CheckGLError("Post GL3 Print");
                 
@@ -476,10 +477,13 @@ namespace Engine {
             
             if (usingGL3()) {
                 _currentTexture = _defaultTexture;
+                glDisable(GL_DEPTH_TEST);
             } else {
                 glDisable(GL_TEXTURE_2D);
                 ResetMatrix();
             }
+            
+            CheckGLError("Post Begin2D");
 		}
 		
 		void End2d() {
@@ -491,6 +495,8 @@ namespace Engine {
             
             _polygons = 0;
             _drawCalls = 0;
+            
+            CheckGLError("Post End2D");
 		}
         
         void Reset() {

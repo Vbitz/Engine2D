@@ -831,9 +831,7 @@ namespace Engine {
             
             Draw2D::CheckGLError("startOfRendering");
             
-            Profiler::Begin("glClear");
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            Profiler::End("glClear");
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             
             Draw2D::Begin2d();
             
