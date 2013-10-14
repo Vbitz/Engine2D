@@ -620,6 +620,78 @@ namespace Engine {
 		
 			ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(img->GetTextureID()));
 		}
+            
+        ENGINE_JS_METHOD(GetImageArray) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to load");
+            
+            v8::Handle<v8::Object> array = v8::Object::New();
+            
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            
+            long fileSize = 0;
+            
+            char* file = Filesystem::GetFileContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0), fileSize);
+            
+            FIMEMORY* mem = FreeImage_OpenMemory((BYTE*) file, (unsigned int)fileSize);
+            
+            FIBITMAP *lImg = FreeImage_LoadFromMemory(FreeImage_GetFileTypeFromMemory(mem), mem);
+            
+            FIBITMAP *img = 0;
+            
+            if (FreeImage_GetBPP(lImg) == 24) {
+                Logger::begin("JSDraw", Logger::LogLevel_Warning) << "Converting image to 32bit" << Logger::end();
+                img = FreeImage_ConvertTo32Bits(lImg);
+            } else {
+                img = lImg;
+            }
+            
+            int imageWidth = FreeImage_GetWidth(img);
+            int imageHeight = FreeImage_GetHeight(img);
+            int imageSize = imageWidth * imageHeight * 4;
+            
+            float* rawArray = new float[imageSize]; // sadly this is a memory leak right now
+            
+            for (int i = 0; i < imageSize; i += 4) {
+                rawArray[i] = 1.0f;
+                rawArray[i + 1] = 1.0f;
+                rawArray[i + 2] = 1.0f;
+                rawArray[i + 3] = 1.0f;
+            }
+            
+            v8::Persistent<v8::Object> persistent_array = v8::Persistent<v8::Object>::New(isolate, array);
+            persistent_array.MarkIndependent(isolate); // and this is also a bad memory leak
+            isolate->AdjustAmountOfExternalAllocatedMemory(imageSize * sizeof(float));
+            
+            array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, imageSize * sizeof(float));
+            
+            array->Set(v8::String::New("length"), v8::Number::New(imageSize));
+            
+            unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
+            
+            int pos = 0;
+            int i = 0;
+            
+            for (int x = 0; x < imageWidth; x++) {
+                for (int y = 0; y < imageHeight; y++) {
+                    array->Set(i + 0, v8::Number::New((float) pixel[pos + 2] / 256.f));
+                    array->Set(i + 1, v8::Number::New((float) pixel[pos + 1] / 256.f));
+                    array->Set(i + 2, v8::Number::New((float) pixel[pos + 0] / 256.f));
+                    array->Set(i + 3, v8::Number::New(1.0f));
+                    pos += 4;
+                    i += 4;
+                }
+            }
+            
+            FreeImage_CloseMemory(mem);
+            
+            ENGINE_JS_SCOPE_CLOSE(array);
+        }
         
         ENGINE_JS_METHOD(CreateImageArray) {
             ENGINE_JS_SCOPE_OPEN;
@@ -974,6 +1046,7 @@ namespace Engine {
             addItem(drawTable, "draw", Draw);
             addItem(drawTable, "drawSub", DrawSub);
             addItem(drawTable, "openImage", OpenImage);
+            addItem(drawTable, "getImageArray", GetImageArray);
             addItem(drawTable, "createImageArray", CreateImageArray);
             addItem(drawTable, "createImage", CreateImage);
             addItem(drawTable, "saveImage", SaveImage);

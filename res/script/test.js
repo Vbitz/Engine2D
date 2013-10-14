@@ -59,6 +59,15 @@ for (var x = 0; x < 360; x++) {
 var img = img ? img : draw.openImage("image/testing.png");
 var img2 = img2 ? img2 : draw.createImage(pix, 100, 100);
 var img3 = img3 ? img3 : draw.createImage(hsv, 360, 100);
+var mImgA = mImgA ? mImgA : draw.getImageArray("image/testing.png");
+
+for (var i = 0; i < mImgA.length; i += 4) {
+	mImgA[i + 0] = 1 - mImgA[i + 0];
+	mImgA[i + 1] = 1 - mImgA[i + 1];
+	mImgA[i + 2] = 1 - mImgA[i + 2];
+}
+
+var mImg = mImg ? mImg : draw.createImage(mImgA, 128, 128);
 
 var t = 0;
 
@@ -89,6 +98,11 @@ sys.drawFunc(function () {
 	if (!draw.isTexture(img3)) {
 		console.log("Loading Image 3");
 		img3 = draw.createImage(hsv, 360, 100);
+	}
+
+	if (!draw.isTexture(mImg)) {
+		console.log("Loading Modded Image");
+		mImg = draw.createImage(mImgA, 128, 128);
 	}
 
 	if (!draw.isFontLoaded("light")) {
@@ -155,6 +169,9 @@ sys.drawFunc(function () {
 	draw.setColor("white");
 	draw.print(760, 240, "Circle");
 	draw.circle(770 + 50, 270 + 50, 50, 40, 200, 0.1, 1.0, true);
+
+	draw.print(900, 240, "Modded Image");
+	draw.draw(mImg, 900, 270, 100, 100);
 
 	for (var i = 0; i < 20; i++) {
 		draw.curve(i * 100, 500, i * 100, 600, 850, 600, input.mouseX, input.mouseY);
