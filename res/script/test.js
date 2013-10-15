@@ -173,12 +173,29 @@ sys.drawFunc(function () {
 	draw.print(900, 240, "Modded Image");
 	draw.draw(mImg, 900, 270, 100, 100);
 
+	draw.print(400, 400, "HSV Image");
+	draw.draw(img3, 410, 420, 360, 100);
+
+	draw.setFont("basic", 16);
+	draw.print(1040, 70, "Profiler");
+
+	draw.setFont("basic", 12);
+	var y = 100;
+	var zones = sys.getProfilerZones();
+	var h = zones.length * 20;
+	draw.setColor(0xcccccc);
+	draw.rect(1030, y - 10, 150, h + 10);
+	zones.forEach(function (i) {
+		draw.setColor(0x010101);
+		draw.print(1050, y, i);
+		draw.setColor(0xfafafa);
+		draw.print(1190, y, sys.getProfilerTime(i).toFixed(4));
+		y += 20;
+	});
+
 	for (var i = 0; i < 20; i++) {
 		draw.curve(i * 100, 500, i * 100, 600, 850, 600, input.mouseX, input.mouseY);
 	}
-
-	draw.print(400, 400, "HSV Image");
-	draw.draw(img3, 410, 420, 360, 100);
 });
 
 sys.keyboardFunc(function (type, key, press) {

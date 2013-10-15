@@ -671,6 +671,8 @@ namespace Engine {
             array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, imageSize * sizeof(float));
             
             array->Set(v8::String::New("length"), v8::Number::New(imageSize));
+            array->Set(v8::String::New("width"), v8::Number::New(imageWidth));
+            array->Set(v8::String::New("height"), v8::Number::New(imageHeight));
             
             unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
             

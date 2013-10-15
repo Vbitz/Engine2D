@@ -288,6 +288,30 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(GetProfilerTime) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Profiler time to get");
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Profiler::GetTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+        }
+        
+        ENGINE_JS_METHOD(GetProfileZones) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            v8::Handle<v8::Array> arr = v8::Array::New();
+            
+            std::vector<std::string> zones = Profiler::GetZones();
+            
+            for (int i = 0; i < zones.size(); i++) {
+                arr->Set(i, v8::String::New(zones.at(i).c_str()));
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE(arr);
+        }
+        
         ENGINE_JS_METHOD(TimeZone) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -462,6 +486,9 @@ namespace Engine {
             addItem(sysTable, "resizeWindow", ResizeWindow);
             addItem(sysTable, "toggleFullscreen", ToggleFullscreen);
             addItem(sysTable, "restartRenderer", RestartRenderer);
+            
+            addItem(sysTable, "getProfilerTime", GetProfilerTime);
+            addItem(sysTable, "getProfilerZones", GetProfileZones);
             
             addItem(sysTable, "perf", PerfZone);
             addItem(sysTable, "time", TimeZone);

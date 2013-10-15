@@ -144,7 +144,7 @@ namespace Engine {
         std::vector<std::string> GetZones() {
             std::vector<std::string> ret;
             for (auto iter = _zones.begin(); iter != _zones.end(); iter++) {
-                ret.push_back(iter->second.prettyName);
+                ret.push_back(iter->first);
             }
             return ret;
         }
