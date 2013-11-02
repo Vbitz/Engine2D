@@ -45,6 +45,8 @@
     #endif
 #endif
 
+#define STR(val) #val
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 

@@ -452,7 +452,7 @@ namespace Engine {
             invalidateScript(Config::GetString("script_bootloader"));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        };
+        }
         
         ENGINE_JS_METHOD(ForceReload) {
             ENGINE_JS_SCOPE_OPEN;
@@ -464,7 +464,35 @@ namespace Engine {
             invalidateScript(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        };
+        }
+        
+        ENGINE_JS_METHOD(Version) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
+            
+            v8::Handle<v8::Object> ret = v8::Object::New();
+            
+            std::stringstream glfwVersion;
+            
+            glfwVersion << GLFW_VERSION_MAJOR
+                << "." << GLFW_VERSION_MINOR
+                << "." << GLFW_VERSION_REVISION;
+            
+            ret->Set(v8::String::NewSymbol("openGL"),
+                     v8::String::NewSymbol((const char*) glGetString(GL_VERSION)));
+            ret->Set(v8::String::NewSymbol("glew"),
+                     v8::String::NewSymbol((const char*) glewGetString(GLEW_VERSION)));
+            ret->Set(v8::String::NewSymbol("v8"),
+                     v8::String::NewSymbol(v8::V8::GetVersion()));
+            ret->Set(v8::String::NewSymbol("engine"), v8::String::NewSymbol("Alpha 2"));
+            ret->Set(v8::String::NewSymbol("glfw"),
+                     v8::String::NewSymbol(glfwVersion.str().c_str()));
+            ret->Set(v8::String::NewSymbol("glsl"),
+                     v8::String::NewSymbol((const char*) glGetString(GL_SHADING_LANGUAGE_VERSION)));
+            
+            ENGINE_JS_SCOPE_CLOSE(ret);
+        }
         
         ENGINE_JS_METHOD(TestGraph) {
             ENGINE_JS_SCOPE_OPEN;
@@ -522,6 +550,8 @@ namespace Engine {
             
             addItem(sysTable, "reloadRootScript", ReloadRootScript);
             addItem(sysTable, "forceReload", ForceReload);
+            
+            addItem(sysTable, "version", Version);
             
             //addItem(sysTable, "testGraph", TestGraph);
         }
