@@ -215,7 +215,7 @@ namespace Engine {
             }
         }
         
-        bool CheckGLError(std::string source) {
+        bool CheckGLError(const char* source) {
             GLenum err;
             bool oneError = false;
             while ((err = glGetError()) != GL_NO_ERROR) {

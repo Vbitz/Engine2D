@@ -46,8 +46,15 @@ namespace Engine {
     }
     
     bool Shader::NeedsUpdate() {
-        return Filesystem::GetFileModifyTime(this->_vertFilename) > this->_vertLastModify
+        static float lastUpdate = Logger::GetTime();
+        
+        if ((Logger::GetTime() - lastUpdate) > 0.2) {
+            lastUpdate = Logger::GetTime();
+            return Filesystem::GetFileModifyTime(this->_vertFilename) > this->_vertLastModify
             || Filesystem::GetFileModifyTime(this->_fragFilename) > this->_fragLastModify;
+        } else {
+            return false;
+        }
     }
     
     void Shader::BindUniform(std::string token) {

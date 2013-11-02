@@ -424,6 +424,8 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, float colR
     buf.Draw(GL_TRIANGLES, verts);
     
     glBindTexture(GL_TEXTURE_2D, 0);
+    
+    delete [] dbuf;
 }
 
 std::ostream& GLFT_Font::beginDraw(float x, float y)

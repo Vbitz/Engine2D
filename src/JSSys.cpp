@@ -237,6 +237,23 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
         
+        ENGINE_JS_METHOD(MemoryStats) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            v8::Handle<v8::Object> ret = v8::Object::New();
+            
+            Platform::engine_memory_info mem_info = Platform::GetMemoryInfo();
+            
+            ret->Set(v8::String::NewSymbol("totalVirutal"), v8::Number::New(mem_info.totalVirtual));
+            ret->Set(v8::String::NewSymbol("totalVirtualFree"), v8::Number::New(mem_info.totalVirtualFree));
+            ret->Set(v8::String::NewSymbol("myVirtualUsed"), v8::Number::New(mem_info.myVirtualUsed));
+            ret->Set(v8::String::NewSymbol("totalPhysical"), v8::Number::New(mem_info.totalPhysical));
+            ret->Set(v8::String::NewSymbol("totalPhysicalFree"), v8::Number::New(mem_info.totalPhysicalFree));
+            ret->Set(v8::String::NewSymbol("myPhysicalUsed"), v8::Number::New(mem_info.myPhysicalUsed));
+            
+            ENGINE_JS_SCOPE_CLOSE(ret);
+        }
+        
         ENGINE_JS_METHOD(ToggleFullscreen) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -473,6 +490,7 @@ namespace Engine {
             addItem(sysTable, "microtime", Microtime);
             
             addItem(sysTable, "heapStats", HeapStats);
+            addItem(sysTable, "memoryStats", MemoryStats);
             
             addItem(sysTable, "exit", Exit);
             

@@ -56,4 +56,6 @@
 
 #include "Config.hpp"
 
+#include "Platform.hpp"
+
 #endif

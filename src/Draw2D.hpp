@@ -12,7 +12,7 @@ namespace Engine {
             float r, g, b;
         } Color3f;
         
-        bool CheckGLError(std::string source);
+        bool CheckGLError(const char* source);
         
         void SetDefinedColor(std::string name, int col);
         
