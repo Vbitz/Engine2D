@@ -37,13 +37,15 @@ for (var i in tests) {
 
 draw.clearColor(0x010101);
 
-var pix = [];
+var pix = draw.createImageArray(100, 100);
 
-for (var i = 0; i < 100 * 100 * 3; i++) {
+for (var i = 0; i < 100 * 100 * 4; i += 4) {
 	pix[i] = Math.cos(i);
+	pix[i + 1] = Math.sin(i + 1);
+	pix[i + 2] = Math.tan(i + 2);
 }
 
-var hsv = [];
+var hsv = draw.createImageArray(360, 100);
 
 var point = 0;
 
@@ -53,6 +55,7 @@ for (var x = 0; x < 360; x++) {
 		hsv[point++] = rgb.r;
 		hsv[point++] = rgb.g;
 		hsv[point++] = rgb.b;
+		hsv[point++] = 1.0;
 	}
 }
 

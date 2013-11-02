@@ -20,12 +20,20 @@ function regen() {
 
 regen();
 
+function get(x, y) {
+	return items[x][y];
+}
+
+function set(x, y, i) {
+	items[x][y] = i;
+}
+
 sys.drawFunc(function () {
 	var mx = Math.floor(input.mouseX / 4);
 	var my = Math.floor(input.mouseY / 4);
 	if (input.leftMouseButton) {
 		if (items[mx] !== undefined && items[mx][my] !== undefined) {
-			items[mx][my] = Math.floor(Math.random() * 255 * 255 * 255);
+			set(mx, my, Math.floor(Math.random() * 255 * 255 * 255));
 		}
 	} else {
 		draw.grid(mx * 4, my * 4, 4, 4);
@@ -35,38 +43,38 @@ sys.drawFunc(function () {
 			if (!paused) {
 				var val = 0;
 
-				val += items[x + 1][y] !== false;
-				val += items[x - 1][y] !== false;
-				val += items[x][y + 1] !== false;
-				val += items[x][y - 1] !== false;
+				val += get(x + 1, y) !== false;
+				val += get(x - 1, y) !== false;
+				val += get(x, y + 1) !== false;
+				val += get(x, y - 1) !== false;
 
-				val += items[x + 1][y + 1] !== false;
-				val += items[x + 1][y - 1] !== false;
-				val += items[x - 1][y + 1] !== false;
-				val += items[x - 1][y - 1] !== false;
+				val += get(x + 1, y + 1) !== false;
+				val += get(x + 1, y - 1) !== false;
+				val += get(x - 1, y + 1) !== false;
+				val += get(x - 1, y - 1) !== false;
 
-				if (items[x][y] && (val < 2 || val > 3)) {
-					items[x][y] = false;
+				if (get(x, y) && (val < 2 || val > 3)) {
+					set(x, y, false);
 				}
-				if (!items[x][y] && val === 3) {
+				if (!get(x, y) && val === 3) {
 					var avr = 0;
 
-					avr += items[x + 1][y];
-					avr += items[x - 1][y];
-					avr += items[x][y + 1];
-					avr += items[x][y - 1];
+					avr += get(x + 1, y);
+					avr += get(x - 1, y);
+					avr += get(x, y + 1);
+					avr += get(x, y - 1);
 
-					avr += items[x + 1][y + 1];
-					avr += items[x + 1][y - 1];
-					avr += items[x - 1][y + 1];
-					avr += items[x - 1][y - 1];
+					avr += get(x + 1, y + 1);
+					avr += get(x + 1, y - 1);
+					avr += get(x - 1, y + 1);
+					avr += get(x - 1, y - 1);
 
-					items[x][y] = Math.floor(avr / 3 + (Math.random() * 20));
+					set(x, y, Math.floor(avr / 3 + (Math.random() * 20)));
 				}
 			}
 
-			if (items[x][y] !== false) {
-				draw.setColor(items[x][y]);
+			if (get(x, y) !== false) {
+				draw.setColor(get(x, y));
 				draw.rect(x * 4, y * 4, 4, 4);
 			}
 		}
