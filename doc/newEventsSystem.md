@@ -1,15 +1,15 @@
 Current System
 =====================
 
-  sys.drawFunc(function () {})
-  sys.keyboardFunc(function (type, key, press) {})
+	sys.drawFunc(function () {})
+	sys.keyboardFunc(function (type, key, press) {})
 
 The current system is good but it won't work for much longer and the more work I do the harder it will be to change.
 
 New System
 =====================
 
-  sys.on(eventName, function (e) {}); // yay for jquery style
+	sys.on(eventName, function (e) {}); // yay for jquery style
 
 I like the above option but thinking though it more I realeased that there are often situations where I want to filter
 the events that come into "sys.on" futher. That's still something I'm thinking over. Right now the best option seems to be
@@ -22,10 +22,10 @@ if they don't care. I could move down that road but the underlying issue is that
 things meens that I should be looking for something much faster. The perfect system would be some kind of query type
 syntax in C++ something like 
 
-  Engine::Events::Emit("keypress", [&](args) -> bool {return args["key"] == key;}, key, press);
+	Engine::Events::Emit("keypress", [&](args) -> bool {return args["key"] == key;}, key, press);
 
 Which is what I'm going to end up doing
 
 The API on the JS Side will be
 
-  sys.on(eventName, {key: "k"}, function () {});
+	sys.on(eventName, {key: "k"}, function () {});
