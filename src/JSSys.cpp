@@ -42,11 +42,10 @@ namespace Engine {
             
             v8::Local<v8::Array> argvArray = v8::Array::New();
             
-            int argc = getCommandLineArgCount();
-            const char** argv = getCommandLineArgs();
+            std::vector<std::string> cArgs = getCommandLineArgs();
             
-            for (int i = 0; i < argc; i++) {
-                argvArray->Set(i, v8::String::New(argv[i]));
+            for (int i = 0; i < cArgs.size(); i++) {
+                argvArray->Set(i, v8::String::New(cArgs[i].c_str()));
             }
             
             ENGINE_JS_SCOPE_CLOSE(argvArray);

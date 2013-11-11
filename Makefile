@@ -1,6 +1,6 @@
 CC=clang
 CXX=clang++
-GDB=gdb
+GDB=lldb
 VALGRIND=valgrind
 RM=rm -f
 OPTIMISE=
@@ -32,7 +32,10 @@ gdb: all
 	$(GDB) $(OUTPUT)
 
 run: all
-	$(OUTPUT)
+	$(OUTPUT) -devmode -debug
+
+test: all
+	$(OUTPUT) -test
 
 all: Engine
 

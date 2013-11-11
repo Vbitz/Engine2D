@@ -24,6 +24,48 @@ namespace Engine {
             _stringCvars[key] = value;
         }
         
+        bool Set(std::string key, std::string value) {
+            switch (GetType(key)) {
+                case ConfigType_String:
+                    SetString(key, value);
+                    break;
+                case ConfigType_Number:
+                    SetNumber(key, std::stof(value));
+                    break;
+                case ConfigType_Bool:
+                    if (value == "true") {
+                        SetBoolean(key, true);
+                    } else if (value == "false") {
+                        SetBoolean(key, false);
+                    } else {
+                        return false;
+                    }
+                    break;
+                case ConfigType_Unknown:
+                    SetString(key, value);
+                    break;
+            }
+            return true;
+        }
+        
+        ConfigType GetType(std::string key) {
+            for (auto iter = _numberCvars.begin(); iter != _numberCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return ConfigType_Number;
+                }
+            }
+            for (auto iter = _boolCvars.begin(); iter != _boolCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return ConfigType_Bool;
+                }
+            }
+            for (auto iter = _stringCvars.begin(); iter != _stringCvars.end(); iter++) {
+                if (iter->first == key) {
+                    return ConfigType_String;
+                }
+            }
+            return ConfigType_Unknown;
+        }
         
         std::string Get(std::string key) {
             for (auto iter = _numberCvars.begin(); iter != _numberCvars.end(); iter++) {

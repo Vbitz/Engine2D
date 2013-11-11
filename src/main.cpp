@@ -1,5 +1,7 @@
 #include "main.hpp"
 
+#include <cstring>
+
 #include "extern/OpenSans-Regular.ttf.hpp"
 
 #include "ResourceManager.hpp"
@@ -30,17 +32,16 @@ namespace Engine {
 	int _screenWidth = 0;
 	int _screenHeight = 0;
     
-    int _argc;
-    const char** _argv;
+    std::vector<std::string> _jsArgs;
     
     bool isGL3Context;
     
     GLFWwindow* window = NULL;
 	
     std::map<std::string, ResourceManager::FontResource*> _fonts;
-	
-	std::map<std::string, std::string> _persists;
 
+    std::map<std::string, std::string> _delayedConfigs;
+    
 	// v8 Scripting
 	v8::Isolate* _globalIsolate;
 
@@ -52,7 +53,7 @@ namespace Engine {
     
 	std::map<std::string, long> _loadedFiles;
     
-    bool _developerMode = true;
+    bool _developerMode = false;
     
     int _detailFrames = 0;
     std::string _detailFilename = "";
@@ -278,6 +279,15 @@ namespace Engine {
 		input_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
 	}
     
+    void UpdateFrameTime() {
+		v8::HandleScope scp;
+		v8::Context::Scope ctx_scope(_globalContext);
+        
+		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
+		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
+        sys_table->Set(v8::String::NewSymbol("deltaTime"), v8::Number::New(Profiler::GetTime("Frame")));
+    }
+    
     void DisablePreload() {
         v8::HandleScope scp;v8::Context::Scope ctx_scope(_globalContext);
         
@@ -290,7 +300,7 @@ namespace Engine {
         Config::SetNumber(  "cl_width",                 800);
         Config::SetNumber(  "cl_height",                600);
         Config::SetBoolean( "cl_aa",                    true);
-        Config::SetBoolean( "cl_vsync",                 true); // lack of vsync causes FPS issues
+        Config::SetBoolean( "cl_vsync",                 false); // lack of vsync causes FPS issues
         Config::SetBoolean( "cl_fullscreen",            false);
         Config::SetBoolean( "cl_openGL3",               false);
         Config::SetString(  "cl_fontPath",              "fonts/OpenSans-Regular.ttf");
@@ -302,6 +312,7 @@ namespace Engine {
         Config::SetString(  "cl_title",                 "Engine2D");
         Config::SetBoolean( "cl_debugContext",          developerMode);
         Config::SetString(  "cl_gl3Shader",             "shaders/basic");
+        Config::SetNumber(  "cl_targetFrameTime",       1.0f / 30.0f);
         
         Config::SetBoolean( "draw_clampCreateTexture",  true);
         Config::SetBoolean( "draw_createImageMipmap",   true);
@@ -309,6 +320,7 @@ namespace Engine {
         Config::SetBoolean( "script_reload",            developerMode);
         Config::SetBoolean( "script_gcFrame",           true);
         Config::SetString(  "script_bootloader",        "lib/boot.js");
+        Config::SetString(  "script_config",            "config/config.json");
         
         Config::SetBoolean( "log_console",              true);
         Config::SetBoolean( "log_consoleVerbose",       developerMode);
@@ -391,14 +403,18 @@ namespace Engine {
         for (int i = 0; i < objNames->Length(); i++) {
             v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
             v8::Local<v8::Value> objItem = obj->Get(objKey);
+            std::string objKeyValue = std::string(*v8::String::Utf8Value(objKey));
+            if (_delayedConfigs.count(objKeyValue) != 0) {
+                continue; // ignore it
+            }
             if (objItem->IsString()) {
-                Config::SetString(std::string(*v8::String::Utf8Value(objKey)),
+                Config::SetString(objKeyValue,
                                   std::string(*v8::String::Utf8Value(objItem)));
             } else if (objItem->IsNumber()) {
-                Config::SetNumber(std::string(*v8::String::Utf8Value(objKey)),
+                Config::SetNumber(objKeyValue,
                                   (float) objItem->NumberValue());
             } else if (objItem->IsBoolean()) {
-                Config::SetBoolean(std::string(*v8::String::Utf8Value(objKey)),
+                Config::SetBoolean(objKeyValue,
                                   (float) objItem->BooleanValue());
             } else {
                 ENGINE_THROW_ARGERROR("Invalid value, values must be a number, string or boolean");
@@ -549,11 +565,99 @@ namespace Engine {
 	void ShutdownFonts() {
         _fonts.clear();
 	}
+    
+    // command line handlers
+    
+    void ApplyDelayedConfigs() {
+        for (auto iter = _delayedConfigs.begin(); iter != _delayedConfigs.end(); iter++) {
+            if (!Config::Set(iter->first, iter->second)) {
+                Logger::begin("CommandLine", Logger::LogLevel_Error) << "Could not set '"
+                    << iter->first << "' to '" << iter->second
+                    << "' Ignoring" << Logger::end();
+            }
+        }
+    }
+    
+    // command line parsing
+    
+    bool ParseCommandLine(int argc, const char* argv[]) {
+        /*
+         Command Line Spec
+         ========================
+         
+         -- Examples --
+         bin/Engine - loads config/config.json and sets basic config values
+         bin/Engine -Ccl_width=1280 -Ccl_height=800 - loads config/config.json and
+            overrides the basic configs cl_width and cl_height
+         bin/Engine -config=config/test.json - loads config/test.json and sets basic config values
+         bin/Engine script/test - any non - configs are passed onto javascript
+         
+         -- Args --
+               -Cname=value             - Overloads a basic config. This is applyed before loading the basic config
+                                            but overrides those configs while they are applyed
+         (NYI) -config=configFile       - Sets the basic config to configFile, configFile is realitive to res/
+                                            since it uses PhysFS this could be other values
+         (NYI) -archive=archiveFile     - Loads a archive file using PhysFS, this is applyed after physfs is started
+         (NYI) -test                    - Runs the built in test suite
+         (NYI) -headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL
+                                            will fail.
+               -devmode                 - Enables developer mode (This enables real time script loading and the console)
+         (NYI) -debug                   - Enables debug mode (This enables a OpenGL debug context and will print messages
+                                            to the console)
+         (NYI) -log=filename            - Logs logger output to filename (This is not writen using PhysFS so it needs a
+                                            regular path)
+         (NYI) -h                       - Prints this message
+         */
+        
+        bool _exit = false;
+        
+        for (int i = 1; i < argc; i++) {
+            if (strcmp(argv[i], "-devmode") == 0) {
+                // enable devmode
+                _developerMode = true;
+            } else if (strcmp(argv[i], "-debug") == 0) {
+                // enable debug
+            } else if (strcmp(argv[i], "-test") == 0) {
+                // start test mode
+            } else if (strcmp(argv[i], "-headless") == 0) {
+                // enable headless mode
+            } else if (strcmp(argv[i], "-h") == 0) {
+                // display help and exit
+                _exit = true;
+            } else if (strncmp(argv[i], "-C", 2) == 0) {
+                // set delayed config
+                size_t keyLength = strcspn(argv[i], "=") - 2;
+                size_t valueLength = strlen(argv[i]) - keyLength - 3; // 2 chars for -C and 1 for =
+                
+                char* key = (char*) malloc(keyLength);
+                strncpy(key, &argv[i][2], keyLength);
+                
+                char* value = (char*) malloc(valueLength);
+                strncpy(value, &argv[i][2 + keyLength + 1], valueLength);
+                
+                _delayedConfigs[key] = std::string(value);
+                
+                free(key);
+                free(value);
+            } else if (strncmp(argv[i], "-config=", 8) == 0) {
+                // set config filename
+            } else if (strncmp(argv[i], "-archive=", 9) == 0) {
+                // add archive to PhysFS after PhysFS Init
+            } else if (strncmp(argv[i], "-log=", 2) == 0) {
+                // set logfile and enable logging
+            } else {
+                // push to JS args
+                _jsArgs.push_back(argv[i]);
+            }
+        }
+        
+        return !_exit;
+    }
 	
 	// semi-realtime time loading
 	
 	void CheckUpdate() {
-		for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
+        for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
 			long lastMod = Filesystem::GetFileModifyTime(iterator->first);
 			if (lastMod > iterator->second) {
                 runFile(iterator->first, true);
@@ -583,12 +687,8 @@ namespace Engine {
         return _globalContext;
     }
     
-    int getCommandLineArgCount() {
-        return _argc;
-    }
-    
-    const char** getCommandLineArgs() {
-        return _argv;
+    std::vector<std::string> getCommandLineArgs() {
+        return _jsArgs;
     }
 	
 	void setDrawFunction(v8::Persistent<v8::Function> func) {
@@ -823,7 +923,9 @@ namespace Engine {
                 CheckUpdate();
             }
             
-            Profiler::Begin("Frame");
+            Profiler::Begin("Frame", Config::GetFloat("cl_targetFrameTime"));
+            
+            UpdateFrameTime();
             
             UpdateMousePos();
             
@@ -836,14 +938,14 @@ namespace Engine {
             Draw2D::Begin2d();
             
             if (!_drawFunc.IsEmpty() && Config::GetBoolean("cl_scriptedDraw")) {
-                Profiler::Begin("JSDraw", 0.04);
+                Profiler::Begin("JSDraw", Config::GetFloat("cl_targetFrameTime") / 3 * 2);
                 if (!CallFunction(_drawFunc)) {
                     _drawFunc.Clear();
                 }
                 Profiler::End("JSDraw");
             }
             
-            Profiler::Begin("EngineUI", 0.04);
+            Profiler::Begin("EngineUI", Config::GetFloat("cl_targetFrameTime") / 3);
             EngineUI::Draw();
             Profiler::End("EngineUI");
             
@@ -917,14 +1019,17 @@ namespace Engine {
 	// main function
 	
 	int main(int argc, char const *argv[]) {
+        if (!ParseCommandLine(argc, argv)) {
+            return 1;
+        }
+        
         LoadBasicConfigs(_developerMode);
+        
+        ApplyDelayedConfigs();
         
         Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
         
 		Filesystem::Init(argv[0]);
-        
-        _argc = argc;
-        _argv = argv;
         
         Profiler::Begin("InitScripting");
             InitScripting(_developerMode);

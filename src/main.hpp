@@ -16,9 +16,7 @@ namespace Engine {
     
     v8::Persistent<v8::Context> getGlobalContext();
     
-    int                         getCommandLineArgCount();
-    
-    const char**                getCommandLineArgs();
+    std::vector<std::string>    getCommandLineArgs();
 
 	int 						getScreenWidth();
 	int 						getScreenHeight();

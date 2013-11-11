@@ -14,7 +14,7 @@ namespace Engine {
     }
     
     Shader::~Shader() {
-        if (!this->_loaded) {
+        if (!this->_loaded && engine::HasGLContext()) {
             this->End();
             glDeleteShader(this->_vertPointer);
             glDeleteShader(this->_fragPointer);
