@@ -13,6 +13,16 @@ console.warn = makeLog("warning");
 console.error = makeLog("error");
 console.verbose = makeLog("verbose");
 
+sys.drawFunc = function (func) {
+	sys.on("draw", func);
+}
+
+sys.keyboardFunc = function (func) {
+	sys.on("input", function (e) {
+		func(e["action"], e["key"], e["state"] === "true");
+	});
+}
+
 var str = fs.readFile("config/config.json");
 
 console.log("Booting JavaScript Phase 1");
@@ -46,7 +56,7 @@ function onPostLoad() {
 }
 
 if (sys.preload) {
-	sys.onPostLoad(onPostLoad);
+	sys.on("postLoad", onPostLoad);
 } else {
 	console.log("Rebooting");
 	sys.restartRenderer();

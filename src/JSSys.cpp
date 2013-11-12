@@ -64,45 +64,42 @@ namespace Engine {
 			
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
-		
-        ENGINE_JS_METHOD(Drawfunc) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_FUNCTION(0, "Arg0 is a function to be called each time a frame is to be rendered");
-            
-			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
-            
-			setDrawFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
-            
-			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-		}
         
-        ENGINE_JS_METHOD(KeyboardFunc) {
+        ENGINE_JS_METHOD(EventsOn) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
             
-            ENGINE_CHECK_ARG_FUNCTION(0, "Arg0 is a function to be called on each key pressed or released");
-            
-			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
-            
-			setKeyFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+            if (args.Length() == 3) {
+                v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[2]);
+                Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                           Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))),
+                           v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+            } else if (args.Length() == 2) {
+                v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[1]);
+                Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                           v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+            } else {
+                
+            }
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(OnPostLoad) {
+        ENGINE_JS_METHOD(EventsEmit) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_FUNCTION(0, "Arg0 is a function to be called once the opengl context is created");
-            
-			v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[0]);
-            
-			setPostLoadFunction(v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+            if (args.Length() == 2) {
+                ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
+                
+                Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                             Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))));
+            } else if (args.Length() == 1) {
+                ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
+                
+                Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0), Events::EventArgs());
+            } else {
+                
+            }
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -510,9 +507,8 @@ namespace Engine {
             
 			addItem(sysTable, "runFile", RunFile);
             
-			addItem(sysTable, "drawFunc", Drawfunc);
-            addItem(sysTable, "keyboardFunc", KeyboardFunc);
-            addItem(sysTable, "onPostLoad", OnPostLoad);
+            addItem(sysTable, "on", EventsOn);
+            addItem(sysTable, "emit", EventsEmit);
             
             addItem(sysTable, "microtime", Microtime);
             

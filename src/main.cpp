@@ -46,10 +46,6 @@ namespace Engine {
 	v8::Isolate* _globalIsolate;
 
 	v8::Persistent<v8::Context> _globalContext;
-	
-	v8::Persistent<v8::Function> _drawFunc;
-	v8::Persistent<v8::Function> _keyboardFunc;
-    v8::Persistent<v8::Function> _onPostLoadFunc;
     
 	std::map<std::string, long> _loadedFiles;
     
@@ -289,7 +285,8 @@ namespace Engine {
     }
     
     void DisablePreload() {
-        v8::HandleScope scp;v8::Context::Scope ctx_scope(_globalContext);
+        v8::HandleScope scp;
+        v8::Context::Scope ctx_scope(_globalContext);
         
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
@@ -318,7 +315,7 @@ namespace Engine {
         Config::SetBoolean( "draw_createImageMipmap",   true);
         
         Config::SetBoolean( "script_reload",            developerMode);
-        Config::SetBoolean( "script_gcFrame",           true);
+        Config::SetBoolean( "script_gcFrame",           developerMode);
         Config::SetString(  "script_bootloader",        "lib/boot.js");
         Config::SetString(  "script_config",            "config/config.json");
         
@@ -353,31 +350,17 @@ namespace Engine {
 	
         // everything after this is to handle the JS Function.
         
-        if (_keyboardFunc.IsEmpty() || EngineUI::ConsoleActive()) {
+        if (EngineUI::ConsoleActive()) {
             return;
         }
         
-        v8::HandleScope scp;
-        v8::Context::Scope ctx_scope(_globalContext);
+        Events::EventArgs e = Events::EventArgs({
+            {"action", ""},
+            {"key", key.c_str()},
+            {"state", std::to_string(state == GLFW_PRESS || state == GLFW_REPEAT)}
+        });
         
-        v8::TryCatch tryCatch;
-        
-        v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(_keyboardFunc);
-
-        v8::Handle<v8::Value> argv[3];
-        
-        argv[0] = v8::String::NewSymbol("");
-        argv[1] = v8::String::NewSymbol(key.c_str());
-        argv[2] = v8::Boolean::New(state == GLFW_PRESS || state == GLFW_REPEAT);
-        
-        real_func->Call(_globalContext->Global(), 3, argv);
-        
-        if (!tryCatch.StackTrace().IsEmpty()) {
-            v8::Handle<v8::Value> exception = tryCatch.StackTrace();
-            v8::String::AsciiValue exception_str(exception);
-            Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
-            _keyboardFunc.Clear();
-        }
+        Events::Emit("input", e);
 	}
     
     void OnGLFWError(int error, const char* msg) {
@@ -690,18 +673,6 @@ namespace Engine {
     std::vector<std::string> getCommandLineArgs() {
         return _jsArgs;
     }
-	
-	void setDrawFunction(v8::Persistent<v8::Function> func) {
-		_drawFunc = func;
-	}
-    
-    void setKeyFunction(v8::Persistent<v8::Function> func) {
-        _keyboardFunc = func;
-    }
-    
-    void setPostLoadFunction(v8::Persistent<v8::Function> func) {
-        _onPostLoadFunc = func;
-    }
     
 	bool _runFile(std::string path, bool persist) {
         v8::HandleScope handle_scope;
@@ -937,11 +908,9 @@ namespace Engine {
             
             Draw2D::Begin2d();
             
-            if (!_drawFunc.IsEmpty() && Config::GetBoolean("cl_scriptedDraw")) {
+            if (Config::GetBoolean("cl_scriptedDraw")) {
                 Profiler::Begin("JSDraw", Config::GetFloat("cl_targetFrameTime") / 3 * 2);
-                if (!CallFunction(_drawFunc)) {
-                    _drawFunc.Clear();
-                }
+                Events::Emit("draw", Events::EventArgs());
                 Profiler::End("JSDraw");
             }
             
@@ -1045,9 +1014,7 @@ namespace Engine {
         
         DisablePreload();
         
-        if (!_onPostLoadFunc.IsEmpty()) {
-            CallFunction(_onPostLoadFunc);
-        }
+        Events::Emit("postLoad", Events::EventArgs());
         
         Draw2D::CheckGLError("On JS Post Load");
         
