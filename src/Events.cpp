@@ -105,14 +105,12 @@ namespace Engine {
         }
         
         bool EventArgs::equalsValue(std::string key, std::string value, bool required) {
-            if (this->_map.count(key) == 0 && required) {
-                return false;
+            if (this->_map.count(key) == 0 && !required) {
+                return true;
+            } else if (this->_map.count(key) > 0 && this->get(key) == value) {
+                return true;
             } else {
-                if (this->get(key) == value) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return false;
             }
         }
         
@@ -140,13 +138,20 @@ namespace Engine {
             }
         }
         
+        void EventArgs::push(std::string key, std::string value) {
+            if (!this->_readOnly) {
+                this->_map[key] = value;
+            }
+        }
+        
         struct Event {
-            std::string TargetName;
+            std::string TargetName, Label;
             EventTarget* Target;
             bool Active;
             
             Event(std::string targetName, EventTarget* target) {
                 this->TargetName = targetName;
+                this->Label = "";
                 this->Target = target;
                 this->Active = true;
             }
@@ -154,16 +159,20 @@ namespace Engine {
         
         std::vector<Event> _events;
         
+        int lastEventID = 0;
+        
         void Emit(std::string evnt, std::function<bool(EventArgs)> filter, EventArgs args) {
-            std::vector<EventTarget*> targets;
+            std::vector<Event> targets;
             for (auto iter = _events.begin(); iter != _events.end(); iter++) {
                 if (iter->TargetName == evnt && iter->Active) {
-                    targets.push_back(iter->Target);
+                    targets.push_back(*iter);
                 }
             }
             for (auto iter = targets.begin(); iter != targets.end(); iter++) {
-                EventTarget* target = *iter;
-                target->Run(filter, args);
+                Event e = *iter;
+                if (e.Active) {
+                    e.Target->Run(filter, args);
+                }
             }
         }
         
@@ -171,20 +180,32 @@ namespace Engine {
             Emit(evnt, [](EventArgs e) { return true; }, args);
         }
         
-        void On(std::string evnt, EventArgs e, EventTargetFunc target) {
+        void Emit(std::string evnt) {
+            Emit(evnt, [](EventArgs e) { return true; }, EventArgs());
+        }
+        
+        int On(std::string evnt, EventArgs e, EventTargetFunc target) {
             _events.push_back(Event(std::string(evnt.c_str()), new CPPEventTarget(target, e)));
+            return lastEventID++;
         }
         
-        void On(std::string evnt, EventArgs e, v8::Persistent<v8::Function> target) {
+        int On(std::string evnt, EventArgs e, v8::Persistent<v8::Function> target) {
             _events.push_back(Event(std::string(evnt.c_str()), new JSEventTarget(target, e)));
+            return lastEventID++;
         }
         
-        void On(std::string evnt, EventTargetFunc target) {
-            On(evnt, EventArgs(), target);
+        int On(std::string evnt, EventTargetFunc target) {
+            return On(evnt, EventArgs(), target);
         }
         
-        void On(std::string evnt, v8::Persistent<v8::Function> target) {
-            On(evnt, EventArgs(), target);
+        int On(std::string evnt, v8::Persistent<v8::Function> target) {
+            return On(evnt, EventArgs(), target);
+        }
+        
+        void Clear(int eventID) {
+            if (eventID < _events.size()) {
+                _events.at(eventID).Active = false;
+            }
         }
     }
 }

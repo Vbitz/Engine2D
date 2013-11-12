@@ -360,7 +360,9 @@ namespace Engine {
             {"state", std::to_string(state == GLFW_PRESS || state == GLFW_REPEAT)}
         });
         
-        Events::Emit("input", e);
+        Events::Emit("input", [&](Events::EventArgs e) {
+            return e.equalsValue("key", key.c_str(), false);
+        }, e);
 	}
     
     void OnGLFWError(int error, const char* msg) {

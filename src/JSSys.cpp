@@ -68,21 +68,22 @@ namespace Engine {
         ENGINE_JS_METHOD(EventsOn) {
             ENGINE_JS_SCOPE_OPEN;
             
+            int res = -1;
             
             if (args.Length() == 3) {
                 v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[2]);
-                Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                            Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))),
                            v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
             } else if (args.Length() == 2) {
                 v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[1]);
-                Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                            v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
             } else {
                 
             }
             
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(res));
         }
         
         ENGINE_JS_METHOD(EventsEmit) {
@@ -100,6 +101,18 @@ namespace Engine {
             } else {
                 
             }
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(EventsClear) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the eventID to clear");
+            
+            Events::Clear(ENGINE_GET_ARG_INT32_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -509,6 +522,7 @@ namespace Engine {
             
             addItem(sysTable, "on", EventsOn);
             addItem(sysTable, "emit", EventsEmit);
+            addItem(sysTable, "clearEvent", EventsClear);
             
             addItem(sysTable, "microtime", Microtime);
             
