@@ -149,9 +149,9 @@ namespace Engine {
             EventTarget* Target;
             bool Active;
             
-            Event(std::string targetName, EventTarget* target) {
+            Event(std::string targetName, std::string label, EventTarget* target) {
                 this->TargetName = targetName;
-                this->Label = "";
+                this->Label = label;
                 this->Target = target;
                 this->Active = true;
             }
@@ -160,6 +160,15 @@ namespace Engine {
         std::vector<Event> _events;
         
         int lastEventID = 0;
+        
+        bool eventExists(std::string name) {
+            for (auto iter = _events.begin(); iter != _events.end(); iter++) {
+                if (iter->Label == name) { // I should switch this over to a unordered_map
+                    return true;
+                }
+            }
+            return false;
+        }
         
         void Emit(std::string evnt, std::function<bool(EventArgs)> filter, EventArgs args) {
             std::vector<Event> targets;
@@ -184,22 +193,32 @@ namespace Engine {
             Emit(evnt, [](EventArgs e) { return true; }, EventArgs());
         }
         
-        int On(std::string evnt, EventArgs e, EventTargetFunc target) {
-            _events.push_back(Event(std::string(evnt.c_str()), new CPPEventTarget(target, e)));
-            return lastEventID++;
+        int On(std::string evnt, std::string name, EventArgs e, EventTargetFunc target) {
+            if (eventExists(name)) {
+                return -1;
+            } else {
+                _events.push_back(Event(std::string(evnt.c_str()), std::string(evnt.c_str()),
+                                        new CPPEventTarget(target, e)));
+                return lastEventID++;
+            }
         }
         
-        int On(std::string evnt, EventArgs e, v8::Persistent<v8::Function> target) {
-            _events.push_back(Event(std::string(evnt.c_str()), new JSEventTarget(target, e)));
-            return lastEventID++;
+        int On(std::string evnt, std::string name, EventArgs e, v8::Persistent<v8::Function> target) {
+            if (eventExists(name)) {
+                return -1;
+            } else {
+                _events.push_back(Event(std::string(evnt.c_str()), std::string(name.c_str()),
+                                        new JSEventTarget(target, e)));
+                return lastEventID++;
+            }
         }
         
-        int On(std::string evnt, EventTargetFunc target) {
-            return On(evnt, EventArgs(), target);
+        int On(std::string evnt, std::string name, EventTargetFunc target) {
+            return On(evnt, name, EventArgs(), target);
         }
         
-        int On(std::string evnt, v8::Persistent<v8::Function> target) {
-            return On(evnt, EventArgs(), target);
+        int On(std::string evnt, std::string name, v8::Persistent<v8::Function> target) {
+            return On(evnt, name, EventArgs(), target);
         }
         
         void Clear(int eventID) {

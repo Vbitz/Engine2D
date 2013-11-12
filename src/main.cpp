@@ -141,6 +141,15 @@ namespace Engine {
         }
     }
     
+    static std::string GLFW_GetStateName(int state) {
+        switch (state) {
+            case GLFW_PRESS:    return "press";
+            case GLFW_REPEAT:   return "repeat";
+            case GLFW_RELEASE:  return "release";
+            default:            return "unknown";
+        }
+    }
+    
     void InitFonts();
     void ShutdownFonts();
     
@@ -355,9 +364,8 @@ namespace Engine {
         }
         
         Events::EventArgs e = Events::EventArgs({
-            {"action", ""},
-            {"key", key.c_str()},
-            {"state", std::to_string(state == GLFW_PRESS || state == GLFW_REPEAT)}
+            {"key", key},
+            {"state", GLFW_GetStateName(state)}
         });
         
         Events::Emit("input", [&](Events::EventArgs e) {

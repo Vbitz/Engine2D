@@ -14,12 +14,12 @@ console.error = makeLog("error");
 console.verbose = makeLog("verbose");
 
 sys.drawFunc = function (func) {
-	sys.on("draw", func);
+	sys.on("draw", "sys.drawFunc", func);
 }
 
 sys.keyboardFunc = function (func) {
-	sys.on("input", function (e) {
-		func(e["action"], e["key"], e["state"] === "true");
+	sys.on("input", "sys.keyboardFunc", function (e) {
+		func("", e["key"], e["state"] === "press" || e["state"] === "repeat");
 	});
 }
 
@@ -47,16 +47,22 @@ for (var i = 0; i < libarys.length; i++) {
 	sys.runFile("lib/" + libarys[i], false);
 }
 
+var postLoadID = -1;
+
 function onPostLoad() {
 	console.log("Booting JavaScript Phase 2");
 	var argv = sys.argv();
 	var glInfo = sys.getGLVersion();
 	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
 	sys.runFile(argv.length > 0 ? argv[0] : sys.config("js_startupScript"), true);
+	if (postLoadID != -1) { // make sure this does not get called twice
+		sys.clearEvent(postLoadID);
+		postLoadID = -1;
+	}
 }
 
 if (sys.preload) {
-	sys.on("postLoad", onPostLoad);
+	postLoadID = sys.on("postLoad", "bootloaderLoad", onPostLoad);
 } else {
 	console.log("Rebooting");
 	sys.restartRenderer();

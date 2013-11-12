@@ -49,10 +49,10 @@ namespace Engine {
         void Emit(std::string evnt, std::function<bool(EventArgs)> filter, EventArgs args);
         void Emit(std::string evnt, EventArgs args);
         void Emit(std::string evnt);
-        int On(std::string evnt, EventArgs e, EventTargetFunc target);
-        int On(std::string evnt, EventArgs e, v8::Persistent<v8::Function> target);
-        int On(std::string evnt, EventTargetFunc target);
-        int On(std::string evnt, v8::Persistent<v8::Function> target);
+        int On(std::string evnt, std::string label, EventArgs e, EventTargetFunc target);
+        int On(std::string evnt, std::string label, EventArgs e, v8::Persistent<v8::Function> target);
+        int On(std::string evnt, std::string label, EventTargetFunc target);
+        int On(std::string evnt, std::string label, v8::Persistent<v8::Function> target);
         void Clear(int eventID);
     }
 }

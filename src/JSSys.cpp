@@ -70,14 +70,16 @@ namespace Engine {
             
             int res = -1;
             
-            if (args.Length() == 3) {
+            if (args.Length() == 4) {
+                v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[3]);
+                res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                                 ENGINE_GET_ARG_CPPSTRING_VALUE(1),
+                           Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(2))),
+                           v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+            } else if (args.Length() == 3) {
                 v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[2]);
                 res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
-                           Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))),
-                           v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
-            } else if (args.Length() == 2) {
-                v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[1]);
-                res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                                 ENGINE_GET_ARG_CPPSTRING_VALUE(1),
                            v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
             } else {
                 
@@ -89,14 +91,12 @@ namespace Engine {
         ENGINE_JS_METHOD(EventsEmit) {
             ENGINE_JS_SCOPE_OPEN;
             
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
+            
             if (args.Length() == 2) {
-                ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
-                
                 Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                              Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))));
             } else if (args.Length() == 1) {
-                ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
-                
                 Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0), Events::EventArgs());
             } else {
                 
