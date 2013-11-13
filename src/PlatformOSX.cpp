@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <unistd.h>
+
 #include <mach/mach.h>
 
 #include <sys/types.h>
@@ -126,6 +128,11 @@ namespace Engine {
             }
             
             return ret;
+        }
+        
+        int GetProcesserCount() {
+            return (int) sysconf(_SC_NPROCESSORS_ONLN); // Show me a system where that
+                // function will return more the 2^32 processers
         }
         
         Libary* OpenLibary(std::string path) {

@@ -184,6 +184,7 @@ namespace Engine {
             sysTable->Set("platform", v8::String::New(_PLATFORM));
             sysTable->Set("devMode", v8::Boolean::New(developerMode));
             sysTable->Set("preload", v8::Boolean::New(true));
+            sysTable->Set("numProcessers", v8::Number::New(Platform::GetProcesserCount()));
 	
 		global->Set("sys", sysTable);
         

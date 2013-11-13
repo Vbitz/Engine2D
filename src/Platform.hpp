@@ -35,6 +35,8 @@ namespace Engine {
         
         engine_memory_info GetMemoryInfo();
         
+        int GetProcesserCount();
+        
         Libary* OpenLibary(std::string path);
         Libary* GetThisLibary();
         
