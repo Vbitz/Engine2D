@@ -346,7 +346,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the zone to time");
             ENGINE_CHECK_ARG_FUNCTION(1, "Arg1 is the function to time");
             
-            double startTime = Logger::GetTime();
+            double startTime = Platform::GetTime();
             
             v8::Context::Scope ctx_scope(getGlobalContext());
             
@@ -361,7 +361,7 @@ namespace Engine {
             }
             
             Logger::begin("JSSys", Logger::LogLevel_User) << "Timed: " << ENGINE_GET_ARG_CPPSTRING_VALUE(0) << " at "
-                << (Logger::GetTime() - startTime) << "s" << Logger::end();
+                << (Platform::GetTime() - startTime) << "s" << Logger::end();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

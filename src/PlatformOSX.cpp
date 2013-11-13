@@ -136,5 +136,21 @@ namespace Engine {
             return new OSXLibary();
         }
         
+        double GetTime() {
+            static double _startTime = -1;
+            
+            timeval _time;
+            gettimeofday(&_time, NULL);
+            
+            double time = _time.tv_sec + (_time.tv_usec * 0.000001);
+            
+            if (_startTime < 0) {
+                _startTime = time;
+                return 0;
+            } else {
+                return time - _startTime;
+            }
+        }
+        
     }
 }

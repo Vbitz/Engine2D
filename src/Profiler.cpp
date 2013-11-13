@@ -1,5 +1,7 @@
 #include "Profiler.hpp"
 
+#include "Platform.hpp"
+
 namespace Engine {
     namespace Profiler {
         
@@ -47,14 +49,14 @@ namespace Engine {
                 _names.push_back("Root");
             }
             if (_zones.count(zone) > 0) {
-                _zones[zone].time = Logger::GetTime();
+                _zones[zone].time = Platform::GetTime();
                 _zones[zone].ended = false;
             } else {
                 //Logger::begin("ProfilerDebug", Logger::LogLevel_Verbose) << "Register: " << zone << Logger::end();
                 ProfileEvent newEvent;
                 newEvent.name = zone;
                 newEvent.prettyName = _getPrettyName(zone);
-                newEvent.time = Logger::GetTime();
+                newEvent.time = Platform::GetTime();
                 newEvent.min = 99999999999;
                 newEvent.lastTime = newEvent.max = 0;
                 newEvent.ended = newEvent.thisFrame = false;
@@ -73,7 +75,7 @@ namespace Engine {
                 return;
             }
             ProfileEvent& e = _zones[zone];
-            e.time = (Logger::GetTime() - e.time);
+            e.time = (Platform::GetTime() - e.time);
             e.lastTime = e.time;
             e.ended = true;
             e.max = _max(e.max, e.lastTime);
@@ -113,7 +115,7 @@ namespace Engine {
         
         void CaptureDetail() {
             _detail << std::endl;
-            _detail << Logger::GetTime();
+            _detail << Platform::GetTime();
             for (auto iter = _detailCapturePoints.begin(); iter != _detailCapturePoints.end(); iter++) {
                 _detail << ',';
                 if (GetEndedThisFrame(*iter)) {

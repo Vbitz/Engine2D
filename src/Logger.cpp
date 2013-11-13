@@ -1,6 +1,7 @@
 #include "Logger.hpp"
 
 #include "Config.hpp"
+#include "Platform.hpp"
 
 namespace Engine {
     namespace Logger {
@@ -62,25 +63,6 @@ namespace Engine {
             }
         }
         
-        double GetTime() {
-#ifdef _PLATFORM_WIN32
-			// TODO : Switch to GetPreformanceCounter
-			double time = (double) timeGetTime() / 1000.0;
-#else
-            timeval _time;
-            gettimeofday(&_time, NULL);
-            
-            double time = _time.tv_sec + (_time.tv_usec * 0.000001);
-#endif
-
-            if (_startTime < 0) {
-                _startTime = time;
-                return 0;
-            } else {
-                return time - _startTime;
-            }
-        }
-        
         std::string cleanString(std::string str) {
             std::size_t lastPos = 0;
             while (str.find('\t', lastPos) != std::string::npos) {
@@ -89,6 +71,18 @@ namespace Engine {
                 lastPos = pos + 1;
             }
             return str;
+        }
+        
+        LogEvent::LogEvent(std::string domain, LogLevel level, std::string event)
+        :   Domain(domain), Level(level), Type(LogType_Text),
+        GraphEvent(NULL), Event(event), Hidden(false) {
+            this->time = Platform::GetTime();
+        }
+        
+        LogEvent::LogEvent(std::string domain, LogLevel level, LogGraphEvent* event)
+        :   Domain(domain), Level(level), Type(LogType_Graphical),
+        GraphEvent(event), Event(""), Hidden(false) {
+            this->time = Platform::GetTime();
         }
         
         void LogText(std::string domain, LogLevel level, std::string str) {
@@ -106,7 +100,7 @@ namespace Engine {
                 }
 
                 if (logConsole) {
-                    std::cout << colorCode << GetTime()
+                    std::cout << colorCode << Platform::GetTime()
                     << " : [" << GetLevelString(level) << "] "
                     << domain << " | " << newStr << std::endl;
                 }
@@ -120,7 +114,7 @@ namespace Engine {
                     _logEvents.push_back(LogEvent(domain, level, newStr));
                     
                     if (logConsole) {
-                        std::cout << colorCode << GetTime()
+                        std::cout << colorCode << Platform::GetTime()
                             << " : [" << GetLevelString(level) << "] "
                             << domain << " | " << newStr << std::endl;
                     }
@@ -132,7 +126,7 @@ namespace Engine {
                 _logEvents.push_back(LogEvent(domain, level, strCopy));
                 
                 if (logConsole) {
-                    std::cout << colorCode << GetTime()
+                    std::cout << colorCode << Platform::GetTime()
                         << " : [" << GetLevelString(level) << "] "
                         << domain << " | " << strCopy << std::endl;
                 }
@@ -147,7 +141,7 @@ namespace Engine {
             _logEvents.push_back(LogEvent(domain, level, event));
             
             if (logConsole) {
-                std::cout << colorCode << GetTime()
+                std::cout << colorCode << Platform::GetTime()
                 << " : [" << GetLevelString(level) << "] "
                 << domain << " | Graphical" << std::endl;
             }

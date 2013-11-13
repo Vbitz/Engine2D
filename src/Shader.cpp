@@ -46,10 +46,10 @@ namespace Engine {
     }
     
     bool Shader::NeedsUpdate() {
-        static float lastUpdate = Logger::GetTime();
+        static float lastUpdate = Platform::GetTime();
         
-        if ((Logger::GetTime() - lastUpdate) > 0.2) {
-            lastUpdate = Logger::GetTime();
+        if ((Platform::GetTime() - lastUpdate) > 0.2) {
+            lastUpdate = Platform::GetTime();
             return Filesystem::GetFileModifyTime(this->_vertFilename) > this->_vertLastModify
             || Filesystem::GetFileModifyTime(this->_fragFilename) > this->_fragLastModify;
         } else {

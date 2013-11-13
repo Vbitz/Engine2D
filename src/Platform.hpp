@@ -37,5 +37,7 @@ namespace Engine {
         
         Libary* OpenLibary(std::string path);
         Libary* GetThisLibary();
+        
+        double GetTime();
     }
 }

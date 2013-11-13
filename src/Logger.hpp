@@ -6,20 +6,10 @@
 #include <sstream>
 #include <functional>
 
-#ifdef _WIN32
-	#include <sys\timeb.h>
-#include <Windows.h>
-#define _PLATFORM_WIN32
-#else
-    #include <sys/time.h>
-#endif
-
 namespace Engine {
     namespace Logger {
         class StreamFlusher { };
         std::ostream& operator<<(std::ostream& os, const StreamFlusher& rhs);
-        
-        double GetTime();
         
         enum LogLevel {
             LogLevel_Error,
@@ -51,17 +41,8 @@ namespace Engine {
         
         class LogEvent {
         public:
-            LogEvent(std::string domain, LogLevel level, std::string event)
-            :   Domain(domain), Level(level), Type(LogType_Text),
-                GraphEvent(NULL), Event(event), Hidden(false) {
-                this->time = GetTime();
-            }
-            
-            LogEvent(std::string domain, LogLevel level, LogGraphEvent* event)
-            :   Domain(domain), Level(level), Type(LogType_Graphical),
-                GraphEvent(event), Event(""), Hidden(false) {
-                this->time = GetTime();
-            }
+            LogEvent(std::string domain, LogLevel level, std::string event);
+            LogEvent(std::string domain, LogLevel level, LogGraphEvent* event);
             
             std::string Domain;
             LogLevel Level;
