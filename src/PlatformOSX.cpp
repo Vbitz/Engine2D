@@ -1,14 +1,84 @@
 #include "Platform.hpp"
 
+#include <iostream>
+
 #include <mach/mach.h>
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
+#include <dlfcn.h>
+#include <mach-o/fat.h>
+#include <mach-o/loader.h>
+
 #include <mach/vm_statistics.h>
 
 namespace Engine {
     namespace Platform {
+        
+        class OSXLibary : public Libary {
+        public:
+            OSXLibary() {
+                // This should get a pointer for the current process, not 100% effective
+                // but it will work fine on OSX
+                this->modulePointer = dlopen(GetRawCommandLineArgV()[0], RTLD_LAZY);
+            }
+            
+            OSXLibary(std::string modulePath) {
+                this->modulePointer = dlopen(modulePath.c_str(), RTLD_LAZY);
+            }
+            
+            ~OSXLibary() override {
+                dlclose(this->modulePointer);
+                this->modulePointer = NULL;
+            }
+            
+            bool IsValid() override {
+                return this->modulePointer != NULL;
+            }
+            
+            FARPROC GetMethod(std::string name) override {
+                return (FARPROC) dlsym(this->modulePointer, name.c_str());
+            }
+            
+            bool CallMethod(std::string name) override {
+                FARPROC m = this->GetMethod(name);
+                if (m != NULL) {
+                    m();
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+            
+            std::vector<std::string> GetExportedMethods() override {
+                std::vector<std::string> ret;
+                
+                // TODO: open the module file using Filesystem and load the content
+                //          this is going to be a real pain
+                
+                return ret;
+            }
+            
+        private:
+            void* modulePointer;
+        };
+        
+        int _argc;
+        const char** _argv;
+        
+        void SetRawCommandLine(int argc, const char** argv) {
+            _argc = argc;
+            _argv = argv;
+        }
+        
+        int GetRawCommandLineArgC() {
+            return _argc;
+        }
+        
+        const char** GetRawCommandLineArgV() {
+            return _argv;
+        }
         
         engine_memory_info GetMemoryInfo() {
             engine_memory_info ret;
@@ -56,6 +126,14 @@ namespace Engine {
             }
             
             return ret;
+        }
+        
+        Libary* OpenLibary(std::string path) {
+            return new OSXLibary(path);
+        }
+        
+        Libary* GetThisLibary() {
+            return new OSXLibary();
         }
         
     }

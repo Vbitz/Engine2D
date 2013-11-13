@@ -328,7 +328,12 @@ namespace Engine {
         Config::SetString(  "script_bootloader",        "lib/boot.js");
         Config::SetString(  "script_config",            "config/config.json");
         
+#ifdef PLATFORM_WINDOWS
+        Config::SetBoolean( "log_console",              developerMode);
+#else
         Config::SetBoolean( "log_console",              true);
+#endif
+        Config::SetBoolean( "log_file",                 "");
         Config::SetBoolean( "log_consoleVerbose",       developerMode);
         Config::SetBoolean( "log_colors",               true);
         Config::SetBoolean( "log_script_undefined",     developerMode);
@@ -998,6 +1003,8 @@ namespace Engine {
 	// main function
 	
 	int main(int argc, char const *argv[]) {
+        Platform::SetRawCommandLine(argc, argv);
+        
         if (!ParseCommandLine(argc, argv)) {
             return 1;
         }

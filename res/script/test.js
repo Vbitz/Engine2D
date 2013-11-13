@@ -31,6 +31,7 @@ for (var i in tests) {
 			testResults[i] = tests[i]();
 		});
 	} catch (e) {
+		console.error("Test failed : " + i + " : " + e.message);
 		testResults[i] = false;
 	}
 }
