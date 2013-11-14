@@ -17,7 +17,9 @@ namespace Engine {
             LogLevel_Log,
             LogLevel_User,
             LogLevel_Verbose,
-            LogLevel_ConsoleInput
+            LogLevel_ConsoleInput,
+            LogLevel_TestLog,
+            LogLevel_TestError
         };
         
         enum LogType {

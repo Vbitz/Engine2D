@@ -137,6 +137,12 @@ namespace Engine {
                     case Logger::LogLevel_Error:
                         Draw2D::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
                         break;
+                    case Logger::LogLevel_TestLog:
+                        Draw2D::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                        break;
+                    case Logger::LogLevel_TestError:
+                        Draw2D::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
+                        break;
                 }
                 
                 std::string time = std::to_string(iterator->time);

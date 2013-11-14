@@ -6,6 +6,8 @@
 
 #include "ResourceManager.hpp"
 
+#include "TestSuite.hpp"
+
 #include "JSSys.hpp"
 #include "JSDraw.hpp"
 #include "JSInput.hpp"
@@ -50,6 +52,7 @@ namespace Engine {
 	std::map<std::string, long> _loadedFiles;
     
     bool _developerMode = false;
+    bool _testMode = false;
     
     int _detailFrames = 0;
     std::string _detailFilename = "";
@@ -597,7 +600,7 @@ namespace Engine {
          (NYI) -config=configFile       - Sets the basic config to configFile, configFile is realitive to res/
                                             since it uses PhysFS this could be other values
          (NYI) -archive=archiveFile     - Loads a archive file using PhysFS, this is applyed after physfs is started
-         (NYI) -test                    - Runs the built in test suite
+               -test                    - Runs the built in test suite
          (NYI) -headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL
                                             will fail.
                -devmode                 - Enables developer mode (This enables real time script loading and the console)
@@ -618,6 +621,7 @@ namespace Engine {
                 // enable debug
             } else if (strcmp(argv[i], "-test") == 0) {
                 // start test mode
+                _testMode = true;
             } else if (strcmp(argv[i], "-headless") == 0) {
                 // enable headless mode
             } else if (strcmp(argv[i], "-h") == 0) {
@@ -652,7 +656,13 @@ namespace Engine {
         
         return !_exit;
     }
+    
+    // Test Suite Loading
 	
+    void LoadTests() {
+        
+    }
+    
 	// semi-realtime time loading
 	
 	void CheckUpdate() {
@@ -1044,7 +1054,12 @@ namespace Engine {
         
         Logger::begin("Application", Logger::LogLevel_Log) << "Loaded" << Logger::end();
         
-        MainLoop();
+        if (_testMode) {
+            LoadTests();
+            TestSuite::Run();
+        } else {
+            MainLoop();
+        }
         
         engine::DisableGLContext();
         
