@@ -22,14 +22,15 @@ New System
 
 The Engine is headed towards modularity in the future and fixing the config system now will have payoffs as the code base becomes more complex.
 
-From a API level it stay the same though the C++ side could do with a update to match a more modern C++ API.
+From a API level it will stay the same though the C++ side could do with a update to match a more modern C++ API.
 
 ```
 // get
-Config::Get("core.window.width")->Int32Value();
+Config::Global()["core.window.width"]->Int32Value();
 // set
-Config::Set("core.renderer.textureMipmaps", false);
+Config::Global()["core.renderer.textureMipmaps"] = false;
 ```
+
 The rational behind having get return a pointer rather then a value is to avoid a lookup in a map each time get is called.
 
 The JS side will be identical for now.
