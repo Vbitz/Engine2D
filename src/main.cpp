@@ -628,8 +628,33 @@ namespace Engine {
                 _testMode = true;
             } else if (strcmp(argv[i], "-headless") == 0) {
                 // enable headless mode
-            } else if (strcmp(argv[i], "-h") == 0) {
-                // display help and exit
+            } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0) {
+                std::cerr << "Engine2D\n"
+"==================\n"
+"\n"
+"-- Examples --\n"
+"bin/Engine - loads config/config.json and sets basic config values\n"
+"bin/Engine -Ccl_width=1280 -Ccl_height=800 - loads config/config.json and "
+"overrides the basic configs cl_width and cl_height\n"
+"bin/Engine -config=config/test.json - loads config/test.json and sets basic config values\n"
+"bin/Engine script/test - any non - configs are passed onto javascript\n"
+"\n"
+"-- Args --\n"
+"-Cname=value                   - Overloads a basic config. This is applyed before loading the basic config"
+" but overrides those configs while they are applyed\n"
+"(NYI) -config=configFile       - Sets the basic config to configFile, configFile is realitive to res/"
+" since it uses PhysFS this could be other values\n"
+"(NYI) -archive=archiveFile     - Loads a archive file using PhysFS, this is applyed after physfs is started\n"
+"-test                          - Runs the built in test suite\n"
+"(NYI) -headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL"
+" will fail.\n"
+"-devmode                       - Enables developer mode (This enables real time script loading and the console)\n"
+"(NYI) -debug                   - Enables debug mode (This enables a OpenGL debug context and will print messages"
+"to the console)\n"
+"(NYI) -log=filename            - Logs logger output to filename (This is not writen using PhysFS so it needs a"
+"regular path)\n"
+"(NYI) -h                       - Prints this message\n"
+                "" << std::endl;
                 _exit = true;
             } else if (strncmp(argv[i], "-C", 2) == 0) {
                 // set delayed config
