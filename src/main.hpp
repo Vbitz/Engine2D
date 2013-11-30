@@ -14,8 +14,6 @@ namespace Engine {
     bool                        loadFont(std::string prettyName, std::string filename);
     bool                        isFontLoaded(std::string fontName);
     
-    v8::Persistent<v8::Context> getGlobalContext();
-    
     std::vector<std::string>    getCommandLineArgs();
 
 	int 						getScreenWidth();

@@ -20,7 +20,7 @@ namespace engine {
 #define ENGINE_THROW_ARGCOUNT(count) v8::ThrowException(v8::Exception::TypeError(v8::String::New("Wrong number of arguments, expected " + count)));
 #define ENGINE_THROW_ARGERROR(str) v8::ThrowException(v8::Exception::TypeError(v8::String::New(str)));
 
-#define ENGINE_JS_METHOD(name) v8::Handle<v8::Value> name(const v8::Arguments& args)
+#define ENGINE_JS_METHOD(name) void name(const v8::FunctionCallbackInfo<v8::Value>& args)
 
 #define ENGINE_CHECK_ARGS_LENGTH(num) if (args.Length() != num) {ENGINE_THROW_ARGCOUNT(num);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
 
@@ -44,8 +44,8 @@ namespace engine {
 #define ENGINE_CHECK_ARG_OBJECT(num, errStr) if (!args[num]->IsObject()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
 #define ENGINE_GET_ARG_OBJECT(num) v8::Object::Cast(*args[num])
 
-#define ENGINE_JS_SCOPE_OPEN v8::HandleScope scope
-#define ENGINE_JS_SCOPE_CLOSE(value) return scope.Close(value)
-#define ENGINE_JS_SCOPE_CLOSE_UNDEFINED return scope.Close(v8::Undefined())
+#define ENGINE_JS_SCOPE_OPEN v8::HandleScope scope(args.GetIsolate())
+#define ENGINE_JS_SCOPE_CLOSE(value) args.GetReturnValue().Set(value); return
+#define ENGINE_JS_SCOPE_CLOSE_UNDEFINED return
 
 #define ENGINE_CHECK_GL if (!engine::HasGLContext()) { ENGINE_THROW_ARGERROR("No OpenGL Context"); ENGINE_JS_SCOPE_CLOSE_UNDEFINED; }

@@ -71,16 +71,16 @@ namespace Engine {
             int res = -1;
             
             if (args.Length() == 4) {
-                v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[3]);
+                v8::Persistent<v8::Function>* func = new v8::Persistent<v8::Function>(v8::Isolate::GetCurrent(), args[3].As<v8::Function>());
                 res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                                  ENGINE_GET_ARG_CPPSTRING_VALUE(1),
-                           Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(2))),
-                           v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+                                 Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(2))),
+                                 func);
             } else if (args.Length() == 3) {
-                v8::Local<v8::Function> func = v8::Local<v8::Function>::Cast(args[2]);
+                v8::Persistent<v8::Function>* func = new v8::Persistent<v8::Function>(v8::Isolate::GetCurrent(), args[2].As<v8::Function>());
                 res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                                  ENGINE_GET_ARG_CPPSTRING_VALUE(1),
-                           v8::Persistent<v8::Function>::New(v8::Isolate::GetCurrent(), func));
+                                 func);
             } else {
                 
             }
@@ -297,13 +297,13 @@ namespace Engine {
             
             Profiler::Begin(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
-            v8::Context::Scope ctx_scope(getGlobalContext());
+            v8::Context::Scope ctx_scope(v8::Context::GetCurrent());
             
             v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
             
             v8::TryCatch tryCatch;
             
-            real_func->Call(getGlobalContext()->Global(), 0, NULL);
+            real_func->Call(v8::Context::GetCurrent()->Global(), 0, NULL);
             
             if (!tryCatch.Exception().IsEmpty()) {
                 v8::ThrowException(tryCatch.Exception());
@@ -348,13 +348,13 @@ namespace Engine {
             
             double startTime = Platform::GetTime();
             
-            v8::Context::Scope ctx_scope(getGlobalContext());
+            v8::Context::Scope ctx_scope(v8::Context::GetCurrent());
             
             v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
             
             v8::TryCatch tryCatch;
             
-            real_func->Call(getGlobalContext()->Global(), 0, NULL);
+            real_func->Call(v8::Context::GetCurrent()->Global(), 0, NULL);
             
             if (!tryCatch.Exception().IsEmpty()) {
                 v8::ThrowException(tryCatch.Exception());

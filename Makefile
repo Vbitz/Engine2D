@@ -23,6 +23,7 @@ doc/include.dot: $(SRCS)
 	cinclude2dot --src src/  > doc/include.dot
 
 modTest: src/modTest.o
+	mkdir -p res/modules
 	$(CXX) -shared -o res/modules/testing.dylib src/modTest.o
 
 valgrind: all
@@ -40,6 +41,7 @@ test: all
 all: Engine
 
 Engine: $(OBJS) src/extern/sqlite3.o
+	mkdir -p bin
 	$(CXX) $(LDFLAGS) -o $(OUTPUT) $(OBJS) $(LDLIBS)
 
 depend: .depend

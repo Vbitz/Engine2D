@@ -42,15 +42,16 @@ namespace Engine {
         
         class JSEventTarget : public EventTarget {
         public:
-            JSEventTarget(v8::Persistent<v8::Function> func, EventArgs filter)
+            JSEventTarget(v8::Persistent<v8::Function>* func, EventArgs filter)
                 : _func(func) {
                     setFilter(filter);
                 }
             
         protected:
             bool _run(EventArgs e) {
-                v8::HandleScope scp;
-                v8::Context::Scope ctx_scope(getGlobalContext());
+                v8::HandleScope scp(v8::Isolate::GetCurrent());
+                v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+                v8::Context::Scope ctx_scope(ctx);
                 
                 v8::TryCatch tryCatch;
                 
@@ -58,7 +59,9 @@ namespace Engine {
                 
                 args[0] = e.getObject();
                 
-                _func->Call(getGlobalContext()->Global(), 1, args);
+                v8::Local<v8::Function> func = v8::Local<v8::Function>::New(v8::Isolate::GetCurrent(), *_func);
+                
+                func->Call(ctx->Global(), 1, args);
             
                 if (!tryCatch.StackTrace().IsEmpty()) {
                     v8::Handle<v8::Value> exception = tryCatch.StackTrace();
@@ -71,7 +74,7 @@ namespace Engine {
             }
             
         private:
-            v8::Persistent<v8::Function> _func;
+            v8::Persistent<v8::Function>* _func;
         };
         
         EventArgs::EventArgs(std::map<std::string, std::string> map)  : _readOnly(true) {
@@ -115,19 +118,16 @@ namespace Engine {
         }
         
         v8::Handle<v8::Object> EventArgs::getObject() {
-            if (this->_obj.IsEmpty()) {
-                v8::HandleScope scp;
+            v8::HandleScope scp(v8::Isolate::GetCurrent());
                 
-                v8::Handle<v8::Object> ret = v8::Object::New();
+            v8::Handle<v8::Object> ret = v8::Object::New();
             
-                for (auto iter = this->_map.begin(); iter != this->_map.end(); iter++) {
-                    ret->Set(v8::String::New(iter->first.c_str()),
-                            v8::String::New(iter->second.c_str()));
-                }
-                
-                this->_obj = v8::Persistent<v8::Object>::New(v8::Isolate::GetCurrent(), ret);
+            for (auto iter = this->_map.begin(); iter != this->_map.end(); iter++) {
+                ret->Set(v8::String::New(iter->first.c_str()),
+                        v8::String::New(iter->second.c_str()));
             }
-            return _obj;
+            
+            return ret;
         }
         
         std::string EventArgs::get(std::string key) const {
@@ -203,7 +203,7 @@ namespace Engine {
             }
         }
         
-        int On(std::string evnt, std::string name, EventArgs e, v8::Persistent<v8::Function> target) {
+        int On(std::string evnt, std::string name, EventArgs e, v8::Persistent<v8::Function>* target) {
             if (eventExists(name)) {
                 return -1;
             } else {
@@ -217,7 +217,7 @@ namespace Engine {
             return On(evnt, name, EventArgs(), target);
         }
         
-        int On(std::string evnt, std::string name, v8::Persistent<v8::Function> target) {
+        int On(std::string evnt, std::string name, v8::Persistent<v8::Function>* target) {
             return On(evnt, name, EventArgs(), target);
         }
         

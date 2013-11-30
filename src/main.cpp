@@ -44,11 +44,6 @@ namespace Engine {
 
     std::map<std::string, std::string> _delayedConfigs;
     
-	// v8 Scripting
-	v8::Isolate* _globalIsolate;
-
-	v8::Persistent<v8::Context> _globalContext;
-    
 	std::map<std::string, long> _loadedFiles;
     
     bool _developerMode = false;
@@ -160,13 +155,13 @@ namespace Engine {
 	
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
     
-	void InitScripting(bool developerMode) {
+    v8::Handle<v8::Context> InitScripting(bool developerMode) {
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
         
-		_globalIsolate = v8::Isolate::New();
-		_globalIsolate->Enter();
+		//_globalIsolate = v8::Isolate::New();
+		//_globalIsolate->Enter();
 
-		v8::HandleScope handle_scope;
+		v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
 
 		v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
 	
@@ -226,7 +221,9 @@ namespace Engine {
 
         global->Set("mod", moduleTable);
         
-		_globalContext = v8::Persistent<v8::Context>::New(_globalIsolate, v8::Context::New(_globalIsolate, NULL, global));
+        v8::Handle<v8::Context> ctx = v8::Context::New(v8::Isolate::GetCurrent(), NULL, global);
+        
+        ctx->Enter();
         
 		if (!runFile(Config::GetString("script_bootloader"), true)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();
@@ -234,24 +231,27 @@ namespace Engine {
         }
         
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
+        
+        return handle_scope.Close(ctx);
 	}
 	
 #undef addItem
 	
 	void ShutdownScripting() {
-		_globalIsolate->Exit();
-		_globalIsolate->Dispose();
+		//_globalIsolate->Exit();
+		//_globalIsolate->Dispose();
 	}
 	
 	bool CallFunction(v8::Handle<v8::Value> func) {
-		v8::HandleScope scp;
-		v8::Context::Scope ctx_scope(_globalContext);
+		v8::HandleScope scp(v8::Isolate::GetCurrent());
+        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+        v8::Context::Scope ctx_scope(ctx);
 	
 		v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(func);
         
 		v8::TryCatch tryCatch;
         
-		real_func->Call(_globalContext->Global(), 0, NULL);
+		real_func->Call(ctx->Global(), 0, NULL);
         
         if (!tryCatch.StackTrace().IsEmpty()) {
             v8::Handle<v8::Value> exception = tryCatch.StackTrace();
@@ -266,9 +266,10 @@ namespace Engine {
 		double x = 0;
 		double y = 0;
 		glfwGetCursorPos(window, &x, &y);
-	
-		v8::HandleScope scp;
-		v8::Context::Scope ctx_scope(_globalContext);
+        
+		v8::HandleScope scp(v8::Isolate::GetCurrent());
+        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+        v8::Context::Scope ctx_scope(ctx);
 	
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("input")));
@@ -279,8 +280,9 @@ namespace Engine {
 	}
 	
 	void UpdateScreen() {
-		v8::HandleScope scp;
-		v8::Context::Scope ctx_scope(_globalContext);
+		v8::HandleScope scp(v8::Isolate::GetCurrent());
+        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+        v8::Context::Scope ctx_scope(ctx);
 	
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
@@ -289,8 +291,9 @@ namespace Engine {
 	}
     
     void UpdateFrameTime() {
-		v8::HandleScope scp;
-		v8::Context::Scope ctx_scope(_globalContext);
+		v8::HandleScope scp(v8::Isolate::GetCurrent());
+        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+        v8::Context::Scope ctx_scope(ctx);
         
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
@@ -298,8 +301,9 @@ namespace Engine {
     }
     
     void DisablePreload() {
-        v8::HandleScope scp;
-        v8::Context::Scope ctx_scope(_globalContext);
+		v8::HandleScope scp(v8::Isolate::GetCurrent());
+        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+        v8::Context::Scope ctx_scope(ctx);
         
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
@@ -692,21 +696,17 @@ namespace Engine {
         return _fonts.count(fontName) != 0;
     }
     
-    v8::Persistent<v8::Context> getGlobalContext() {
-        return _globalContext;
-    }
-    
     std::vector<std::string> getCommandLineArgs() {
         return _jsArgs;
     }
     
 	bool _runFile(std::string path, bool persist) {
-        v8::HandleScope handle_scope;
-        
 		Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading File: " << path << Logger::end();
-
-		v8::Context::Scope ctx_scope(_globalContext);
-
+        
+		v8::HandleScope scp(v8::Isolate::GetCurrent());
+        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+        v8::Context::Scope ctx_scope(ctx);
+        
 		char* inputScript = Filesystem::GetFileContent(path);
 
 		v8::TryCatch tryCatch;
@@ -858,11 +858,11 @@ namespace Engine {
     }
     
     void runCommand(std::string str) {
-        v8::HandleScope handle_scope;
+		v8::HandleScope scp(v8::Isolate::GetCurrent());
+        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+        v8::Context::Scope ctx_scope(ctx);
         
 		Logger::begin("Console", Logger::LogLevel_ConsoleInput) << "> " << str << Logger::end();
-        
-		v8::Context::Scope ctx_scope(_globalContext);
         
 		v8::TryCatch tryCatch;
         
@@ -1028,9 +1028,13 @@ namespace Engine {
         
 		Filesystem::Init(argv[0]);
         
+        v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+        
         Profiler::Begin("InitScripting");
-            InitScripting(_developerMode);
+            v8::Handle<v8::Context> ctx = InitScripting(_developerMode);
         Profiler::End("InitScripting");
+        
+        ctx->Enter();
         
         Profiler::Begin("InitOpenGL");
             InitOpenGL();

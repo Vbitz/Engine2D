@@ -79,8 +79,8 @@ GLFT_Font::GLFT_Font() :
     height_(0), drawX_(0), drawY_(0)
 {
     // eh let's just ask openGL
-    std::string str = std::string((const char*) glGetString(GL_VERSION));
-    if (str.find("3.") == 0) {
+    std::string str = std::string((const char*) glGetString(GL_VERSION)); // for once I'm happy about a error
+    if (str.find("3.") == 0 || str.find("4.") == 0) {                     // that being said I should fix this
         _usingGL3 = true;
     } else {
         _usingGL3 = false;

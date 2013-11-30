@@ -41,7 +41,6 @@ namespace Engine {
         private:
             bool _readOnly;
             std::map<std::string, std::string> _map;
-            v8::Persistent<v8::Object> _obj;
         };
         
         typedef void (*EventTargetFunc)(EventArgs e);
@@ -50,9 +49,9 @@ namespace Engine {
         void Emit(std::string evnt, EventArgs args);
         void Emit(std::string evnt);
         int On(std::string evnt, std::string label, EventArgs e, EventTargetFunc target);
-        int On(std::string evnt, std::string label, EventArgs e, v8::Persistent<v8::Function> target);
+        int On(std::string evnt, std::string label, EventArgs e, v8::Persistent<v8::Function>* target);
         int On(std::string evnt, std::string label, EventTargetFunc target);
-        int On(std::string evnt, std::string label, v8::Persistent<v8::Function> target);
+        int On(std::string evnt, std::string label, v8::Persistent<v8::Function>* target);
         void Clear(int eventID);
     }
 }

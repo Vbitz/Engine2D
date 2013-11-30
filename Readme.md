@@ -4,7 +4,7 @@ OSX Build Guide
 - Install Homebrew
 - Clone the project to a directory of your choice
 - Install `glew physfs v8 freeimage glm freetype` using Homebrew
-- Clone and install https://github.com/glfw/glfw
+- Clone and install https://github.com/glfw/glfw (You can also get a Homebrew formula from https://github.com/Homebrew/homebrew-versions/blob/master/glfw3.rb)
 - Run `make run` in the project directory
 - If you want a .app then Run `make release`. The bundle will then be generated to release-osx/
 

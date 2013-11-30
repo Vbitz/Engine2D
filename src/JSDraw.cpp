@@ -109,7 +109,7 @@ namespace Engine {
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
             if (Draw2D::IsOffscreen(x, y, w, h)) {
-                return scope.Close(v8::Undefined());
+                return;
             }
 		
 			col1 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(4);
@@ -664,8 +664,6 @@ namespace Engine {
                 rawArray[i + 3] = 1.0f;
             }
             
-            v8::Persistent<v8::Object> persistent_array = v8::Persistent<v8::Object>::New(isolate, array);
-            persistent_array.MarkIndependent(isolate); // and this is also a bad memory leak
             isolate->AdjustAmountOfExternalAllocatedMemory(imageSize * sizeof(float));
             
             array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, imageSize * sizeof(float));
@@ -718,8 +716,6 @@ namespace Engine {
                 rawArray[i + 3] = 1.0f;
             }
             
-            v8::Persistent<v8::Object> persistent_array = v8::Persistent<v8::Object>::New(isolate, array);
-            persistent_array.MarkIndependent(isolate); // and this is also a bad memory leak
             isolate->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
             
             array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));
