@@ -1,7 +1,7 @@
 #pragma once
 
-#include "common.hpp"
-#include "main.hpp"
+#include "Scripting.hpp"
+#include "Util.hpp"
 
 namespace Engine {
 

@@ -1,5 +1,7 @@
 #include "JSInput.hpp"
 
+#include "Application.hpp"
+
 namespace Engine {
     namespace JsInput {
         
@@ -19,7 +21,9 @@ namespace Engine {
             
             const char* str = convertToUpper(*ENGINE_GET_ARG_CSTRING_VALUE(0));
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(glfwGetKey(getGLFWWindow(), (int) str[0]) == GLFW_PRESS));
+            int key = (int) str[0];
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(getKeyPressed(key)));
         }
         
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))

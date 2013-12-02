@@ -1,5 +1,7 @@
 #include "EngineUI.hpp"
 
+#include "Application.hpp"
+
 namespace Engine {
     namespace EngineUI {
         std::stringstream ss;

@@ -1,6 +1,8 @@
 #include "Events.hpp"
 
-#include "main.hpp"
+#include <vector>
+
+#include "Logger.hpp"
 
 namespace Engine {
     namespace Events {

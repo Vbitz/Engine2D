@@ -1,6 +1,6 @@
 #include "Draw2D.hpp"
 
-#include "main.hpp"
+#include "Application.hpp"
 
 #include "GL3Buffer.hpp"
 

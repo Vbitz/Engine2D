@@ -2,8 +2,6 @@
 
 #include "common.hpp"
 
-#include "main.hpp"
-
 #include "Draw2D.hpp"
 
 namespace Engine {

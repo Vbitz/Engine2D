@@ -9,22 +9,11 @@
 
 #include "ResourceManager.hpp"
 
+#include "Application.hpp"
+
 namespace Engine {
 
 	namespace JsDraw {
-		
-        ENGINE_JS_METHOD(LoadShader) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_GL;
-            
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 has to be a filename pointing to a shader");
-            
-            upgradeGL3();
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
         
 		ENGINE_JS_METHOD(Rect) {
             ENGINE_JS_SCOPE_OPEN;
@@ -1024,8 +1013,6 @@ namespace Engine {
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
         
         void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
-            addItem(drawTable, "loadShader", LoadShader);
-            
             addItem(drawTable, "rect", Rect);
             addItem(drawTable, "grid", Grid);
             addItem(drawTable, "grad", Grad);

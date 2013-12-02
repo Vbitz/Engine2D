@@ -1,5 +1,8 @@
 #include "JSFS.hpp"
 
+#include "Util.hpp"
+#include "Filesystem.hpp"
+
 namespace Engine {
     namespace JsFS {
         ENGINE_JS_METHOD(ReadFile) {

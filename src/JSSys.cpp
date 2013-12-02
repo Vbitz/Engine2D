@@ -2,6 +2,10 @@
 
 #include "LogGraphEvents.hpp"
 
+#include "common.hpp"
+#include "Application.hpp"
+#include "EngineUI.hpp"
+
 namespace Engine {
 
 	namespace JsSys {
@@ -122,9 +126,11 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New();
             
-            ret->Set(v8::String::NewSymbol("major"), v8::Number::New(glfwGetWindowAttrib(getGLFWWindow(), GLFW_CONTEXT_VERSION_MAJOR)));
-            ret->Set(v8::String::NewSymbol("minor"), v8::Number::New(glfwGetWindowAttrib(getGLFWWindow(), GLFW_CONTEXT_VERSION_MINOR)));
-            ret->Set(v8::String::NewSymbol("rev"), v8::Number::New(glfwGetWindowAttrib(getGLFWWindow(), GLFW_CONTEXT_REVISION)));
+            OpenGLVersion version = getOpenGLVersion();
+
+            ret->Set(v8::String::New("major"), v8::Number::New(version.major));
+            ret->Set(v8::String::New("minor"), v8::Number::New(version.minor));
+            ret->Set(v8::String::New("revision"), v8::Number::New(version.revision));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
@@ -222,9 +228,8 @@ namespace Engine {
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the new X size of the window");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the new Y size of the window");
             
-            glfwSetWindowSize(getGLFWWindow(),
-                              ENGINE_GET_ARG_INT32_VALUE(0),
-                              ENGINE_GET_ARG_INT32_VALUE(1));
+            setScreenSize(  ENGINE_GET_ARG_INT32_VALUE(0),
+                            ENGINE_GET_ARG_INT32_VALUE(1));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
