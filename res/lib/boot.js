@@ -27,8 +27,6 @@ var str = fs.readFile("config/config.json");
 
 console.log("Booting JavaScript Phase 1");
 
-console.log("Current Config: " + str);
-
 var globalConfig = {};
 
 try {
