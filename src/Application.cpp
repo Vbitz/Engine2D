@@ -187,6 +187,10 @@ namespace Engine {
         sysTable->Set("preload", v8::Boolean::New(true));
         sysTable->Set("numProcessers", v8::Number::New(Platform::GetProcesserCount()));
         
+        // depending on the runtime being used in the future this will be set to something unique per system
+        // for example on steam it can be the friends name or SteamID
+        sysTable->Set("username", v8::String::New(Platform::GetUsername().c_str()));
+        
 		global->Set("sys", sysTable);
         
         // drawTable
@@ -730,7 +734,9 @@ namespace Engine {
     // Test Suite Loading
 	
     void LoadTests() {
-        
+        if (_debugMode) {
+            TestSuite::LoadTestSuiteTests();
+        }
     }
     
 	// semi-realtime time loading

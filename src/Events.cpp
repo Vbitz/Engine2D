@@ -59,9 +59,11 @@ namespace Engine {
                 
                 v8::Handle<v8::Value> args[1];
                 
-                args[0] = e.getObject();
+                v8::Handle<v8::Object> obj = e.getObject();
                 
-                v8::Local<v8::Function> func = v8::Local<v8::Function>::New(v8::Isolate::GetCurrent(), *_func);
+                args[0] = obj;
+                
+                v8::Handle<v8::Function> func = v8::Handle<v8::Function>::New(v8::Isolate::GetCurrent(), *_func);
                 
                 func->Call(ctx->Global(), 1, args);
             
@@ -129,7 +131,7 @@ namespace Engine {
                         v8::String::New(iter->second.c_str()));
             }
             
-            return ret;
+            return scp.Close(ret);
         }
         
         std::string EventArgs::get(std::string key) const {

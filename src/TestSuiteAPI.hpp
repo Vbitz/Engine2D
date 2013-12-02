@@ -6,7 +6,7 @@ namespace Engine {
     class Test {
     public:
         virtual void Setup() {}
-        virtual void Run() {}
+        virtual void Run() = 0;
         virtual void PullDown() {}
         
         virtual std::string GetName() { return "Invalid Test"; }

@@ -8,7 +8,7 @@ namespace Engine {
         if (!value) {
             this->FailTest();
             Logger::begin("TestSuite", Logger::LogLevel_TestError)
-                << "FAILED : " << name << Logger::end();
+                << "FAILED in " + this->GetName() + " : " << name << Logger::end();
         }
     }
     
@@ -20,12 +20,37 @@ namespace Engine {
         return this->_failed;
     }
     
+    class PassTestTest : public Test {
+    public:
+        void Run() override { }
+        
+        std::string GetName() override {
+            return "PassTest";
+        }
+    };
+    
+    class FailTestTest : public Test {
+    public:
+        void Run() override {
+            this->Assert("Fail", false);
+        }
+        
+        std::string GetName() override {
+            return "FailTest";
+        }
+    };
+    
     namespace TestSuite {
         
         std::vector<Test*> _tests;
         
         void RegisterTest(Test* t) {
             _tests.push_back(t);
+        }
+        
+        void LoadTestSuiteTests() {
+            _tests.push_back(new PassTestTest());
+            _tests.push_back(new FailTestTest());
         }
         
         void Run() {

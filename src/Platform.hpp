@@ -43,5 +43,7 @@ namespace Engine {
         bool ShowMessageBox(std::string title, std::string text, bool modal);
         
         double GetTime();
+        
+        std::string GetUsername();
     }
 }

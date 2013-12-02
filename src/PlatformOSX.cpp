@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <pwd.h>
 #include <unistd.h>
 
 #include <mach/mach.h>
@@ -176,6 +177,11 @@ namespace Engine {
             }
             
             return true;
+        }
+        
+        std::string GetUsername() {
+            struct passwd *userInfo = getpwuid(getuid());
+            return std::string(userInfo->pw_name);
         }
         
     }

@@ -36,7 +36,7 @@ run: all
 	$(OUTPUT) -devmode -debug
 
 test: all
-	$(OUTPUT) -test -devmode -debug
+	$(OUTPUT) -test # tests run in normal conditions
 
 all: Engine
 

@@ -130,7 +130,7 @@ namespace Engine {
 
             ret->Set(v8::String::New("major"), v8::Number::New(version.major));
             ret->Set(v8::String::New("minor"), v8::Number::New(version.minor));
-            ret->Set(v8::String::New("revision"), v8::Number::New(version.revision));
+            ret->Set(v8::String::New("rev"), v8::Number::New(version.revision));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }

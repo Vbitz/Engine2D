@@ -27,9 +27,11 @@ var testResults = {};
 
 for (var i in tests) {
 	try {
+		console.log("Running JS Test : " + i);
 		sys.perf(i + "_test", function () {
 			testResults[i] = tests[i]();
 		});
+		console.log("Test passed : " + i);
 	} catch (e) {
 		console.error("Test failed : " + i + " : " + e.message);
 		testResults[i] = false;

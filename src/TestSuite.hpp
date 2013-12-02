@@ -11,6 +11,8 @@ namespace Engine {
     namespace TestSuite {
         void RegisterTest(Test* t);
         
+        void LoadTestSuiteTests();
+        
         void Run();
     }
 }
