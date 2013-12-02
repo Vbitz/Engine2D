@@ -21,4 +21,8 @@ namespace Engine {
     private:
         bool _failed;
     };
+    
+    namespace TestSuite {
+        void RegisterTest(Test* t);
+    }
 }

@@ -45,5 +45,7 @@ namespace Engine {
         double GetTime();
         
         std::string GetUsername();
+        
+        void DumpStackTrace();
     }
 }

@@ -14,6 +14,9 @@
 #include <mach-o/fat.h>
 #include <mach-o/loader.h>
 
+#include <execinfo.h>
+#include <cxxabi.h>
+
 #include <mach/vm_statistics.h>
 
 #include <CoreFoundation/CoreFoundation.h>
@@ -182,6 +185,27 @@ namespace Engine {
         std::string GetUsername() {
             struct passwd *userInfo = getpwuid(getuid());
             return std::string(userInfo->pw_name);
+        }
+        
+        void DumpStackTrace() {
+            void* callstack[128];
+            int frames = backtrace(callstack, 128);
+            for (int i = 1; i < frames; i++) {
+                Dl_info info;
+                if (dladdr(callstack[i], &info) > 0) {
+                    char* realname;
+                    int status = 0;
+                    realname = abi::__cxa_demangle(info.dli_sname, 0, 0, &status);
+                    if (status == 0) {
+                        printf("  %i | 0x%016llx | %-50s | %s\n", i, (uint64_t) callstack[i], info.dli_fname, realname);
+                    } else {
+                        printf("  %i | 0x%016llx | %-50s | %s\n", i, (uint64_t) callstack[i], info.dli_fname, info.dli_sname);
+                    }
+                    free(realname);
+                } else {
+                    printf("  %i | 0x%016llx | [unknown symbol]\n", i, (uint64_t) callstack[i]);
+                }
+            }
         }
         
     }

@@ -8,6 +8,8 @@
 
 #include "TestSuite.hpp"
 
+#include "PlatformTests.hpp"
+
 #include "EngineUI.hpp"
 
 #include "JSSys.hpp"
@@ -737,6 +739,7 @@ namespace Engine {
         if (_debugMode) {
             TestSuite::LoadTestSuiteTests();
         }
+        LoadPlatformTests();
     }
     
 	// semi-realtime time loading
