@@ -47,6 +47,7 @@ namespace Engine {
 	std::map<std::string, long> _loadedFiles;
     
     bool _developerMode = false;
+    bool _debugMode = false;
     bool _testMode = false;
     
     int _detailFrames = 0;
@@ -310,42 +311,79 @@ namespace Engine {
         sys_table->Set(v8::String::New("preload"), v8::Boolean::New(false));
     }
 
-    void LoadBasicConfigs(bool developerMode) {
+    void LoadBasicConfigs(bool developerMode, bool debugMode) {
+        // new names in comments
+        // I still need to think though and make sure these match up
+        
+        // cl_width = core.window.width
         Config::SetNumber(  "cl_width",                 800);
+        // cl_height = core.window.height
         Config::SetNumber(  "cl_height",                600);
+        // cl_aa = core.render.aa
         Config::SetBoolean( "cl_aa",                    true);
+        // cl_vsync = core.window.vsync
         Config::SetBoolean( "cl_vsync",                 false); // lack of vsync causes FPS issues
+        // cl_fullscreen = core.window.fullscreen
         Config::SetBoolean( "cl_fullscreen",            false);
+        // cl_openGL3 = core.render.openGL = "3.3"
         Config::SetBoolean( "cl_openGL3",               false);
+        // cl_fontPath = core.content.fontPath
         Config::SetString(  "cl_fontPath",              "fonts/OpenSans-Regular.ttf");
+        // cl_showVerboseLog = core.debug.showVerboseLog
         Config::SetBoolean( "cl_showVerboseLog",        false);
+        // cl_runOnIdle = core.runOnIdle
         Config::SetBoolean( "cl_runOnIdle",             false);
+        // cl_engineUI = core.debug.engineUI
         Config::SetBoolean( "cl_engineUI",              developerMode);
-        Config::SetBoolean( "cl_profiler",              developerMode);
+        // cl_profiler = core.debug.profiler
+        Config::SetBoolean( "cl_profiler",              developerMode || debugMode);
+        // This config will be removed since drawing is now handled via events
         Config::SetBoolean( "cl_scriptedDraw",          true);
+        // cl_title = core.window.title
         Config::SetString(  "cl_title",                 "Engine2D");
+        // cl_debugContext = core.debug.debugRenderer
         Config::SetBoolean( "cl_debugContext",          developerMode);
+        // cl_gl3Shader = core.render.basicShader
         Config::SetString(  "cl_gl3Shader",             "shaders/basic");
+        // cl_targetFrameRate = core.render.targetFrameTime
         Config::SetNumber(  "cl_targetFrameTime",       1.0f / 30.0f);
         
+        // draw_clampCreateTexture = core.render.clampTexture
         Config::SetBoolean( "draw_clampCreateTexture",  true);
+        // draw_createImageMipmap = core.render.forceMipmaps
         Config::SetBoolean( "draw_createImageMipmap",   true);
         
+        // script_reload = core.script.autoReload
         Config::SetBoolean( "script_reload",            developerMode);
+        // script_gcFrame = core.script.gcOnFrame
         Config::SetBoolean( "script_gcFrame",           developerMode);
+        // script_bootloader = core.script.loader
         Config::SetString(  "script_bootloader",        "lib/boot.js");
+        // script_config = core.config.path
         Config::SetString(  "script_config",            "config/config.json");
         
+        // js_startupScript = core.script.entryPoint
+        Config::SetString(  "js_startupScript",         "script/basic");
+        
+        // log_console = core.log.enableConsole
 #ifdef PLATFORM_WINDOWS
+        // With quite a bit of research into console logging performance on windows it seems like I should be using
+        // printf or buffered std::cout
         Config::SetBoolean( "log_console",              developerMode);
 #else
         Config::SetBoolean( "log_console",              true);
 #endif
+        // log_file = core.log.filePath
         Config::SetBoolean( "log_file",                 "");
-        Config::SetBoolean( "log_consoleVerbose",       developerMode);
+        // log_consoleVerbose = core.log.levels.verbose
+        Config::SetBoolean( "log_consoleVerbose",       developerMode || debugMode);
+        // log_colors = core.log.showColors
         Config::SetBoolean( "log_colors",               true);
+        // log_script_undefined = core.log.src.undefinedValue
         Config::SetBoolean( "log_script_undefined",     developerMode);
+        // log_profiler_maxTime = core.log.src.perfIssues
         Config::SetBoolean( "log_profiler_maxTime",     developerMode);
+        // log_createImage = core.log.src.createImage
         Config::SetBoolean( "log_createImage",          true);
     }
 	
@@ -623,6 +661,7 @@ namespace Engine {
                 _developerMode = true;
             } else if (strcmp(argv[i], "-debug") == 0) {
                 // enable debug
+                _debugMode = true;
             } else if (strcmp(argv[i], "-test") == 0) {
                 // start test mode
                 _testMode = true;
@@ -1045,7 +1084,7 @@ namespace Engine {
             return 1;
         }
         
-        LoadBasicConfigs(_developerMode);
+        LoadBasicConfigs(_developerMode, _debugMode);
         
         ApplyDelayedConfigs();
         

@@ -1,0 +1,56 @@
+name                        | defaultValue                  | NYI   | description
+============================|===============================================================================================================
+                            |                               |       |
+core                        |                               |       |
+    runOnIdle               | false                         |       | Run the engine while the window is out of focus
+    appName                 | "Untitled"                    |   X   | The application name for setting PhysFS write directory
+                            |                               |       |
+    window                  |                               |       |
+        width               | 800                           |       | Set the starting width of the window
+        height              | 600                           |       | Set the starting height of the window
+        vsync               | false                         |       | Should the window try to enable VSync
+        fullscreen          | false                         |       | Should the window start in fullscreen
+        title               | "Engine2D"                    |       | Window title text
+                            |                               |       |
+    render                  |                               |       |
+        aa                  | true                          |       | Enable Anti-Aliasing
+        openGL              | 3.3                           |       | What version of OpenGL to ask for
+        basicShader         | "shaders/basic"               |       | What shader to use for OpenGL 3.0+
+        targetFrameTime     | 30 FPS                        |       | Target framerate for the profiler
+        clampTexture        | true                          |       | Clamp colors in textures to 0.0-1.0
+        forceMipmaps        | true                          |       | Always create Mipmaps
+                            |                               |       |
+    content                 |                               |       |
+        fontPath            | "fonts/OpenSans-Regular.ttf"  |       | The default font to use in the Engine
+                            |                               |       |
+    config                  |                               |       |
+        path                | "config/config.json"          |       | The path to load the configuration from
+                            |                               |       |
+    script                  |                               |       |
+        gcOnFrame           | true                          |       | Basiclty call v8::v8::IdleNotifyication each frame
+        loader              | "lib/boot.js"                 |       | The script to call to initalise scripting, this is called before
+                            |                               |       | the window is created
+        entryPoint          | "script/test"                 |       | The script that loader will call to start the application
+                            |                               |       |
+    log                     |                               |       |
+        levels              |                               |       |
+            verbose         | {developerMode || debugMode}  |       | Show verbose level logs?
+            log             | true                          |   X   | Show log level logs?
+            user            | true                          |   X   | Show user level logs?
+            warning         | true                          |   X   | Show warning level logs?
+            consoleInput    | true                          |   X   | Show console input in logging?
+        src                 |                               |       |
+            undefiendValue  | {developerMode}               |       | Print undefined values returned from JavaScript
+            createImage     | true                          |       | Log the OpenGL Texture ID of each one created
+            perfIssues      | {developerMode || debugMode}  |       | Print perforance issues
+            glErrors        | true                          |   X   | Show OpenGL errors in logs
+            scriptLoad      | {developerMode || debugMode}  |   X   | Print script filenames as they load
+        filePath            | ""                            |   X   | The path to output logging to in realtime
+        showColors          | true                          |       | Show colors in the console log
+                            |                               |       |
+    debug                   |                               |       |
+        engineUI            | {developerMode}               |       | Enable EngineUI
+            showVerboseLog  | false                         |       | Show verbose log values in engineUI
+        profiler            | {developerMode || debugMode}  |       | Enable the profiler
+        debugRenderer       | {developerMode}               |       | Enable then GL debug context extention
+        reloadScripts       | {developerMode}               |       | Automaticly reload scripts as their saved

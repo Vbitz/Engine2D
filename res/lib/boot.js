@@ -37,8 +37,6 @@ try {
 	console.log("Error Loading config: " + e);
 }
 
-sys.config("js_startupScript", "script/test");
-
 sys.setWindowCreateParams(globalConfig);
 
 var libarys = ["ui"];
