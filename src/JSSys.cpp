@@ -503,6 +503,22 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
         
+        ENGINE_JS_METHOD(MsgBox) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the title of the message box");
+            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the message in the message box");
+            ENGINE_CHECK_ARG_BOOLEAN(2, "Arg2 makes the dialog modal if set to true");
+            
+            Platform::ShowMessageBox(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                                     ENGINE_GET_ARG_CPPSTRING_VALUE(1),
+                                     ENGINE_GET_ARG_BOOLEAN_VALUE(2));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(TestGraph) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -561,6 +577,8 @@ namespace Engine {
             addItem(sysTable, "forceReload", ForceReload);
             
             addItem(sysTable, "version", Version);
+            
+            addItem(sysTable, "msgBox", MsgBox);
             
             //addItem(sysTable, "testGraph", TestGraph);
         }

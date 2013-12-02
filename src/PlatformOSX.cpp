@@ -15,6 +15,8 @@
 
 #include <mach/vm_statistics.h>
 
+#include <CoreFoundation/CoreFoundation.h>
+
 namespace Engine {
     namespace Platform {
         
@@ -157,6 +159,23 @@ namespace Engine {
             } else {
                 return time - _startTime;
             }
+        }
+        
+        bool ShowMessageBox(std::string title, std::string text, bool modal) {
+            CFStringRef _title = CFStringCreateWithCString(kCFAllocatorDefault, title.c_str(), kCFStringEncodingASCII);
+            CFStringRef _text = CFStringCreateWithCString(kCFAllocatorDefault, text.c_str(), kCFStringEncodingASCII);
+            
+            CFOptionFlags res = 0;
+            
+            if (modal) {
+                CFUserNotificationDisplayAlert(0, kCFUserNotificationNoteAlertLevel,
+                                               NULL, NULL, NULL, _title, _text, NULL, NULL, NULL, &res);
+            } else {
+                CFUserNotificationDisplayNotice(0, kCFUserNotificationNoteAlertLevel,
+                                                NULL, NULL, NULL, _title, _text, NULL);
+            }
+            
+            return true;
         }
         
     }

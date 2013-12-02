@@ -40,6 +40,8 @@ namespace Engine {
         Libary* OpenLibary(std::string path);
         Libary* GetThisLibary();
         
+        bool ShowMessageBox(std::string title, std::string text, bool modal);
+        
         double GetTime();
     }
 }
