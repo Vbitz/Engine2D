@@ -42,7 +42,7 @@ namespace Engine {
         }
         
         void Begin(std::string zone, double maxTime) {
-            if (!Config::GetBoolean("cl_profiler")) {
+            if (!Config::GetBoolean("core.debug.profiler")) {
                 return;
             }
             if (_names.size() == 0) {
@@ -68,7 +68,7 @@ namespace Engine {
         }
         
         void End(std::string zone) {
-            if (!Config::GetBoolean("cl_profiler")) {
+            if (!Config::GetBoolean("core.debug.profiler")) {
                 return;
             }
             if (_zones.count(zone) == 0) {
@@ -81,7 +81,7 @@ namespace Engine {
             e.max = _max(e.max, e.lastTime);
             e.min = _min(e.min, e.lastTime);
             e.thisFrame = true;
-            if (e.reportLong && e.time > e.maxTime && Config::GetBoolean("log_profiler_maxTime")) {
+            if (e.reportLong && e.time > e.maxTime && Config::GetBoolean("core.log.src.perfIssues")) {
                 Logger::begin("Profiler", Logger::LogLevel_Warning)
                     << "ProfileEvent: " << e.prettyName << " : "
                     << "Exceeded Max Time: " << e.maxTime << " : "
@@ -129,7 +129,7 @@ namespace Engine {
         }
         
         void StartProfileFrame() {
-            if (!Config::GetBoolean("cl_profiler")) {
+            if (!Config::GetBoolean("core.debug.profiler")) {
                 return;
             }
             

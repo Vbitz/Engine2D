@@ -205,7 +205,7 @@ namespace Engine {
         
         ctx->Enter();
         
-		if (!this->_runFile(Config::GetString("script_bootloader"), true)) {
+		if (!this->_runFile(Config::GetString("core.script.loader"), true)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();
             EngineUI::ToggleConsole(); // give them something to debug using
         }
@@ -274,74 +274,41 @@ namespace Engine {
         // new names in comments
         // I still need to think though and make sure these match up
         
-        // cl_width = core.window.width
-        Config::SetNumber(  "cl_width",                 800);
-        // cl_height = core.window.height
-        Config::SetNumber(  "cl_height",                600);
-        // cl_aa = core.render.aa
-        Config::SetBoolean( "cl_aa",                    true);
-        // cl_vsync = core.window.vsync
-        Config::SetBoolean( "cl_vsync",                 false); // lack of vsync causes FPS issues
-        // cl_fullscreen = core.window.fullscreen
-        Config::SetBoolean( "cl_fullscreen",            false);
-        // cl_openGL3 = core.render.openGL = "3.3"
-        Config::SetBoolean( "cl_openGL3",               false);
-        // cl_fontPath = core.content.fontPath
-        Config::SetString(  "cl_fontPath",              "fonts/OpenSans-Regular.ttf");
-        // cl_showVerboseLog = core.debug.showVerboseLog
-        Config::SetBoolean( "cl_showVerboseLog",        false);
-        // cl_runOnIdle = core.runOnIdle
-        Config::SetBoolean( "cl_runOnIdle",             false);
-        // cl_engineUI = core.debug.engineUI
-        Config::SetBoolean( "cl_engineUI",              this->_developerMode);
-        // cl_profiler = core.debug.profiler
-        Config::SetBoolean( "cl_profiler",              this->_developerMode || this->_debugMode);
-        // cl_title = core.window.title
-        Config::SetString(  "cl_title",                 "Engine2D");
-        // cl_debugContext = core.debug.debugRenderer
-        Config::SetBoolean( "cl_debugContext",          this->_developerMode);
-        // cl_gl3Shader = core.render.basicShader
-        Config::SetString(  "cl_gl3Shader",             "shaders/basic");
-        // cl_targetFrameRate = core.render.targetFrameTime
-        Config::SetNumber(  "cl_targetFrameTime",       1.0f / 30.0f);
+        Config::SetNumber(  "core.window.width",                 800);
+        Config::SetNumber(  "core.window.height",                600);
+        Config::SetBoolean( "core.render.aa",                    true);
+        Config::SetBoolean( "core.window.vsync",                 false); // lack of vsync causes FPS issues
+        Config::SetBoolean( "core.window.fullscreen",            false);
+        Config::SetString(  "core.render.openGL",               "3.2");
+        Config::SetString(  "core.content.fontPath",              "fonts/OpenSans-Regular.ttf");
+        Config::SetBoolean( "core.debug.engineUI.showVerboseLog",        false);
+        Config::SetBoolean( "core.runOnIdle",             false);
+        Config::SetBoolean( "core.debug.engineUI",              this->_developerMode);
+        Config::SetBoolean( "core.debug.profiler",              this->_developerMode || this->_debugMode);
+        Config::SetString(  "core.window.title",                 "Engine2D");
+        Config::SetBoolean( "core.debug.debugRenderer",          false);
+        Config::SetString(  "core.render.basicShader",             "shaders/basic");
+        Config::SetNumber(  "core.render.targetFrameTime",       1.0f / 30.0f);
         
-        // draw_clampCreateTexture = core.render.clampTexture
-        Config::SetBoolean( "draw_clampCreateTexture",  true);
-        // draw_createImageMipmap = core.render.forceMipmaps
-        Config::SetBoolean( "draw_createImageMipmap",   true);
+        Config::SetBoolean( "core.render.clampTexture",  true);
+        Config::SetBoolean( "core.render.forceMipmaps",   true);
         
-        // script_reload = core.script.autoReload
-        Config::SetBoolean( "script_reload",            this->_developerMode);
-        // script_gcFrame = core.script.gcOnFrame
-        Config::SetBoolean( "script_gcFrame",           this->_developerMode);
-        // script_bootloader = core.script.loader
-        Config::SetString(  "script_bootloader",        "lib/boot.js");
-        // script_config = core.config.path
-        Config::SetString(  "script_config",            "config/config.json");
-        
-        // js_startupScript = core.script.entryPoint
-        Config::SetString(  "js_startupScript",         "script/basic");
+        Config::SetBoolean( "core.script.autoReload",            this->_developerMode);
+        Config::SetBoolean( "core.script.gcOnFrame",           this->_developerMode);
+        Config::SetString(  "core.script.loader",        "lib/boot.js");
+        Config::SetString(  "core.config.path",            "config/config.json");
+        Config::SetString(  "core.script.entryPoint",         "script/basic");
         
         // log_console = core.log.enableConsole
-#ifdef PLATFORM_WINDOWS
         // With quite a bit of research into console logging performance on windows it seems like I should be using
         // printf or buffered std::cout
-        Config::SetBoolean( "log_console",              this->_developerMode);
-#else
-        Config::SetBoolean( "log_console",              true);
-#endif
-        // log_file = core.log.filePath
-        Config::SetBoolean( "log_file",                 "");
-        // log_consoleVerbose = core.log.levels.verbose
-        Config::SetBoolean( "log_consoleVerbose",       this->_developerMode || this->_debugMode);
-        // log_colors = core.log.showColors
-        Config::SetBoolean( "log_colors",               true);
-        // log_script_undefined = core.log.src.undefinedValue
-        Config::SetBoolean( "log_script_undefined",     this->_developerMode);
-        // log_profiler_maxTime = core.log.src.perfIssues
-        Config::SetBoolean( "log_profiler_maxTime",     this->_developerMode);
-        // log_createImage = core.log.src.createImage
-        Config::SetBoolean( "log_createImage",          true);
+        Config::SetBoolean( "core.log.enableConsole",              true);
+        Config::SetBoolean( "core.log.filePath",                 "");
+        Config::SetBoolean( "core.log.levels.verbose",       this->_developerMode || this->_debugMode);
+        Config::SetBoolean( "core.log.showColors",               true);
+        Config::SetBoolean( "core.log.src.undefinedValue",     this->_developerMode);
+        Config::SetBoolean( "core.log.src.perfIssues",     this->_developerMode);
+        Config::SetBoolean( "core.log.src.createImage",          true);
     }
 	
     void Application::_resizeWindow(GLFWwindow* window, int w, int h) {
@@ -417,10 +384,10 @@ namespace Engine {
         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
     }
     
-    void Application::_openWindow(int width, int height, bool fullscreen, bool openGL3Context) {
+    void Application::_openWindow(int width, int height, bool fullscreen, std::string openGL3Context) {
         Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Window/Context" << Logger::end();
         
-        if (openGL3Context) {
+        if (openGL3Context == "3.2") {
             Logger::begin("Window", Logger::LogLevel_Warning) << "Loading OpenGL 3.2" << Logger::end();
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -432,15 +399,15 @@ namespace Engine {
             isGL3Context = false;
         }
         
-        if (Config::GetBoolean("cl_aa")) {
+        if (Config::GetBoolean("core.render.aa")) {
             glfwWindowHint(GLFW_SAMPLES, 4);
         }
         
-        if (Config::GetBoolean("cl_debugContext")) {
+        if (Config::GetBoolean("core.debug.debugRenderer")) {
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
         }
         
-		window = glfwCreateWindow(width, height, Config::GetString("cl_title").c_str(), fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL); // you can resize how ever much you like
+		window = glfwCreateWindow(width, height, Config::GetString("core.window.title").c_str(), fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL); // you can resize how ever much you like
         
         if (window == NULL) {
             Logger::begin("Window", Logger::LogLevel_Error) << "Error Creating Window" << Logger::end();
@@ -448,7 +415,7 @@ namespace Engine {
         
         glfwMakeContextCurrent(window);
         
-        glfwSwapInterval(Config::GetBoolean("cl_vsync") ? 1 : 0);
+        glfwSwapInterval(Config::GetBoolean("core.window.vsync") ? 1 : 0);
         
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLEW" << Logger::end();
         
@@ -486,7 +453,7 @@ namespace Engine {
         
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
-        if (Config::GetBoolean("cl_debugContext")) {
+        if (Config::GetBoolean("core.debug.debugRenderer")) {
             glDebugMessageCallback(DebugMessageCallback, NULL);
         }
         
@@ -512,8 +479,8 @@ namespace Engine {
         
 		glfwInit();
         
-        this->_openWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"),
-                   Config::GetBoolean("cl_fullscreen"), Config::GetBoolean("cl_openGL3"));
+        this->_openWindow(Config::GetInt("core.window.width"), Config::GetInt("core.window.height"),
+                   Config::GetBoolean("core.window.fullscreen"), Config::GetString("core.render.openGL"));
 	}
 	
 	void Application::_shutdownOpenGL() {
@@ -525,8 +492,8 @@ namespace Engine {
     
 	void Application::_initFonts() {
         Profiler::Begin("LoadFonts");
-        if (!this->LoadFont("basic", Config::GetString("cl_fontPath"))) {
-            Logger::begin("Font", Logger::LogLevel_Warning) << "Font not found: " << Config::GetString("cl_fontPath") << " falling back to inbuilt font" << Logger::end();
+        if (!this->LoadFont("basic", Config::GetString("core.content.fontPath"))) {
+            Logger::begin("Font", Logger::LogLevel_Warning) << "Font not found: " << Config::GetString("core.content.fontPath") << " falling back to inbuilt font" << Logger::end();
             ResourceManager::Load("basicFont", new ResourceManager::RawSource(OpenSans_Regular, sizeof(OpenSans_Regular)));
             _fonts["basic"] = new ResourceManager::FontResource("basicFont");
         }
@@ -761,8 +728,8 @@ namespace Engine {
     
     void Application::_restartRenderer() {
         this->_closeWindow();
-        this->_openWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"),
-                   Config::GetBoolean("cl_fullscreen"), Config::GetBoolean("cl_openGL3"));
+        this->_openWindow(Config::GetInt("core.window.width"), Config::GetInt("core.window.height"),
+                          Config::GetBoolean("core.window.fullscreen"), Config::GetString("core.render.openGL"));
         this->_updateScreen();
     }
     
@@ -774,13 +741,15 @@ namespace Engine {
     void Application::_toggleFullscreen() {
         if (this->_isFullscreen) {
             this->_closeWindow();
-            this->_openWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"), false, isGL3Context);
+            this->_openWindow(Config::GetInt("core.window.width"), Config::GetInt("core.window.height"), false,
+                              Config::GetString("core.render.openGL"));
             this->_isFullscreen = false;
             this->_updateScreen();
         } else {
             const GLFWvidmode* desktopMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             this->_closeWindow();
-            this->_openWindow(desktopMode->width, desktopMode->height, true, isGL3Context);
+            this->_openWindow(desktopMode->width, desktopMode->height, true,
+                              Config::GetString("core.render.openGL"));
             this->_isFullscreen = true;
             this->_updateScreen();
         }
@@ -861,7 +830,7 @@ namespace Engine {
 		} else {
             v8::Local<v8::Value> result = script->Run();
             if (*result != NULL) { // well it works
-                if (result->IsUndefined() && !Config::GetBoolean("log_script_undefined")) {
+                if (result->IsUndefined() && !Config::GetBoolean("core.log.src.undefinedValue")) {
                     
                 } else {
                     Logger::begin("Console", Logger::LogLevel_Log) << (result->IsNull() ? "null" : *v8::String::Utf8Value(result->ToString())) << Logger::end();
@@ -907,18 +876,18 @@ namespace Engine {
             
 			if (!this->_isFullscreen &&
                 !glfwGetWindowAttrib(window, GLFW_FOCUSED) &&
-                !Config::GetBoolean("cl_runOnIdle") &&
+                !Config::GetBoolean("core.runOnIdle") &&
                 !glfwWindowShouldClose(window)) {
 				glfwWaitEvents();
                 sleep(0);
 				continue;
 			}
             
-            if (Config::GetBoolean("script_reload")) {
+            if (Config::GetBoolean("core.debug.reloadScripts")) {
                 this->_checkUpdate();
             }
             
-            Profiler::Begin("Frame", Config::GetFloat("cl_targetFrameTime"));
+            Profiler::Begin("Frame", Config::GetFloat("core.render.targetFrameTime"));
             
             this->_updateFrameTime();
             
@@ -932,11 +901,11 @@ namespace Engine {
             
             Draw2D::Begin2d();
             
-            Profiler::Begin("EventDraw", Config::GetFloat("cl_targetFrameTime") / 3 * 2);
+            Profiler::Begin("EventDraw", Config::GetFloat("core.render.targetFrameTime") / 3 * 2);
             Events::Emit("draw", Events::EventArgs());
             Profiler::End("EventDraw");
             
-            Profiler::Begin("EngineUI", Config::GetFloat("cl_targetFrameTime") / 3);
+            Profiler::Begin("EngineUI", Config::GetFloat("core.render.targetFrameTime") / 3);
             EngineUI::Draw();
             Profiler::End("EngineUI");
             
@@ -962,7 +931,7 @@ namespace Engine {
             
             Draw2D::CheckGLError("endOfRendering");
             
-            if (Config::GetBoolean("script_gcFrame")) {
+            if (Config::GetBoolean("core.script.gcOnFrame")) {
                 Profiler::Begin("ScriptGC");
                 v8::V8::IdleNotification();
                 Profiler::End("ScriptGC");

@@ -468,7 +468,7 @@ namespace Engine {
 
         void Init2d() {
             if (GetAppSingilton()->UsingGL3()) {
-                std::string gl3Shader = Config::GetString("cl_gl3Shader");
+                std::string gl3Shader = Config::GetString("core.render.basicShader");
                 _currentShader.Init(gl3Shader + ".vert", gl3Shader + ".frag");
                 if (!IsValidTextureID(_defaultTexture)) {
                     _defaultTexture = GenerateDefaultTexture();

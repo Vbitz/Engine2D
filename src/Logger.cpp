@@ -92,9 +92,9 @@ namespace Engine {
         }
         
         void LogText(std::string domain, LogLevel level, std::string str) {
-            bool logConsole = Config::GetBoolean("log_console")
-                && (level != LogLevel_Verbose || Config::GetBoolean("log_consoleVerbose"));
-            std::string colorCode = Config::GetBoolean("log_colors") ? GetLevelColor(level) : "";
+            bool logConsole = Config::GetBoolean("core.log.enableConsole")
+                && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
+            std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
             
             if (str.find('\n') == -1) {
                 std::string newStr = cleanString(str);
@@ -140,9 +140,9 @@ namespace Engine {
         }
         
         void LogGraph(std::string domain, LogLevel level, LogGraphEvent* event) {
-            bool logConsole = Config::GetBoolean("log_console")
-                && (level != LogLevel_Verbose || Config::GetBoolean("log_consoleVerbose"));
-            std::string colorCode = Config::GetBoolean("log_colors") ? GetLevelColor(level) : "";
+            bool logConsole = Config::GetBoolean("core.log.enableConsole")
+            && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
+            std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
             
             _logEvents.push_back(LogEvent(domain, level, event));
             

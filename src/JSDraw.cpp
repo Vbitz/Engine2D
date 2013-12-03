@@ -744,7 +744,7 @@ namespace Engine {
             } else {
                 int len = width * height;
                 
-                bool noClamp = !Config::GetBoolean("draw_clampCreateTexture");
+                bool noClamp = !Config::GetBoolean("core.render.clampTexture");
                 
                 if (arr->Length() != width * height * 3) {
                     ENGINE_THROW_ARGERROR("Array size != width * height * 3");
@@ -780,7 +780,7 @@ namespace Engine {
             
                 glBindTexture(GL_TEXTURE_2D, texID);
             
-                if (Config::GetBoolean("draw_createImageMipmap")) {
+                if (Config::GetBoolean("core.render.forceMipmaps")) {
                     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                                 GL_NEAREST_MIPMAP_NEAREST );
                 } else {
@@ -793,7 +793,7 @@ namespace Engine {
             
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, pixels);
             
-            if (Config::GetBoolean("draw_createImageMipmap")) {
+            if (Config::GetBoolean("core.render.forceMipmaps")) {
                 glGenerateMipmap(GL_TEXTURE_2D);
             }
             
@@ -805,7 +805,7 @@ namespace Engine {
                 free(pixels);
             }
             
-            if (Config::GetBoolean("log_createImage")) {
+            if (Config::GetBoolean("core.log.src.createImage")) {
                 Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from data: " << texID << Logger::end();
             }
             

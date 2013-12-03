@@ -1,5 +1,4 @@
 sys.drawFunc(function () {
-	//console.log("Frame");
 	draw.setColor("red");
 	draw.rect(100, 100, 20, 80);
 	draw.setColor("blue");
@@ -9,10 +8,7 @@ sys.drawFunc(function () {
 });
 
 sys.keyboardFunc(function (type, key, press) {
-	if (key === "G") {
-		sys.config("cl_openGL3", true);
-		sys.restartRenderer();
-	} else if (key === "ESC") {
+	if (key === "ESC") {
 		sys.exit();
 	}
 });

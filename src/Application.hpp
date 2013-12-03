@@ -68,7 +68,7 @@ namespace Engine {
         void _shutdownOpenGL();
         void _initOpenGL();
         void _closeWindow();
-        void _openWindow(int width, int height, bool fullscreen, bool openGL3Context);
+        void _openWindow(int width, int height, bool fullscreen, std::string openGLVersion);
         void _loadBasicConfigs();
         void _disablePreload();
         void _updateFrameTime();

@@ -463,7 +463,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ReloadRootScript) {
             ENGINE_JS_SCOPE_OPEN;
             
-            GetAppSingilton()->InvalidateScript(Config::GetString("script_bootloader"));
+            GetAppSingilton()->InvalidateScript(Config::GetString("core.script.entryPoint"));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

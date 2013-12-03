@@ -46,7 +46,7 @@ namespace Engine {
         float currentFPS = 0;
         
         void Draw() {
-            if (!Config::GetBoolean("cl_engineUI")) {
+            if (!Config::GetBoolean("core.debug.engineUI")) {
                 return;
             }
             
@@ -101,7 +101,7 @@ namespace Engine {
             
             std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
             
-            bool showVerbose = Config::GetBoolean("cl_showVerboseLog"); // pretty cheap
+            bool showVerbose = Config::GetBoolean("core.debug.engineUI.showVerboseLog"); // pretty cheap
             
             int i = app->GetScreenHeight() - 40;
             
@@ -184,7 +184,7 @@ namespace Engine {
 #endif
 
         void OnKeyPress(int key, int press, bool shift) {
-            if (!Config::GetBoolean("cl_engineUI")) {
+            if (!Config::GetBoolean("core.debug.engineUI")) {
                 return;
             }
             

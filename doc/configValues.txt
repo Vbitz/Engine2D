@@ -33,6 +33,7 @@ core                        |                               |       |
         entryPoint          | "script/test"                 |       | The script that loader will call to start the application
                             |                               |       |
     log                     |                               |       |
+        enableConsole       | true                          |       | Controls if messages are printed to the console
         levels              |                               |       |
             verbose         | {developerMode || debugMode}  |       | Show verbose level logs?
             log             | true                          |   X   | Show log level logs?
@@ -43,7 +44,6 @@ core                        |                               |       |
             undefiendValue  | {developerMode}               |       | Print undefined values returned from JavaScript
             createImage     | true                          |       | Log the OpenGL Texture ID of each one created
             perfIssues      | {developerMode || debugMode}  |       | Print perforance issues
-            glErrors        | true                          |   X   | Show OpenGL errors in logs
             scriptLoad      | {developerMode || debugMode}  |   X   | Print script filenames as they load
         filePath            | ""                            |   X   | The path to output logging to in realtime
         showColors          | true                          |       | Show colors in the console log

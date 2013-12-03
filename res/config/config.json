@@ -1,12 +1,11 @@
 {
-	"js_startupScript": "script/test",
-	"cl_width": 1000,
-	"cl_height": 600,
-	"cl_fullscreen": false,
-	"cl_openGL3": true,
-	"cl_aa": false,
-	"cl_vsync": false,
-	"cl_fontPath": "fonts/OpenSans-Regular.ttf",
+	"core.script.entryPoint": "script/test",
+	"core.window.width": 1000,
+	"core.window.height": 600,
+	"core.window.fullscreen": false,
+	"core.render.openGL": "3.2",
+	"core.render.aa": false,
+	"core.window.vsync": false,
 	"__comment": "just for openGL3",
-	"cl_debugContext": false
+	"core.debug.debugRenderer": false
 }
