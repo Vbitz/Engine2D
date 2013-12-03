@@ -296,8 +296,6 @@ namespace Engine {
         Config::SetBoolean( "cl_engineUI",              this->_developerMode);
         // cl_profiler = core.debug.profiler
         Config::SetBoolean( "cl_profiler",              this->_developerMode || this->_debugMode);
-        // This config will be removed since drawing is now handled via events
-        Config::SetBoolean( "cl_scriptedDraw",          true);
         // cl_title = core.window.title
         Config::SetString(  "cl_title",                 "Engine2D");
         // cl_debugContext = core.debug.debugRenderer
@@ -554,34 +552,6 @@ namespace Engine {
     // command line parsing
     
     bool Application::_parseCommandLine(int argc, const char* argv[]) {
-        /*
-         Command Line Spec
-         ========================
-         
-         -- Examples --
-         bin/Engine - loads config/config.json and sets basic config values
-         bin/Engine -Ccl_width=1280 -Ccl_height=800 - loads config/config.json and
-         overrides the basic configs cl_width and cl_height
-         bin/Engine -config=config/test.json - loads config/test.json and sets basic config values
-         bin/Engine script/test - any non - configs are passed onto javascript
-         
-         -- Args --
-         -Cname=value             - Overloads a basic config. This is applyed before loading the basic config
-         but overrides those configs while they are applyed
-         (NYI) -config=configFile       - Sets the basic config to configFile, configFile is realitive to res/
-         since it uses PhysFS this could be other values
-         (NYI) -archive=archiveFile     - Loads a archive file using PhysFS, this is applyed after physfs is started
-         -test                    - Runs the built in test suite
-         (NYI) -headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL
-         will fail.
-         -devmode                 - Enables developer mode (This enables real time script loading and the console)
-         (NYI) -debug                   - Enables debug mode (This enables a OpenGL debug context and will print messages
-         to the console)
-         (NYI) -log=filename            - Logs logger output to filename (This is not writen using PhysFS so it needs a
-         regular path)
-         (NYI) -h                       - Prints this message
-         */
-        
         bool _exit = false;
         
         for (int i = 1; i < argc; i++) {
@@ -962,11 +932,9 @@ namespace Engine {
             
             Draw2D::Begin2d();
             
-            if (Config::GetBoolean("cl_scriptedDraw")) {
-                Profiler::Begin("JSDraw", Config::GetFloat("cl_targetFrameTime") / 3 * 2);
-                Events::Emit("draw", Events::EventArgs());
-                Profiler::End("JSDraw");
-            }
+            Profiler::Begin("EventDraw", Config::GetFloat("cl_targetFrameTime") / 3 * 2);
+            Events::Emit("draw", Events::EventArgs());
+            Profiler::End("EventDraw");
             
             Profiler::Begin("EngineUI", Config::GetFloat("cl_targetFrameTime") / 3);
             EngineUI::Draw();
