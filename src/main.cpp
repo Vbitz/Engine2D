@@ -4,5 +4,5 @@
 
 int main(int argc, char const *argv[])
 {
-	return Engine::main(argc, argv);
+	return Engine::GetAppSingilton()->Start(argc, argv);
 }

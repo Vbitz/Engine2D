@@ -229,7 +229,8 @@ namespace Engine {
             glPushMatrix();
 			glDisable(GL_DEPTH_TEST);
 			glLoadIdentity();
-			glOrtho(0, getScreenWidth(), getScreenHeight(), 0, 1, -1);
+            Application* app = GetAppSingilton();
+			glOrtho(0, app->GetScreenWidth(), app->GetScreenHeight(), 0, 1, -1);
         }
         
         void SetDefinedColor(std::string name, int col) {
@@ -241,7 +242,7 @@ namespace Engine {
         }
         
         void BeginRendering(GLenum mode) {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 if (_currentMode != mode || _currentMode == GL_LINE_STRIP) { // it's a hack, I really need to fix this
                     FlushAll();
                     _currentMode = mode;
@@ -253,7 +254,7 @@ namespace Engine {
         }
         
         void EndRendering() {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 if (_currentVerts > BUFFER_SIZE - 256) {
                     FlushAll();
                     BeginRendering(_currentMode);
@@ -265,7 +266,7 @@ namespace Engine {
         }
         
         void AddVert(float x, float y, float z) {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 AddVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, _currentColorA, 0.0, 0.0);
             } else {
                 glVertex3f(x - _centerX, y - _centerY, z);
@@ -274,7 +275,7 @@ namespace Engine {
         }
         
         void AddVert(float x, float y, float z, double r, double g, double b, double a) {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 AddVert(x, y, z, r, g, b, a, 0.0, 0.0);
             } else {
                 glColor3f(r, g, b);
@@ -283,7 +284,7 @@ namespace Engine {
         }
         
         void AddVert(float x, float y, float z, float s, float t) {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 AddVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, _currentColorA, s, t);
             } else {
                 glTexCoord2f(s, t);
@@ -292,7 +293,7 @@ namespace Engine {
         }
         
         void AddVert(float x, float y, float z, double r, double g, double b, double a, float s, float t) {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 _buffer[_currentVerts * 9 + 0] = x;
                 _buffer[_currentVerts * 9 + 1] = y;
                 _buffer[_currentVerts * 9 + 2] = z;
@@ -312,7 +313,7 @@ namespace Engine {
         }
         
         void EnableTexture(int texId) {
-            if (!usingGL3()) {
+            if (!GetAppSingilton()->UsingGL3()) {
                 glEnable(GL_TEXTURE_2D);
             
                 glBindTexture(GL_TEXTURE_2D, texId);
@@ -323,7 +324,7 @@ namespace Engine {
         }
         
         void DisableTexture() {
-            if (!usingGL3()) {
+            if (!GetAppSingilton()->UsingGL3()) {
                 glBindTexture(GL_TEXTURE_2D, 0);
             
                 glDisable(GL_TEXTURE_2D);
@@ -346,10 +347,10 @@ namespace Engine {
         }
         
         void Print(float x, float y, const char* string) {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 FlushAll();
                 
-                GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
+                GLFT_Font* drawingFont = GetAppSingilton()->GetFont(_currentFontName, _currentFontSize);
                 
                 drawingFont->drawTextGL3(x, y, &_currentShader, _currentColorR,
                                          _currentColorG, _currentColorB, string);
@@ -361,7 +362,7 @@ namespace Engine {
             
                 GLSetColor();
             
-                GLFT_Font* drawingFont = getFont(_currentFontName, _currentFontSize);
+                GLFT_Font* drawingFont = GetAppSingilton()->GetFont(_currentFontName, _currentFontSize);
 
                 drawingFont->drawText(x - _centerX, y - _centerY, string);
             
@@ -374,7 +375,7 @@ namespace Engine {
         }
         
         float CalcStringWidth(std::string str) {
-            return getFont(_currentFontName, _currentFontSize)->calcStringWidth(str);
+            return GetAppSingilton()->GetFont(_currentFontName, _currentFontSize)->calcStringWidth(str);
         }
         
         void SetFont(std::string name, int size) {
@@ -383,12 +384,12 @@ namespace Engine {
         }
         
         void LoadFont(std::string prettyName, std::string filename) {
-            loadFont(prettyName, filename);
+            GetAppSingilton()->LoadFont(prettyName, filename);
             _currentFontName = prettyName;
         }
         
         bool IsFontLoaded(std::string name) {
-            return isFontLoaded(name);
+            return GetAppSingilton()->IsFontLoaded(name);
         }
         
         bool IsValidTextureID(int texID) {
@@ -431,7 +432,7 @@ namespace Engine {
         void FlushAll() {
             static GL3Buffer buf(_currentShader); // temporory
             
-            if (!usingGL3()) {
+            if (!GetAppSingilton()->UsingGL3()) {
                 throw "That's a bug";
             }
             
@@ -466,7 +467,7 @@ namespace Engine {
         }
 
         void Init2d() {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 std::string gl3Shader = Config::GetString("cl_gl3Shader");
                 _currentShader.Init(gl3Shader + ".vert", gl3Shader + ".frag");
                 if (!IsValidTextureID(_defaultTexture)) {
@@ -479,7 +480,7 @@ namespace Engine {
 		void Begin2d() {
             EnableSmooth();
             
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 _currentTexture = _defaultTexture;
                 glDisable(GL_DEPTH_TEST);
             } else {
@@ -491,7 +492,7 @@ namespace Engine {
 		}
 		
 		void End2d() {
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 FlushAll();
             } else {
                 glPopMatrix();

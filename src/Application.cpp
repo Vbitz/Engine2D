@@ -20,42 +20,6 @@
 #include "JSMod.hpp"
 
 namespace Engine {
-	
-	// state
-	bool running = false;
-    
-    bool isFullscreen = false;
-    
-    bool toggleNextframe = false;
-    bool screenshotNextframe = false;
-    bool _dumpProfileAtFrameEnd = false;
-    bool _restartNextFrame = false;
-    
-    std::string _screenshotFilename;
-	
-	double lastTime = 0;
-	
-	int _screenWidth = 0;
-	int _screenHeight = 0;
-    
-    std::vector<std::string> _jsArgs;
-    
-    bool isGL3Context;
-    
-    GLFWwindow* window = NULL;
-	
-    std::map<std::string, ResourceManager::FontResource*> _fonts;
-    
-    std::map<std::string, std::string> _delayedConfigs;
-    
-	std::map<std::string, long> _loadedFiles;
-    
-    bool _developerMode = false;
-    bool _debugMode = false;
-    bool _testMode = false;
-    
-    int _detailFrames = 0;
-    std::string _detailFilename = "";
     
     // from https://github.com/glfw/glfw/blob/master/tests/events.c
     static std::string GLFW_GetKeyName(int key)
@@ -153,14 +117,20 @@ namespace Engine {
         }
     }
     
-    void InitFonts();
-    void ShutdownFonts();
+    void OnGLFWError(int error, const char* msg) {
+        Logger::begin("Window", Logger::LogLevel_Error) << "GLFW Error : " << error << " : " << msg << Logger::end();
+    }
+    
+    void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, void* userParam) {
+        Logger::begin("OpenGL", Logger::LogLevel_Error) << source << " : " << type << " : " <<
+        id << " : " << severity << " : " << message << Logger::end();
+    }
     
     ENGINE_JS_METHOD(SetWindowInitParams);
 	
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
     
-    v8::Handle<v8::Context> InitScripting(bool developerMode) {
+    v8::Handle<v8::Context> Application::_initScripting() {
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
         
 		//_globalIsolate = v8::Isolate::New();
@@ -174,6 +144,7 @@ namespace Engine {
         v8::Handle<v8::ObjectTemplate> consoleTable = v8::ObjectTemplate::New();
         
         addItem(consoleTable, "_log", JsSys::Println);
+        addItem(consoleTable, "clear", JsSys::ClearConsole);
         
         global->Set("console", consoleTable);
         
@@ -185,7 +156,7 @@ namespace Engine {
         addItem(sysTable, "setWindowCreateParams", SetWindowInitParams);
         
         sysTable->Set("platform", v8::String::New(_PLATFORM));
-        sysTable->Set("devMode", v8::Boolean::New(developerMode));
+        sysTable->Set("devMode", v8::Boolean::New(this->_developerMode));
         sysTable->Set("preload", v8::Boolean::New(true));
         sysTable->Set("numProcessers", v8::Number::New(Platform::GetProcesserCount()));
         
@@ -234,7 +205,7 @@ namespace Engine {
         
         ctx->Enter();
         
-		if (!runFile(Config::GetString("script_bootloader"), true)) {
+		if (!this->_runFile(Config::GetString("script_bootloader"), true)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();
             EngineUI::ToggleConsole(); // give them something to debug using
         }
@@ -246,32 +217,12 @@ namespace Engine {
 	
 #undef addItem
 	
-	void ShutdownScripting() {
+	void Application::_shutdownScripting() {
 		//_globalIsolate->Exit();
 		//_globalIsolate->Dispose();
 	}
 	
-	bool CallFunction(v8::Handle<v8::Value> func) {
-		v8::HandleScope scp(v8::Isolate::GetCurrent());
-        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
-        v8::Context::Scope ctx_scope(ctx);
-        
-		v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(func);
-        
-		v8::TryCatch tryCatch;
-        
-		real_func->Call(ctx->Global(), 0, NULL);
-        
-        if (!tryCatch.StackTrace().IsEmpty()) {
-            v8::Handle<v8::Value> exception = tryCatch.StackTrace();
-            v8::String::Utf8Value exception_str(exception);
-            Logger::begin("Scripting", Logger::LogLevel_Error) << "Exception in C++ to JS Call: " << *exception_str << Logger::end();
-            return false;
-        }
-        return true;
-	}
-	
-	void UpdateMousePos() {
+	void Application::_updateMousePos() {
 		double x = 0;
 		double y = 0;
 		glfwGetCursorPos(window, &x, &y);
@@ -288,7 +239,7 @@ namespace Engine {
 		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS));
 	}
 	
-	void UpdateScreen() {
+	void Application::_updateScreen() {
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
         v8::Context::Scope ctx_scope(ctx);
@@ -299,7 +250,7 @@ namespace Engine {
 		input_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
 	}
     
-    void UpdateFrameTime() {
+    void Application::_updateFrameTime() {
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
         v8::Context::Scope ctx_scope(ctx);
@@ -309,7 +260,7 @@ namespace Engine {
         sys_table->Set(v8::String::NewSymbol("deltaTime"), v8::Number::New(Profiler::GetTime("Frame")));
     }
     
-    void DisablePreload() {
+    void Application::_disablePreload() {
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
         v8::Context::Scope ctx_scope(ctx);
@@ -319,7 +270,7 @@ namespace Engine {
         sys_table->Set(v8::String::New("preload"), v8::Boolean::New(false));
     }
     
-    void LoadBasicConfigs(bool developerMode, bool debugMode) {
+    void Application::_loadBasicConfigs() {
         // new names in comments
         // I still need to think though and make sure these match up
         
@@ -342,15 +293,15 @@ namespace Engine {
         // cl_runOnIdle = core.runOnIdle
         Config::SetBoolean( "cl_runOnIdle",             false);
         // cl_engineUI = core.debug.engineUI
-        Config::SetBoolean( "cl_engineUI",              developerMode);
+        Config::SetBoolean( "cl_engineUI",              this->_developerMode);
         // cl_profiler = core.debug.profiler
-        Config::SetBoolean( "cl_profiler",              developerMode || debugMode);
+        Config::SetBoolean( "cl_profiler",              this->_developerMode || this->_debugMode);
         // This config will be removed since drawing is now handled via events
         Config::SetBoolean( "cl_scriptedDraw",          true);
         // cl_title = core.window.title
         Config::SetString(  "cl_title",                 "Engine2D");
         // cl_debugContext = core.debug.debugRenderer
-        Config::SetBoolean( "cl_debugContext",          developerMode);
+        Config::SetBoolean( "cl_debugContext",          this->_developerMode);
         // cl_gl3Shader = core.render.basicShader
         Config::SetString(  "cl_gl3Shader",             "shaders/basic");
         // cl_targetFrameRate = core.render.targetFrameTime
@@ -362,9 +313,9 @@ namespace Engine {
         Config::SetBoolean( "draw_createImageMipmap",   true);
         
         // script_reload = core.script.autoReload
-        Config::SetBoolean( "script_reload",            developerMode);
+        Config::SetBoolean( "script_reload",            this->_developerMode);
         // script_gcFrame = core.script.gcOnFrame
-        Config::SetBoolean( "script_gcFrame",           developerMode);
+        Config::SetBoolean( "script_gcFrame",           this->_developerMode);
         // script_bootloader = core.script.loader
         Config::SetString(  "script_bootloader",        "lib/boot.js");
         // script_config = core.config.path
@@ -377,38 +328,39 @@ namespace Engine {
 #ifdef PLATFORM_WINDOWS
         // With quite a bit of research into console logging performance on windows it seems like I should be using
         // printf or buffered std::cout
-        Config::SetBoolean( "log_console",              developerMode);
+        Config::SetBoolean( "log_console",              this->_developerMode);
 #else
         Config::SetBoolean( "log_console",              true);
 #endif
         // log_file = core.log.filePath
         Config::SetBoolean( "log_file",                 "");
         // log_consoleVerbose = core.log.levels.verbose
-        Config::SetBoolean( "log_consoleVerbose",       developerMode || debugMode);
+        Config::SetBoolean( "log_consoleVerbose",       this->_developerMode || this->_debugMode);
         // log_colors = core.log.showColors
         Config::SetBoolean( "log_colors",               true);
         // log_script_undefined = core.log.src.undefinedValue
-        Config::SetBoolean( "log_script_undefined",     developerMode);
+        Config::SetBoolean( "log_script_undefined",     this->_developerMode);
         // log_profiler_maxTime = core.log.src.perfIssues
-        Config::SetBoolean( "log_profiler_maxTime",     developerMode);
+        Config::SetBoolean( "log_profiler_maxTime",     this->_developerMode);
         // log_createImage = core.log.src.createImage
         Config::SetBoolean( "log_createImage",          true);
     }
 	
-	void ResizeWindow(GLFWwindow* window, int w, int h) {
+    void Application::_resizeWindow(GLFWwindow* window, int w, int h) {
+        Application* app = GetAppSingilton();
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
-		_screenWidth = w;
-		_screenHeight = h;
-		if (running)
+		app->_screenWidth = w;
+		app->_screenHeight = h;
+		if (app->_running)
 		{
-			UpdateScreen();
+			app->_updateScreen();
 		}
 		glViewport(0, 0, w, h);
         Draw2D::CheckGLError("Post Viewpoint");
     }
 	
-	void KeyPress(GLFWwindow* window, int rawKey, int scanCode, int state, int mods) {
-        if (!glfwGetWindowAttrib(window, GLFW_FOCUSED) && !isFullscreen) {
+	 void Application::_keyPress(GLFWwindow* window, int rawKey, int scanCode, int state, int mods) {
+        if (!glfwGetWindowAttrib(window, GLFW_FOCUSED) && !GetAppSingilton()->_isFullscreen) {
             return;
         }
         
@@ -432,15 +384,6 @@ namespace Engine {
         }, e);
 	}
     
-    void OnGLFWError(int error, const char* msg) {
-        Logger::begin("Window", Logger::LogLevel_Error) << "GLFW Error : " << error << " : " << msg << Logger::end();
-    }
-    
-    void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, void* userParam) {
-        Logger::begin("OpenGL", Logger::LogLevel_Error) << source << " : " << type << " : " <<
-        id << " : " << severity << " : " << message << Logger::end();
-    }
-    
     ENGINE_JS_METHOD(SetWindowInitParams) {
         ENGINE_JS_SCOPE_OPEN;
         
@@ -456,7 +399,7 @@ namespace Engine {
             v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
             v8::Local<v8::Value> objItem = obj->Get(objKey);
             std::string objKeyValue = std::string(*v8::String::Utf8Value(objKey));
-            if (_delayedConfigs.count(objKeyValue) != 0) {
+            if (GetAppSingilton()->IsDelayedConfig(objKeyValue)) {
                 continue; // ignore it
             }
             if (objItem->IsString()) {
@@ -476,7 +419,7 @@ namespace Engine {
         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
     }
     
-    void OpenWindow(int width, int height, bool fullscreen, bool openGL3Context) {
+    void Application::_openWindow(int width, int height, bool fullscreen, bool openGL3Context) {
         Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Window/Context" << Logger::end();
         
         if (openGL3Context) {
@@ -525,10 +468,10 @@ namespace Engine {
         
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init Callbacks" << Logger::end();
         
-        ResizeWindow(window, width, height);
+        this->_resizeWindow(window, width, height);
         
-        glfwSetWindowSizeCallback(window, ResizeWindow);
-		glfwSetKeyCallback(window, KeyPress);
+        glfwSetWindowSizeCallback(window, this->_resizeWindow);
+		glfwSetKeyCallback(window, this->_keyPress);
         
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         
@@ -553,60 +496,38 @@ namespace Engine {
         
         Logger::begin("Window", Logger::LogLevel_Log) << "Loaded OpenGL" << Logger::end();
         
-        InitFonts();
+        this->_initFonts();
         Draw2D::Init2d();
     }
     
-    void CloseWindow() {
+    void Application::_closeWindow() {
         Logger::begin("Window", Logger::LogLevel_Log) << "Terminating Window" << Logger::end();
-        ShutdownFonts();
+        this->_shutdownFonts();
         ResourceManager::UnloadAll();
         glfwDestroyWindow(window);
     }
 	
-	void InitOpenGL() {
+	void Application::_initOpenGL() {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLFW" << Logger::end();
         
         glfwSetErrorCallback(OnGLFWError);
         
 		glfwInit();
         
-        OpenWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"),
+        this->_openWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"),
                    Config::GetBoolean("cl_fullscreen"), Config::GetBoolean("cl_openGL3"));
 	}
 	
-	void ShutdownOpenGL() {
-        CloseWindow();
+	void Application::_shutdownOpenGL() {
+        this->_closeWindow();
 		glfwTerminate();
 	}
 	
 	// font rendering
-	
-    bool loadFont(std::string prettyName, std::string filename) {
-        Logger::begin("Font", Logger::LogLevel_Log)
-        << "Loading Font: " << filename << " as " << prettyName
-        << Logger::end();
-        
-        Draw2D::CheckGLError("PreLoadFont");
-        
-		if (Filesystem::FileExists(filename)) {
-            ResourceManager::Load(filename);
-            _fonts[prettyName] = new ResourceManager::FontResource(filename);
-		} else {
-			Logger::begin("Font", Logger::LogLevel_Error) << "Could not load font" << Logger::end();
-            return false;
-		}
-        
-        Draw2D::CheckGLError("PostLoadFont");
-        
-        Logger::begin("Font", Logger::LogLevel_Log) << "Loaded Font" << Logger::end();
-        
-        return true;
-    }
     
-	void InitFonts() {
+	void Application::_initFonts() {
         Profiler::Begin("LoadFonts");
-        if (!loadFont("basic", Config::GetString("cl_fontPath"))) {
+        if (!this->LoadFont("basic", Config::GetString("cl_fontPath"))) {
             Logger::begin("Font", Logger::LogLevel_Warning) << "Font not found: " << Config::GetString("cl_fontPath") << " falling back to inbuilt font" << Logger::end();
             ResourceManager::Load("basicFont", new ResourceManager::RawSource(OpenSans_Regular, sizeof(OpenSans_Regular)));
             _fonts["basic"] = new ResourceManager::FontResource("basicFont");
@@ -614,13 +535,13 @@ namespace Engine {
         Profiler::End("LoadFonts");
 	}
 	
-	void ShutdownFonts() {
+	void Application::_shutdownFonts() {
         _fonts.clear();
 	}
     
     // command line handlers
     
-    void ApplyDelayedConfigs() {
+    void Application::_applyDelayedConfigs() {
         for (auto iter = _delayedConfigs.begin(); iter != _delayedConfigs.end(); iter++) {
             if (!Config::Set(iter->first, iter->second)) {
                 Logger::begin("CommandLine", Logger::LogLevel_Error) << "Could not set '"
@@ -632,7 +553,7 @@ namespace Engine {
     
     // command line parsing
     
-    bool ParseCommandLine(int argc, const char* argv[]) {
+    bool Application::_parseCommandLine(int argc, const char* argv[]) {
         /*
          Command Line Spec
          ========================
@@ -735,7 +656,7 @@ namespace Engine {
     
     // Test Suite Loading
 	
-    void LoadTests() {
+    void Application::_loadTests() {
         if (_debugMode) {
             TestSuite::LoadTestSuiteTests();
         }
@@ -744,42 +665,69 @@ namespace Engine {
     
 	// semi-realtime time loading
 	
-	void CheckUpdate() {
+	void Application::_checkUpdate() {
         for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
 			long lastMod = Filesystem::GetFileModifyTime(iterator->first);
 			if (lastMod > iterator->second) {
-                runFile(iterator->first, true);
+                this->RunFile(iterator->first, true);
 			}
 		}
 	}
 	
 	// public methods
+    
+    bool Application::IsDelayedConfig(std::string configKey) {
+        return this->_delayedConfigs.count(configKey) != 0;
+    }
 	
-	int getScreenWidth() {
+	int Application::GetScreenWidth() {
 		return _screenWidth;
 	}
 	
-	int getScreenHeight() {
+	int Application::GetScreenHeight() {
 		return _screenHeight;
 	}
 
-    void setScreenSize(int width, int height) {
+    void Application::SetScreenSize(int width, int height) {
         glfwSetWindowSize(window, width, height);
     }
 	
-	GLFT_Font* getFont(std::string fontName, int size) {
+	GLFT_Font* Application::GetFont(std::string fontName, int size) {
         return _fonts[fontName]->GetFont(size);
 	}
     
-    bool isFontLoaded(std::string fontName) {
+    
+    bool Application::LoadFont(std::string prettyName, std::string filename) {
+        Logger::begin("Font", Logger::LogLevel_Log)
+        << "Loading Font: " << filename << " as " << prettyName
+        << Logger::end();
+        
+        Draw2D::CheckGLError("PreLoadFont");
+        
+		if (Filesystem::FileExists(filename)) {
+            ResourceManager::Load(filename);
+            _fonts[prettyName] = new ResourceManager::FontResource(filename);
+		} else {
+			Logger::begin("Font", Logger::LogLevel_Error) << "Could not load font" << Logger::end();
+            return false;
+		}
+        
+        Draw2D::CheckGLError("PostLoadFont");
+        
+        Logger::begin("Font", Logger::LogLevel_Log) << "Loaded Font" << Logger::end();
+        
+        return true;
+    }
+    
+    bool Application::IsFontLoaded(std::string fontName) {
         return _fonts.count(fontName) != 0;
     }
     
-    std::vector<std::string> getCommandLineArgs() {
+    std::vector<std::string> Application::GetCommandLineArgs() {
         return _jsArgs;
     }
     
-	bool _runFile(std::string path, bool persist) {
+	bool Application::_runFile(std::string path, bool persist) {
 		Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading File: " << path << Logger::end();
         
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
@@ -818,7 +766,7 @@ namespace Engine {
 		}
 	}
     
-    bool runFile(std::string path, bool persist) {
+    bool Application::RunFile(std::string path, bool persist) {
         if (!Filesystem::FileExists(path)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << path << " Not Found" << Logger::end();
             return false;
@@ -832,48 +780,48 @@ namespace Engine {
         }
     }
     
-    void exit() {
-        running = false;
+    void Application::Exit() {
+        this->_running = false;
     }
     
-    void restartRenderer() {
+    void Application::RestartRenderer() {
         Logger::begin("Window", Logger::LogLevel_Log) << "Restarting renderer on next frame" << Logger::end();
         _restartNextFrame = true;
     }
     
-    void _restartRenderer() {
-        CloseWindow();
-        OpenWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"),
+    void Application::_restartRenderer() {
+        this->_closeWindow();
+        this->_openWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"),
                    Config::GetBoolean("cl_fullscreen"), Config::GetBoolean("cl_openGL3"));
-        UpdateScreen();
+        this->_updateScreen();
     }
     
-    void toggleFullscreen() {
+    void Application::ToggleFullscreen() {
         Logger::begin("Window", Logger::LogLevel_Log) << "Switching to fullscreen on next frame" << Logger::end();
-        toggleNextframe = true;
+        this->_toggleNextframe = true;
     }
     
-    void _toggleFullscreen() {
-        if (isFullscreen) {
-            CloseWindow();
-            OpenWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"), false, isGL3Context);
-            isFullscreen = false;
-            UpdateScreen();
+    void Application::_toggleFullscreen() {
+        if (this->_isFullscreen) {
+            this->_closeWindow();
+            this->_openWindow(Config::GetInt("cl_width"), Config::GetInt("cl_height"), false, isGL3Context);
+            this->_isFullscreen = false;
+            this->_updateScreen();
         } else {
             const GLFWvidmode* desktopMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            CloseWindow();
-            OpenWindow(desktopMode->width, desktopMode->height, true, isGL3Context);
-            isFullscreen = true;
-            UpdateScreen();
+            this->_closeWindow();
+            this->_openWindow(desktopMode->width, desktopMode->height, true, isGL3Context);
+            this->_isFullscreen = true;
+            this->_updateScreen();
         }
     }
     
-	void saveScreenshot(std::string screenshotFilename) {
-        _screenshotFilename = screenshotFilename;
-        screenshotNextframe = true;
+	void Application::SaveScreenshot(std::string screenshotFilename) {
+        this->_screenshotFilename = screenshotFilename;
+        this->_screenshotNextframe = true;
     }
     
-    void _saveScreenshot() {
+    void Application::_saveScreenshot() {
         int width, height;
         glfwGetWindowSize(window, &width, &height);
         BYTE* pixels = new BYTE[3 * width * height];
@@ -911,32 +859,19 @@ namespace Engine {
         std::free(pixels);
     }
     
-    void upgradeGL3() {
-        int width, height;
-        
-        glfwGetWindowSize(window, &width, &height);
-        
-        CloseWindow();
-        OpenWindow(width, height, isFullscreen, true);
-    }
-    
-    bool usingGL3() {
+    bool Application::UsingGL3() {
         return isGL3Context;
     }
     
-    GLFWwindow* getGLFWWindow() {
-        return window;
-    }
-    
-    void dumpProfile() {
+    void Application::DumpProfile() {
         _dumpProfileAtFrameEnd = true;
     }
     
-    void _dumpProfile() {
+    void Application::_dumpProfile() {
         Profiler::DumpProfile();
     }
     
-    void runCommand(std::string str) {
+    void Application::RunCommand(std::string str) {
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
         v8::Context::Scope ctx_scope(ctx);
@@ -970,21 +905,21 @@ namespace Engine {
 		}
     }
     
-    void detailProfile(int frames, std::string filename) {
+    void Application::DetailProfile(int frames, std::string filename) {
         Profiler::ResetDetail();
         _detailFrames = frames;
         _detailFilename = filename;
     }
     
-    void invalidateScript(std::string scriptName) {
+    void Application::InvalidateScript(std::string scriptName) {
         _loadedFiles[scriptName] = 0;
     }
     
-    bool getKeyPressed(int key) {
+    bool Application::GetKeyPressed(int key) {
         return glfwGetKey(window, key) == GLFW_PRESS;
     }
     
-    OpenGLVersion getOpenGLVersion() {
+    OpenGLVersion Application::GetOpenGLVersion() {
         OpenGLVersion ret;
         
         ret.major = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MAJOR);
@@ -994,13 +929,13 @@ namespace Engine {
         return ret;
     }
     
-    void MainLoop() {
-        running = true;
+    void Application::_mainLoop() {
+        this->_running = true;
         
-		while (running) {
+		while (this->_running) {
             Profiler::StartProfileFrame();
             
-			if (!isFullscreen &&
+			if (!this->_isFullscreen &&
                 !glfwGetWindowAttrib(window, GLFW_FOCUSED) &&
                 !Config::GetBoolean("cl_runOnIdle") &&
                 !glfwWindowShouldClose(window)) {
@@ -1010,14 +945,14 @@ namespace Engine {
 			}
             
             if (Config::GetBoolean("script_reload")) {
-                CheckUpdate();
+                this->_checkUpdate();
             }
             
             Profiler::Begin("Frame", Config::GetFloat("cl_targetFrameTime"));
             
-            UpdateFrameTime();
+            this->_updateFrameTime();
             
-            UpdateMousePos();
+            this->_updateMousePos();
             
             Profiler::Begin("Draw");
             
@@ -1053,7 +988,7 @@ namespace Engine {
             
 			if (glfwWindowShouldClose(window)) {
 				Logger::begin("Window", Logger::LogLevel_Log) << "Exiting" << Logger::end();
-				running = false;
+				this->_running = false;
 				break;
 			}
             
@@ -1065,36 +1000,36 @@ namespace Engine {
                 Profiler::End("ScriptGC");
             }
             
-            if (toggleNextframe) {
+            if (this->_toggleNextframe) {
                 Profiler::Begin("ToggleFullscreen");
-                _toggleFullscreen();
+                this->_toggleFullscreen();
                 Profiler::End("ToggleFullscreen");
-                toggleNextframe = false;
+                this->_toggleNextframe = false;
             }
             
-            if (_restartNextFrame) {
+            if (this->_restartNextFrame) {
                 Profiler::Begin("RestartRenderer");
-                _restartRenderer();
+                this->_restartRenderer();
                 Profiler::End("RestartRenderer");
-                _restartNextFrame = false;
+                this->_restartNextFrame = false;
             }
             
-            if (screenshotNextframe) {
+            if (this->_screenshotNextframe) {
                 Profiler::Begin("SaveScreenshot");
-                _saveScreenshot();
+                this->_saveScreenshot();
                 Profiler::End("SaveScreenshot");
-                screenshotNextframe = false;
+                this->_screenshotNextframe = false;
             }
             
-            if (_dumpProfileAtFrameEnd) {
-                _dumpProfile();
-                _dumpProfileAtFrameEnd = false;
+            if (this->_dumpProfileAtFrameEnd) {
+                this->_dumpProfile();
+                this->_dumpProfileAtFrameEnd = false;
             }
             
-            if (_detailFrames > 0) {
+            if (this->_detailFrames > 0) {
                 Profiler::CaptureDetail();
-                _detailFrames--;
-                if (_detailFrames <= 0) {
+                this->_detailFrames--;
+                if (this->_detailFrames <= 0) {
                     std::string detailData = Profiler::GetDetailProfile();
                     Filesystem::WriteFile(_detailFilename, (char*) detailData.c_str(), sizeof(char) * detailData.length());
                     Logger::begin("Profiler", Logger::LogLevel_Log)
@@ -1106,16 +1041,16 @@ namespace Engine {
     
 	// main function
 	
-	int main(int argc, char const *argv[]) {
+	int Application::Start(int argc, char const *argv[]) {
         Platform::SetRawCommandLine(argc, argv);
         
-        if (!ParseCommandLine(argc, argv)) {
+        if (!this->_parseCommandLine(argc, argv)) {
             return 1;
         }
         
-        LoadBasicConfigs(_developerMode, _debugMode);
+        this->_loadBasicConfigs();
         
-        ApplyDelayedConfigs();
+        this->_applyDelayedConfigs();
         
         Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
         
@@ -1124,20 +1059,20 @@ namespace Engine {
         v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         
         Profiler::Begin("InitScripting");
-        v8::Handle<v8::Context> ctx = InitScripting(_developerMode);
+        v8::Handle<v8::Context> ctx = this->_initScripting();
         Profiler::End("InitScripting");
         
         ctx->Enter();
         
         Profiler::Begin("InitOpenGL");
-        InitOpenGL();
+        this->_initOpenGL();
         Profiler::End("InitOpenGL");
         
         Draw2D::CheckGLError("Post InitOpenGL");
         
         engine::EnableGLContext();
         
-        DisablePreload();
+        this->_disablePreload();
         
         Events::Emit("postLoad", Events::EventArgs());
         
@@ -1145,23 +1080,23 @@ namespace Engine {
         
         FreeImage_Initialise();
         
-        UpdateScreen();
+        this->_updateScreen();
         
         Draw2D::CheckGLError("Post Finish Loading");
         
         Logger::begin("Application", Logger::LogLevel_Log) << "Loaded" << Logger::end();
         
-        if (_testMode) {
-            LoadTests();
+        if (this->_testMode) {
+            this->_loadTests();
             TestSuite::Run();
         } else {
-            MainLoop();
+            this->_mainLoop();
         }
         
         engine::DisableGLContext();
         
-		ShutdownOpenGL();
-		ShutdownScripting();
+		this->_shutdownOpenGL();
+		this->_shutdownScripting();
         
 		Filesystem::Destroy();
         
@@ -1169,5 +1104,14 @@ namespace Engine {
         
 		return 0;
 	}
+    
+    Application* _singilton = NULL;
+    
+    Application* GetAppSingilton() {
+        if (_singilton == NULL) {
+            _singilton = new Application();
+        }
+        return _singilton;
+    }
 	
 } // namespace Engine

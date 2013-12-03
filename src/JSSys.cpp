@@ -46,7 +46,7 @@ namespace Engine {
             
             v8::Local<v8::Array> argvArray = v8::Array::New();
             
-            std::vector<std::string> cArgs = getCommandLineArgs();
+            std::vector<std::string> cArgs = GetAppSingilton()->GetCommandLineArgs();
             
             for (int i = 0; i < cArgs.size(); i++) {
                 argvArray->Set(i, v8::String::New(cArgs[i].c_str()));
@@ -64,7 +64,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_BOOLEAN(1, "Arg1 is set to automaticly reload Arg0 when it's changed");
             
             std::string scriptFilename = *ENGINE_GET_ARG_CSTRING_VALUE(0) + std::string(".js");
-			runFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1));
+			GetAppSingilton()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1));
 			
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -126,7 +126,7 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New();
             
-            OpenGLVersion version = getOpenGLVersion();
+            OpenGLVersion version = GetAppSingilton()->GetOpenGLVersion();
 
             ret->Set(v8::String::New("major"), v8::Number::New(version.major));
             ret->Set(v8::String::New("minor"), v8::Number::New(version.minor));
@@ -156,7 +156,7 @@ namespace Engine {
             
             v8::Handle<v8::Array> arr = v8::Array::New();
             
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 int extentionCount;
                 glGetIntegerv(GL_NUM_EXTENSIONS, &extentionCount);
             
@@ -202,7 +202,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to save the screenshot as");
             
-            saveScreenshot(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            GetAppSingilton()->SaveScreenshot(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -228,8 +228,8 @@ namespace Engine {
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the new X size of the window");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the new Y size of the window");
             
-            setScreenSize(  ENGINE_GET_ARG_INT32_VALUE(0),
-                            ENGINE_GET_ARG_INT32_VALUE(1));
+            GetAppSingilton()->SetScreenSize(   ENGINE_GET_ARG_INT32_VALUE(0),
+                                                ENGINE_GET_ARG_INT32_VALUE(1));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -271,7 +271,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ToggleFullscreen) {
             ENGINE_JS_SCOPE_OPEN;
             
-            toggleFullscreen();
+            GetAppSingilton()->ToggleFullscreen();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -279,7 +279,7 @@ namespace Engine {
         ENGINE_JS_METHOD(RestartRenderer) {
             ENGINE_JS_SCOPE_OPEN;
             
-            restartRenderer();
+            GetAppSingilton()->RestartRenderer();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -287,7 +287,7 @@ namespace Engine {
         ENGINE_JS_METHOD(Exit) {
             ENGINE_JS_SCOPE_OPEN;
             
-            exit();
+            GetAppSingilton()->Exit();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -425,7 +425,7 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            detailProfile(ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+            GetAppSingilton()->DetailProfile(ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -463,7 +463,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ReloadRootScript) {
             ENGINE_JS_SCOPE_OPEN;
             
-            invalidateScript(Config::GetString("script_bootloader"));
+            GetAppSingilton()->InvalidateScript(Config::GetString("script_bootloader"));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -475,7 +475,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the script to reload");
             
-            invalidateScript(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            GetAppSingilton()->InvalidateScript(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -575,8 +575,6 @@ namespace Engine {
             addItem(sysTable, "profile", Profile);
             
             addItem(sysTable, "profileSet", ProfileSet);
-            
-            addItem(sysTable, "clearConsole", ClearConsole);
             
             addItem(sysTable, "reloadRootScript", ReloadRootScript);
             addItem(sysTable, "forceReload", ForceReload);

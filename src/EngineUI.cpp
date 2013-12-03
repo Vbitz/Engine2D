@@ -50,13 +50,15 @@ namespace Engine {
                 return;
             }
             
+            Application* app = GetAppSingilton();
+            
             if (!_showConsole) {
                 Draw2D::SetColor(25 / 255.0f, 25 / 255.0f, 25 / 255.0f);
             } else {
                 Draw2D::SetColor(40 / 255.0f, 40 / 255.0f, 40 / 255.0f, 0.95f);
             }
             
-            Draw2D::Rect(0.0f, 0.0f, getScreenWidth(), _showConsole ? getScreenHeight() : 14);
+            Draw2D::Rect(0.0f, 0.0f, app->GetScreenWidth(), _showConsole ? app->GetScreenHeight() : 14);
             
             Draw2D::SetFont("basic", 10);
             if (!_showConsole) {
@@ -85,11 +87,11 @@ namespace Engine {
             ss.precision(4);
             ss << "FPS: " << currentFPS;
             ss << " | DrawTime: " << drawTime;
-            Draw2D::Print(getScreenWidth() - 220, 4, ss.str().c_str());
+            Draw2D::Print(app->GetScreenWidth() - 220, 4, ss.str().c_str());
             
             Draw2D::DisableSmooth();
             
-            Draw2D::LineGraph(getScreenWidth() - 430, 14, 2, 200, lastDrawTimes, 100);
+            Draw2D::LineGraph(app->GetScreenWidth() - 430, 14, 2, 200, lastDrawTimes, 100);
             
             Draw2D::EnableSmooth();
             
@@ -101,7 +103,7 @@ namespace Engine {
             
             bool showVerbose = Config::GetBoolean("cl_showVerboseLog"); // pretty cheap
             
-            int i = getScreenHeight() - 40;
+            int i = app->GetScreenHeight() - 40;
             
             for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
                 if (iterator->Hidden) {
@@ -112,11 +114,11 @@ namespace Engine {
                     if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
                         i -= 6; // add some padding to show that a message is there, just hidden
                         Draw2D::SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
-                        Draw2D::Rect(0, i + 2, getScreenWidth(), 2);
+                        Draw2D::Rect(0, i + 2, app->GetScreenWidth(), 2);
                     } else {
                         i -= 22;
                         Draw2D::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
-                        Draw2D::Rect(60, i + 1, getScreenWidth() - 60, 20);
+                        Draw2D::Rect(60, i + 1, app->GetScreenWidth() - 60, 20);
                     }
                 }
                 
@@ -168,11 +170,11 @@ namespace Engine {
             }
             
             Draw2D::SetColor(0.0f, 0.0f, 0.0f, 0.85f);
-            Draw2D::Rect(5, getScreenHeight() - 30, getScreenWidth() - 10, 25);
+            Draw2D::Rect(5, app->GetScreenHeight() - 30, app->GetScreenWidth() - 10, 25);
             
             Draw2D::SetColor(1.0f, 1.0f, 1.0f);
             Draw2D::SetFont("basic", 12);
-            Draw2D::Print(10, getScreenHeight() - 22, (currentConsoleInput.str() + "_").c_str());
+            Draw2D::Print(10, app->GetScreenHeight() - 22, (currentConsoleInput.str() + "_").c_str());
         }
         
 #ifndef _PLATFORM_WIN32
@@ -185,11 +187,13 @@ namespace Engine {
             if (!Config::GetBoolean("cl_engineUI")) {
                 return;
             }
+            
+            Application* app = GetAppSingilton();
 
 			if (key == KEY_CONSOLE && press == GLFW_PRESS) { // `
                 ToggleConsole();
 			} else if (key == GLFW_KEY_F10 && press == GLFW_PRESS) { // f10
-				dumpProfile();
+				app->DumpProfile();
             }
 
             if (!_showConsole) {
@@ -212,7 +216,7 @@ namespace Engine {
 					}
                 }
             } else if (key == GLFW_KEY_ENTER && press == GLFW_PRESS) {
-                runCommand(currentConsoleInput.str());
+                app->RunCommand(currentConsoleInput.str());
                 currentConsoleInput.str("");
             }
         }

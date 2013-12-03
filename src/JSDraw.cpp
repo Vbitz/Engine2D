@@ -488,7 +488,7 @@ namespace Engine {
             
             Draw2D::BeginRendering(GL_TRIANGLES);
             
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 Draw2D::CheckGLError("JSDraw::Draw::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
             }
                 
@@ -553,14 +553,14 @@ namespace Engine {
             
             Draw2D::EnableTexture(texId);
             
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 glBindTexture(GL_TEXTURE_2D, texId);
             }
                 
             glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &imageWidth);
             glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &imageHeight);
             
-            if (usingGL3()) {
+            if (GetAppSingilton()->UsingGL3()) {
                 glBindTexture(GL_TEXTURE_2D, 0);
             }
             
