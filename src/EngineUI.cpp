@@ -44,6 +44,9 @@ namespace Engine {
         
         float fpsTimer = 0.0f;
         float currentFPS = 0;
+    
+        std::vector<std::string> commandHistory;
+        size_t currentHistoryLine = 0;
         
         void Draw() {
             if (!Config::GetBoolean("core.debug.engineUI")) {
@@ -215,8 +218,23 @@ namespace Engine {
 						currentConsoleInput.seekp(str.length());
 					}
                 }
+            } else if (key == GLFW_KEY_UP && press == GLFW_PRESS) {
+                if (currentHistoryLine > 0) {
+                    currentHistoryLine--;
+                    currentConsoleInput.str(commandHistory[currentHistoryLine]);
+                }
+            } else if (key == GLFW_KEY_DOWN && press == GLFW_PRESS) {
+                if (commandHistory.size() > 0 && currentHistoryLine < commandHistory.size() - 1) {
+                    currentHistoryLine++;
+                    currentConsoleInput.str(commandHistory[currentHistoryLine]);
+                }
             } else if (key == GLFW_KEY_ENTER && press == GLFW_PRESS) {
-                app->RunCommand(currentConsoleInput.str());
+                std::string command = currentConsoleInput.str();
+                app->RunCommand(command);
+                if (commandHistory.size() == 0 || commandHistory[commandHistory.size() - 1] != command) {
+                    commandHistory.push_back(command);
+                }
+                currentHistoryLine = commandHistory.size();
                 currentConsoleInput.str("");
             }
         }
