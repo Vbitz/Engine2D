@@ -284,6 +284,14 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(Trace) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            Platform::DumpStackTrace();
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(Exit) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -550,6 +558,7 @@ namespace Engine {
             addItem(sysTable, "heapStats", HeapStats);
             addItem(sysTable, "memoryStats", MemoryStats);
             
+            addItem(sysTable, "trace", Trace);
             addItem(sysTable, "exit", Exit);
             
             addItem(sysTable, "getGLVersion", GetGLVersion);
