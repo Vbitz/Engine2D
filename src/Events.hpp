@@ -52,6 +52,6 @@ namespace Engine {
         int On(std::string evnt, std::string label, EventArgs e, v8::Persistent<v8::Function>* target);
         int On(std::string evnt, std::string label, EventTargetFunc target);
         int On(std::string evnt, std::string label, v8::Persistent<v8::Function>* target);
-        void Clear(int eventID);
+        void Clear(std::string eventID);
     }
 }

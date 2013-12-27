@@ -165,15 +165,6 @@ namespace Engine {
         
         int lastEventID = 0;
         
-        bool eventExists(std::string name) {
-            for (auto iter = _events.begin(); iter != _events.end(); iter++) {
-                if (iter->Label == name) { // I should switch this over to a unordered_map
-                    return true;
-                }
-            }
-            return false;
-        }
-        
         void Emit(std::string evnt, std::function<bool(EventArgs)> filter, EventArgs args) {
             std::vector<Event> targets;
             for (auto iter = _events.begin(); iter != _events.end(); iter++) {
@@ -198,23 +189,15 @@ namespace Engine {
         }
         
         int On(std::string evnt, std::string name, EventArgs e, EventTargetFunc target) {
-            if (eventExists(name)) {
-                return -1;
-            } else {
-                _events.push_back(Event(std::string(evnt.c_str()), std::string(evnt.c_str()),
-                                        new CPPEventTarget(target, e)));
-                return lastEventID++;
-            }
+            _events.push_back(Event(std::string(evnt.c_str()), std::string(evnt.c_str()),
+                                    new CPPEventTarget(target, e)));
+            return lastEventID++;
         }
         
         int On(std::string evnt, std::string name, EventArgs e, v8::Persistent<v8::Function>* target) {
-            if (eventExists(name)) {
-                return -1;
-            } else {
-                _events.push_back(Event(std::string(evnt.c_str()), std::string(name.c_str()),
-                                        new JSEventTarget(target, e)));
-                return lastEventID++;
-            }
+            _events.push_back(Event(std::string(evnt.c_str()), std::string(name.c_str()),
+                                    new JSEventTarget(target, e)));
+            return lastEventID++;
         }
         
         int On(std::string evnt, std::string name, EventTargetFunc target) {
@@ -225,9 +208,11 @@ namespace Engine {
             return On(evnt, name, EventArgs(), target);
         }
         
-        void Clear(int eventID) {
-            if (eventID < _events.size()) {
-                _events.at(eventID).Active = false;
+        void Clear(std::string eventID) {
+            for (auto iter = _events.begin(); iter != _events.end(); iter++) {
+                if (iter->Label == eventID) {
+                    iter->Active = false;
+                }
             }
         }
     }

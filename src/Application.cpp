@@ -883,7 +883,7 @@ namespace Engine {
 				continue;
 			}
             
-            if (Config::GetBoolean("core.debug.reloadScripts")) {
+            if (Config::GetBoolean("core.script.autoReload")) {
                 this->_checkUpdate();
             }
             
@@ -990,6 +990,14 @@ namespace Engine {
         this->_applyDelayedConfigs();
         
         Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
+        
+        if (this->_debugMode) {
+            Logger::begin("Application", Logger::LogLevel_Warning) << "=== Debug Mode Active ===" << Logger::end();
+        }
+        
+        if (this->_developerMode) {
+            Logger::begin("Application", Logger::LogLevel_Warning) << "=== Developer Mode Active ===" << Logger::end();
+        }
         
 		Filesystem::Init(argv[0]);
         
