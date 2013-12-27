@@ -274,41 +274,43 @@ namespace Engine {
         // new names in comments
         // I still need to think though and make sure these match up
         
-        Config::SetNumber(  "core.window.width",                 800);
-        Config::SetNumber(  "core.window.height",                600);
-        Config::SetBoolean( "core.render.aa",                    true);
-        Config::SetBoolean( "core.window.vsync",                 false); // lack of vsync causes FPS issues
-        Config::SetBoolean( "core.window.fullscreen",            false);
-        Config::SetString(  "core.render.openGL",               "3.2");
-        Config::SetString(  "core.content.fontPath",              "fonts/OpenSans-Regular.ttf");
-        Config::SetBoolean( "core.debug.engineUI.showVerboseLog",        false);
-        Config::SetBoolean( "core.runOnIdle",             false);
-        Config::SetBoolean( "core.debug.engineUI",              this->_developerMode);
-        Config::SetBoolean( "core.debug.profiler",              this->_developerMode || this->_debugMode);
-        Config::SetString(  "core.window.title",                 "Engine2D");
-        Config::SetBoolean( "core.debug.debugRenderer",          false);
-        Config::SetString(  "core.render.basicShader",             "shaders/basic");
-        Config::SetNumber(  "core.render.targetFrameTime",       1.0f / 30.0f);
+        Config::SetBoolean( "core.runOnIdle",                       false);
+        Config::SetBoolean( "core.catchErrors",                     !this->_debugMode);
         
-        Config::SetBoolean( "core.render.clampTexture",  true);
-        Config::SetBoolean( "core.render.forceMipmaps",   true);
+        Config::SetNumber(  "core.window.width",                    800);
+        Config::SetNumber(  "core.window.height",                   600);
+        Config::SetBoolean( "core.render.aa",                       true);
+        Config::SetBoolean( "core.window.vsync",                    false); // lack of vsync causes FPS issues
+        Config::SetBoolean( "core.window.fullscreen",               false);
+        Config::SetString(  "core.render.openGL",                   "3.2");
+        Config::SetString(  "core.content.fontPath",                "fonts/OpenSans-Regular.ttf");
+        Config::SetBoolean( "core.debug.engineUI.showVerboseLog",   false);
+        Config::SetBoolean( "core.debug.engineUI",                  this->_developerMode);
+        Config::SetBoolean( "core.debug.profiler",                  this->_developerMode || this->_debugMode);
+        Config::SetString(  "core.window.title",                    "Engine2D");
+        Config::SetBoolean( "core.debug.debugRenderer",             false);
+        Config::SetString(  "core.render.basicShader",              "shaders/basic");
+        Config::SetNumber(  "core.render.targetFrameTime",          1.0f / 30.0f);
         
-        Config::SetBoolean( "core.script.autoReload",            this->_developerMode);
-        Config::SetBoolean( "core.script.gcOnFrame",           this->_developerMode);
-        Config::SetString(  "core.script.loader",        "lib/boot.js");
-        Config::SetString(  "core.config.path",            "config/config.json");
-        Config::SetString(  "core.script.entryPoint",         "script/basic");
+        Config::SetBoolean( "core.render.clampTexture",             true);
+        Config::SetBoolean( "core.render.forceMipmaps",             true);
+        
+        Config::SetBoolean( "core.script.autoReload",               this->_developerMode);
+        Config::SetBoolean( "core.script.gcOnFrame",                this->_developerMode);
+        Config::SetString(  "core.script.loader",                   "lib/boot.js");
+        Config::SetString(  "core.config.path",                     "config/config.json");
+        Config::SetString(  "core.script.entryPoint",               "script/basic");
         
         // log_console = core.log.enableConsole
         // With quite a bit of research into console logging performance on windows it seems like I should be using
         // printf or buffered std::cout
-        Config::SetBoolean( "core.log.enableConsole",              true);
-        Config::SetBoolean( "core.log.filePath",                 "");
-        Config::SetBoolean( "core.log.levels.verbose",       this->_developerMode || this->_debugMode);
-        Config::SetBoolean( "core.log.showColors",               true);
-        Config::SetBoolean( "core.log.src.undefinedValue",     this->_developerMode);
-        Config::SetBoolean( "core.log.src.perfIssues",     this->_developerMode);
-        Config::SetBoolean( "core.log.src.createImage",          true);
+        Config::SetBoolean( "core.log.enableConsole",               true);
+        Config::SetBoolean( "core.log.filePath",                    "");
+        Config::SetBoolean( "core.log.levels.verbose",              this->_developerMode || this->_debugMode);
+        Config::SetBoolean( "core.log.showColors",                  true);
+        Config::SetBoolean( "core.log.src.undefinedValue",          this->_developerMode);
+        Config::SetBoolean( "core.log.src.perfIssues",              this->_developerMode);
+        Config::SetBoolean( "core.log.src.createImage",             true);
     }
 	
     void Application::_resizeWindow(GLFWwindow* window, int w, int h) {
@@ -977,18 +979,8 @@ namespace Engine {
     }
     
 	// main function
-	
-	int Application::Start(int argc, char const *argv[]) {
-        Platform::SetRawCommandLine(argc, argv);
-        
-        if (!this->_parseCommandLine(argc, argv)) {
-            return 1;
-        }
-        
-        this->_loadBasicConfigs();
-        
-        this->_applyDelayedConfigs();
-        
+    
+    int Application::_postStart() {
         Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
         
         if (this->_debugMode) {
@@ -999,7 +991,7 @@ namespace Engine {
             Logger::begin("Application", Logger::LogLevel_Warning) << "=== Developer Mode Active ===" << Logger::end();
         }
         
-		Filesystem::Init(argv[0]);
+		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
         
         v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         
@@ -1048,7 +1040,30 @@ namespace Engine {
         JSMod::CloseAllOpenModules();
         
 		return 0;
-	}
+    }
+	
+	int Application::Start(int argc, char const *argv[]) {
+        Platform::SetRawCommandLine(argc, argv);
+        
+        if (!this->_parseCommandLine(argc, argv)) {
+            return 1;
+        }
+        
+        this->_loadBasicConfigs();
+        
+        this->_applyDelayedConfigs();
+        
+        if (Config::GetBoolean("core.catchErrors")) {
+            try {
+                return this->_postStart();
+            } catch (...) {
+                Platform::ShowMessageBox("Engine2D", "Engine2D has crashed and will now close", true);
+                return 1;
+            }
+        } else {
+            return this->_postStart();
+        }
+    }
     
     Application* _singilton = NULL;
     

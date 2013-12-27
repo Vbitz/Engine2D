@@ -54,6 +54,7 @@ namespace Engine {
         static void _keyPress(GLFWwindow* window, int rawKey, int scanCode, int state, int mods);
         static void _resizeWindow(GLFWwindow* window, int w, int h);
         
+        int  _postStart();
         void _dumpProfile();
         void _saveScreenshot();
         void _toggleFullscreen();
