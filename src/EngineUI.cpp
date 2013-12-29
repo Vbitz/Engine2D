@@ -222,11 +222,17 @@ namespace Engine {
                 if (currentHistoryLine > 0) {
                     currentHistoryLine--;
                     currentConsoleInput.str(commandHistory[currentHistoryLine]);
+                    if (currentConsoleInput.str().length() != 0) {
+                        currentConsoleInput.seekp(currentConsoleInput.str().length());
+                    }
                 }
             } else if (key == GLFW_KEY_DOWN && press == GLFW_PRESS) {
                 if (commandHistory.size() > 0 && currentHistoryLine < commandHistory.size() - 1) {
                     currentHistoryLine++;
                     currentConsoleInput.str(commandHistory[currentHistoryLine]);
+                    if (currentConsoleInput.str().length() != 0) {
+                        currentConsoleInput.seekp(currentConsoleInput.str().length());
+                    }
                 }
             } else if (key == GLFW_KEY_ENTER && press == GLFW_PRESS) {
                 std::string command = currentConsoleInput.str();

@@ -42,7 +42,7 @@ namespace Engine {
         
 		// fuuuu visual studio
 
-		std::map<std::string, int> _predefinedColors;
+		std::unordered_map<std::string, int> _predefinedColors;
 
 		bool _predefFilled = false;
 
@@ -535,12 +535,13 @@ namespace Engine {
 				_initPredefinedColors();
 				_predefFilled = true;
 			}
-            if (_predefinedColors.count(colorName) == 0) {
-                Logger::begin("Draw2D", Logger::LogLevel_Error) << "Color not found: " << colorName << Logger::end();
-                SetColor(0x123456);
-            } else {
+            // Too many perf issues from calling count
+            //if (_predefinedColors.count(colorName) == 0) {
+            //    Logger::begin("Draw2D", Logger::LogLevel_Error) << "Color not found: " << colorName << Logger::end();
+            //    SetColor(0x123456);
+            //} else {
                 SetColor(_predefinedColors[colorName]);
-            }
+            //}
         }
         
         void SetColor(float r, float g, float b) {

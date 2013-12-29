@@ -18,6 +18,9 @@ namespace Engine {
         }
 
 	private:
+        void _init();
+        void _shutdown();
+        
 		void bindShader();
         
         GLuint _vertexArrayPointer, _vertexBufferPointer;

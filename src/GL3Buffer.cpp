@@ -4,11 +4,19 @@
 
 namespace Engine {
     GL3Buffer::GL3Buffer(Shader shader) : _currentShader(shader), _shaderBound(false) {
+        this->_init();
+    }
+    
+    GL3Buffer::~GL3Buffer() {
+        this->_shutdown();
+    }
+    
+    void GL3Buffer::_init() {
         glGenVertexArrays(1, &this->_vertexArrayPointer);
         glGenBuffers(1, &this->_vertexBufferPointer);
     }
     
-    GL3Buffer::~GL3Buffer() {
+    void GL3Buffer::_shutdown() {
         glDeleteBuffers(1, &this->_vertexBufferPointer);
         glDeleteVertexArrays(1, &this->_vertexArrayPointer);
     }
