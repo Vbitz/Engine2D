@@ -50,6 +50,8 @@ function onPostLoad() {
 	var argv = sys.argv();
 	var glInfo = sys.getGLVersion();
 	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
+	sys.screenWidth = globalConfig["core.window.width"];
+	sys.screenHeight = globalConfig["core.window.height"];
 	sys.runFile(argv.length > 0 ? argv[0] : sys.config("core.script.entryPoint"), true);
 	sys.clearEvent("bootloaderLoad");
 }

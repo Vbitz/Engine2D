@@ -178,7 +178,7 @@ namespace Engine {
             _predefinedColors["lavenderBlush"] = 0xFFF0F5;
             _predefinedColors["mistyRose"] = 0xFFE4E1;
             _predefinedColors["gainsboro"] = 0xDCDCDC;
-            _predefinedColors["lightGray"] = 0xD3D3D3;
+            _predefinedColors["lightGrey"] = 0xD3D3D3;
             _predefinedColors["silver"] = 0xC0C0C0;
             _predefinedColors["darkGrey"] = 0xA9A9A9;
             _predefinedColors["grey"] = 0x808080;
