@@ -18,6 +18,7 @@
 #include "JSFS.hpp"
 #include "JSDatabase.hpp"
 #include "JSMod.hpp"
+#include "JSUnsafe.hpp"
 
 namespace Engine {
     
@@ -200,6 +201,13 @@ namespace Engine {
         JSMod::InitMod(moduleTable);
         
         global->Set("mod", moduleTable);
+        
+        // unsafeTable
+        v8::Handle<v8::ObjectTemplate> unsafeTable = v8::ObjectTemplate::New();
+        
+        JsUnsafe::InitUnsafe(unsafeTable);
+        
+        global->Set("unsafe", unsafeTable);
         
         v8::Handle<v8::Context> ctx = v8::Context::New(v8::Isolate::GetCurrent(), NULL, global);
         

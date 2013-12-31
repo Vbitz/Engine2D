@@ -17,6 +17,7 @@ SRCS= 	src/main.cpp \
 		src/JSFS.cpp \
 		src/JSDatabase.cpp \
 		src/JSMod.cpp \
+		src/JSUnsafe.cpp \
 		src/Database.cpp \
 		src/Filesystem.cpp \
 		src/extern/GLFT_Font.cpp \
@@ -62,6 +63,7 @@ run: all
 
 test: all
 	$(OUTPUT) -test # tests run in normal conditions
+		# some tests are only enabled in debug mode but those are special cases
 
 all: Engine
 

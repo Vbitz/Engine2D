@@ -20,6 +20,53 @@ var tests = {
 		mod.call(m, "testing");
 
 		return true;
+	},
+	"Unsafe": function () {
+		// get the pagesize
+		var pagesize = unsafe.getPageSize();
+
+		function copy(a, b, bOff, len) {
+			for (var i = 0; i < len; i++) {
+				b[i + bOff] = a[i];
+			}
+		}
+
+		// disassembled:
+		// 		ret
+		var instructions = [0xc3];
+
+		// add some more space to the buffer for page alignment
+		var bufSize = 32 + pagesize;
+
+		// malloc the buffer
+		var buf = unsafe.malloc(bufSize);
+
+		// get the real address to the buffer to calucate the offset to write the machine code to
+		var realBufAddress = unsafe.addressOf(buf);
+		var bufAddr = unsafe.addressOf(buf);
+
+		// align bufAddr to the closest memory page (otherwise mprotect won't work and calling will crash node)
+		bufAddr -= (bufAddr % pagesize);
+		bufAddr += pagesize;
+
+		// copy the instructions to the buffer aligned to page boundarys
+		copy(instructions, buf, (bufAddr - realBufAddress), instructions.length);
+
+		// call mprotect() to make sure we can run the code
+		if (!unsafe.mprotect(bufAddr, bufSize, true)) {
+			throw new Error("mprotect failed");
+		} else {
+			// call the code
+			unsafe.call(bufAddr);
+
+			// disable execution and reenable write access so free() stays safe
+			unsafe.mprotect(bufAddr, bufSize, false);
+		}
+
+		// finaly free the buffer
+		unsafe.free(bufAddr);
+
+		return true;
 	}
 };
 
