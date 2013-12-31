@@ -203,11 +203,14 @@ namespace Engine {
         global->Set("mod", moduleTable);
         
         // unsafeTable
-        v8::Handle<v8::ObjectTemplate> unsafeTable = v8::ObjectTemplate::New();
         
-        JsUnsafe::InitUnsafe(unsafeTable);
+        if (this->_developerMode || this->_debugMode) {
+            v8::Handle<v8::ObjectTemplate> unsafeTable = v8::ObjectTemplate::New();
         
-        global->Set("unsafe", unsafeTable);
+            JsUnsafe::InitUnsafe(unsafeTable);
+        
+            global->Set("unsafe", unsafeTable);
+        }
         
         v8::Handle<v8::Context> ctx = v8::Context::New(v8::Isolate::GetCurrent(), NULL, global);
         
