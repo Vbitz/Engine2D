@@ -48,12 +48,18 @@ for (var i = 0; i < libarys.length; i++) {
 function onPostLoad() {
 	console.log("Booting JavaScript Phase 2");
 	var argv = sys.argv();
+	if (argv.length > 0) {
+		sys.config("core.script.entryPoint", argv[0]);
+	}
 	var glInfo = sys.getGLVersion();
 	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
 	sys.screenWidth = globalConfig["core.window.width"];
 	sys.screenHeight = globalConfig["core.window.height"];
-	sys.runFile(argv.length > 0 ? argv[0] : sys.config("core.script.entryPoint"), true);
 	sys.clearEvent("bootloaderLoad");
+	if (!sys.runFile(sys.config("core.script.entryPoint"), true)) {
+		console.error("Could not load core.script.entryPoint=" + sys.config("core.script.entryPoint"));
+		console.toggle();
+	}
 }
 
 if (sys.preload) {

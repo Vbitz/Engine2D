@@ -64,9 +64,8 @@ namespace Engine {
             ENGINE_CHECK_ARG_BOOLEAN(1, "Arg1 is set to automaticly reload Arg0 when it's changed");
             
             std::string scriptFilename = *ENGINE_GET_ARG_CSTRING_VALUE(0) + std::string(".js");
-			GetAppSingilton()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1));
 			
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetAppSingilton()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1))));
 		}
         
         ENGINE_JS_METHOD(EventsOn) {
@@ -464,6 +463,14 @@ namespace Engine {
             ENGINE_JS_SCOPE_OPEN;
             
             EngineUI::ClearConsole();
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(ToggleConsole) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            EngineUI::ToggleConsole();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

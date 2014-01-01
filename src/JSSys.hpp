@@ -8,6 +8,7 @@ namespace Engine {
 	namespace JsSys {
         ENGINE_JS_METHOD(Println);
         ENGINE_JS_METHOD(ClearConsole);
+        ENGINE_JS_METHOD(ToggleConsole);
         
         void InitSys(v8::Handle<v8::ObjectTemplate> sysTable);
 	}

@@ -146,6 +146,7 @@ namespace Engine {
         
         addItem(consoleTable, "_log", JsSys::Println);
         addItem(consoleTable, "clear", JsSys::ClearConsole);
+        addItem(consoleTable, "toggle", JsSys::ToggleConsole);
         
         global->Set("console", consoleTable);
         
@@ -204,7 +205,7 @@ namespace Engine {
         
         // unsafeTable
         
-        if (this->_developerMode || this->_debugMode) {
+        if (this->_developerMode) {
             v8::Handle<v8::ObjectTemplate> unsafeTable = v8::ObjectTemplate::New();
         
             JsUnsafe::InitUnsafe(unsafeTable);
@@ -546,6 +547,9 @@ namespace Engine {
                 _testMode = true;
             } else if (strcmp(argv[i], "-headless") == 0) {
                 // enable headless mode
+            } else if (strcmp(argv[i], "-v8-options") == 0) {
+                v8::V8::SetFlagsFromString("--help", 6);
+                _exit = true; // v8 exits automaticly but let's just help it along
             } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0) {
                 std::cerr << "Engine2D\n"
                 "==================\n"
@@ -571,6 +575,8 @@ namespace Engine {
                 "to the console)\n"
                 "(NYI) -log=filename            - Logs logger output to filename (This is not writen using PhysFS so it needs a"
                 "regular path)\n"
+                "-v8-options                    - Prints v8 option help and exit\n"
+                "-v8flag=value               - Set's v8 flags from the command line"
                 "(NYI) -h                       - Prints this message\n"
                 "" << std::endl;
                 _exit = true;
@@ -589,11 +595,23 @@ namespace Engine {
                 
                 free(key);
                 free(value);
+            } else if (strncmp(argv[i], "-v8", 3) == 0) {
+                // set delayed config
+                size_t configLength = strlen(argv[i]) - 3;
+                char* key = (char*) malloc(2 + configLength + 1);
+                key[0] = '-'; key[1] = '-';
+                strncpy(&key[2], &argv[i][3], configLength);
+                key[2 + configLength] = '\0';
+                
+                Logger::begin("Scripting_CFG", Logger::LogLevel_Log) << "Setting V8 Option: " << key << Logger::end();
+                v8::V8::SetFlagsFromString(key, (int) strlen(key));
+                
+                free(key);
             } else if (strncmp(argv[i], "-config=", 8) == 0) {
                 // set config filename
             } else if (strncmp(argv[i], "-archive=", 9) == 0) {
                 // add archive to PhysFS after PhysFS Init
-            } else if (strncmp(argv[i], "-log=", 2) == 0) {
+            } else if (strncmp(argv[i], "-log=", 5) == 0) {
                 // set logfile and enable logging
             } else {
                 // push to JS args
