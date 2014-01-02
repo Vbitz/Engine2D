@@ -16,6 +16,7 @@ namespace Engine {
 		void						Destroy();
 
         bool                        Mount(std::string path, std::string fsPath);
+        bool                        Mount(std::string path);
         void                        SetupUserDir(std::string path);
         
 		bool						FileExists(std::string path);

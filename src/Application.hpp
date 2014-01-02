@@ -104,6 +104,8 @@ namespace Engine {
         
         std::map<std::string, long> _loadedFiles;
         
+        std::vector<std::string> _archivePaths;
+        
         bool _developerMode = false;
         bool _debugMode = false;
         bool _testMode = false;

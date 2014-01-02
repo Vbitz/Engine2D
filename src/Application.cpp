@@ -556,8 +556,8 @@ namespace Engine {
                 "\n"
                 "-- Examples --\n"
                 "bin/Engine - loads config/config.json and sets basic config values\n"
-                "bin/Engine -Ccl_width=1280 -Ccl_height=800 - loads config/config.json and "
-                "overrides the basic configs cl_width and cl_height\n"
+                "bin/Engine -Ccore.window.width=1280 -Ccore.window.height=800 - loads config/config.json and "
+                "overrides the basic configs core.window.width and core.window.height\n"
                 "bin/Engine -config=config/test.json - loads config/test.json and sets basic config values\n"
                 "bin/Engine script/test - any non - configs are passed onto javascript\n"
                 "\n"
@@ -566,7 +566,7 @@ namespace Engine {
                 " but overrides those configs while they are applyed\n"
                 "(NYI) -config=configFile       - Sets the basic config to configFile, configFile is realitive to res/"
                 " since it uses PhysFS this could be other values\n"
-                "(NYI) -archive=archiveFile     - Loads a archive file using PhysFS, this is applyed after physfs is started\n"
+                "-mountPath=archiveFile         - Loads a archive file using PhysFS, this is applyed after physfs is started\n"
                 "-test                          - Runs the built in test suite\n"
                 "(NYI) -headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL"
                 " will fail.\n"
@@ -576,7 +576,7 @@ namespace Engine {
                 "(NYI) -log=filename            - Logs logger output to filename (This is not writen using PhysFS so it needs a"
                 "regular path)\n"
                 "-v8-options                    - Prints v8 option help and exit\n"
-                "-v8flag=value               - Set's v8 flags from the command line"
+                "-v8flag=value                  - Set's v8 flags from the command line\n"
                 "(NYI) -h                       - Prints this message\n"
                 "" << std::endl;
                 _exit = true;
@@ -609,8 +609,16 @@ namespace Engine {
                 free(key);
             } else if (strncmp(argv[i], "-config=", 8) == 0) {
                 // set config filename
-            } else if (strncmp(argv[i], "-archive=", 9) == 0) {
+            } else if (strncmp(argv[i], "-mountPath=", 11) == 0) {
                 // add archive to PhysFS after PhysFS Init
+                size_t configLength = strlen(argv[i]) - 11;
+                char* archive = (char*) malloc(configLength + 1);
+                strncpy(archive, &argv[i][11], configLength);
+                archive[configLength] = '\0';
+                
+                this->_archivePaths.push_back(archive);
+                
+                free(archive);
             } else if (strncmp(argv[i], "-log=", 5) == 0) {
                 // set logfile and enable logging
             } else {
@@ -1022,6 +1030,10 @@ namespace Engine {
         
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
         
+        for (auto iter = this->_archivePaths.begin(); iter != this->_archivePaths.end(); iter++) {
+            Filesystem::Mount(*iter);
+        }
+        
         v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         
         Profiler::Begin("InitScripting");
@@ -1072,11 +1084,15 @@ namespace Engine {
     }
 	
 	int Application::Start(int argc, char const *argv[]) {
+        Config::SetBoolean("core.log.enableConsole", true); // make sure we can log to the console right from the start
+        
         Platform::SetRawCommandLine(argc, argv);
         
         if (!this->_parseCommandLine(argc, argv)) {
             return 1;
         }
+        
+        Config::SetBoolean("core.log.enableConsole", false);
         
         this->_loadBasicConfigs();
         

@@ -30,6 +30,10 @@ namespace Engine {
             return result > 0;
         }
         
+        bool Mount(std::string path) {
+            return Mount(path, "");
+        }
+        
         void SetupUserDir(std::string path) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
