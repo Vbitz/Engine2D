@@ -70,33 +70,36 @@ namespace Engine {
                 Draw2D::SetColor(1.0f, 1.0f, 1.0f);
             }
             
-            double drawTime = Profiler::GetTime("Draw");
-            lastDrawTimes[currentLastDrawTimePos++] = drawTime;
-            if (currentLastDrawTimePos > 100) {
-                currentLastDrawTimePos = 0;
-            }
-            
-            float fps = 1000 / (Profiler::GetTime("Frame") * 1000);
-            
-            fpsTimer += Profiler::GetTime("Frame");
-            
-            if (fpsTimer > 0.1f) {
-                currentFPS = glm::floor(fps);
-                fpsTimer = 0;
+            if (Config::GetBoolean("core.debug.profiler")) {
+                double drawTime = Profiler::GetTime("Draw");
+                lastDrawTimes[currentLastDrawTimePos++] = drawTime;
+                if (currentLastDrawTimePos > 100) {
+                    currentLastDrawTimePos = 0;
+                }
+                
+                float fps = 1000 / (Profiler::GetTime("Frame") * 1000);
+                
+                fpsTimer += Profiler::GetTime("Frame");
+                
+                if (fpsTimer > 0.1f) {
+                    currentFPS = glm::floor(fps);
+                    fpsTimer = 0;
+                }
+                
+                ss.str("");
+                ss.precision(4);
+                ss << "FPS: " << currentFPS;
+                ss << " | DrawTime: " << drawTime;
+                Draw2D::Print(app->GetScreenWidth() - 220, 4, ss.str().c_str());
+                
+                Draw2D::DisableSmooth();
+                
+                Draw2D::LineGraph(app->GetScreenWidth() - 430, 14, 2, 200, lastDrawTimes, 100);
+                
+                Draw2D::EnableSmooth();
             }
             
             Draw2D::Print(10, 4, "-- Engine2D --");
-            ss.str("");
-            ss.precision(4);
-            ss << "FPS: " << currentFPS;
-            ss << " | DrawTime: " << drawTime;
-            Draw2D::Print(app->GetScreenWidth() - 220, 4, ss.str().c_str());
-            
-            Draw2D::DisableSmooth();
-            
-            Draw2D::LineGraph(app->GetScreenWidth() - 430, 14, 2, 200, lastDrawTimes, 100);
-            
-            Draw2D::EnableSmooth();
             
             if (!_showConsole) {
                 return;
