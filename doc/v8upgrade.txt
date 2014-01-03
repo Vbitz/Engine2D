@@ -1,0 +1,282 @@
+src/Application.cpp:#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+src/Application.cpp:    v8::Handle<v8::Context> Application::_initScripting() {
+src/Application.cpp:		//_globalIsolate = v8::Isolate::New();
+src/Application.cpp:		v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+src/Application.cpp:		v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
+src/Application.cpp:        v8::Handle<v8::ObjectTemplate> consoleTable = v8::ObjectTemplate::New();
+src/Application.cpp:		v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
+src/Application.cpp:        sysTable->Set("platform", v8::String::New(_PLATFORM));
+src/Application.cpp:        sysTable->Set("devMode", v8::Boolean::New(this->_developerMode));
+src/Application.cpp:        sysTable->Set("preload", v8::Boolean::New(true));
+src/Application.cpp:        sysTable->Set("numProcessers", v8::Number::New(Platform::GetProcesserCount()));
+src/Application.cpp:        sysTable->Set("username", v8::String::New(Platform::GetUsername().c_str()));
+src/Application.cpp:        v8::Handle<v8::ObjectTemplate> drawTable = v8::ObjectTemplate::New();
+src/Application.cpp:        v8::Handle<v8::ObjectTemplate> fsTable = v8::ObjectTemplate::New();
+src/Application.cpp:        v8::Handle<v8::ObjectTemplate> dbTable = v8::ObjectTemplate::New();
+src/Application.cpp:        v8::Handle<v8::ObjectTemplate> inputTable = v8::ObjectTemplate::New();
+src/Application.cpp:        v8::Handle<v8::ObjectTemplate> moduleTable = v8::ObjectTemplate::New();
+src/Application.cpp:            v8::Handle<v8::ObjectTemplate> unsafeTable = v8::ObjectTemplate::New();
+src/Application.cpp:        v8::Handle<v8::Context> ctx = v8::Context::New(v8::Isolate::GetCurrent(), NULL, global);
+src/Application.cpp:		v8::HandleScope scp(v8::Isolate::GetCurrent());
+src/Application.cpp:        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+src/Application.cpp:        v8::Context::Scope ctx_scope(ctx);
+src/Application.cpp:		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
+src/Application.cpp:		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("input")));
+src/Application.cpp:		input_table->Set(v8::String::New("mouseX"), v8::Number::New(x));
+src/Application.cpp:		input_table->Set(v8::String::New("mouseY"), v8::Number::New(y));
+src/Application.cpp:		input_table->Set(v8::String::New("leftMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS));
+src/Application.cpp:		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS));
+src/Application.cpp:		v8::HandleScope scp(v8::Isolate::GetCurrent());
+src/Application.cpp:        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+src/Application.cpp:        v8::Context::Scope ctx_scope(ctx);
+src/Application.cpp:		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
+src/Application.cpp:		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
+src/Application.cpp:		input_table->Set(v8::String::New("screenWidth"), v8::Number::New(_screenWidth));
+src/Application.cpp:		input_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
+src/Application.cpp:		v8::HandleScope scp(v8::Isolate::GetCurrent());
+src/Application.cpp:        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+src/Application.cpp:        v8::Context::Scope ctx_scope(ctx);
+src/Application.cpp:		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
+src/Application.cpp:		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
+src/Application.cpp:        sys_table->Set(v8::String::NewSymbol("deltaTime"), v8::Number::New(Profiler::GetTime("Frame")));
+src/Application.cpp:		v8::HandleScope scp(v8::Isolate::GetCurrent());
+src/Application.cpp:        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+src/Application.cpp:        v8::Context::Scope ctx_scope(ctx);
+src/Application.cpp:		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
+src/Application.cpp:		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
+src/Application.cpp:        sys_table->Set(v8::String::New("preload"), v8::Boolean::New(false));
+src/Application.cpp:        v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
+src/Application.cpp:        v8::Local<v8::Array> objNames = obj->GetPropertyNames();
+src/Application.cpp:            v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
+src/Application.cpp:            v8::Local<v8::Value> objItem = obj->Get(objKey);
+src/Application.cpp:            std::string objKeyValue = std::string(*v8::String::Utf8Value(objKey));
+src/Application.cpp:                                  std::string(*v8::String::Utf8Value(objItem)));
+src/Application.cpp:                v8::V8::SetFlagsFromString("--help", 6);
+src/Application.cpp:                v8::V8::SetFlagsFromString(key, (int) strlen(key));
+src/Application.cpp:		v8::HandleScope scp(v8::Isolate::GetCurrent());
+src/Application.cpp:        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+src/Application.cpp:        v8::Context::Scope ctx_scope(ctx);
+src/Application.cpp:		v8::TryCatch tryCatch;
+src/Application.cpp:		v8::Handle<v8::Script> script = v8::Script::Compile(
+src/Application.cpp:                                                            v8::String::New(inputScript), v8::String::New(path.c_str()));
+src/Application.cpp:			v8::Handle<v8::Value> exception = tryCatch.StackTrace();
+src/Application.cpp:			v8::String::AsciiValue exception_str(exception);
+src/Application.cpp:                v8::Handle<v8::Value> exception = tryCatch.StackTrace();
+src/Application.cpp:                v8::String::AsciiValue exception_str(exception);
+src/Application.cpp:		v8::HandleScope scp(v8::Isolate::GetCurrent());
+src/Application.cpp:        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+src/Application.cpp:        v8::Context::Scope ctx_scope(ctx);
+src/Application.cpp:		v8::TryCatch tryCatch;
+src/Application.cpp:		v8::Handle<v8::Script> script = v8::Script::Compile(
+src/Application.cpp:                                                            v8::String::New(str.c_str()),
+src/Application.cpp:                                                            v8::String::NewSymbol("Console"));
+src/Application.cpp:			v8::Handle<v8::Value> exception = tryCatch.StackTrace();
+src/Application.cpp:			v8::String::AsciiValue exception_str(exception);
+src/Application.cpp:            v8::Local<v8::Value> result = script->Run();
+src/Application.cpp:                    Logger::begin("Console", Logger::LogLevel_Log) << (result->IsNull() ? "null" : *v8::String::Utf8Value(result->ToString())) << Logger::end();
+src/Application.cpp:                v8::Handle<v8::Value> exception = tryCatch.StackTrace();
+src/Application.cpp:                v8::String::AsciiValue exception_str(exception);
+src/Application.cpp:                v8::V8::IdleNotification();
+src/Application.cpp:        v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+src/Application.cpp:        v8::Handle<v8::Context> ctx = this->_initScripting();
+src/Application.hpp:        v8::Handle<v8::Context> _initScripting();
+Binary file src/Application.o matches
+Binary file src/Draw2D.o matches
+Binary file src/EngineUI.o matches
+src/Events.cpp:            JSEventTarget(v8::Persistent<v8::Function>* func, EventArgs filter)
+src/Events.cpp:                v8::HandleScope scp(v8::Isolate::GetCurrent());
+src/Events.cpp:                v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+src/Events.cpp:                v8::Context::Scope ctx_scope(ctx);
+src/Events.cpp:                v8::TryCatch tryCatch;
+src/Events.cpp:                v8::Handle<v8::Value> args[1];
+src/Events.cpp:                v8::Handle<v8::Object> obj = e.getObject();
+src/Events.cpp:                v8::Handle<v8::Function> func = v8::Handle<v8::Function>::New(v8::Isolate::GetCurrent(), *_func);
+src/Events.cpp:                    v8::Handle<v8::Value> exception = tryCatch.StackTrace();
+src/Events.cpp:                    v8::String::AsciiValue exception_str(exception);
+src/Events.cpp:            v8::Persistent<v8::Function>* _func;
+src/Events.cpp:        EventArgs::EventArgs(v8::Handle<v8::Object> obj) : _readOnly(true) {
+src/Events.cpp:            v8::Local<v8::Array> objNames = obj->GetPropertyNames();
+src/Events.cpp:                v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
+src/Events.cpp:                v8::Local<v8::Value> objItem = obj->Get(objKey);
+src/Events.cpp:                std::string objKeyValue = std::string(*v8::String::Utf8Value(objKey));
+src/Events.cpp:                this->_map[objKeyValue] = std::string(*v8::String::Utf8Value(objItem->ToString()));
+src/Events.cpp:        v8::Handle<v8::Object> EventArgs::getObject() {
+src/Events.cpp:            v8::HandleScope scp(v8::Isolate::GetCurrent());
+src/Events.cpp:            v8::Handle<v8::Object> ret = v8::Object::New();
+src/Events.cpp:                ret->Set(v8::String::New(iter->first.c_str()),
+src/Events.cpp:                        v8::String::New(iter->second.c_str()));
+src/Events.cpp:        int On(std::string evnt, std::string name, EventArgs e, v8::Persistent<v8::Function>* target) {
+src/Events.cpp:        int On(std::string evnt, std::string name, v8::Persistent<v8::Function>* target) {
+src/Events.hpp:            EventArgs(v8::Handle<v8::Object> obj);
+src/Events.hpp:            v8::Handle<v8::Object> getObject();
+src/Events.hpp:        int On(std::string evnt, std::string label, EventArgs e, v8::Persistent<v8::Function>* target);
+src/Events.hpp:        int On(std::string evnt, std::string label, v8::Persistent<v8::Function>* target);
+Binary file src/Events.o matches
+src/JSDatabase.cpp:            v8::Local<v8::Array> arr = v8::Array::New();
+src/JSDatabase.cpp:                v8::Local<v8::Object> row = v8::Object::New();
+src/JSDatabase.cpp:                    row->Set(v8::String::New(iterator2->first.c_str()), v8::String::New(iterator2->second.c_str()));
+src/JSDatabase.cpp:#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+src/JSDatabase.cpp:        void InitDatabase(v8::Handle<v8::ObjectTemplate> dbTable) {
+src/JSDatabase.hpp:        void InitDatabase(v8::Handle<v8::ObjectTemplate> dbTable);
+Binary file src/JSDatabase.o matches
+src/JSDraw.cpp:                v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
+src/JSDraw.cpp:                v8::Local<v8::Array> objNames = obj->GetPropertyNames();
+src/JSDraw.cpp:                    v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
+src/JSDraw.cpp:                    v8::Local<v8::Value> objItem = obj->Get(objKey);
+src/JSDraw.cpp:                    Draw2D::SetDefinedColor(std::string(*v8::String::Utf8Value(objKey)),
+src/JSDraw.cpp:            v8::Handle<v8::Object> ret = v8::Object::New();
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
+src/JSDraw.cpp:                ret->Set(v8::String::NewSymbol("r"), v8::Number::New(0.0f));
+src/JSDraw.cpp:                ret->Set(v8::String::NewSymbol("g"), v8::Number::New(0.0f));
+src/JSDraw.cpp:                ret->Set(v8::String::NewSymbol("b"), v8::Number::New(0.0f));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(t));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(p));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(q));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(p));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(p));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(t));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(p));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(q));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(t));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(p));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(p));
+src/JSDraw.cpp:                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(q));
+src/JSDraw.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Draw2D::IsFontLoaded(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+src/JSDraw.cpp:			ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(img->GetTextureID()));
+src/JSDraw.cpp:            v8::Handle<v8::Object> array = v8::Object::New();
+src/JSDraw.cpp:            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+src/JSDraw.cpp:            array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, imageSize * sizeof(float));
+src/JSDraw.cpp:            array->Set(v8::String::New("length"), v8::Number::New(imageSize));
+src/JSDraw.cpp:            array->Set(v8::String::New("width"), v8::Number::New(imageWidth));
+src/JSDraw.cpp:            array->Set(v8::String::New("height"), v8::Number::New(imageHeight));
+src/JSDraw.cpp:                    array->Set(i + 0, v8::Number::New((float) pixel[pos + 2] / 256.f));
+src/JSDraw.cpp:                    array->Set(i + 1, v8::Number::New((float) pixel[pos + 1] / 256.f));
+src/JSDraw.cpp:                    array->Set(i + 2, v8::Number::New((float) pixel[pos + 0] / 256.f));
+src/JSDraw.cpp:                    array->Set(i + 3, v8::Number::New(1.0f));
+src/JSDraw.cpp:            v8::Handle<v8::Object> array = v8::Object::New();
+src/JSDraw.cpp:            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+src/JSDraw.cpp:            array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));
+src/JSDraw.cpp:            v8::Local<v8::Array> arr = ENGINE_GET_ARG_ARRAY(0);
+src/JSDraw.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(texID));
+src/JSDraw.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Draw2D::IsValidTextureID(ENGINE_GET_ARG_INT32_VALUE(0))));
+src/JSDraw.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Draw2D::CalcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+src/JSDraw.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(Draw2D::GetVerts()));
+src/JSDraw.cpp:#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+src/JSDraw.cpp:        void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
+src/JSDraw.hpp:        void InitDraw(v8::Handle<v8::ObjectTemplate> obj);
+Binary file src/JSDraw.o matches
+src/JSFS.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContent(path)));
+src/JSFS.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+src/JSFS.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New((int) Filesystem::FileSize(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+src/JSFS.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(result));
+src/JSFS.cpp:#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+src/JSFS.cpp:        void InitFS(v8::Handle<v8::ObjectTemplate> fsTable) {
+src/JSFS.hpp:        void InitFS(v8::Handle<v8::ObjectTemplate> fsTable);
+Binary file src/JSFS.o matches
+src/JSInput.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetAppSingilton()->GetKeyPressed(key)));
+src/JSInput.cpp:#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+src/JSInput.cpp:        void InitInput(v8::Handle<v8::ObjectTemplate> inputTable) {
+src/JSInput.hpp:		void InitInput(v8::Handle<v8::ObjectTemplate> inputTable);
+Binary file src/JSInput.o matches
+src/JSMod.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(modID));
+src/JSMod.cpp:#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+src/JSMod.cpp:        void InitMod(v8::Handle<v8::ObjectTemplate> modTable) {
+src/JSMod.hpp:		void InitMod(v8::Handle<v8::ObjectTemplate> obj);
+Binary file src/JSMod.o matches
+src/JSSys.cpp:				v8::String::Utf8Value str(args[i]->ToString());
+src/JSSys.cpp:            v8::Local<v8::Array> argvArray = v8::Array::New();
+src/JSSys.cpp:                argvArray->Set(i, v8::String::New(cArgs[i].c_str()));
+src/JSSys.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetAppSingilton()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1))));
+src/JSSys.cpp:                v8::Persistent<v8::Function>* func = new v8::Persistent<v8::Function>(v8::Isolate::GetCurrent(), args[3].As<v8::Function>());
+src/JSSys.cpp:                                 Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(2))),
+src/JSSys.cpp:                v8::Persistent<v8::Function>* func = new v8::Persistent<v8::Function>(v8::Isolate::GetCurrent(), args[2].As<v8::Function>());
+src/JSSys.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(res));
+src/JSSys.cpp:                             Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))));
+src/JSSys.cpp:            v8::Handle<v8::Object> ret = v8::Object::New();
+src/JSSys.cpp:            ret->Set(v8::String::New("major"), v8::Number::New(version.major));
+src/JSSys.cpp:            ret->Set(v8::String::New("minor"), v8::Number::New(version.minor));
+src/JSSys.cpp:            ret->Set(v8::String::New("rev"), v8::Number::New(version.revision));
+src/JSSys.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(has));
+src/JSSys.cpp:            v8::Handle<v8::Array> arr = v8::Array::New();
+src/JSSys.cpp:                        arr->Set(i, v8::String::New((const char*) str));
+src/JSSys.cpp:                    arr->Set(currentIndex++, v8::String::New(extentionList.substr(currentPos, nextPos - currentPos).c_str()));
+src/JSSys.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(result));
+src/JSSys.cpp:			ENGINE_JS_SCOPE_CLOSE(v8::Number::New(GetTickCount()));
+src/JSSys.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(time.tv_sec + (time.tv_usec * 0.000001)));
+src/JSSys.cpp:            v8::Handle<v8::Object> ret = v8::Object::New();
+src/JSSys.cpp:            v8::HeapStatistics stats;
+src/JSSys.cpp:            v8::Isolate::GetCurrent()->GetHeapStatistics(&stats);
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("heapLimit"), v8::Number::New(stats.heap_size_limit()));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("heapTotalSize"), v8::Number::New(stats.total_heap_size()));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("heapTotalExecSize"), v8::Number::New(stats.total_heap_size_executable()));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("heapUsed"), v8::Number::New(stats.used_heap_size()));
+src/JSSys.cpp:            v8::Handle<v8::Object> ret = v8::Object::New();
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("totalVirutal"), v8::Number::New(mem_info.totalVirtual));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("totalVirtualFree"), v8::Number::New(mem_info.totalVirtualFree));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("myVirtualUsed"), v8::Number::New(mem_info.myVirtualUsed));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("totalPhysical"), v8::Number::New(mem_info.totalPhysical));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("totalPhysicalFree"), v8::Number::New(mem_info.totalPhysicalFree));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("myPhysicalUsed"), v8::Number::New(mem_info.myPhysicalUsed));
+src/JSSys.cpp:            v8::Context::Scope ctx_scope(v8::Context::GetCurrent());
+src/JSSys.cpp:            v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
+src/JSSys.cpp:            v8::TryCatch tryCatch;
+src/JSSys.cpp:            real_func->Call(v8::Context::GetCurrent()->Global(), 0, NULL);
+src/JSSys.cpp:                v8::ThrowException(tryCatch.Exception());
+src/JSSys.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Profiler::GetTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+src/JSSys.cpp:            v8::Handle<v8::Array> arr = v8::Array::New();
+src/JSSys.cpp:                arr->Set(i, v8::String::New(zones.at(i).c_str()));
+src/JSSys.cpp:            v8::Context::Scope ctx_scope(v8::Context::GetCurrent());
+src/JSSys.cpp:            v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
+src/JSSys.cpp:            v8::TryCatch tryCatch;
+src/JSSys.cpp:            real_func->Call(v8::Context::GetCurrent()->Global(), 0, NULL);
+src/JSSys.cpp:                v8::ThrowException(tryCatch.Exception());
+src/JSSys.cpp:                ENGINE_JS_SCOPE_CLOSE(v8::String::New(Config::Get(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str()));
+src/JSSys.cpp:            v8::V8::IdleNotification(200); // recomend a full GC (the internals which I've gone through
+src/JSSys.cpp:            v8::Handle<v8::Object> ret = v8::Object::New();
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("openGL"),
+src/JSSys.cpp:                     v8::String::NewSymbol((const char*) glGetString(GL_VERSION)));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("glew"),
+src/JSSys.cpp:                     v8::String::NewSymbol((const char*) glewGetString(GLEW_VERSION)));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("v8"),
+src/JSSys.cpp:                     v8::String::NewSymbol(v8::V8::GetVersion()));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("engine"), v8::String::NewSymbol("Alpha 2"));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("glfw"),
+src/JSSys.cpp:                     v8::String::NewSymbol(glfwVersion.str().c_str()));
+src/JSSys.cpp:            ret->Set(v8::String::NewSymbol("glsl"),
+src/JSSys.cpp:                     v8::String::NewSymbol((const char*) glGetString(GL_SHADING_LANGUAGE_VERSION)));
+src/JSSys.cpp:#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+src/JSSys.cpp:        void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {
+src/JSSys.hpp:        void InitSys(v8::Handle<v8::ObjectTemplate> sysTable);
+Binary file src/JSSys.o matches
+src/JSUnsafe.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Number::New((long) numAddr));
+src/JSUnsafe.cpp:            v8::Handle<v8::Object> array = v8::Object::New();
+src/JSUnsafe.cpp:            array->SetIndexedPropertiesToExternalArrayData(rawPointer, v8::kExternalByteArray, length * sizeof(char));
+src/JSUnsafe.cpp:                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(true));
+src/JSUnsafe.cpp:                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(false));
+src/JSUnsafe.cpp:            v8::Handle<v8::Object> array = v8::Object::New();
+src/JSUnsafe.cpp:            array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalByteArray, arrayLength * sizeof(char));
+src/JSUnsafe.cpp:            v8::Handle<v8::Array> arr = v8::Handle<v8::Array>(ENGINE_GET_ARG_ARRAY(0));
+src/JSUnsafe.cpp:            v8::Handle<v8::Array> arr = v8::Handle<v8::Array>(ENGINE_GET_ARG_ARRAY(0));
+src/JSUnsafe.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Number::New((double) address));
+src/JSUnsafe.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(res > -1));
+src/JSUnsafe.cpp:            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(getpagesize()));
+src/JSUnsafe.cpp:#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+src/JSUnsafe.cpp:        void InitUnsafe(v8::Handle<v8::ObjectTemplate> unsafeTable) {
+src/JSUnsafe.hpp:        void InitUnsafe(v8::Handle<v8::ObjectTemplate> sysTable);
+Binary file src/JSUnsafe.o matches
+src/Util.hpp:#define ENGINE_THROW_ARGCOUNT(count) v8::ThrowException(v8::Exception::TypeError(v8::String::New("Wrong number of arguments, expected " + count)));
+src/Util.hpp:#define ENGINE_THROW_ARGERROR(str) v8::ThrowException(v8::Exception::TypeError(v8::String::New(str)));
+src/Util.hpp:#define ENGINE_JS_METHOD(name) void name(const v8::FunctionCallbackInfo<v8::Value>& args)
+src/Util.hpp:#define ENGINE_GET_ARG_CSTRING_VALUE(num) v8::String::Utf8Value(args[num])
+src/Util.hpp:#define ENGINE_GET_ARG_CPPSTRING_VALUE(num) std::string(*v8::String::Utf8Value(args[num]))
+src/Util.hpp:#define ENGINE_GET_ARG_ARRAY(num) v8::Array::Cast(*args[num])
+src/Util.hpp:#define ENGINE_GET_ARG_OBJECT(num) v8::Object::Cast(*args[num])
+src/Util.hpp:#define ENGINE_JS_SCOPE_OPEN v8::HandleScope scope(args.GetIsolate())
