@@ -5,7 +5,7 @@
 	"core.window.fullscreen": false,
 	"core.render.openGL": "3.2",
 	"core.render.aa": false,
-	"core.window.vsync": false,
+	"core.window.vsync": true,
 	"__comment": "just for openGL3",
 	"core.debug.debugRenderer": false
 }
