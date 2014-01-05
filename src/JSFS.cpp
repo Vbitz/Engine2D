@@ -8,8 +8,6 @@ namespace Engine {
         ENGINE_JS_METHOD(ReadFile) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file to read");
             
             std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
@@ -19,7 +17,18 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContent(path)));
+            if (args.Length() == 2) {
+                ENGINE_CHECK_ARG_BOOLEAN(1, "Set Arg1 if you need a raw byte array");
+                long fileLength = 0;
+                char* file = Filesystem::GetFileContent(path, fileLength);
+                v8::Handle<v8::Array> arr = v8::Array::New();
+                for (int i = 0; i < fileLength; i++) {
+                    arr->Set(i, v8::Number::New((unsigned char) file[i]));
+                }
+                ENGINE_JS_SCOPE_CLOSE(arr);
+            } else {
+                ENGINE_JS_SCOPE_CLOSE(v8::String::New(Filesystem::GetFileContent(path)));
+            }
         }
         
         ENGINE_JS_METHOD(WriteFile) {
