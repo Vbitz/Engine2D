@@ -539,6 +539,16 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(ShellExec) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the url to execute");
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Platform::ShellExecute(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+        }
+        
         ENGINE_JS_METHOD(TestGraph) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -598,6 +608,7 @@ namespace Engine {
             addItem(sysTable, "version", Version);
             
             addItem(sysTable, "msgBox", MsgBox);
+            addItem(sysTable, "shell", ShellExec);
             
             //addItem(sysTable, "testGraph", TestGraph);
         }

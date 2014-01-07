@@ -208,5 +208,8 @@ namespace Engine {
             }
         }
         
+        int ShellExecute(std::string path) {
+            return system(("open " + path).c_str());
+        }
     }
 }

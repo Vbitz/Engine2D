@@ -47,5 +47,7 @@ namespace Engine {
         std::string GetUsername();
         
         void DumpStackTrace();
+        
+        int ShellExecute(std::string path);
     }
 }
