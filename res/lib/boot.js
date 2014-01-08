@@ -12,6 +12,7 @@ console.log = makeLog("log");
 console.warn = makeLog("warning");
 console.error = makeLog("error");
 console.verbose = makeLog("verbose");
+console.writeRaw = makeLog("raw");
 
 sys.drawFunc = function (func) {
 	sys.clearEvent("sys.drawFunc");

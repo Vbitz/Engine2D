@@ -34,8 +34,12 @@ namespace Engine {
 				logStr += cstr;
 			}
             
-            Logger::LogText("Script", _getLevelFromStr(ENGINE_GET_ARG_CPPSTRING_VALUE(0)), logStr);
-            
+            if (ENGINE_GET_ARG_CPPSTRING_VALUE(0) == "raw") {
+                printf("%s", logStr.c_str());
+            } else {
+                Logger::LogText("Script", _getLevelFromStr(ENGINE_GET_ARG_CPPSTRING_VALUE(0)), logStr);
+            }
+                
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
         
