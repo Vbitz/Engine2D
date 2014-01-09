@@ -21,6 +21,7 @@ SRCS= 	src/main.cpp \
 		src/Database.cpp \
 		src/Filesystem.cpp \
 		src/extern/GLFT_Font.cpp \
+		src/extern/jsoncpp.cpp \
 		src/GL3Buffer.cpp \
 		src/Shader.cpp \
 		src/EngineUI.cpp \
