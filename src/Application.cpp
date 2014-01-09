@@ -4,6 +4,8 @@
 
 #include "extern/OpenSans-Regular.ttf.hpp"
 
+#include "extern/json/json.h"
+
 #include "ResourceManager.hpp"
 
 #include "TestSuite.hpp"
@@ -154,8 +156,6 @@ namespace Engine {
 		v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
         
         JsSys::InitSys(sysTable);
-        
-        addItem(sysTable, "setWindowCreateParams", SetWindowInitParams);
         
         sysTable->Set("platform", v8::String::New(_PLATFORM));
         sysTable->Set("devMode", v8::Boolean::New(this->_developerMode));
@@ -324,6 +324,38 @@ namespace Engine {
         Config::SetBoolean( "core.log.src.perfIssues",              this->_developerMode);
         Config::SetBoolean( "core.log.src.createImage",             true);
     }
+    
+    void Application::_loadConfigFile() {
+        std::string configPath = Config::GetString("core.config.path");
+        Logger::begin("Application", Logger::LogLevel_Log) << "Loading Config: " << configPath << Logger::end();
+        Json::Value root;
+        Json::Reader reader;
+        bool fileLoaded = reader.parse(Filesystem::GetFileContent(configPath), root);
+        if (!fileLoaded) {
+            Logger::begin("Application", Logger::LogLevel_Error) << "Failed to load Config" << Logger::end();
+            return;
+        }
+        if (!root.isObject()) {
+            Logger::begin("Application", Logger::LogLevel_Error) << "Config root has to be a object" << Logger::end();
+            return;
+        }
+        if (root.empty()) {
+            return;
+        }
+        Json::Value::Members keys = root.getMemberNames();
+        for (auto iter = keys.begin(); iter != keys.end(); iter++) {
+            Json::Value value = root[*iter];
+            if (value.isNull()) {
+                // ignore null values
+            } else if (value.isString()) {
+                Config::SetString(*iter, value.asString());
+            } else if (value.isNumeric()) {
+                Config::SetNumber(*iter, value.asFloat());
+            } else if (value.isBool()) {
+                Config::SetBoolean(*iter, value.asBool());
+            }
+        }
+    }
 	
     void Application::_resizeWindow(GLFWwindow* window, int w, int h) {
         Application* app = GetAppSingilton();
@@ -362,41 +394,6 @@ namespace Engine {
             return e.equalsValue("key", key.c_str(), false);
         }, e);
 	}
-    
-    ENGINE_JS_METHOD(SetWindowInitParams) {
-        ENGINE_JS_SCOPE_OPEN;
-        
-        ENGINE_CHECK_ARGS_LENGTH(1);
-        
-        ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is the object to set the window creation values with");
-        
-        v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
-        
-        v8::Local<v8::Array> objNames = obj->GetPropertyNames();
-        
-        for (int i = 0; i < objNames->Length(); i++) {
-            v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
-            v8::Local<v8::Value> objItem = obj->Get(objKey);
-            std::string objKeyValue = std::string(*v8::String::Utf8Value(objKey));
-            if (GetAppSingilton()->IsDelayedConfig(objKeyValue)) {
-                continue; // ignore it
-            }
-            if (objItem->IsString()) {
-                Config::SetString(objKeyValue,
-                                  std::string(*v8::String::Utf8Value(objItem)));
-            } else if (objItem->IsNumber()) {
-                Config::SetNumber(objKeyValue,
-                                  (float) objItem->NumberValue());
-            } else if (objItem->IsBoolean()) {
-                Config::SetBoolean(objKeyValue,
-                                   (float) objItem->BooleanValue());
-            } else {
-                ENGINE_THROW_ARGERROR("Invalid value, values must be a number, string or boolean");
-            }
-        }
-        
-        ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-    }
     
     void Application::_openWindow(int width, int height, bool fullscreen, std::string openGL3Context) {
         Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Window/Context" << Logger::end();
@@ -564,8 +561,6 @@ namespace Engine {
                 "-- Args --\n"
                 "-Cname=value                   - Overloads a basic config. This is applyed before loading the basic config"
                 " but overrides those configs while they are applyed\n"
-                "(NYI) -config=configFile       - Sets the basic config to configFile, configFile is realitive to res/"
-                " since it uses PhysFS this could be other values\n"
                 "-mountPath=archiveFile         - Loads a archive file using PhysFS, this is applyed after physfs is started\n"
                 "-test                          - Runs the built in test suite\n"
                 "(NYI) -headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL"
@@ -607,8 +602,6 @@ namespace Engine {
                 v8::V8::SetFlagsFromString(key, (int) strlen(key));
                 
                 free(key);
-            } else if (strncmp(argv[i], "-config=", 8) == 0) {
-                // set config filename
             } else if (strncmp(argv[i], "-mountPath=", 11) == 0) {
                 // add archive to PhysFS after PhysFS Init
                 size_t configLength = strlen(argv[i]) - 11;
@@ -1033,6 +1026,8 @@ namespace Engine {
         for (auto iter = this->_archivePaths.begin(); iter != this->_archivePaths.end(); iter++) {
             Filesystem::Mount(*iter);
         }
+        
+        this->_loadConfigFile();
         
         v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         

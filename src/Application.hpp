@@ -76,6 +76,7 @@ namespace Engine {
         void _updateScreen();
         void _updateMousePos();
         void _shutdownScripting();
+        void _loadConfigFile();
         v8::Handle<v8::Context> _initScripting();
         
         bool _running = false;

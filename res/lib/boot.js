@@ -1,3 +1,5 @@
+console._log("log", "Booting JavaScript Phase 1");
+
 function makeLog(type) {
 	return function () {
 		var args = [type];
@@ -26,20 +28,6 @@ sys.keyboardFunc = function (func) {
 	});
 }
 
-var str = fs.readFile("config/config.json");
-
-console.log("Booting JavaScript Phase 1");
-
-var globalConfig = {};
-
-try {
-	globalConfig = JSON.parse(str);
-} catch (e) {
-	console.log("Error Loading config: " + e);
-}
-
-sys.setWindowCreateParams(globalConfig);
-
 var libarys = ["ui"];
 
 for (var i = 0; i < libarys.length; i++) {
@@ -54,8 +42,8 @@ function onPostLoad() {
 	}
 	var glInfo = sys.getGLVersion();
 	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
-	sys.screenWidth = globalConfig["core.window.width"];
-	sys.screenHeight = globalConfig["core.window.height"];
+	sys.screenWidth = sys.config("core.window.width");
+	sys.screenHeight = sys.config("core.window.height");
 	sys.clearEvent("bootloaderLoad");
 	if (!sys.runFile(sys.config("core.script.entryPoint"), true)) {
 		console.error("Could not load core.script.entryPoint=" + sys.config("core.script.entryPoint"));
