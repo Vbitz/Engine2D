@@ -1029,6 +1029,8 @@ namespace Engine {
         
         this->_loadConfigFile();
         
+        this->_applyDelayedConfigs();
+        
         v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         
         Profiler::Begin("InitScripting");
@@ -1090,8 +1092,6 @@ namespace Engine {
         Config::SetBoolean("core.log.enableConsole", false);
         
         this->_loadBasicConfigs();
-        
-        this->_applyDelayedConfigs();
         
         if (Config::GetBoolean("core.catchErrors")) {
             try {
