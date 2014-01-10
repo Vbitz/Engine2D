@@ -356,6 +356,14 @@ namespace Engine {
             }
         }
     }
+    
+    void Application::_printConfigVars() {
+        Logger::begin("Application", Logger::LogLevel_Log) << "== Config Vars ==" << Logger::end();
+        std::vector<std::string> items = Config::GetAll();
+        for (auto iter = items.begin(); iter != items.end(); iter++) {
+            Logger::begin("Config", Logger::LogLevel_Log) << *iter << Logger::end();
+        }
+    }
 	
     void Application::_resizeWindow(GLFWwindow* window, int w, int h) {
         Application* app = GetAppSingilton();
@@ -547,6 +555,8 @@ namespace Engine {
             } else if (strcmp(argv[i], "-v8-options") == 0) {
                 v8::V8::SetFlagsFromString("--help", 6);
                 _exit = true; // v8 exits automaticly but let's just help it along
+            } else if (strcmp(argv[i], "-Cvars") == 0) {
+                _configVarsMode = true;
             } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0) {
                 std::cerr << "Engine2D\n"
                 "==================\n"
@@ -556,23 +566,24 @@ namespace Engine {
                 "bin/Engine -Ccore.window.width=1280 -Ccore.window.height=800 - loads config/config.json and "
                 "overrides the basic configs core.window.width and core.window.height\n"
                 "bin/Engine -config=config/test.json - loads config/test.json and sets basic config values\n"
-                "bin/Engine script/test - any non - configs are passed onto javascript\n"
+                "bin/Engine script/test - any non `-` configs are passed onto javascript\n"
                 "\n"
                 "-- Args --\n"
                 "-Cname=value                   - Overloads a basic config. This is applyed before loading the basic config"
-                " but overrides those configs while they are applyed\n"
-                "-mountPath=archiveFile         - Loads a archive file using PhysFS, this is applyed after physfs is started\n"
-                "-test                          - Runs the built in test suite\n"
+                " but overrides those configs while they are applyed.\n"
+                "-Cvars                         - Prints all Config Variables megred from the defaults and the set config file.\n"
+                "-mountPath=archiveFile         - Loads a archive file using PhysFS, this is applyed after physfs is started.\n"
+                "-test                          - Runs the built in test suite.\n"
                 "(NYI) -headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL"
                 " will fail.\n"
-                "-devmode                       - Enables developer mode (This enables real time script loading and the console)\n"
-                "(NYI) -debug                   - Enables debug mode (This enables a OpenGL debug context and will print messages"
-                "to the console)\n"
-                "(NYI) -log=filename            - Logs logger output to filename (This is not writen using PhysFS so it needs a"
-                "regular path)\n"
-                "-v8-options                    - Prints v8 option help and exit\n"
-                "-v8flag=value                  - Set's v8 flags from the command line\n"
-                "(NYI) -h                       - Prints this message\n"
+                "-devmode                       - Enables developer mode (This enables real time script loading and the console).\n"
+                "-debug                         - Enables debug mode (This enables a OpenGL debug context and will print messages"
+                "to the console).\n"
+                "(NYI) -log=filename            - Logs logger output to filename (This is not writen using PhysFS so it needs a "
+                "regular path).\n"
+                "-v8-options                    - Prints v8 option help then exits.\n"
+                "-v8flag=value                  - Set's v8 flags from the command line.\n"
+                "-h                             - Prints this message.\n"
                 "" << std::endl;
                 _exit = true;
             } else if (strncmp(argv[i], "-C", 2) == 0) {
@@ -583,7 +594,8 @@ namespace Engine {
                 char* key = (char*) malloc(keyLength);
                 strncpy(key, &argv[i][2], keyLength);
                 
-                char* value = (char*) malloc(valueLength);
+                char* value = (char*) malloc(valueLength + 1);
+                value[valueLength] = '\0';
                 strncpy(value, &argv[i][2 + keyLength + 1], valueLength);
                 
                 _delayedConfigs[key] = std::string(value);
@@ -1030,6 +1042,12 @@ namespace Engine {
         this->_loadConfigFile();
         
         this->_applyDelayedConfigs();
+        
+        if (this->_configVarsMode) {
+            this->_printConfigVars();
+            Filesystem::Destroy();
+            return 0;
+        }
         
         v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         

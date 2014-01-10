@@ -76,6 +76,7 @@ namespace Engine {
         void _updateScreen();
         void _updateMousePos();
         void _shutdownScripting();
+        void _printConfigVars();
         void _loadConfigFile();
         v8::Handle<v8::Context> _initScripting();
         
@@ -110,6 +111,7 @@ namespace Engine {
         bool _developerMode = false;
         bool _debugMode = false;
         bool _testMode = false;
+        bool _configVarsMode = false;
         
         int _detailFrames = 0;
         std::string _detailFilename = "";
