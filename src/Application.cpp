@@ -129,19 +129,20 @@ namespace Engine {
         id << " : " << severity << " : " << message << Logger::end();
     }
     
-    ENGINE_JS_METHOD(SetWindowInitParams);
+    static void globalAccessor(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info) {
+        info.GetReturnValue().Set(info.Holder());
+    }
 	
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
     
     v8::Handle<v8::Context> Application::_initScripting() {
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
         
-		//_globalIsolate = v8::Isolate::New();
-		//_globalIsolate->Enter();
-        
 		v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         
 		v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
+        
+        global->SetAccessor(v8::String::NewSymbol("global"), globalAccessor);
         
         // consoleTable
         v8::Handle<v8::ObjectTemplate> consoleTable = v8::ObjectTemplate::New();
