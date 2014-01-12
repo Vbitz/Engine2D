@@ -2,6 +2,8 @@
 // Game works at 11:59:16pm (wow 15 minutes)
 // Bugs fixed and ready to commit at 12:09:50pm (It was a issue with the way I was handling input)
 
+sys.config("core.debug.profiler", true);
+
 function randFloat(min, max) {
 	if (max === undefined) {
 		max = min;
@@ -19,16 +21,27 @@ function randArray(arr) {
 }
 
 var score = 0;
+var lives = 10;
 
 function lose() {
 	console.log("lost at: " + score);
 	sys.forceReload("script/typingGame.js");
 }
 
-var wordBank = [
-	"Engine2D"
-	// You can add your own wordbank here or load it from a file
-];
+var maxWordLength = 50;
+
+// WordList derived from "Moby Word Lists by Grady Ward" released under Public Domain
+var wordBank = fs.readFile("content/wordList.txt")
+	.split('\n')
+	.splice(1)
+	.map(function (i) {
+		return i.trim();
+	})
+	.filter(function (i) {
+		return i.length <= maxWordLength && i.length > 0;
+	});
+
+console.log("Loaded " + wordBank.length + " words");
 
 wordBank = wordBank.map(function (i) {
 	return i.toLowerCase();
@@ -41,10 +54,12 @@ var pendingKeys = [];
 var keyLastFrame = false;
 
 function addWord() {
+	var word = randArray(wordBank);
+	console.log("adding: [" + word + "]");
 	words.push({
-		word: randArray(wordBank),
+		word: word,
 		x: rand(100, sys.screenWidth - 100),
-		y: rand(100, sys.screenHeight - 100)
+		y: 50
 	});
 }
 
@@ -59,20 +74,38 @@ sys.on("draw", "typingGame.draw", function () {
 
 	var removeWords = [];
 
+	var realWordSpeed = 100 * sys.deltaTime;
+
 	for (var i = 0; i < words.length; i++) {
 		word = words[i];
 
+		if (word.word.length <= 0) {
+			continue;
+		}
+
 		// update word
-		if (word.word.length > 0 && word.word[0].toUpperCase() === lastKey) {
+		if (word.word[0].toUpperCase() === lastKey) {
 			lastKey = "";
 			score += 10;
 			word.word = word.word.substring(1);
 			if (word.word.length < 1) {
-				score += 1000;
+				score += 100;
 				removeWords.push(i);
 				addWord();
 				break;
 			}
+		}
+
+		word.y += realWordSpeed;
+
+		if (word.y > sys.screenHeight) {
+			lives--;
+			if (lives < 0) {
+				lose();
+			}
+			removeWords.push(i);
+			addWord();
+			break;
 		}
 
 		draw.print(word.x, word.y, word.word);
