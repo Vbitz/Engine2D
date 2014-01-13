@@ -8,7 +8,7 @@ WARNING= -Wall -Weffc++
 VFLAGS=
 CXXFLAGS= $(OPTIMISE) -g -std=gnu++11 -stdlib=libc++ $(WARNING) -I/usr/local/include/freetype2 -I/usr/local/include
 LDFLAGS= $(OPTIMISE) -g -std=gnu++11 -stdlib=libc++ -L/usr/local/lib/ -lfreetype
-LDLIBS= -framework Cocoa -framework OpenGL -framework IOKit -lglew -lglfw3 -lphysfs -lv8 -lfreeimage
+LDLIBS= -framework Cocoa -framework OpenGL -framework IOKit -lglew -lglfw3 -lphysfs -lv8 -lfreeimage -lpthread
 
 SRCS= 	src/main.cpp \
 		src/JSInput.cpp \

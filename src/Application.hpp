@@ -78,6 +78,8 @@ namespace Engine {
         void _shutdownScripting();
         void _printConfigVars();
         void _loadConfigFile();
+        void _enableV8Debugger();
+        void _handleDebugMessage();
         v8::Handle<v8::Context> _initScripting();
         
         bool _running = false;

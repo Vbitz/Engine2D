@@ -22,7 +22,14 @@
 #include "JSMod.hpp"
 #include "JSUnsafe.hpp"
 
+#include <pthread.h>
+
+#include <v8-debug.h>
+
 namespace Engine {
+    
+    static pthread_mutex_t debugMesssageReadyMutex;
+    static bool debugMessageReady = false;
     
     // from https://github.com/glfw/glfw/blob/master/tests/events.c
     static std::string GLFW_GetKeyName(int key)
@@ -229,6 +236,26 @@ namespace Engine {
 	}
 	
 #undef addItem
+    
+    // WARNING: This is executed on another thread, basicly everything right now is not threadsafe
+    static void DispatchDebugMessages() {
+        pthread_mutex_lock(&debugMesssageReadyMutex);
+        debugMessageReady = true;
+        pthread_mutex_unlock(&debugMesssageReadyMutex);
+    }
+    
+    void Application::_handleDebugMessage() {
+        v8::Debug::ProcessDebugMessages();
+    }
+    
+    void Application::_enableV8Debugger() {
+        int debugPort = Config::GetInt("core.debug.v8DebugPort");
+        v8::Debug::SetDebugMessageDispatchHandler(DispatchDebugMessages);
+        v8::Debug::EnableAgent("Engine2D", debugPort, false);
+        Config::SetBoolean("core.runOnIdle", true);
+        pthread_mutex_init(&debugMesssageReadyMutex, NULL);
+        Logger::begin("Application", Logger::LogLevel_Log) << "Started V8 Debugger on 127.0.0.1:" << debugPort << Logger::end();
+    }
 	
 	void Application::_shutdownScripting() {
 		//_globalIsolate->Exit();
@@ -324,6 +351,8 @@ namespace Engine {
         Config::SetBoolean( "core.log.src.undefinedValue",          this->_developerMode);
         Config::SetBoolean( "core.log.src.perfIssues",              this->_developerMode);
         Config::SetBoolean( "core.log.src.createImage",             true);
+        
+        Config::SetNumber(  "core.debug.v8DebugPort",               5858);
     }
     
     void Application::_loadConfigFile() {
@@ -928,6 +957,15 @@ namespace Engine {
 				continue;
 			}
             
+            if (this->_debugMode) {
+                pthread_mutex_lock(&debugMesssageReadyMutex);
+                if (debugMessageReady) {
+                    this->_handleDebugMessage();
+                    debugMessageReady = false;
+                }
+                pthread_mutex_unlock(&debugMesssageReadyMutex);
+            }
+            
             if (Config::GetBoolean("core.script.autoReload")) {
                 this->_checkUpdate();
             }
@@ -1057,6 +1095,10 @@ namespace Engine {
         Profiler::End("InitScripting");
         
         ctx->Enter();
+        
+        if (this->_debugMode) {
+            _enableV8Debugger();
+        }
         
         Profiler::Begin("InitOpenGL");
         this->_initOpenGL();
