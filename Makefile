@@ -98,6 +98,7 @@ release: all
 
 	cp -R res/lib release-osx/Engine.app/Contents/Resources/res/lib
 	cp -R res/fonts release-osx/Engine.app/Contents/Resources/res/fonts
+	cp -R res/shaders release-osx/Engine.app/Contents/Resources/res/shaders
 	cp Info.plist release-osx/Engine.app/Contents
 	cp res/config/config.json release-osx/Engine.app/Contents/Resources/res/config/config.json
 	cp res/script/test.js release-osx/Engine.app/Contents/Resources/res/script/test.js
