@@ -326,9 +326,9 @@ namespace Engine {
         v8::Context::Scope ctx_scope(ctx);
         
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
-		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
-		input_table->Set(v8::String::New("screenWidth"), v8::Number::New(_screenWidth));
-		input_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
+		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
+		sys_table->Set(v8::String::New("screenWidth"), v8::Number::New(_screenWidth));
+		sys_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
 	}
     
     void Application::_updateFrameTime() {
