@@ -2,6 +2,8 @@
 
 #include "Application.hpp"
 
+#include "FramePerfMonitor.hpp"
+
 namespace Engine {
     namespace EngineUI {
         std::stringstream ss;
@@ -41,9 +43,6 @@ namespace Engine {
         // just temporey until the profiler has this built in
         float lastDrawTimes[100];
         int currentLastDrawTimePos = 0;
-        
-        float fpsTimer = 0.0f;
-        float currentFPS = 0;
     
         std::vector<std::string> commandHistory;
         size_t currentHistoryLine = 0;
@@ -73,22 +72,14 @@ namespace Engine {
             if (Config::GetBoolean("core.debug.profiler")) {
                 double drawTime = Profiler::GetTime("Draw");
                 lastDrawTimes[currentLastDrawTimePos++] = drawTime;
+                
                 if (currentLastDrawTimePos > 100) {
                     currentLastDrawTimePos = 0;
                 }
                 
-                float fps = 1000 / (Profiler::GetTime("Frame") * 1000);
-                
-                fpsTimer += Profiler::GetTime("Frame");
-                
-                if (fpsTimer > 0.1f) {
-                    currentFPS = glm::floor(fps);
-                    fpsTimer = 0;
-                }
-                
                 ss.str("");
                 ss.precision(4);
-                ss << "FPS: " << currentFPS;
+                ss << "FPS: " << FramePerfMonitor::GetFPS();
                 ss << " | DrawTime: " << drawTime;
                 Draw2D::Print(app->GetScreenWidth() - 220, 4, ss.str().c_str());
                 

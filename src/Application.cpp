@@ -10,6 +10,8 @@
 
 #include "TestSuite.hpp"
 
+#include "FramePerfMonitor.hpp"
+
 #include "PlatformTests.hpp"
 
 #include "EngineUI.hpp"
@@ -297,7 +299,7 @@ namespace Engine {
         
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
-        sys_table->Set(v8::String::NewSymbol("deltaTime"), v8::Number::New(Profiler::GetTime("Frame")));
+        sys_table->Set(v8::String::NewSymbol("deltaTime"), v8::Number::New(FramePerfMonitor::GetFrameTime()));
     }
     
     void Application::_disablePreload() {
@@ -425,7 +427,8 @@ namespace Engine {
         
         Events::EventArgs e = Events::EventArgs({
             {"key", key},
-            {"state", GLFW_GetStateName(state)}
+            {"state", GLFW_GetStateName(state)},
+            {"mod", (mods & GLFW_MOD_SHIFT) ? "true" : "false"}
         });
         
         Events::Emit("input", [&](Events::EventArgs e) {
@@ -947,6 +950,7 @@ namespace Engine {
         
 		while (this->_running) {
             Profiler::StartProfileFrame();
+            FramePerfMonitor::BeginFrame();
             
 			if (!this->_isFullscreen &&
                 !glfwGetWindowAttrib(window, GLFW_FOCUSED) &&
@@ -1056,6 +1060,8 @@ namespace Engine {
                     << "Saved Profiler Report as: " << Filesystem::GetRealPath(_detailFilename) << Logger::end();
                 }
             }
+            
+            FramePerfMonitor::EndFrame();
 		}
     }
     

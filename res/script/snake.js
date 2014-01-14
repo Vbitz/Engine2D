@@ -1,4 +1,3 @@
-sys.config("core.debug.profiler", true);
 sys.config("core.script.autoReload", true);
 
 fs.configDir("snake");

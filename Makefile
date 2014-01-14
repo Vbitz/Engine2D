@@ -28,6 +28,7 @@ SRCS= 	src/main.cpp \
 		src/Draw2D.cpp \
 		src/Logger.cpp \
 		src/Profiler.cpp \
+		src/FramePerfMonitor.cpp \
 		src/ResourceManager.cpp \
 		src/Config.cpp \
 		src/LogGraphEvents.cpp \
