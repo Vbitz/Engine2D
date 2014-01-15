@@ -172,9 +172,9 @@ global.sys.exit = function () {};
 
 /**
  * @typedef {Object} OpenGLVersion
- * @property {number} major: The major version of OpenGL
- * @property {number} minor: The minor version of OpenGL
- * @property {number} rev: The revision of OpenGL
+ * @property {number} major  The major version of OpenGL
+ * @property {number} minor  The minor version of OpenGL
+ * @property {number} rev  The revision of OpenGL
  */
 
 /**
@@ -274,33 +274,123 @@ global.sys.time = function (name, func) {};
 global.sys.config = function (key, value) {};
 
 /**
- * Manuly invokes the garbage collector
+ * Manuly invokes the garbage collector.
  */
 global.sys.gc = function () {};
 
+/**
+ * Captures profiling results for frames and then writes them in CSV format to filename, fs.configDir has be called beforehand.
+ * @example
+ * fs.configDir("example");
+ * sys.profile(100, "profileResults.csv");
+ * @param  {number} frames
+ * @param  {string} filename
+ */
+global.sys.profile = function (frames, filename) {};
 
-global.sys.profile = function () {};
+/**
+ * Changes enables or disables maximum profile zone time. A warning will be printed if this time is exceaded.
+ * @example
+ * sys.profileSet("Frame", false); // Disable frametime performace warnings
+ * @param  {string} profileZone - The zone to modify
+ * @param  {number|boolean} maxTime - The maximum time in seconds that the zone can take before printing a warning, pass false to disable
+ */
+global.sys.profileSet = function (profileZone, maxTime) {};
 
-
-global.sys.profileSet = function () {};
-
+/**
+ * Forces lib/boot.js to be reloaded at the start of the next frame
+ */
 global.sys.reloadRootScript = function () {};
-global.sys.forceReload = function () {};
 
+/**
+ * Forces script to be reloaded at the start of the next frame
+ * @example
+ * function lose() {
+ *     sys.forceReload("script/game.js"); // Restart the game when the player loses
+ * }
+ * @param  {string} script - The filename of the script to reload including the extention
+ */
+global.sys.forceReload = function (script) {};
+
+
+/**
+ * @typedef {object} VersionInfo
+ * @property {string} openGL  The OpenGL version currently in use
+ * @property {string} glew  The version of GLEW the engine was compiled with
+ * @property {string} v8  The version of V8 the engine was compiled with
+ * @property {string} engine  The release version identifyer for the engine 
+ * @property {string} glfw  The version of GLFW compiled into the engine
+ * @property {string} glsl  The version of GLSL currently in use with OpenGL
+ */
+
+/**
+ * Returns a {@link VersionInfo} object specifying the versions in use currently
+ * @return {VersionInfo}
+ */
 global.sys.version = function () {};
 
-global.sys.msgBox = function () {};
-global.sys.shell = function () {};
+/**
+ * Shows a platform dependent MessageBox
+ * @param  {string} title
+ * @param  {string} msg
+ * @param  {boolean} modal - Should the code block until the box is closed
+ */
+global.sys.msgBox = function (title, msg, modal) {};
 
+/**
+ * Open filename with the default handler for the format
+ * @example
+ * sys.shell("http://vbitz.com/"); // Open vbitz.com with the default web browser
+ * @param  {string} filename
+ */
+global.sys.shell = function (filename) {};
+
+/**
+ * The current platform the engine is running on, the value can be "Windows"|"Darwin (OSX)"|"Linux"
+ * @type {String}
+ */
 global.sys.platform = "";
+
+/**
+ * Is the engine running in developer mode. Developer mode allows arbitiry code execution and enables the console and profiler
+ * @type {Boolean}
+ */
 global.sys.devMode = false;
+
+/**
+ * Has the OpenGL context been created yet?
+ * @type {Boolean}
+ */
 global.sys.preload = false;
+
+/**
+ * The number of processers installed in the system.
+ * @type {Number}
+ */
 global.sys.numProcessers = 0;
+
+/**
+ * The username of the currently logged in user.
+ * @type {String}
+ */
 global.sys.username = "";
 
+/**
+ * The width of the Engine viewpoint
+ * @type {Number}
+ */
 global.sys.screenWidth = 0;
+
+/**
+ * The height of the Engine viewpoint
+ * @type {Number}
+ */
 global.sys.screenHeight = 0;
 
+/**
+ * The number of seconds since the last frame.
+ * @type {Number}
+ */
 global.sys.deltaTime = 0;
 
 /** @namespace */
