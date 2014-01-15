@@ -213,14 +213,7 @@ namespace Engine {
         ENGINE_JS_METHOD(Microtime) {
             ENGINE_JS_SCOPE_OPEN;
             
-#ifdef _PLATFORM_WIN32
-			ENGINE_JS_SCOPE_CLOSE(v8::Number::New(GetTickCount()));
-#else
-			timeval time;
-            gettimeofday(&time, NULL);
-
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(time.tv_sec + (time.tv_usec * 0.000001)));
-#endif
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Platform::GetTime()));
         }
         
         ENGINE_JS_METHOD(ResizeWindow) {
@@ -564,8 +557,6 @@ namespace Engine {
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
         
         void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {
-			addItem(sysTable, "println", Println);
-            
             addItem(sysTable, "argv", ArgV);
             
 			addItem(sysTable, "runFile", RunFile);
