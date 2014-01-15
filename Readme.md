@@ -49,7 +49,7 @@ I have not tested a Linux version yet but you should be able to mostly follow th
 Sample Code
 -------------------
 ```javascript
-sys.drawFunc(function () {
+sys.on("draw", "helloWorld", function () {
 	draw.setColor("blue");
 	draw.rect(100, 100, 100, 100);
 });
