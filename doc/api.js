@@ -396,22 +396,63 @@ global.sys.deltaTime = 0;
 /** @namespace */
 global.fs = {};
 
-global.fs.readFile = function () {};
-global.fs.writeFile = function () {};
-global.fs.fileExists = function () {};
-global.fs.fileSize = function () {};
-global.fs.mountFile = function () {};
-global.fs.configDir = function () {};
-global.fs.mkdir = function () {};
+/**
+ * Returns the content of the file mounted at path.
+ * @param  {string} filename
+ * @param  {boolean} [raw] - If true the function will return a raw byte array
+ * @return {string|number[]}
+ */
+global.fs.readFile = function (filename, raw) {};
+
+/**
+ * Writes content to filename mounted on PhysFS
+ * @param  {string} filename
+ * @param  {string} content
+ */
+global.fs.writeFile = function (filename, content) {};
+
+/**
+ * Returns true if filename exists.
+ * @param  {string} filename
+ * @return {boolean}
+ */
+global.fs.fileExists = function (filename) {};
+
+/**
+ * Returns the filesize of filename in bytes
+ * @param  {string} filename
+ * @return {number}
+ */
+global.fs.fileSize = function (filename) {};
+
+/**
+ * Mounts archivePath to mountPath on PhysFS. filetypes supported by archivePath including .zip and .7z
+ * @param  {string} archivePath
+ * @param  {string} mountPath
+ */
+global.fs.mountFile = function (archivePath, mountPath) {};
+
+/**
+ * Set's up a directory under the user's local profile to write files to. This function must be called before any files can be writen.
+ * @param  {string} appName - The name of the directory, this should be a unique application name
+ */
+global.fs.configDir = function (appName) {};
+
+/**
+ * Create's a new directory at path.
+ * @param  {string} path
+ */
+global.fs.mkdir = function (path) {};
 
 /** @namespace */
 global.draw = {};
 
-global.draw.rect = function () {};
+global.draw.rect = function (x, y, w, h) {};
 global.draw.grid = function () {};
 global.draw.grad = function () {};
 global.draw.circle = function () {};
 global.draw.curve = function () {};
+global.draw.line = function (x0, y0, x1, y1) {};
 
 global.draw.colorPalette = function () {};
 global.draw.setColorF = function () {};
