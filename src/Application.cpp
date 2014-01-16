@@ -479,7 +479,7 @@ namespace Engine {
         Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Window/Context" << Logger::end();
         
         if (openGL3Context == "3.2") {
-            Logger::begin("Window", Logger::LogLevel_Warning) << "Loading OpenGL 3.2" << Logger::end();
+            //Logger::begin("Window", Logger::LogLevel_Warning) << "Loading OpenGL 3.2" << Logger::end();
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -759,9 +759,9 @@ namespace Engine {
     
     
     bool Application::LoadFont(std::string prettyName, std::string filename) {
-        Logger::begin("Font", Logger::LogLevel_Log)
-        << "Loading Font: " << filename << " as " << prettyName
-        << Logger::end();
+        Logger::begin("Font", Logger::LogLevel_Verbose)
+            << "Loading Font: " << filename << " as " << prettyName
+            << Logger::end();
         
         Draw2D::CheckGLError("PreLoadFont");
         
@@ -775,7 +775,7 @@ namespace Engine {
         
         Draw2D::CheckGLError("PostLoadFont");
         
-        Logger::begin("Font", Logger::LogLevel_Log) << "Loaded Font" << Logger::end();
+        Logger::begin("Font", Logger::LogLevel_Verbose) << "Loaded Font: " << filename << " as " << prettyName << Logger::end();
         
         return true;
     }

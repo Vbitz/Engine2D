@@ -88,7 +88,7 @@ namespace Engine {
                 this->_source = _getSource(sourceID);
             }
             
-            Logger::begin("ResourceManager", Logger::LogLevel_Log)
+            Logger::begin("ResourceManager", Logger::LogLevel_Verbose)
                 << "Loading Resource with sourceID: " << sourceID << " and name " << this->_source->GetName()
                 << Logger::end();
             this->_loaded = false;
@@ -149,7 +149,7 @@ namespace Engine {
             }
             
             if (force || this->_source->NeedsUpdate()) {
-                Logger::begin("ResourceManager", Logger::LogLevel_Log) << "Reloading Resource: " << this->GetName() << Logger::end();
+                Logger::begin("ResourceManager", Logger::LogLevel_Verbose) << "Reloading Resource: " << this->GetName() << Logger::end();
                 this->Unload();
                 this->Load();
             }
