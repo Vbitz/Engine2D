@@ -1,5 +1,3 @@
-sys.config("core.script.autoReload", true);
-
 fs.configDir("snake");
 
 draw.clearColor(0xdadada);

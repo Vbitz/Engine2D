@@ -719,12 +719,20 @@ namespace Engine {
 	// semi-realtime time loading
 	
 	void Application::_checkUpdate() {
-        for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
-			long lastMod = Filesystem::GetFileModifyTime(iterator->first);
-			if (lastMod > iterator->second) {
-                this->RunFile(iterator->first, true);
-			}
-		}
+        if (Config::GetBoolean("core.script.autoReload")) {
+            for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
+                long lastMod = Filesystem::GetFileModifyTime(iterator->first);
+                if (lastMod > iterator->second) {
+                    this->RunFile(iterator->first, true);
+                }
+            }
+        } else {
+            for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
+                if (iterator->second < 0) {
+                    this->RunFile(iterator->first, true);
+                }
+            }
+        }
 	}
 	
 	// public methods
@@ -781,7 +789,7 @@ namespace Engine {
     }
     
 	bool Application::_runFile(std::string path, bool persist) {
-		Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading File: " << path << Logger::end();
+		Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Loading File: " << path << Logger::end();
         
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
@@ -806,7 +814,7 @@ namespace Engine {
                 std::free(inputScript);
                 return false;
             }
-            Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded File: " << path << Logger::end();
+            Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Loaded File: " << path << Logger::end();
             if (persist) {
                 _loadedFiles[path] = Filesystem::GetFileModifyTime(path);
             }
@@ -964,7 +972,8 @@ namespace Engine {
     }
     
     void Application::InvalidateScript(std::string scriptName) {
-        _loadedFiles[scriptName] = 0;
+        Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Invalidating Script: " << scriptName << Logger::end();
+        _loadedFiles[scriptName] = -1;
     }
     
     bool Application::GetKeyPressed(int key) {
@@ -1006,9 +1015,7 @@ namespace Engine {
                 pthread_mutex_unlock(&debugMesssageReadyMutex);
             }
             
-            if (Config::GetBoolean("core.script.autoReload")) {
-                this->_checkUpdate();
-            }
+            this->_checkUpdate();
             
             Profiler::Begin("Frame", Config::GetFloat("core.render.targetFrameTime"));
             
