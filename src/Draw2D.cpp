@@ -625,6 +625,13 @@ namespace Engine {
             Draw2D::EndRendering();
         }
         
+        void Line(float x0, float y0, float x1, float y1) {
+            BeginRendering(GL_LINES);
+                AddVert(x0, y0, 0.0f);
+                AddVert(x1, y1, 0.0f);
+            EndRendering();
+        }
+        
         void Lines(float* points, unsigned int count) {
             Draw2D::BeginRendering(GL_LINE_STRIP);
             for (int i = 0; i < count * 2; i += 2) {
@@ -743,13 +750,6 @@ namespace Engine {
                 q0 = _calculateBezierPoint(t, vec1, vec2, vec3, vec4);
                 AddVert(q0.x, q0.y, q0.z);
             }
-            EndRendering();
-        }
-        
-        void Line(float x1, float y1, float x2, float y2) {
-            BeginRendering(GL_LINES);
-                AddVert(x1, y1, 0.0f);
-                AddVert(x2, y2, 0.0f);
             EndRendering();
         }
     }

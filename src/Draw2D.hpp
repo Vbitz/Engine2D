@@ -74,6 +74,7 @@ namespace Engine {
         
         void Grad(float x, float y, float w, float h, int col1, int col2, bool vert);
         
+        void Line(float x1, float y1, float x2, float y2);
         void Lines(float* points, unsigned int count);
         void LineGraph(float xOff, float yOff, float xScale, float yScale, float* points, unsigned int count);
         
@@ -87,7 +88,5 @@ namespace Engine {
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4);
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int segments);
         void BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments);
-        
-        void Line(float x1, float y1, float x2, float y2);
     }
 }

@@ -167,6 +167,24 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(Line) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
+            
+            ENGINE_CHECK_ARGS_LENGTH(4);
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the First X point of the line");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the First Y point of the line");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Second X point of the line");
+            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the Second Y point of the line");
+            
+            Draw2D::Line(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1),
+                         ENGINE_GET_ARG_NUMBER_VALUE(2), ENGINE_GET_ARG_NUMBER_VALUE(3));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(Curve) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -257,8 +275,14 @@ namespace Engine {
                 Draw2D::SetColor(col); // yay now draw2d handles it
             } else if (args[0]->IsString()) {
                 Draw2D::SetColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            } else if (args[0]->IsObject()) {
+                v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
+                double r = obj->Get(v8::String::NewSymbol("r"))->NumberValue();
+                double g = obj->Get(v8::String::NewSymbol("g"))->NumberValue();
+                double b = obj->Get(v8::String::NewSymbol("b"))->NumberValue();
+                Draw2D::SetColor(r, g, b);
             } else {
-                ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb)");
+                ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb) or a object with r,g,b propertys");
             }
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -1018,6 +1042,7 @@ namespace Engine {
             addItem(drawTable, "grad", Grad);
             addItem(drawTable, "circle", Circle);
             addItem(drawTable, "curve", Curve);
+            addItem(drawTable, "line", Line);
             
             addItem(drawTable, "colorPalette", ColorPalette);
             addItem(drawTable, "setColorF", SetColorF);
