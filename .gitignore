@@ -15,7 +15,7 @@ release-osx
 
 .DS_Store
 
-Engine2D.xcodeproj
+*.xcodeproj
 
 *.o
 
@@ -23,3 +23,6 @@ Internal*
 
 *.dot
 *.ps
+
+third_party/
+build/
