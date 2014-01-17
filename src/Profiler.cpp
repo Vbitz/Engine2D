@@ -1,5 +1,13 @@
 #include "Profiler.hpp"
 
+#include <functional>
+#include <unordered_map>
+#include <sstream>
+#include <map>
+
+#include "Logger.hpp"
+#include "Config.hpp"
+
 #include "Platform.hpp"
 
 namespace Engine {
@@ -157,9 +165,13 @@ namespace Engine {
         }
         
         std::vector<std::string> GetZones() {
+            return GetZones(false);
+        }
+        
+        std::vector<std::string> GetZones(bool pretty) {
             std::vector<std::string> ret;
             for (auto iter = _zones.begin(); iter != _zones.end(); iter++) {
-                ret.push_back(iter->first);
+                ret.push_back(pretty ? iter->second.prettyName : iter->first);
             }
             return ret;
         }

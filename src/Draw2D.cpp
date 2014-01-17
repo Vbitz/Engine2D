@@ -672,6 +672,7 @@ namespace Engine {
             float rStart = pi2 * start;
             float rEnd = pi2 * end;
             float res = pi2 / segments;
+            FlushAll();
             BeginRendering(fill ? (innerRadius != radius ? GL_TRIANGLE_STRIP // doughnut
                                    : GL_TRIANGLE_FAN) // filled circle
                            : (end == 1.0f ? GL_LINE_LOOP // circle outline
@@ -700,6 +701,7 @@ namespace Engine {
                 }
             }
             EndRendering();
+            FlushAll();
         }
         
         

@@ -1,12 +1,7 @@
 #pragma once
 
-#include <functional>
-#include <unordered_map>
-#include <sstream>
-#include <map>
-
-#include "Logger.hpp"
-#include "Config.hpp"
+#include <vector>
+#include <string>
 
 namespace Engine {
     namespace Profiler {
@@ -26,6 +21,7 @@ namespace Engine {
         double GetTime(std::string zone);
         
         std::vector<std::string> GetZones();
+        std::vector<std::string> GetZones(bool prettyName);
         
         void SetMaxTime(std::string zone, double time);
         void EnableMaxTime(std::string zone, double time);

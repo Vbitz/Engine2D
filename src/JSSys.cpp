@@ -338,7 +338,13 @@ namespace Engine {
             
             v8::Handle<v8::Array> arr = v8::Array::New();
             
-            std::vector<std::string> zones = Profiler::GetZones();
+            std::vector<std::string> zones;
+            
+            if (args.Length() == 1) {
+                zones = Profiler::GetZones(ENGINE_GET_ARG_BOOLEAN_VALUE(0));
+            } else {
+                zones = Profiler::GetZones(false);
+            }
             
             for (int i = 0; i < zones.size(); i++) {
                 arr->Set(i, v8::String::New(zones.at(i).c_str()));
