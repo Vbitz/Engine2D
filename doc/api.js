@@ -750,11 +750,41 @@ global.draw.setCenter = function (x, y) {};
 /** @namespace */
 global.input = {};
 
-global.input.keyDown = function () {};
+/**
+ * Returns true if key is pressed
+ * @param  {string} key
+ * @return {boolean}
+ */
+global.input.keyDown = function (key) {};
 
+/**
+ * The X postion of the mouse
+ * @type {Number}
+ */
 global.input.mouseX = 0;
+
+/**
+ * The Y postion of the mouse
+ * @type {Number}
+ */
 global.input.mouseY = 0;
+
+/**
+ * The Left mouse button state
+ * @type {Boolean}
+ */
 global.input.leftMouseButton = false;
+
+/**
+ * The Middle mouse button state
+ * @type {Boolean}
+ */
+global.input.middleMouseButton = false;
+
+/**
+ * The Right mouse button state
+ * @type {Boolean}
+ */
 global.input.rightMouseButton = false;
 
 /** @namespace */
