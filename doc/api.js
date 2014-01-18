@@ -810,7 +810,7 @@ global.mod.call = function (id, method) {};
 
 /** 
  * db is powered by sqlite3 and uses SQL syntax for statements
- * @type {Object}
+ * @namespace
  */
 global.db = {};
 
