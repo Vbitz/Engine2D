@@ -835,16 +835,73 @@ global.db.exec = function (statement) {};
 global.db.execPrepare = function (statement) {};
 
 /**
- * Currently only defined if Developer Mode is enabled
+ * Currently only defined if Developer Mode is enabled. Also just about every method here can crash the Engine
  * @namespace
 */
 global.unsafe = {};
 
-global.unsafe.getNumberAddress = function () {};
-global.unsafe.getNative = function () {};
-global.unsafe.call = function () {};
-global.unsafe.malloc = function () {};
-global.unsafe.free = function () {};
-global.unsafe.addressOf = function () {};
-global.unsafe.mprotect = function () {};
+/**
+ * @typedef {number} Address
+ * Warning, this is really a double thanks to JavaScript so be careful about accuracy
+ */
+
+/**
+ * @typedef {number[]} MallocArray
+ * This array is a read/write view of the memory at the location it was created
+ */
+
+/**
+ * Allocates a buffer to store number and returns the address
+ * @param  {number} number
+ * @return {Address}
+ */
+global.unsafe.getNumberAddress = function (number) {};
+
+/**
+ * Returns a {@link MallocArray} for address
+ * @param  {Address} address
+ * @param  {number} length
+ * @return {MallocArray}
+ */
+global.unsafe.getNative = function (address, length) {};
+
+/**
+ * Casts address to a function pointer and calls it
+ * @param  {Address} address
+ */
+global.unsafe.call = function (address) {};
+
+/**
+ * Allocates a {@link MallocArray} array of length
+ * @param  {number} length
+ * @return {MallocArray}
+ */
+global.unsafe.malloc = function (length) {};
+
+/**
+ * Frees the memory in a {@link MallocArray}
+ * @param  {MallocArray} array
+ */
+global.unsafe.free = function (array) {};
+
+/**
+ * Returns the real address of a {@link MallocArray}
+ * @param  {MallocArray} array
+ * @return {Address}
+ */
+global.unsafe.addressOf = function (array) {};
+
+/**
+ * Set's execute permission on pages of memory. Returns true if it's sucessful
+ * @param  {Address} address - Needs to be aligned to nearest page.
+ * @param  {number} length
+ * @param  {boolean} enable
+ * @return {boolean}
+ */
+global.unsafe.mprotect = function (address, length, enable) {};
+
+/**
+ * Returns the current system pagesize, the only safe method in this namespace
+ * @return {number}
+ */
 global.unsafe.getPageSize = function () {};
