@@ -447,45 +447,305 @@ global.fs.mkdir = function (path) {};
 /** @namespace */
 global.draw = {};
 
+/**
+ * Draw a rectange with the current color at x,y, w, h in size
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} w
+ * @param  {number} h
+ */
 global.draw.rect = function (x, y, w, h) {};
-global.draw.grid = function () {};
-global.draw.grad = function () {};
-global.draw.circle = function () {};
-global.draw.curve = function () {};
+
+/**
+ * Draw a rectange outline with the current color at x,y, w, h in size
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} w
+ * @param  {number} h
+ */
+global.draw.grid = function (x, y, w, h) {};
+
+/**
+ * Draw a rectange filled with a left/right or up/down gradient specifyed by col1 and col2 at x,y, w, h in size
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} w
+ * @param  {number} h
+ * @param  {number} col1 - Specifyed as a number with the format 0xrrggbb
+ * @param  {number} col2 - Specifyed as a number with the format 0xrrggbb
+ * @param  {boolean} orientation - true for up/down and false for left/right
+ */
+global.draw.grad = function (x, y, w, h, col1, col2, orientation) {};
+
+/**
+ * Draw circular primatives including pie slices, doughnuts and circles
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} radius
+ * @param  {number} [innerRadius] - Set to radius to draw a regular circle, radius by default
+ * @param  {number} [numberOfSides] - The number of vertex's at the edge of the circle, radius * 5 by default
+ * @param  {number} [startPos] - Start persent of the circle, 0.0 by default
+ * @param  {number} [endPos] - End persent of the circle, 1.0 by default
+ * @param  {number} [fillStyle] - Fill the inside of the circle or draw a line strip at the edge
+ */
+global.draw.circle = function (x, y, radius, innerRadius, numberOfSides, startPos, endPos, fillStyle) {};
+
+/**
+ * Draw a line from x0, y0 to x1, y1
+ * @param  {number} x0
+ * @param  {number} y0
+ * @param  {number} x1
+ * @param  {number} y1
+ */
 global.draw.line = function (x0, y0, x1, y1) {};
 
-global.draw.colorPalette = function () {};
-global.draw.setColorF = function () {};
-global.draw.setColor = function () {};
-global.draw.setColorI = function () {};
-global.draw.clearColor = function () {};
-global.draw.getRGBFromHSV = function () {};
+/**
+ * Draw a cubic benzier curve from x0, y0, to x3, y3 through x1, y1 and x2, y2
+ * @param  {number} x0
+ * @param  {number} y0
+ * @param  {number} x1
+ * @param  {number} y1
+ * @param  {number} x2
+ * @param  {number} y2
+ * @param  {number} x3
+ * @param  {number} y3
+ */
+global.draw.curve = function (x0, y0, x1, y1, x2, y2, x3, y3) {};
 
-global.draw.print = function () {};
-global.draw.getStringWidth = function () {};
+/**
+ * Set's predefined colors for use in draw.setColor
+ * @param  {string|Object} name
+ * @param  {number} color
+ * @example <caption>Used with 2 arguments draw.colorPalette accepts a string and a color</caption>
+ * draw.colorPalette("blue", 0x0000ff);
+ * @example <caption>Used with 1 object draw.colorPalette set's each string to a color value</caption>
+ * draw.colorPalette({
+ *     "red": 0xff0000,
+ *     "green": 0x00ff00,
+ *     "blue": 0x0000ff
+ * });
+ */
+global.draw.colorPalette = function (name, color) {};
 
-global.draw.draw = function () {};
-global.draw.drawSub = function () {};
-global.draw.openImage = function () {};
-global.draw.getImageArray = function () {};
-global.draw.createImageArray = function () {};
-global.draw.createImage = function () {};
-global.draw.saveImage = function () {};
-global.draw.freeImage = function () {};
-global.draw.isTexture = function () {};
+/**
+ * Set's the current drawing color to r, g, b
+ * @param {number} r - The red value between 0.0 and 1.0
+ * @param {number} g - The green value between 0.0 and 1.0
+ * @param {number} b - The blue value between 0.0 and 1.0
+ */
+global.draw.setColorF = function (r, g, b) {};
 
+/**
+ * @typedef {Object} Color
+ * @property {number} r The red value between 0.0 and 1.0
+ * @property {number} g The green value between 0.0 and 1.0
+ * @property {number} b The blue value between 0.0 and 1.0
+ */
+
+/**
+ * Set's the current drawing color
+ * @param {string|number|Color} color
+ * @example <caption>Passing a string set's the color to a predefined color</caption>
+ * draw.setColor("red");
+ * @example <caption>Passing a number in the format 0xrrggbb set's the color to that value</caption>
+ * draw.setColor(0xff0000);
+ * @example <caption>Passing a {@link Color} set's it to the value inside color</caption>
+ * draw.setColor({r: 1.0, g: 0.0, b: 0.0})
+ */
+global.draw.setColor = function (color) {};
+
+/**
+ * Set's the current drawing color to r, g, b
+ * @param {number} r - The red value between 0 and 255
+ * @param {number} g - The green value between 0 and 255
+ * @param {number} b - The blue value between 0 and 255
+ */
+global.draw.setColorI = function (r, g, b) {};
+
+/**
+ * Set's the background clear color
+ * @param  {string|number} color - Same argument format as {@link global.draw.setColor} without support for {@link Color}
+ */
+global.draw.clearColor = function (color) {};
+
+/**
+ * Returns a {@link Color} from the HSV values
+ * @param  {number} h - The Hue Component between 0 and 360
+ * @param  {number} s - The Saturation Component between 0.0f and 1.0f
+ * @param  {number} v - The Value Component between 0.0f and 1.0f
+ * @return {Color}
+ */
+global.draw.getRGBFromHSV = function (h, s, v) {};
+
+/**
+ * Prints str at x, y using the current font
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {string} str
+ */
+global.draw.print = function (x, y, str) {};
+
+/**
+ * Returns the width of str in pixels
+ * @param  {string} str
+ * @return {number}
+ */
+global.draw.getStringWidth = function (str) {};
+
+/**
+ * @typedef {number} TextureID
+ */
+
+/**
+ * Renders the image specifyed by texId at x, y sized at w, h
+ * @param  {TextureID} texId
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} w
+ * @param  {number} h
+ */
+global.draw.draw = function (texId, x, y, w, h) {};
+
+/**
+ * Renders a segment of the image specifyed by texId at x, y sized at w, h
+ * @param  {TextureID} texId
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} w
+ * @param  {number} h
+ * @param  {number} xSub
+ * @param  {number} ySub
+ * @param  {number} wSub
+ * @param  {number} hSub
+ */
+global.draw.drawSub = function (texId, x, y, w, h, xSub, ySub, wSub, hSub) {};
+
+/**
+ * Loads filename as a image, most file formats are supported using FreeImage
+ * @param  {string} filename
+ * @return {TextureID}
+ */
+global.draw.openImage = function (filename) {};
+
+/**
+ * @typedef {number[]} Image
+ * Image is optimised for loading using {@link global.draw.createImage}
+ * @property {number} width The width of the image
+ * @property {number} height The height of the image
+ */
+
+/**
+ * Loads filename as a image returning the raw pixel array
+ * @param  {string} filename
+ * @return {Image}
+ */
+global.draw.getImageArray = function (filename) {};
+
+/**
+ * Returns a {@link Image} with width * height pixels
+ * @param  {number} w
+ * @param  {number} h
+ * @return {Image}
+ */
+global.draw.createImageArray = function (w, h) {};
+
+/**
+ * Converts a {@link Image} into a {@link TextureID}
+ * @param  {Image|number[]} arr - {@link Image} is strongly prefered to number[]
+ * @param  {number} w - The width of the Image to create
+ * @param  {number} h - The height of the Image to create
+ * @return {TextureID}
+ */
+global.draw.createImage = function (arr, w, h) {};
+
+/**
+ * Save texId to filename, requires fs.configDir to be called before hand
+ * @param  {TextureID} texId
+ * @param  {string} filename
+ */
+global.draw.saveImage = function (texId, filename) {};
+
+/**
+ * Delete's texId from the system's graphics memory
+ * @param  {TextureID} texId
+ */
+global.draw.freeImage = function (texId) {};
+
+/**
+ * Returns true if texId is valid
+ * @param  {TextureID}  texId
+ * @return {Boolean}
+ */
+global.draw.isTexture = function (texId) {};
+
+/**
+ * Reset the current camera positon
+ * @deprecated Not avalible on OpenGL 3.3 yet
+ */
 global.draw.cameraReset = function () {};
-global.draw.cameraPan = function () {};
-global.draw.cameraZoom = function () {};
-global.draw.cameraRotate = function () {};
 
-global.draw.setFont = function () {};
-global.draw.loadFont = function () {};
-global.draw.isFontLoaded = function () {};
+/**
+ * Pans the camera by x, y
+ * @deprecated Not avalible on OpenGL 3.3 yet
+ * @param  {number} x
+ * @param  {number} y
+ */
+global.draw.cameraPan = function (x, y) {};
 
+/**
+ * Zooms the camera by factor f
+ * @deprecated Not avalible on OpenGL 3.3 yet
+ * @param  {number} f
+ */
+global.draw.cameraZoom = function (f) {};
+
+/**
+ * Rotates the camera by r degrees
+ * @deprecated Not avalible on OpenGL 3.3 yet
+ * @param  {number} r
+ */
+global.draw.cameraRotate = function (r) {};
+
+/**
+ * Set's the current font to prettyName, size. The font will be loaded if it does not exist
+ * @param {string} prettyName
+ * @param {number} size
+ */
+global.draw.setFont = function (prettyName, size) {};
+
+/**
+ * Load a .ttf font file. The font is not loaded until setFont is called at least once
+ * @param  {string} prettyName
+ * @param  {string} filename
+ */
+global.draw.loadFont = function (prettyName, filename) {};
+
+/**
+ * Returns true if the font pointed to by prettyName is loaded
+ * @param  {string}  prettyName
+ * @return {Boolean}
+ */
+global.draw.isFontLoaded = function (prettyName) {};
+
+/**
+ * Returns the number of verts rendered this frame
+ * @return {number}
+ */
 global.draw.getVerts = function () {};
-global.draw.setDrawOffscreen = function () {};
-global.draw.setCenter = function () {};
+
+/**
+ * Should offscreen objects be rendered
+ * @deprecated Not Implamented
+ * @param {boolean} draw
+ */
+global.draw.setDrawOffscreen = function (draw) {};
+
+/**
+ * Set's the point to center drawing around
+ * @param {number} x
+ * @param {number} y
+ */
+global.draw.setCenter = function (x, y) {};
 
 /** @namespace */
 global.input = {};
