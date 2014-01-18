@@ -4,7 +4,6 @@
 			"target_name": "engine2D",
 			"type": "executable",
 			"dependencies": [],
-			"include_dirs": [],
 			"sources": [
 				"src/main.cpp",
 				"src/JSInput.cpp",

@@ -726,7 +726,10 @@ namespace Engine {
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the width of the new Image Array");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the height of the new Image Array");
             
-            int arraySize = ENGINE_GET_ARG_INT32_VALUE(0) * ENGINE_GET_ARG_INT32_VALUE(1) * 4;
+            int imageWidth = ENGINE_GET_ARG_INT32_VALUE(0),
+                imageHeight = ENGINE_GET_ARG_INT32_VALUE(1);
+            
+            int arraySize = imageWidth * imageHeight * 4;
             
             v8::Handle<v8::Object> array = v8::Object::New();
             
@@ -744,6 +747,10 @@ namespace Engine {
             isolate->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
             
             array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));
+            
+            array->Set(v8::String::New("length"), v8::Number::New(arraySize));
+            array->Set(v8::String::New("width"), v8::Number::New(imageWidth));
+            array->Set(v8::String::New("height"), v8::Number::New(imageHeight));
             
             ENGINE_JS_SCOPE_CLOSE(array);
         }
