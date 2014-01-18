@@ -1,5 +1,5 @@
 // Engine2D Javascript API Documentation
-// Correct as of 14th Jan 2014
+// Correct as of 18th Jan 2014
 
 this.global = this; // Global object exposed as global
 
@@ -790,17 +790,52 @@ global.input.rightMouseButton = false;
 /** @namespace */
 global.mod = {};
 
-global.mod.open = function () {};
-global.mod.call = function () {};
+/**
+ * @typedef {number} ModuleID
+ */
 
-/** @namespace */
+/**
+ * Open a module at filename
+ * @param  {string} filename - The real filename path to the module without a extention
+ * @return {ModuleID}
+ */
+global.mod.open = function (filename) {};
+
+/**
+ * Call a paramterless method exported by the module defined by id
+ * @param  {ModuleID} id
+ * @param  {string} method
+ */
+global.mod.call = function (id, method) {};
+
+/** 
+ * db is powered by sqlite3 and uses SQL syntax for statements
+ * @type {Object}
+ */
 global.db = {};
 
-global.db.open = function () {};
-global.db.exec = function () {};
-global.db.execPrepare = function () {};
+/**
+ * Opens or creates a sqlite3 database at filename
+ * @param  {string} filename
+ */
+global.db.open = function (filename) {};
 
-/** Currently only defined if Developer Mode is enabled
+/**
+ * Executes a statement
+ * @param  {string} statement - A valid SQL statement
+ * @return {[type]}
+ */
+global.db.exec = function (statement) {};
+
+/**
+ * Executes a statement and returns the responce as a table
+ * @param  {string} statement - A valid SQL statement
+ * @return {Object[]}
+ */
+global.db.execPrepare = function (statement) {};
+
+/**
+ * Currently only defined if Developer Mode is enabled
  * @namespace
 */
 global.unsafe = {};
