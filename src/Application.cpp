@@ -317,6 +317,7 @@ namespace Engine {
 		input_table->Set(v8::String::New("mouseX"), v8::Number::New(x));
 		input_table->Set(v8::String::New("mouseY"), v8::Number::New(y));
 		input_table->Set(v8::String::New("leftMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS));
+		input_table->Set(v8::String::New("middleMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS));
 		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS));
 	}
 	
