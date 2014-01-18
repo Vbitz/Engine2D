@@ -26,7 +26,7 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>// Engine2D Javascript API Documentation
-// Correct as of 14th Jan 2014
+// Correct as of 18th Jan 2014
 
 this.global = this; // Global object exposed as global
 
@@ -777,38 +777,159 @@ global.draw.setCenter = function (x, y) {};
 /** @namespace */
 global.input = {};
 
-global.input.keyDown = function () {};
+/**
+ * Returns true if key is pressed
+ * @param  {string} key
+ * @return {boolean}
+ */
+global.input.keyDown = function (key) {};
 
+/**
+ * The X postion of the mouse
+ * @type {Number}
+ */
 global.input.mouseX = 0;
+
+/**
+ * The Y postion of the mouse
+ * @type {Number}
+ */
 global.input.mouseY = 0;
+
+/**
+ * The Left mouse button state
+ * @type {Boolean}
+ */
 global.input.leftMouseButton = false;
+
+/**
+ * The Middle mouse button state
+ * @type {Boolean}
+ */
+global.input.middleMouseButton = false;
+
+/**
+ * The Right mouse button state
+ * @type {Boolean}
+ */
 global.input.rightMouseButton = false;
 
 /** @namespace */
 global.mod = {};
 
-global.mod.open = function () {};
-global.mod.call = function () {};
+/**
+ * @typedef {number} ModuleID
+ */
 
-/** @namespace */
+/**
+ * Open a module at filename
+ * @param  {string} filename - The real filename path to the module without a extention
+ * @return {ModuleID}
+ */
+global.mod.open = function (filename) {};
+
+/**
+ * Call a paramterless method exported by the module defined by id
+ * @param  {ModuleID} id
+ * @param  {string} method
+ */
+global.mod.call = function (id, method) {};
+
+/** 
+ * db is powered by sqlite3 and uses SQL syntax for statements
+ * @type {Object}
+ */
 global.db = {};
 
-global.db.open = function () {};
-global.db.exec = function () {};
-global.db.execPrepare = function () {};
+/**
+ * Opens or creates a sqlite3 database at filename
+ * @param  {string} filename
+ */
+global.db.open = function (filename) {};
 
-/** Currently only defined if Developer Mode is enabled
+/**
+ * Executes a statement
+ * @param  {string} statement - A valid SQL statement
+ */
+global.db.exec = function (statement) {};
+
+/**
+ * Executes a statement and returns the responce as a table
+ * @param  {string} statement - A valid SQL statement
+ * @return {Object[]}
+ */
+global.db.execPrepare = function (statement) {};
+
+/**
+ * Currently only defined if Developer Mode is enabled. Also just about every method here can crash the Engine
  * @namespace
 */
 global.unsafe = {};
 
-global.unsafe.getNumberAddress = function () {};
-global.unsafe.getNative = function () {};
-global.unsafe.call = function () {};
-global.unsafe.malloc = function () {};
-global.unsafe.free = function () {};
-global.unsafe.addressOf = function () {};
-global.unsafe.mprotect = function () {};
+/**
+ * @typedef {number} Address
+ * Warning, this is really a double thanks to JavaScript so be careful about accuracy
+ */
+
+/**
+ * @typedef {number[]} MallocArray
+ * This array is a read/write view of the memory at the location it was created
+ */
+
+/**
+ * Allocates a buffer to store number and returns the address
+ * @param  {number} number
+ * @return {Address}
+ */
+global.unsafe.getNumberAddress = function (number) {};
+
+/**
+ * Returns a {@link MallocArray} for address
+ * @param  {Address} address
+ * @param  {number} length
+ * @return {MallocArray}
+ */
+global.unsafe.getNative = function (address, length) {};
+
+/**
+ * Casts address to a function pointer and calls it
+ * @param  {Address} address
+ */
+global.unsafe.call = function (address) {};
+
+/**
+ * Allocates a {@link MallocArray} array of length
+ * @param  {number} length
+ * @return {MallocArray}
+ */
+global.unsafe.malloc = function (length) {};
+
+/**
+ * Frees the memory in a {@link MallocArray}
+ * @param  {MallocArray} array
+ */
+global.unsafe.free = function (array) {};
+
+/**
+ * Returns the real address of a {@link MallocArray}
+ * @param  {MallocArray} array
+ * @return {Address}
+ */
+global.unsafe.addressOf = function (array) {};
+
+/**
+ * Set's execute permission on pages of memory. Returns true if it's sucessful
+ * @param  {Address} address - Needs to be aligned to nearest page.
+ * @param  {number} length
+ * @param  {boolean} enable
+ * @return {boolean}
+ */
+global.unsafe.mprotect = function (address, length, enable) {};
+
+/**
+ * Returns the current system pagesize, the only safe method in this namespace
+ * @return {number}
+ */
 global.unsafe.getPageSize = function () {};
 </code></pre>
         </article>
@@ -820,13 +941,13 @@ global.unsafe.getPageSize = function () {};
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="global.console.html">console</a></li><li><a href="global.db.html">db</a></li><li><a href="global.draw.html">draw</a></li><li><a href="global.fs.html">fs</a></li><li><a href="global.input.html">input</a></li><li><a href="global.mod.html">mod</a></li><li><a href="global.sys.html">sys</a></li><li><a href="global.unsafe.html">unsafe</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="global.console.html">console</a></li><li><a href="global.draw.html">draw</a></li><li><a href="global.fs.html">fs</a></li><li><a href="global.input.html">input</a></li><li><a href="global.mod.html">mod</a></li><li><a href="global.sys.html">sys</a></li><li><a href="global.unsafe.html">unsafe</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha3</a> on Sat Jan 18 2014 14:53:57 GMT+1300 (NZDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha3</a> on Sat Jan 18 2014 16:22:56 GMT+1300 (NZDT)
 </footer>
 
 <script> prettyPrint(); </script>

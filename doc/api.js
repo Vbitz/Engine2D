@@ -823,7 +823,6 @@ global.db.open = function (filename) {};
 /**
  * Executes a statement
  * @param  {string} statement - A valid SQL statement
- * @return {[type]}
  */
 global.db.exec = function (statement) {};
 
