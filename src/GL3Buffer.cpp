@@ -21,6 +21,42 @@ namespace Engine {
         glDeleteVertexArrays(1, &this->_vertexArrayPointer);
     }
     
+    bool GL3Buffer::NeedsUpdate() {
+        if (this->_currentShader.NeedsUpdate()) {
+            Logger::begin("GL3Buffer", Logger::LogLevel_Verbose) << "GL3Buffer reloaded due to Shader" << Logger::end();
+            return true;
+        }
+        
+        if (!glIsBuffer(this->_vertexBufferPointer)) {
+            Logger::begin("GL3Buffer", Logger::LogLevel_Verbose) << "GL3Buffer reloaded due to Vertex Buffer" << Logger::end();
+            return true;
+        }
+        
+        return false;
+    }
+    
+    bool GL3Buffer::Update() {
+        if (!this->NeedsUpdate()) {
+            return false;
+        }
+        
+        if (glIsBuffer(this->_vertexBufferPointer)) {
+            glDeleteBuffers(1, &this->_vertexBufferPointer);
+        }
+        
+        if (glIsVertexArray(this->_vertexArrayPointer)) {
+            glDeleteBuffers(1, &this->_vertexArrayPointer);
+        }
+        
+        this->Invalidate();
+        
+        this->_init();
+        
+        this->_currentShader.Update();
+        
+        return true;
+    }
+    
     void GL3Buffer::Upload(float *buffer, int count) {
         glBindVertexArray(this->_vertexArrayPointer);
         glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);

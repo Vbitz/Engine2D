@@ -48,6 +48,10 @@ namespace Engine {
     bool Shader::NeedsUpdate() {
         static float lastUpdate = Platform::GetTime();
         
+        if (!glIsProgram(this->_programPointer)) {
+            return true; // The shader is invalid so it needs to be loaded
+        }
+        
         if ((Platform::GetTime() - lastUpdate) > 0.2) {
             lastUpdate = Platform::GetTime();
             return Filesystem::GetFileModifyTime(this->_vertFilename) > this->_vertLastModify
@@ -55,6 +59,10 @@ namespace Engine {
         } else {
             return false;
         }
+    }
+    
+    bool Shader::checkProgramPointer() {
+        return this->_programPointer != 0 && this->_loaded && glIsProgram(this->_programPointer);
     }
     
     void Shader::BindUniform(std::string token) {

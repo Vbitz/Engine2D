@@ -440,9 +440,8 @@ namespace Engine {
                 return; // nothing to draw
             }
             
-            if (_currentShader.Update()) {
-                Logger::begin("Draw2D", Logger::LogLevel_Log) << "Shader Reloaded" << Logger::end();
-                buf.Invalidate();
+            if (buf.Update()) {
+                Logger::begin("Draw2D", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
             }
 
             glBindTexture(GL_TEXTURE_2D, _currentTexture);

@@ -13,6 +13,9 @@ namespace Engine {
 		void Upload(float* buffer, int count);
 		void Draw(GLenum mode, int vertexCount);
         
+        bool NeedsUpdate();
+        bool Update();
+        
         void Invalidate() {
             this->_shaderBound = false;
         }

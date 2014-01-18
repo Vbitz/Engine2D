@@ -388,11 +388,7 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, float colR
     
     static Engine::GL3Buffer buf(*shader);
     
-    if (shader->NeedsUpdate()) {
-        Engine::Logger::begin("Draw2D", Engine::Logger::LogLevel_Log)
-            << "Shader Reloaded" << Engine::Logger::end();
-        buf.Invalidate();
-    }
+    buf.Update();
     
     glBindTexture(GL_TEXTURE_2D, texID_);
     
