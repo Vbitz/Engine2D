@@ -218,13 +218,11 @@ global.sys.resizeWindow = function (width, height) {};
 
 /**
  * Toggles the window into fullscreen mode
- * @deprecated Crashes OpenGL 3.x due to a bug in the Engine
  */
 global.sys.toggleFullscreen = function () {};
 
 /**
  * Closes and reopens the window resetting any render paramters
- * @deprecated Crashes OpenGL 3.x due to a bug in the Engine
  */
 global.sys.restartRenderer = function () {};
 
