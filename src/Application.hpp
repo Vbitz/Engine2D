@@ -81,6 +81,7 @@ namespace Engine {
         void _enableV8Debugger();
         void _handleDebugMessage();
         v8::Handle<v8::Context> _initScripting();
+        void _enableTypedArrays();
         
         bool _running = false;
         

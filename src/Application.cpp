@@ -28,6 +28,14 @@
 
 #include <v8-debug.h>
 
+class MallocArrayBufferAllocator : public v8::ArrayBuffer::Allocator {
+public:
+    virtual void* Allocate(size_t length) { return malloc(length); }
+    virtual void* AllocateUninitialized(size_t length) { return malloc(length); }
+    virtual void Free(void* data) { free(data); }
+    virtual void Free(void* data, size_t length) { free(data); }
+};
+
 namespace Engine {
     
     static pthread_mutex_t debugMesssageReadyMutex;
@@ -180,11 +188,17 @@ namespace Engine {
     static void globalAccessor(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info) {
         info.GetReturnValue().Set(info.Holder());
     }
+    
+    void Application::_enableTypedArrays() {
+        v8::V8::SetArrayBufferAllocator(new MallocArrayBufferAllocator());
+    }
 	
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
     
     v8::Handle<v8::Context> Application::_initScripting() {
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
+        
+        this->_enableTypedArrays();
         
 		v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         
