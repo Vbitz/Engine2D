@@ -1,0 +1,16 @@
+{
+	"shader": [
+		{
+			"type": "glsl_150",
+			"vertex": "basic.vert",
+			"fragment": "basic.frag"
+		}
+	],
+	"textures": 1,
+	"vertexBufferParams": {
+		"vertex": "vertex",
+		"color": "color",
+		"texCoard": "texCoard",
+		"projection": "projection"
+	}
+}
