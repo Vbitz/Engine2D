@@ -26,3 +26,5 @@ Internal*
 
 third_party/
 build/
+
+.taskStatus
