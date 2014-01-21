@@ -5,6 +5,8 @@
 
 import sys;
 
+PROJECT_ROOT = 0;
+
 commands = {};
 
 class command(object):
@@ -19,9 +21,47 @@ class command(object):
 		commands[func.__name__].run = False;
 		return func;
 
-@command(usage="Builds platform project files")
+def resolve_path(base, path):
+	return path;
+
+def require_in_path(arr):
+	for x in arr:
+		pass;
+	return True;
+
+def shell_command(cmd, throw=False):
+	print("shell : %s" % (cmd));
+
+@command(usage="Downloads a local copy of SVN if we can't find one")
+def fetch_svn():
+	try:
+		require_in_path(["svn"]);
+	except Exception, e:
+		# check for SVN in path, if we can find it then put it in the path
+		print("SVN not found: " + str(e));
+		# download a standalone copy of SVN and put it in third_party/svn then put it in the path
+		raise e
+	# at this point we have SVN in the path and can download GYP
+	pass;
+
+@command(requires=["fetch_svn"], usage="Downloads the latest version of GYP using SVN")
+def fetch_gyp():
+	# check for GYP in third_party first
+	# if it's not there then download it using SVN
+	pass;
+
+@command(requires=["fetch_gyp"], usage="Builds platform project files")
 def gyp():
-	print("Running GYP");
+	# run GYP
+	shell_command(" ".join([
+			resolve_path(PROJECT_ROOT, "third_party/gyp/gyp"),
+			"--depth 0",
+			resolve_path(PROJECT_ROOT, "engine2D.gyp")
+		]), True);
+
+@command(requires=["gyp"], usage="Open's the platform specfic IDE")
+def ide():
+	print("Opening IDE");
 
 @command(requires=["gyp"], usage="Builds executables")
 def buildBinary():
@@ -43,7 +83,7 @@ def help():
 def run_command(cmdName):
 	# run all required commands
 	for cmd in commands[cmdName].requires:
-		if not commands[cmdName].run:
+		if not commands[cmdName].run: ## make sure the command is not run twice
 			run_command(cmd);
 
 	# finaly run the commadn the user is intrested in
