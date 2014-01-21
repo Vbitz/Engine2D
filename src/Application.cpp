@@ -898,39 +898,16 @@ namespace Engine {
     void Application::_saveScreenshot() {
         int width, height;
         glfwGetWindowSize(window, &width, &height);
-        BYTE* pixels = new BYTE[3 * width * height];
-        glReadPixels(0, 0, width, height, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+        BYTE* pixels = new BYTE[4 * width * height];
+        glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
         
-        FIMEMORY* mem = FreeImage_OpenMemory();
-        
-        FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, ((((24 * width) + 23) / 24) * 3),
-                                                       24, 0xFF0000, 0x00FF00, 0x0000FF, false);
-        
-        FREE_IMAGE_FORMAT format = FreeImage_GetFIFFromFilename(_screenshotFilename.c_str());
-        
-        if (format == FIF_UNKNOWN) {
-            format = FIF_BMP;
-        }
-        
-        FreeImage_SaveToMemory(format, image, mem);
-        
-        long fileSize = FreeImage_TellMemory(mem);
-        
-        FreeImage_SeekMemory(mem, 0, SEEK_SET);
-        
-        char* buffer = (char*)malloc(sizeof(char) * fileSize);
-        
-        FreeImage_ReadMemory(buffer, sizeof(char), (unsigned int) fileSize, mem);
-        
-        Filesystem::WriteFile(_screenshotFilename, buffer, fileSize);
+        ImageWriter::SaveBufferToFile(this->_screenshotFilename, pixels, width, height);
         
         Logger::begin("Screenshot", Logger::LogLevel_Log)
         << "Saved Screenshot as: " << Filesystem::GetRealPath(_screenshotFilename)
         << Logger::end();
         
-        FreeImage_CloseMemory(mem);
-        
-        std::free(pixels);
+        delete [] pixels;
     }
     
     bool Application::UsingGL3() {

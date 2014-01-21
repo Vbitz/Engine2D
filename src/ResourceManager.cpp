@@ -203,15 +203,16 @@ namespace Engine {
             
         }
         
-        ImageResource::ImageResource(std::string sourceName) : Resource(sourceName), _textureID(-1), _manualTexture(false) {
+        ImageResource::ImageResource(std::string sourceName) : Resource(sourceName), _manualTexture(false) {
             this->_loaded = false;
             this->_name = this->_source->GetName();
         }
         
         // ImageResource
-        ImageResource::ImageResource(GLuint textureID) : Resource(""), _textureID(textureID), _manualTexture(true) {
+        ImageResource::ImageResource(Texture* t) : Resource(""), _manualTexture(true) {
             this->_loaded = true;
-            this->_name = "ManualImage_" + std::to_string(textureID);
+            this->_texture = t;
+            this->_name = "ManualImage";
         }
         
         bool ImageResource::IsCritical() {
@@ -222,87 +223,24 @@ namespace Engine {
             return this->_name;
         }
         
-        GLuint ImageResource::GetTextureID() {
+        Texture* ImageResource::GetTexture() {
             if (!this->IsLoaded()) {
                 this->_forceLoad();
             }
-            return this->_textureID;
+            return this->_texture;
         }
 
         void ImageResource::_load() {
             // this method needs to get to the point where GetTextureID returns a valid texture;
             if (!this->_manualTexture) {
-                long fileSize = 0; // Move this to Draw2D or some kind of TextureManager
+                long fileSize = 0;
                 
                 unsigned char* file = this->_source->GetData(fileSize);
                 
-                GLuint text;
-                
-                FIMEMORY* mem = FreeImage_OpenMemory((BYTE*) file, (unsigned int)fileSize);
-                
-                FIBITMAP *lImg = FreeImage_LoadFromMemory(FreeImage_GetFileTypeFromMemory(mem), mem);
-                
-                FIBITMAP *img = 0;
-                
-                if (FreeImage_GetBPP(lImg) == 24) {
-                    Logger::begin("JSDraw", Logger::LogLevel_Warning) << "Converting image to 32bit" << Logger::end();
-                    img = FreeImage_ConvertTo32Bits(lImg);
-                } else {
-                    img = lImg;
-                }
-                
-                int width = FreeImage_GetWidth(img);
-                int height = FreeImage_GetHeight(img);
-                
-                unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
-                unsigned char* texture = new unsigned char[4 * width * height];
-                
-                int pos = 0;
-                
-                for (int x = 0; x < width; x++) {
-                    for (int y = 0; y < height; y++) {
-                        texture[pos + 0] = pixel[pos + 2];
-                        texture[pos + 1] = pixel[pos + 1];
-                        texture[pos + 2] = pixel[pos + 0];
-                        texture[pos + 3] = pixel[pos + 3];
-                        pos += 4;
-                    }
-                }
-                
-                Draw2D::CheckGLError("Pre Image Load");
-                
-                glGenTextures(1, &text);
-                
-                glBindTexture(GL_TEXTURE_2D, text);
-                
-                glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                                GL_NEAREST_MIPMAP_NEAREST );
-                
-                glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                GL_NEAREST );
-                
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
-                
-                glGenerateMipmap(GL_TEXTURE_2D);
-                
-                glBindTexture(GL_TEXTURE_2D, 0);
-                
-                Draw2D::CheckGLError("Post Image Load");
-                
-                Logger::begin("JSDraw", Logger::LogLevel_Log) << "Created Image from file: " << text << Logger::end();
-                
-                this->_textureID = text;
-                
-                FreeImage_CloseMemory(mem);
-                
-                std::free(texture); // that should fix some anoying memory leaks
+                this->_texture = ImageReader::TextureFromFileBuffer(file, fileSize);
             } else {
                 Logger::begin("ResourceManager", Logger::LogLevel_Warning) << "Manual Texture's can't be loaded" << Logger::end();
             }
-        }
-        
-        void ImageResource::_unload() {
-            glDeleteTextures(1, &this->_textureID);
         }
         
         

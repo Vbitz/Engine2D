@@ -33,6 +33,8 @@
 				"src/TestSuite.cpp",
 				"src/Application.cpp",
 				"src/PlatformTests.cpp",
+				"src/SpriteSheet.cpp",
+				"src/TextureLoader.cpp",
 				"src/extern/sqlite3.c"
 			],
 			"conditions": [

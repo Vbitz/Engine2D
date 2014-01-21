@@ -36,9 +36,9 @@ namespace Engine {
         
         Shader _currentShader;
         
-        GLuint _defaultTexture;
+        Texture* _defaultTexture;
         
-        GLuint _currentTexture;
+        Texture* _currentTexture;
         
 		// fuuuu visual studio
 
@@ -312,14 +312,14 @@ namespace Engine {
             }
         }
         
-        void EnableTexture(int texId) {
+        void EnableTexture(Texture* tex) {
             if (!GetAppSingilton()->UsingGL3()) {
                 glEnable(GL_TEXTURE_2D);
             
-                glBindTexture(GL_TEXTURE_2D, texId);
+                tex->Begin();
             } else {
                 FlushAll();
-                _currentTexture = texId;
+                _currentTexture = tex;
             }
         }
         
@@ -396,37 +396,8 @@ namespace Engine {
             return glIsTexture(texID);
         }
         
-        GLuint GenerateDefaultTexture() {
-            
-            GLuint tex;
-            glGenTextures(1, &tex);
-            
-            CheckGLError("Draw2D::GenerateDefaultTexture::PostGenTexture");
-            
-            glBindTexture(GL_TEXTURE_2D, tex);
-            
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                            GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                            GL_NEAREST);
-            
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            
-            float color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-            glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color );
-            
-            float pixels[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-            
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_FLOAT, pixels);
-            
-            CheckGLError("Draw2D::GenerateDefaultTexture::PostUploadTexture");
-            
-            glBindTexture(GL_TEXTURE_2D, 0);
-            
-            CheckGLError("Draw2D::GenerateDefaultTexture::PostCreateTexture");
-            
-            return tex;
+        Texture* GenerateDefaultTexture() {
+            return ImageReader::TextureFromBuffer(new float[4] {1.0f, 1.0f, 1.0f, 1.0f}, 1, 1);
         }
         
         void FlushAll() {
@@ -444,13 +415,13 @@ namespace Engine {
                 Logger::begin("Draw2D", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
             }
 
-            glBindTexture(GL_TEXTURE_2D, _currentTexture);
+            _currentTexture->Begin();
             
             buf.Upload(_buffer, _currentVerts * 9 * sizeof(float));
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
             buf.Draw(_currentMode, _currentVerts);
             
-            glBindTexture(GL_TEXTURE_2D, 0);
+            _currentTexture->End();
             
             /* I think this line here needs a story. What happens when you forget it?
                Well as it turns out it will eat though the buffer growing ever bigger until
@@ -469,7 +440,8 @@ namespace Engine {
             if (GetAppSingilton()->UsingGL3()) {
                 std::string gl3Shader = Config::GetString("core.render.basicShader");
                 _currentShader.Init(gl3Shader + ".vert", gl3Shader + ".frag");
-                if (!IsValidTextureID(_defaultTexture)) {
+                if (_defaultTexture == NULL || !_defaultTexture->IsValid()) {
+                    Logger::begin("Draw2D", Logger::LogLevel_Verbose) << "Creating Default Texture" << Logger::end();
                     _defaultTexture = GenerateDefaultTexture();
                 }
                 _currentTexture = _defaultTexture;
@@ -590,6 +562,52 @@ namespace Engine {
                 AddVert(x, y + h, 0);
                 AddVert(x, y, 0);
             EndRendering();
+        }
+        
+        void DrawImage(Texture* tex, float x, float y, float w, float h) {
+            EnableTexture(tex);
+            
+            BeginRendering(GL_TRIANGLES);
+            
+            if (GetAppSingilton()->UsingGL3()) {
+                Draw2D::CheckGLError("Draw2D::DrawImage::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
+            }
+            
+            //              x         y         z   s     t
+            AddVert(x,        y,        0,  0.0f, 0.0f);
+            AddVert(x + w,    y,        0,  1.0f, 0.0f);
+            AddVert(x + w,    y + h,    0,  1.0f, 1.0f);
+            AddVert(x,        y,        0,  0.0f, 0.0f);
+            AddVert(x,        y + h,    0,  0.0f, 1.0f);
+            AddVert(x + w,    y + h,    0,  1.0f, 1.0f);
+            
+            EndRendering();
+            
+            CheckGLError("Draw2D::DrawImage::PostEnd");
+            
+            DisableTexture();
+            
+            CheckGLError("Draw2D::DrawImage::PostDraw");
+        }
+        
+        void DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
+            EnableTexture(tex);
+            
+            int imageWidth = tex->GetWidth();
+            int imageHeight = tex->GetHeight();
+            
+            BeginRendering(GL_TRIANGLES);
+            //      x           y           z       s                       t
+            AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
+            AddVert(x1 + w1,    y1,         0,      (x2 + w2) / imageWidth, y2 / imageHeight);
+            AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
+            AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
+            AddVert(x1,         y1 + h1,    0,      x2 / imageWidth,        (y2 + h2) / imageHeight);
+            AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
+            
+            EndRendering();
+            
+            DisableTexture();
         }
         
         void Grad(float x, float y, float w, float h, int col1, int col2, bool vert) {

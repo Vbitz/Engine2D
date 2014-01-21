@@ -109,10 +109,10 @@ for (var x = 0; x < 360; x++) {
 	}
 }
 
-var img = img ? img : draw.openImage("image/testing.png");
+var img = img ? img : draw.openImage("texture/testing.png");
 var img2 = img2 ? img2 : draw.createImage(pix, 100, 100);
 var img3 = img3 ? img3 : draw.createImage(hsv, 360, 100);
-var mImgA = mImgA ? mImgA : draw.getImageArray("image/testing.png");
+var mImgA = mImgA ? mImgA : draw.getImageArray("texture/testing.png");
 
 for (var i = 0; i < mImgA.length; i += 4) {
 	mImgA[i + 0] = 1 - mImgA[i + 0];
@@ -140,7 +140,7 @@ var firstDraw = true;
 sys.drawFunc(function () {
 	if (!draw.isTexture(img)) {
 		console.log("Loading Image 1");
-		img = draw.openImage("image/testing.png");
+		img = draw.openImage("texture/testing.png");
 	}
 
 	if (!draw.isTexture(img2)) {

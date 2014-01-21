@@ -44,6 +44,9 @@ namespace engine {
 #define ENGINE_CHECK_ARG_OBJECT(num, errStr) if (!args[num]->IsObject()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
 #define ENGINE_GET_ARG_OBJECT(num) v8::Object::Cast(*args[num])
 
+#define ENGINE_CHECK_ARG_EXTERNAL(num, errStr) if (!args[num]->IsExternal()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
+#define ENGINE_GET_ARG_EXTERNAL_VALUE(num) v8::Handle<v8::External>::Cast(args[num])->Value()
+
 #define ENGINE_JS_SCOPE_OPEN v8::HandleScope scope(args.GetIsolate())
 #define ENGINE_JS_SCOPE_CLOSE(value) args.GetReturnValue().Set(value); return
 #define ENGINE_JS_SCOPE_CLOSE_UNDEFINED return

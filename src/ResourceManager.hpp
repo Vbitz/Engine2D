@@ -6,6 +6,8 @@
 
 #include "extern/GLFT_Font.hpp"
 
+#include "TextureLoader.hpp"
+
 #include <FreeImage.h>
 
 /*
@@ -13,6 +15,8 @@
  */
  
 namespace Engine {
+    class Texture;
+    
     namespace ResourceManager {
         class Source {
         public:
@@ -159,24 +163,23 @@ namespace Engine {
         public:
             ImageResource() : Resource() {}
             ImageResource(std::string sourceID);
-            ImageResource(GLuint textureID);
+            ImageResource(Texture* textureID);
             
             bool IsCritical() override;
             
             std::string GetName() override;
             
-            GLuint GetTextureID();
+            Texture* GetTexture();
             
         protected:
             void _load() override;
-            void _unload() override;
             
         private:
             std::string _name;
             
             bool _manualTexture;
             
-            GLuint _textureID;
+            Texture* _texture;
         };
         
         class FontResource : public Resource {

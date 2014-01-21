@@ -4,9 +4,14 @@
 
 #include "extern/GLFT_Font.hpp"
 
+#include "TextureLoader.hpp"
+
 #define BUFFER_SIZE 4096
 
 namespace Engine {
+    
+    class Texture;
+    
     namespace Draw2D {
         typedef struct _Color3f {
             float r, g, b;
@@ -29,7 +34,7 @@ namespace Engine {
         void AddVert(float x, float y, float z, float s, float t);
         void AddVert(float x, float y, float z, double r, double g, double b, double a, float s, float t);
         
-        void EnableTexture(int texId);
+        void EnableTexture(Texture* texId);
         void DisableTexture();
         
         void EnableSmooth();
@@ -40,8 +45,6 @@ namespace Engine {
         void SetFont(std::string name, int fontSize);
         void LoadFont(std::string prettyName, std::string filename);
         bool IsFontLoaded(std::string name);
-        
-        bool IsValidTextureID(int texID);
         
         void FlushAll();
 		
@@ -71,6 +74,9 @@ namespace Engine {
         
         void Rect(float x, float y, float w, float h);
         void Grid(float x, float y, float w, float h);
+        
+        void DrawImage(Texture* tex, float x, float y, float w, float h);
+        void DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2);
         
         void Grad(float x, float y, float w, float h, int col1, int col2, bool vert);
         
