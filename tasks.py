@@ -4,8 +4,11 @@
 # Built for Python 2.7
 
 import sys;
+import os;
+import subprocess;
 
 PROJECT_ROOT = 0;
+PROJECT_BUILD_PATH = 1;
 
 commands = {};
 
@@ -21,16 +24,29 @@ class command(object):
 		commands[func.__name__].run = False;
 		return func;
 
-def resolve_path(base, path):
-	return path;
+def get_exe_name():
+	if sys.platform == "darwin":
+		return "engine2D";
+
+def resolve_path(base, path=""):
+	if base == PROJECT_ROOT:
+		return os.path.relpath(path);
+	elif base == PROJECT_BUILD_PATH:
+		return os.path.join(resolve_path(PROJECT_ROOT, "build/Default"), path)
+	else:
+		raise "Invalid base";
 
 def require_in_path(arr):
 	for x in arr:
 		pass;
 	return True;
 
-def shell_command(cmd, throw=False):
+def shell_command(cmd, throw=True):
 	print("shell : %s" % (cmd));
+	if throw:
+		subprocess.check_call(cmd);
+	else:
+		subprocess.call(cmd);
 
 @command(usage="Downloads a local copy of SVN if we can't find one")
 def fetch_svn():
@@ -53,32 +69,41 @@ def fetch_gyp():
 @command(requires=["fetch_gyp"], usage="Builds platform project files")
 def gyp():
 	# run GYP
-	shell_command(" ".join([
+	shell_command([
 			resolve_path(PROJECT_ROOT, "third_party/gyp/gyp"),
-			"--depth 0",
+			"--depth=0",
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
-		]), True);
+		]);
 
 @command(requires=["gyp"], usage="Open's the platform specfic IDE")
 def ide():
 	print("Opening IDE");
 
 @command(requires=["gyp"], usage="Builds executables")
-def buildBinary():
-	print("Running Build");
+def build_bin():
+	if sys.platform == "darwin": # OSX
+		shell_command(["xcodebuild"]);
 
-@command(requires=["buildBinary"], usage="Copys support files to the build path")
-def buildEnviroment():
+@command(requires=["build_bin"], usage="Copys support files to the build path")
+def build_env():
 	print("Copying Enviroment");
 
-@command(requires=["buildEnviroment"], usage="Runs the engine in Development Mode")
+@command(requires=["build_env"], usage="Runs the engine in Development Mode")
 def run():
-	print("Running Run");
+	shell_command([
+			resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
+			"-devmode",
+			"-debug"
+		]);
 
 @command(usage="Prints the commandName and usage for each command")
 def help():
 	for x in commands:
 		print("%s | %s" % (x, commands[x].usage));
+
+@command(usage="Prints the current building enviroment")
+def env():
+	print("sys.platform = %s" % (sys.platform));
 
 def run_command(cmdName):
 	# run all required commands
@@ -87,13 +112,12 @@ def run_command(cmdName):
 			run_command(cmd);
 
 	# finaly run the commadn the user is intrested in
+	print("==== Running: %s ====" % (cmdName));
 	commands[cmdName]();
 	commands[cmdName].run = True;
 
 def main(args):
 	# require python version 2.7
-
-	# check for GYP
 
 	# get the command and run it
 	if len(args) < 2:
