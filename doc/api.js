@@ -678,13 +678,11 @@ global.draw.isTexture = function (texId) {};
 
 /**
  * Reset the current camera positon
- * @deprecated Not avalible on OpenGL 3.3 yet
  */
 global.draw.cameraReset = function () {};
 
 /**
  * Pans the camera by x, y
- * @deprecated Not avalible on OpenGL 3.3 yet
  * @param  {number} x
  * @param  {number} y
  */
@@ -692,14 +690,12 @@ global.draw.cameraPan = function (x, y) {};
 
 /**
  * Zooms the camera by factor f
- * @deprecated Not avalible on OpenGL 3.3 yet
  * @param  {number} f
  */
 global.draw.cameraZoom = function (f) {};
 
 /**
  * Rotates the camera by r degrees
- * @deprecated Not avalible on OpenGL 3.3 yet
  * @param  {number} r
  */
 global.draw.cameraRotate = function (r) {};
