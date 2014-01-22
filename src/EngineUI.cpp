@@ -52,6 +52,8 @@ namespace Engine {
                 return;
             }
             
+            Draw2D::ResetMatrix();
+            
             Application* app = GetAppSingilton();
             
             if (!_showConsole) {

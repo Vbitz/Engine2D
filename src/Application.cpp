@@ -1037,6 +1037,10 @@ namespace Engine {
             Events::Emit("draw", Events::EventArgs());
             Profiler::End("EventDraw");
             
+            Draw2D::End2d();
+            
+            Draw2D::Begin2d();
+            
             Profiler::Begin("EngineUI", Config::GetFloat("core.render.targetFrameTime") / 3);
             EngineUI::Draw();
             Profiler::End("EngineUI");

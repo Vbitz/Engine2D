@@ -71,6 +71,9 @@ namespace Engine {
         void SetDrawOffscreen(bool drawOffscreen);
         
         void SetCenter(float x, float y);
+        void CameraPan(float x, float y);
+        void CameraZoom(float f);
+        void CameraRotate(float r);
         
         void Rect(float x, float y, float w, float h);
         void Grid(float x, float y, float w, float h);

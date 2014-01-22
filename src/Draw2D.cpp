@@ -198,6 +198,8 @@ namespace Engine {
                 case GL_INVALID_VALUE:      return "Invalid Value";
                 case GL_INVALID_OPERATION:  return "Invalid Operation";
                 case GL_OUT_OF_MEMORY:      return "Out of Memory";
+                case GL_STACK_OVERFLOW:     return "Stack Overflow";
+                case GL_STACK_UNDERFLOW:    return "Stack Underflow";
                 default:                    return "Unknown Error: " + std::to_string(error);
             }
         }
@@ -232,7 +234,7 @@ namespace Engine {
             if (GetAppSingilton()->UsingGL3()) {
                 _currentModelMatrix = glm::mat4();
             } else {
-                glPushMatrix();
+                //glPushMatrix();
                 glDisable(GL_DEPTH_TEST);
                 glLoadIdentity();
                 Application* app = GetAppSingilton();
@@ -301,8 +303,8 @@ namespace Engine {
         
         void AddVert(float x, float y, float z, double r, double g, double b, double a, float s, float t) {
             if (GetAppSingilton()->UsingGL3()) {
-                _buffer[_currentVerts * 9 + 0] = x;
-                _buffer[_currentVerts * 9 + 1] = y;
+                _buffer[_currentVerts * 9 + 0] = x - _centerX;
+                _buffer[_currentVerts * 9 + 1] = y - _centerY;
                 _buffer[_currentVerts * 9 + 2] = z;
                 
                 _buffer[_currentVerts * 9 + 3] = r;
@@ -359,7 +361,7 @@ namespace Engine {
                 
                 GLFT_Font* drawingFont = GetAppSingilton()->GetFont(_currentFontName, _currentFontSize);
                 
-                drawingFont->drawTextGL3(x, y, &_currentEffect, _currentColorR,
+                drawingFont->drawTextGL3(x - _centerX, y - _centerY, &_currentEffect, _currentColorR,
                                          _currentColorG, _currentColorB, string);
                 
                 CheckGLError("Post GL3 Print");
@@ -475,7 +477,7 @@ namespace Engine {
             if (GetAppSingilton()->UsingGL3()) {
                 FlushAll();
             } else {
-                glPopMatrix();
+                //glPopMatrix();
             }
             
             _polygons = 0;
@@ -550,6 +552,30 @@ namespace Engine {
         void SetCenter(float x, float y) {
             _centerX = x;
             _centerY = y;
+        }
+        
+        void CameraPan(float x, float y) {
+            if (GetAppSingilton()->UsingGL3()) {
+                _currentModelMatrix = glm::translate(_currentModelMatrix, glm::vec3(x, y, 0.0f));
+            } else {
+                glTranslatef(x, y, 0.0f);
+            }
+        }
+        
+        void CameraZoom(float f) {
+            if (GetAppSingilton()->UsingGL3()) {
+                _currentModelMatrix = glm::scale(_currentModelMatrix, glm::vec3(f, f, 0.0f));
+            } else {
+                glScalef(f, f, 0.0f);
+            }
+        }
+        
+        void CameraRotate(float r) {
+            if (GetAppSingilton()->UsingGL3()) {
+                _currentModelMatrix = glm::rotate(_currentModelMatrix, r, glm::vec3(0, 0, 1));
+            } else {
+                glRotatef(r, 0.0f, 0.0f, 1.0f);
+            }
         }
         
         void Rect(float x, float y, float w, float h) {
@@ -694,11 +720,14 @@ namespace Engine {
         
         void Circle(float xCenter, float yCenter, float radius, float innerRadius,
                     int segments, float start, float end, bool fill) {
+            bool usingGl3 = GetAppSingilton()->UsingGL3();
             static double pi2 = 2 * 3.14159265358979323846;
             float rStart = pi2 * start;
             float rEnd = pi2 * end;
             float res = pi2 / segments;
-            FlushAll();
+            if (usingGl3) {
+                FlushAll();
+            }
             BeginRendering(fill ? (innerRadius != radius ? GL_TRIANGLE_STRIP // doughnut
                                    : GL_TRIANGLE_FAN) // filled circle
                            : (end == 1.0f ? GL_LINE_LOOP // circle outline
@@ -727,7 +756,9 @@ namespace Engine {
                 }
             }
             EndRendering();
-            FlushAll();
+            if (usingGl3) {
+                FlushAll();
+            }
         }
         
         

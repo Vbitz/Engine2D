@@ -153,6 +153,7 @@ console.log(sys.hasExtention("GL_ARB_fragment_program"));
 var r = 0;
 
 sys.drawFunc(function () {
+	draw.cameraReset();
 	draw.cameraPan(sys.screenWidth / 2, sys.screenHeight / 2);
 	draw.setCenter(sys.screenWidth / 2, sys.screenHeight / 2);
 	draw.cameraZoom(1);
@@ -183,7 +184,7 @@ sys.drawFunc(function () {
 });
 
 sys.keyboardFunc(function (type, chr, press) {
-	if (press && chr === 'r') {
+	if (press && chr === 'R') {
 		genTree();
 	}
 });

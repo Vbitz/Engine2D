@@ -858,7 +858,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X Distince to pan");
                 ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y Distince to pan");
                 
-                glTranslatef(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), 0.0f);
+                Draw2D::CameraPan(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -872,9 +872,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to zoom the camera");
                 
-                double zoomFactor = args[0]->NumberValue();
-                
-                glScalef(zoomFactor, zoomFactor, 0.0f);
+                Draw2D::CameraZoom(ENGINE_GET_ARG_NUMBER_VALUE(0));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -888,9 +886,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to rotate the camera");
                 
-                double rotateFactor = ENGINE_GET_ARG_NUMBER_VALUE(0);
-                
-                glRotatef(rotateFactor, 0.0f, 0.0f, 1.0f);
+                Draw2D::CameraRotate(ENGINE_GET_ARG_NUMBER_VALUE(0));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }

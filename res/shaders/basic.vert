@@ -14,6 +14,6 @@ out vec4 postVertex;
 void main() {
 	postColor = color;
 	postTexCoard = texCoard;
-	postVertex = (model * view * projection) * vec4(vertex, 1.0);
+	postVertex = (projection * view * model) * vec4(vertex, 1.0);
 	gl_Position = postVertex;
 }
