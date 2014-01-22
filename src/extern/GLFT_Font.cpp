@@ -42,6 +42,9 @@
 
 #include <iostream>
 
+#include "../Shader.hpp"
+#include "../GL3Buffer.hpp"
+
 // static members
 FT_Library FTLibraryContainer::library_;
 FTLibraryContainer GLFT_Font::library_;
@@ -374,7 +377,7 @@ void AddVert(float* _buffer, int _currentVerts, float x, float y, float r, float
     _buffer[_currentVerts * 9 + 8] = t;
 }
 
-void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, float colR, float colG, float colB, const std::string& str) const {
+void GLFT_Font::drawTextGL3(float x, float y, Engine::EffectParameters* effect, float colR, float colG, float colB, const std::string& str) const {
     
     if (!isValid()) {
         throw std::logic_error("Invalid GLFT_Font::drawTextGL3 call.");
@@ -386,7 +389,7 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, float colR
     
     //return; // just until it's fixed
     
-    static Engine::GL3Buffer buf(*shader);
+    static Engine::GL3Buffer buf(*effect);
     
     buf.Update();
     
@@ -417,7 +420,7 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::Shader* shader, float colR
     }
     
     buf.Upload(dbuf, verts * 9 * sizeof(float));
-    buf.Draw(GL_TRIANGLES, verts);
+    buf.Draw(GL_TRIANGLES, glm::mat4(), glm::mat4(), verts);
     
     glBindTexture(GL_TEXTURE_2D, 0);
     

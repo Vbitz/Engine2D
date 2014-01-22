@@ -47,12 +47,10 @@
 class GLFT_Font;
 
 namespace Engine {
-    class Shader;
-    class GL3Buffer;
+    class EffectParameters;
 }
 
-#include "../Shader.hpp"
-#include "../GL3Buffer.hpp"
+#include "../EffectParameters.hpp"
 
 // opengl includes
 #ifdef _WIN32
@@ -115,7 +113,7 @@ public:
     void drawText(float x, float y, const char *str, ...) const;
     void drawText(float x, float y, const std::string& str) const;
     
-    void drawTextGL3(float x, float y, Engine::Shader* shader, float colR, float colG, float colB, const std::string& str) const;
+    void drawTextGL3(float x, float y, Engine::EffectParameters* effect, float colR, float colG, float colB, const std::string& str) const;
     
     std::ostream& beginDraw(float x, float y);
     StreamFlusher endDraw();

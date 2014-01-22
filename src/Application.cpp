@@ -387,7 +387,7 @@ namespace Engine {
         Config::SetBoolean( "core.debug.profiler",                  this->_developerMode || this->_debugMode);
         Config::SetString(  "core.window.title",                    "Engine2D");
         Config::SetBoolean( "core.debug.debugRenderer",             false);
-        Config::SetString(  "core.render.basicShader",              "shaders/basic");
+        Config::SetString(  "core.render.basicEffect",              "shaders/basic.json");
         Config::SetNumber(  "core.render.targetFrameTime",          1.0f / 30.0f);
         
         Config::SetBoolean( "core.render.clampTexture",             true);

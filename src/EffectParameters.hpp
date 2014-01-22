@@ -5,10 +5,9 @@
 
 #include "extern/json/json.h"
 
-#include "Filesystem.hpp"
+#include "common.hpp"
+
 #include "Shader.hpp"
-#include "Platform.hpp"
-#include "Application.hpp"
 
 namespace Engine {
     
@@ -25,9 +24,11 @@ namespace Engine {
     
     class EffectParameters {
     public:
+        EffectParameters();
         EffectParameters(std::string basePath, Json::Value root);
         
         Shader* CreateShader();
+        ShaderSettings GetShaderSettings();
         
         bool NeedsUpdate();
         

@@ -47,6 +47,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+namespace Engine {
+    namespace EffectShaderTypes {
+        enum Type {
+            GLSL_150,
+            Unknown
+        };
+    };
+};
+
 #include "Logger.hpp"
 
 #include "Profiler.hpp"

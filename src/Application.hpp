@@ -2,18 +2,11 @@
 
 #include "common.hpp"
 
-#include "extern/GLFT_Font.hpp"
-
 #include "ResourceManager.hpp"
 
+#include "extern/GLFT_Font.hpp"
+
 namespace Engine {
-    
-    namespace EffectShaderTypes {
-        enum Type {
-            GLSL_150,
-            Unknown
-        };
-    };
     
     typedef struct _openGLVersion {
         int major, minor, revision;

@@ -1,5 +1,7 @@
 #include "EffectParameters.hpp"
 
+#include "Application.hpp"
+
 namespace Engine {
     
     EffectShaderTypes::Type shaderTypeFromString(std::string type) {
@@ -24,6 +26,10 @@ namespace Engine {
         return ret;
     }
     
+    EffectParameters::EffectParameters() {
+        
+    }
+    
     EffectParameters::EffectParameters(std::string basePath, Json::Value root) {
         this->_read(basePath, root);
     }
@@ -31,8 +37,13 @@ namespace Engine {
     Shader* EffectParameters::CreateShader() {
         ShaderSpec spec = this->_getBestShaderSpec();
         Shader* shader = new Shader();
+        Logger::begin("EffectParameters", Logger::LogLevel_Verbose) << "Using Shader: " << spec.vertexShaderPath << " : " << spec.fragmentShaderPath << Logger::end();
         shader->Init(spec.vertexShaderPath, spec.fragmentShaderPath);
         return shader;
+    }
+    
+    ShaderSettings EffectParameters::GetShaderSettings() {
+        return _shaderSettings;
     }
     
     bool EffectParameters::NeedsUpdate() {

@@ -3,6 +3,7 @@
 #include "Application.hpp"
 
 #include "GL3Buffer.hpp"
+#include "EffectParameters.hpp"
 
 namespace Engine {
     namespace Draw2D {
@@ -34,11 +35,13 @@ namespace Engine {
         std::string _currentFontName = "basic"; // ah there we are fonts fixed
         int _currentFontSize = 16;
         
-        Shader _currentShader;
+        EffectParameters _currentEffect;
         
         Texture* _defaultTexture;
         
         Texture* _currentTexture;
+        
+        glm::mat4 _currentModelMatrix;;
         
 		// fuuuu visual studio
 
@@ -226,11 +229,15 @@ namespace Engine {
         }
         
         void ResetMatrix() {
-            glPushMatrix();
-			glDisable(GL_DEPTH_TEST);
-			glLoadIdentity();
-            Application* app = GetAppSingilton();
-			glOrtho(0, app->GetScreenWidth(), app->GetScreenHeight(), 0, 1, -1);
+            if (GetAppSingilton()->UsingGL3()) {
+                _currentModelMatrix = glm::mat4();
+            } else {
+                glPushMatrix();
+                glDisable(GL_DEPTH_TEST);
+                glLoadIdentity();
+                Application* app = GetAppSingilton();
+                glOrtho(0, app->GetScreenWidth(), app->GetScreenHeight(), 0, 1, -1);
+            }
         }
         
         void SetDefinedColor(std::string name, int col) {
@@ -352,7 +359,7 @@ namespace Engine {
                 
                 GLFT_Font* drawingFont = GetAppSingilton()->GetFont(_currentFontName, _currentFontSize);
                 
-                drawingFont->drawTextGL3(x, y, &_currentShader, _currentColorR,
+                drawingFont->drawTextGL3(x, y, &_currentEffect, _currentColorR,
                                          _currentColorG, _currentColorB, string);
                 
                 CheckGLError("Post GL3 Print");
@@ -401,7 +408,7 @@ namespace Engine {
         }
         
         void FlushAll() {
-            static GL3Buffer buf(_currentShader); // temporory
+            static GL3Buffer buf(_currentEffect); // temporory
             
             if (!GetAppSingilton()->UsingGL3()) {
                 throw "That's a bug";
@@ -419,7 +426,7 @@ namespace Engine {
             
             buf.Upload(_buffer, _currentVerts * 9 * sizeof(float));
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
-            buf.Draw(_currentMode, _currentVerts);
+            buf.Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
             
             _currentTexture->End();
             
@@ -438,8 +445,9 @@ namespace Engine {
 
         void Init2d() {
             if (GetAppSingilton()->UsingGL3()) {
-                std::string gl3Shader = Config::GetString("core.render.basicShader");
-                _currentShader.Init(gl3Shader + ".vert", gl3Shader + ".frag");
+                std::string gl3Effect = Config::GetString("core.render.basicEffect");
+                _currentEffect = EffectReader::GetEffectFromFile(gl3Effect);
+                _currentEffect.CreateShader();
                 if (_defaultTexture == NULL || !_defaultTexture->IsValid()) {
                     Logger::begin("Draw2D", Logger::LogLevel_Verbose) << "Creating Default Texture" << Logger::end();
                     _defaultTexture = GenerateDefaultTexture();
@@ -456,8 +464,9 @@ namespace Engine {
                 glDisable(GL_DEPTH_TEST);
             } else {
                 glDisable(GL_TEXTURE_2D);
-                ResetMatrix();
             }
+            
+            ResetMatrix();
             
             CheckGLError("Post Begin2D");
 		}
@@ -573,7 +582,7 @@ namespace Engine {
                 Draw2D::CheckGLError("Draw2D::DrawImage::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
             }
             
-            //              x         y         z   s     t
+            //      x         y         z   s     t
             AddVert(x,        y,        0,  0.0f, 0.0f);
             AddVert(x + w,    y,        0,  1.0f, 0.0f);
             AddVert(x + w,    y + h,    0,  1.0f, 1.0f);

@@ -3,6 +3,8 @@ in vec3 vertex;
 in vec4 color;
 in vec2 texCoard;
 
+uniform mat4 model;
+uniform mat4 view;
 uniform mat4 projection;
 
 out vec4 postColor;
@@ -12,6 +14,6 @@ out vec4 postVertex;
 void main() {
 	postColor = color;
 	postTexCoard = texCoard;
-	postVertex = projection * vec4(vertex, 1.0);
+	postVertex = (model * view * projection) * vec4(vertex, 1.0);
 	gl_Position = postVertex;
 }
