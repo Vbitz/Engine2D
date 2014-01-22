@@ -33,6 +33,7 @@
 				"src/TestSuite.cpp",
 				"src/Application.cpp",
 				"src/PlatformTests.cpp",
+				"src/EffectParameters.cpp",
 				"src/SpriteSheet.cpp",
 				"src/TextureLoader.cpp",
 				"src/extern/sqlite3.c"
@@ -42,7 +43,8 @@
 					"xcode_settings": {
 						"OTHER_CPLUSPLUSFLAGS": [
 							"-std=gnu++11",
-							"-stdlib=libc++"
+							"-stdlib=libc++",
+							"-pthread"
 						],
 						"OTHER_LDFLAGS": [
 							"-lfreetype "
@@ -51,7 +53,7 @@
 							"-lphysfs",
 							"-lv8",
 							"-lfreeimage",
-							"-lpthread"
+							"-pthread"
 						]
 					},
 					"include_dirs": [

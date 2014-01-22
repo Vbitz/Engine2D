@@ -982,6 +982,10 @@ namespace Engine {
         return ret;
     }
     
+    EffectShaderTypes::Type Application::GetBestEffectShaderType() {
+        return EffectShaderTypes::GLSL_150;
+    }
+    
     void Application::_mainLoop() {
         this->_running = true;
         

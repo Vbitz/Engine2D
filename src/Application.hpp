@@ -8,6 +8,13 @@
 
 namespace Engine {
     
+    namespace EffectShaderTypes {
+        enum Type {
+            GLSL_150,
+            Unknown
+        };
+    };
+    
     typedef struct _openGLVersion {
         int major, minor, revision;
     } OpenGLVersion;
@@ -47,6 +54,8 @@ namespace Engine {
         bool GetKeyPressed(int key);
         
         OpenGLVersion GetOpenGLVersion();
+        
+        EffectShaderTypes::Type GetBestEffectShaderType();
         
     private:
         void _mainLoop();

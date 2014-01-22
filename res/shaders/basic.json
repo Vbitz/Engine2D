@@ -10,7 +10,12 @@
 	"vertexBufferParams": {
 		"vertex": "vertex",
 		"color": "color",
-		"texCoard": "texCoard",
+		"texCoard": "texCoard"
+	},
+	"cameraSettings": {
+		"model": "model",
+		"view": "view",
 		"projection": "projection"
-	}
+	},
+	"userParams": {}
 }
