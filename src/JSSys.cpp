@@ -517,7 +517,7 @@ namespace Engine {
                      v8::String::NewSymbol((const char*) glewGetString(GLEW_VERSION)));
             ret->Set(v8::String::NewSymbol("v8"),
                      v8::String::NewSymbol(v8::V8::GetVersion()));
-            ret->Set(v8::String::NewSymbol("engine"), v8::String::NewSymbol("Alpha 2"));
+            ret->Set(v8::String::NewSymbol("engine"), v8::String::NewSymbol(Application::GetEngineVersion().c_str()));
             ret->Set(v8::String::NewSymbol("glfw"),
                      v8::String::NewSymbol(glfwVersion.str().c_str()));
             ret->Set(v8::String::NewSymbol("glsl"),

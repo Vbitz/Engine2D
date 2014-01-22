@@ -28,6 +28,8 @@
 
 #include <v8-debug.h>
 
+#include "Build.hpp"
+
 class MallocArrayBufferAllocator : public v8::ArrayBuffer::Allocator {
 public:
     virtual void* Allocate(size_t length) { return malloc(length); }
@@ -986,6 +988,10 @@ namespace Engine {
         return EffectShaderTypes::GLSL_150;
     }
     
+    std::string Application::GetEngineVersion() {
+        return std::string("Engine2D v ") + std::string(ENGINE_VERSION);
+    }
+    
     void Application::_mainLoop() {
         this->_running = true;
         
@@ -1107,7 +1113,7 @@ namespace Engine {
 	// main function
     
     int Application::_postStart() {
-        Logger::begin("Application", Logger::LogLevel_Log) << "Starting" << Logger::end();
+        Logger::begin("Application", Logger::LogLevel_Log) << "Starting: " << Application::GetEngineVersion() << Logger::end();
         
         if (this->_debugMode) {
             Logger::begin("Application", Logger::LogLevel_Warning) << "=== Debug Mode Active ===" << Logger::end();

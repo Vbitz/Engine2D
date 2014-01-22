@@ -57,6 +57,8 @@ namespace Engine {
         
         EffectShaderTypes::Type GetBestEffectShaderType();
         
+        static std::string GetEngineVersion();
+        
     private:
         void _mainLoop();
         
