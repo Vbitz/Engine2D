@@ -519,6 +519,7 @@ namespace Engine {
         
         if (window == NULL) {
             Logger::begin("Window", Logger::LogLevel_Error) << "Error Creating Window" << Logger::end();
+            exit(EXIT_FAILURE); // can't continue if we have no window
         }
         
         glfwMakeContextCurrent(window);
@@ -535,7 +536,10 @@ namespace Engine {
         
         if (err != GLEW_OK) {
             Logger::begin("Window", Logger::LogLevel_Error) << "Error starting GLEW: " << glewGetErrorString(err) << Logger::end();
+            exit(EXIT_FAILURE); // can't continue if we have no glew
         }
+        
+        glGetError(); // We don't care about the error
         
         Draw2D::CheckGLError("Ignore Me, Mostly");
         
@@ -561,7 +565,7 @@ namespace Engine {
         
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
-        if (Config::GetBoolean("core.debug.debugRenderer")) {
+        if (Config::GetBoolean("core.debug.debugRenderer") && glDebugMessageCallback != NULL) {
             glDebugMessageCallback(DebugMessageCallback, NULL);
         }
         

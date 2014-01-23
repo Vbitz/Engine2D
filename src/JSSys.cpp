@@ -147,6 +147,10 @@ namespace Engine {
             
             bool has = glewGetExtension(*ENGINE_GET_ARG_CSTRING_VALUE(0));
             
+            if (GetAppSingilton()->UsingGL3()) {
+                glGetError(); // A bug in GLEW always throws a GL error
+            }
+            
             Draw2D::CheckGLError("Post Has Extention");
             
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(has));
