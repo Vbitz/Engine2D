@@ -943,7 +943,7 @@ namespace Engine {
             Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
 		} else {
             v8::Local<v8::Value> result = script->Run();
-            if (*result != NULL) { // well it works
+            if (*result != NULL && !result->IsExternal()) { // well it works
                 if (result->IsUndefined() && !Config::GetBoolean("core.log.src.undefinedValue")) {
                     
                 } else {
