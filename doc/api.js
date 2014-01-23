@@ -591,10 +591,6 @@ global.draw.print = function (x, y, str) {};
 global.draw.getStringWidth = function (str) {};
 
 /**
- * @typedef {number} TextureID
- */
-
-/**
  * Renders the image specifyed by texId at x, y sized at w, h
  * @param  {TextureID} texId
  * @param  {number} x
@@ -619,11 +615,29 @@ global.draw.draw = function (texId, x, y, w, h) {};
 global.draw.drawSub = function (texId, x, y, w, h, xSub, ySub, wSub, hSub) {};
 
 /**
+ * Renders a sprite using spriteSheet, this sprite can be animated in the sprite definition
+ * @param  {SpriteSheet} spriteSheet The spritesheet to use
+ * @param  {string} sprite           The sprite to draw
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} w
+ * @param  {number} h
+ */
+global.draw.drawSprite = function (spriteSheet, sprite, x, y, w, h) {};
+
+/**
  * Loads filename as a image, most file formats are supported using FreeImage
  * @param  {string} filename
  * @return {TextureID}
  */
 global.draw.openImage = function (filename) {};
+
+/**
+ * Loads filename as a spritesheet, spritesheets are specfiyed using a JSON format
+ * @param  {string} filename      The file to load
+ * @return {SpriteSheet}          The loaded sprite sheet
+ */
+global.draw.openSpriteSheet = function (filename) {};
 
 /**
  * @typedef {number[]} Image
@@ -675,6 +689,13 @@ global.draw.freeImage = function (texId) {};
  * @return {Boolean}
  */
 global.draw.isTexture = function (texId) {};
+
+/**
+ * Returns true if spriteSheet is valid
+ * @param  {SpriteSheet} 
+ * @return {Boolean}
+ */
+global.draw.isSpiteSheet = function (spriteSheet) {};
 
 /**
  * Reset the current camera positon
