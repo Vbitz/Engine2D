@@ -164,7 +164,7 @@ def fetch_freeimage():
 	if sys.platform == "win32":
 		# windows needs http://downloads.sourceforge.net/freeimage/FreeImage3154Win32.zip
 		pass;
-	elif:
+	elif sys.platform == "darwin": #osx
 		# osx needs http://downloads.sourceforge.net/freeimage/FreeImage3154.zip (5,513,923 bytes)
 		# extracts to FreeImage using unzip -aa to make sure patching works
 		# Patch FreeImage/Makefile.gnu with third_party/patches/FreeImage_osx.patch
