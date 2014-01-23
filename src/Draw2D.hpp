@@ -5,12 +5,14 @@
 #include "extern/GLFT_Font.hpp"
 
 #include "TextureLoader.hpp"
+#include "SpriteSheet.hpp"
 
 #define BUFFER_SIZE 4096
 
 namespace Engine {
     
     class Texture;
+    class SpriteSheet;
     
     namespace Draw2D {
         typedef struct _Color3f {
@@ -80,6 +82,7 @@ namespace Engine {
         
         void DrawImage(Texture* tex, float x, float y, float w, float h);
         void DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2);
+        void DrawSprite(SpriteSheet* sheet, std::string sprite, float x, float y, float w, float h);
         
         void Grad(float x, float y, float w, float h, int col1, int col2, bool vert);
         

@@ -44,7 +44,7 @@ namespace Engine {
         Texture* TextureFromBuffer(float* texture, int width, int height);
         Texture* TextureFromBuffer(GLuint textureID, float* texture, int width, int height);
         
-        ResourceManager::ImageResource* ImageFromFile(std::string filename);
+        ResourceManager::ImageResource* TextureFromFile(std::string filename);
     }
     
     namespace ImageWriter {

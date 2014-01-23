@@ -578,6 +578,40 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
+            ENGINE_JS_METHOD(DrawSprite) {
+                ENGINE_JS_SCOPE_OPEN;
+                
+                SpriteSheet* sheet;
+                std::string sprite;
+                GLfloat x, y, w, h;
+                
+                ENGINE_CHECK_ARGS_LENGTH(6);
+                
+                ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is a valid spritesheet that's been loaded since the last context change");
+                ENGINE_CHECK_ARG_STRING(1, "Arg1 is the sprite or animation to draw")
+                ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be X of a rect");
+                ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Y of a rect");
+                ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Width of a rect");
+                ENGINE_CHECK_ARG_NUMBER(5, "Arg5 has to be Height of a rect");
+                
+                sheet = (SpriteSheet*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+
+                if (!sheet->IsValid()) {
+                    ENGINE_THROW_ARGERROR("Arg0 is not a valid spritesheet");
+                    ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                }
+            
+                sprite = ENGINE_GET_ARG_CPPSTRING_VALUE(1);
+                x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
+                y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
+                w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
+                h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(5);
+                
+                Draw2D::DrawSprite(sheet, sprite, x, y, w, h);
+                
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
             ENGINE_JS_METHOD(OpenImage) {
                 ENGINE_JS_SCOPE_OPEN;
                 
@@ -605,6 +639,24 @@ namespace Engine {
                 img->Load();
                 
                 ENGINE_JS_SCOPE_CLOSE(v8::External::New(img->GetTexture()));
+            }
+            
+            ENGINE_JS_METHOD(OpenSpriteSheet) {
+                ENGINE_JS_SCOPE_OPEN;
+                
+                ENGINE_CHECK_GL;
+                
+                ENGINE_CHECK_ARGS_LENGTH(1);
+                
+                ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the scriptsheet json to load");
+                
+                std::string filename = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
+                
+                if (!ResourceManager::HasSource(filename)) {
+                    ResourceManager::Load(filename);
+                }
+                
+                ENGINE_JS_SCOPE_CLOSE(v8::External::New(SpriteSheetReader::LoadSpriteSheetFromFile(filename)));
             }
             
             ENGINE_JS_METHOD(GetImageArray) {
@@ -830,11 +882,29 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARGS_LENGTH(1);
                 
-                ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is the texture to free");
+                if (!args[0]->IsExternal()) {
+                    ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(false));
+                }
                 
                 Texture* tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
                 
                 ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(tex->IsValid()));
+            }
+            
+            ENGINE_JS_METHOD(IsSpriteSheet) {
+                ENGINE_JS_SCOPE_OPEN;
+                
+                ENGINE_CHECK_GL;
+                
+                ENGINE_CHECK_ARGS_LENGTH(1);
+                
+                if (!args[0]->IsExternal()) {
+                    ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(false));
+                }
+                
+                SpriteSheet* sprite = (SpriteSheet*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+                
+                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(sprite->IsValid()));
             }
             
             // basicly restarts 2d drawing
@@ -949,13 +1019,16 @@ namespace Engine {
                 
                 addItem(drawTable, "draw", Draw);
                 addItem(drawTable, "drawSub", DrawSub);
+                addItem(drawTable, "drawSprite", DrawSprite);
                 addItem(drawTable, "openImage", OpenImage);
+                addItem(drawTable, "openSpriteSheet", OpenSpriteSheet);
                 addItem(drawTable, "getImageArray", GetImageArray);
                 addItem(drawTable, "createImageArray", CreateImageArray);
                 addItem(drawTable, "createImage", CreateImage);
                 addItem(drawTable, "saveImage", SaveImage);
                 addItem(drawTable, "freeImage", FreeImage);
                 addItem(drawTable, "isTexture", IsTexture);
+                addItem(drawTable, "isSpriteSheet", IsSpriteSheet);
                 
                 addItem(drawTable, "cameraReset", CameraReset);
                 addItem(drawTable, "cameraPan", CameraPan);

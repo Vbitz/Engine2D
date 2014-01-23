@@ -122,6 +122,8 @@ for (var i = 0; i < mImgA.length; i += 4) {
 
 var mImg = mImg ? mImg : draw.createImage(mImgA, 128, 128);
 
+var spriteSheet = spriteSheet ? spriteSheet : draw.openSpriteSheet("texture/spriteTest.json");
+
 var t = 0;
 
 var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object");
@@ -156,6 +158,11 @@ sys.drawFunc(function () {
 	if (!draw.isTexture(mImg)) {
 		console.log("Loading Modded Image");
 		mImg = draw.createImage(mImgA, 128, 128);
+	}
+
+	if (!draw.isSpriteSheet(spriteSheet)) {
+		console.log("Loading Sprite Sheet");
+		spriteSheet = draw.openSpriteSheet("texture/spriteTest.json");
 	}
 
 	if (!draw.isFontLoaded("light")) {
@@ -226,8 +233,11 @@ sys.drawFunc(function () {
 	draw.print(900, 240, "Modded Image");
 	draw.draw(mImg, 900, 270, 100, 100);
 
-	draw.print(400, 400, "HSV Image");
-	draw.draw(img3, 410, 420, 360, 100);
+	draw.print(400, 380, "Sprite Sheet");
+	draw.drawSprite(spriteSheet, "idle", 410, 390, 100, 100);
+
+	draw.print(400, 500, "HSV Image");
+	draw.draw(img3, 410, 520, 360, 100);
 
 	draw.setFont("basic", 16);
 	draw.print(1040, 70, "Profiler");

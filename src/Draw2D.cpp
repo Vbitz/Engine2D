@@ -645,6 +645,11 @@ namespace Engine {
             DisableTexture();
         }
         
+        void DrawSprite(SpriteSheet* sheet, std::string sprite, float x, float y, float w, float h) {
+            Sprite s = sheet->GetSprite(sprite);
+            DrawImage(s.tex, x, y, w, h, s.loc.x, s.loc.y, s.loc.w, s.loc.h);
+        }
+        
         void Grad(float x, float y, float w, float h, int col1, int col2, bool vert) {
             if (col1 > 256 * 256 * 256 || col2 > 256 * 256 * 256) {
                 return;

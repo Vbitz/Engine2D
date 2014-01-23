@@ -1,0 +1,16 @@
+{
+	"texture": "spriteTest.png",
+	"sprites": {
+		"img1": [ 0,  0, 32, 32],
+		"img2": [32,  0, 32, 32],
+		"img3": [ 0, 32, 32, 32],
+		"img4": [32, 32, 32, 32]
+	},
+
+	"animations": {
+		"idle": {
+			"images": ["img1", "img2", "img3", "img4"],
+			"speed": 0.10
+		}
+	}
+}
