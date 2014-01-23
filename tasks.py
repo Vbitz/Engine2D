@@ -110,6 +110,12 @@ def run():
 			"-debug"
 		]);
 
+@command(usage="Build documentation using jsdoc")
+def docs():
+	shell_command([
+			"jsdoc", "-d", "./doc/apiDocs/", "./doc/api.js", "./Readme.md"
+		]);
+
 @command(usage="Prints the commandName and usage for each command")
 def help():
 	for x in commands:
