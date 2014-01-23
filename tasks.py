@@ -94,14 +94,19 @@ def gyp():
 def check_depends():
 	return True;
 
+@command(usage="Fetch and install GLM")
+def fetch_glm():
+	# both platforms need http://sourceforge.net/projects/ogl-math/files/glm-0.9.5.1/glm-0.9.5.1.zip/download (4071873 bytes)
+	# extracts to glm
+	# copy entire glm/include folder to thrid_party/include
+	pass;
+
 @command(usage="Fetch a freetype binary distribution or compile one")
 def fetch_freetype():
+	# osx comes with freetype already installed
 	if sys.platform == "win32": # windows
 		# windows needs http://sourceforge.net/projects/gnuwin32/files/freetype/2.3.5-1/freetype-2.3.5-1-lib.zip/download
 		# and also http://sourceforge.net/projects/gnuwin32/files/freetype/2.3.5-1/freetype-2.3.5-1-bin.zip/download
-		pass;
-	elif sys.platform == "darwin": # osx
-		# osx (and other unixes) need http://download.savannah.gnu.org/releases/freetype/freetype-2.5.1.tar.gz
 		pass;
 
 @command(usage="Fetch a glew binary distribution or compile one")
@@ -110,19 +115,31 @@ def fetch_glew():
 		# windows needs https://sourceforge.net/projects/glew/files/glew/1.10.0/glew-1.10.0-win32.zip/download
 		pass;
 	elif sys.platform == "darwin": # osx
-		# osx (and other unixes) need https://sourceforge.net/projects/glew/files/glew/1.10.0/glew-1.10.0.tgz/download
+		# osx (and other unixes) need https://sourceforge.net/projects/glew/files/glew/1.10.0/glew-1.10.0.tgz/download (567,605 bytes)
+		# extracts to glew-1.10.0
+		# run make glew.lib (takes a while)
+		# copy include/GL to third_party/include
+		# copy lib/libGLEW.a to third_party/lib
 		pass;
 
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def fetch_glfw3():
-	# both platforms need https://github.com/glfw/glfw/archive/3.0.3.zip
-	# just run cmake and build it, it should be the same for both os's
+	# both platforms need https://github.com/glfw/glfw/archive/3.0.3.zip (400,137 bytes)
+	# extracts to glfw-3.0.3
+	# run cmake -DGLFW_BUILD_TESTS=false . in glfw-3.0.3
+	# run make 
+	# copy include/GLFW to third_party/include
+	# copy src/libglfw3.a to third_party/lib
 	pass;
 
 @command(requires=["fetch_cmake"], usage="Fetch and build physfs using cmake")
 def fetch_physfs():
-	# both platforms need https://icculus.org/physfs/downloads/physfs-2.0.2.tar.gz
-	# same story as GLFW3
+	# both platforms need https://icculus.org/physfs/downloads/physfs-2.0.2.tar.gz (671,700 bytes)
+	# extracts to physfs-2.0.2
+	# run cmake . in physfs-2.0.2
+	# run make (takes no time at all)
+	# copy physfs.h to third_party/include
+	# copy libphysfs.a to third_party/lib
 	pass;
 
 @command(requires=["fetch_svn"], usage="Fetch and build V8 using GYP")
@@ -131,7 +148,6 @@ def fetch_v8():
 	# the zip file extracts to v8-3.21.17
 	# change directory to third_party/depend_src/v8-3.21.17
 	# svn co http://gyp.googlecode.com/svn/trunk build/gyp (pretty small)
-	# svn co http://src.chromium.org/chrome/trunk/deps/third_party/icu46 third_party/icu (takes a good while to download)
 
 	if sys.platform == "win32": # windows
 		# svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@231940 third_party/cygwin
@@ -140,7 +156,7 @@ def fetch_v8():
 		# copy the relevent files to third_party/lib and third_party/include
 		pass
 	elif sys.platform == "darwin": #osx
-		# make native (takes bloody ages)
+		# make native i18nsupport=off (takes bloody ages)
 		pass
 
 @command(usage="Fetch a freeimage binary distribution")
@@ -157,7 +173,7 @@ def fetch_freeimage():
 		# Copy the files from dist to third_party/lib and third_party/include
 		pass;
 
-@command(requires=["fetch_freetype", "fetch_glew", "fetch_glfw3", "fetch_physfs", "fetch_v8", "fetch_freeimage"], usage="Fetches Build Dependancys", check=check_depends)
+@command(requires=["fetch_glm", "fetch_freetype", "fetch_glew", "fetch_glfw3", "fetch_physfs", "fetch_v8", "fetch_freeimage"], usage="Fetches Build Dependancys", check=check_depends)
 def fetch_build_deps():
 	pass;
 
