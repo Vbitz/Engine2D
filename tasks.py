@@ -13,15 +13,20 @@ PROJECT_BUILD_PATH = 2;
 
 commands = {};
 
+def noop():
+	return True;
+
 class command(object):
-	def __init__(self, requires=[], usage="TODO: "):
+	def __init__(self, requires=[], usage="TODO: ", check=noop):
 		self.requires = requires;
 		self.usage = usage;
+		self.check = check;
 	
 	def __call__(self, func):
 		commands[func.__name__] = func;
 		commands[func.__name__].requires = self.requires;
 		commands[func.__name__].usage = self.usage;
+		commands[func.__name__].check = self.check;
 		commands[func.__name__].run = False;
 		return func;
 
@@ -67,6 +72,10 @@ def fetch_svn():
 	# at this point we have SVN in the path and can download GYP
 	pass;
 
+@command(usage="Downloads a local copy of CMake if we can't find one")
+def fetch_cmake():
+	pass;
+
 @command(requires=["fetch_svn"], usage="Downloads the latest version of GYP using SVN")
 def fetch_gyp():
 	# check for GYP in third_party first
@@ -81,6 +90,76 @@ def gyp():
 			"--depth=0",
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
 		]);
+
+def check_depends():
+	return True;
+
+@command(usage="Fetch a freetype binary distribution or compile one")
+def fetch_freetype():
+	if sys.platform == "win32": # windows
+		# windows needs http://sourceforge.net/projects/gnuwin32/files/freetype/2.3.5-1/freetype-2.3.5-1-lib.zip/download
+		# and also http://sourceforge.net/projects/gnuwin32/files/freetype/2.3.5-1/freetype-2.3.5-1-bin.zip/download
+		pass;
+	elif sys.platform == "darwin": # osx
+		# osx (and other unixes) need http://download.savannah.gnu.org/releases/freetype/freetype-2.5.1.tar.gz
+		pass;
+
+@command(usage="Fetch a glew binary distribution or compile one")
+def fetch_glew():
+	if sys.platform == "win32": # windows
+		# windows needs https://sourceforge.net/projects/glew/files/glew/1.10.0/glew-1.10.0-win32.zip/download
+		pass;
+	elif sys.platform == "darwin": # osx
+		# osx (and other unixes) need https://sourceforge.net/projects/glew/files/glew/1.10.0/glew-1.10.0.tgz/download
+		pass;
+
+@command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
+def fetch_glfw3():
+	# both platforms need https://github.com/glfw/glfw/archive/3.0.3.zip
+	# just run cmake and build it, it should be the same for both os's
+	pass;
+
+@command(requires=["fetch_cmake"], usage="Fetch and build physfs using cmake")
+def fetch_physfs():
+	# both platforms need https://icculus.org/physfs/downloads/physfs-2.0.2.tar.gz
+	# same story as GLFW3
+	pass;
+
+@command(requires=["fetch_svn"], usage="Fetch and build V8 using GYP")
+def fetch_v8():
+	# both platforms need https://github.com/v8/v8/archive/3.21.17.zip (16,949,393 bytes)
+	# the zip file extracts to v8-3.21.17
+	# change directory to third_party/depend_src/v8-3.21.17
+	# svn co http://gyp.googlecode.com/svn/trunk build/gyp (pretty small)
+	# svn co http://src.chromium.org/chrome/trunk/deps/third_party/icu46 third_party/icu (takes a good while to download)
+
+	if sys.platform == "win32": # windows
+		# svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@231940 third_party/cygwin
+		# python build\gyp_v8
+		# "c:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.com" /build Release build\All.sln
+		# copy the relevent files to third_party/lib and third_party/include
+		pass
+	elif sys.platform == "darwin": #osx
+		# make native (takes bloody ages)
+		pass
+
+@command(usage="Fetch a freeimage binary distribution")
+def fetch_freeimage():
+	if sys.platform == "win32":
+		# windows needs http://downloads.sourceforge.net/freeimage/FreeImage3154Win32.zip
+		pass;
+	elif:
+		# osx needs http://downloads.sourceforge.net/freeimage/FreeImage3154.zip (5,513,923 bytes)
+		# extracts to FreeImage using unzip -aa to make sure patching works
+		# Patch FreeImage/Makefile.gnu with third_party/patches/FreeImage_osx.patch
+		# Patch FreeImage/Source/OpenEXR/IlmImf/ImfAutoArray.h with third_party/patches/FreeImage_OpenEXR_osx.patch
+		# run make -p Makefile.gnu inside of FreeImage
+		# Copy the files from dist to third_party/lib and third_party/include
+		pass;
+
+@command(requires=["fetch_freetype", "fetch_glew", "fetch_glfw3", "fetch_physfs", "fetch_v8", "fetch_freeimage"], usage="Fetches Build Dependancys", check=check_depends)
+def fetch_build_deps():
+	pass;
 
 @command(requires=["gyp"], usage="Open's the platform specfic IDE")
 def ide():
@@ -126,6 +205,10 @@ def env():
 	print("sys.platform = %s" % (sys.platform));
 
 def run_command(cmdName):
+	if not commands[cmdName].check():
+		print("==== Skiping: %s" % (cmdName));
+		return
+
 	# run all required commands
 	for cmd in commands[cmdName].requires:
 		if not commands[cmdName].run: ## make sure the command is not run twice
