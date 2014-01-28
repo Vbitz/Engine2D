@@ -36,6 +36,7 @@
 				"src/EffectParameters.cpp",
 				"src/SpriteSheet.cpp",
 				"src/TextureLoader.cpp",
+				"src/Timer.cpp",
 				"src/extern/sqlite3.c"
 			],
 			"conditions": [

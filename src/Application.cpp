@@ -11,6 +11,7 @@
 #include "TestSuite.hpp"
 
 #include "FramePerfMonitor.hpp"
+#include "Timer.hpp"
 
 #include "PlatformTests.hpp"
 
@@ -1002,6 +1003,7 @@ namespace Engine {
 		while (this->_running) {
             Profiler::StartProfileFrame();
             FramePerfMonitor::BeginFrame();
+            Timer::Update();
             
 			if (!this->_isFullscreen &&
                 !glfwGetWindowAttrib(window, GLFW_FOCUSED) &&
