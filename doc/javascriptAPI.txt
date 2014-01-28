@@ -130,8 +130,8 @@ Done	| Old Syntax														| New Syntax
 		| 																	| new Matrix([]);
 		| 																	| Math.degToRad(a)
 		| 																	| Math.radToDeg(a)
-		| 																	| Math.PI_2
-		| 																	| Math.PI_4
+	X	| 																	| Math.PI_2
+	X	| 																	| Math.PI_4
 		| 																	| new Vector3(x, y, z)
 		|																	| new Vector4(x, y, z)
 		| 																	| Math.distince(v1, v2)

@@ -24,6 +24,7 @@
 #include "JSDatabase.hpp"
 #include "JSMod.hpp"
 #include "JSUnsafe.hpp"
+#include "JSMathHelper.hpp"
 
 #include <pthread.h>
 
@@ -282,6 +283,8 @@ namespace Engine {
         v8::Handle<v8::Context> ctx = v8::Context::New(v8::Isolate::GetCurrent(), NULL, global);
         
         ctx->Enter();
+        
+        JsMathHelper::InitMathHelper();
         
 		if (!this->_runFile(Config::GetString("core.script.loader"), true)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();

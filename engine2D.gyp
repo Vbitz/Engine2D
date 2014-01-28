@@ -13,6 +13,7 @@
 				"src/JSDatabase.cpp",
 				"src/JSMod.cpp",
 				"src/JSUnsafe.cpp",
+				"src/JSMathHelper.cpp",
 				"src/Database.cpp",
 				"src/Filesystem.cpp",
 				"src/extern/GLFT_Font.cpp",
