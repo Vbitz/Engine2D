@@ -127,3 +127,22 @@ Done	| Old Syntax														| New Syntax
 		| unsafe.mprotect(address, length, enable)							| Needs quite a bit more safety, it's a complex method
 		| unsafe.getPageSize()												| unsafe.pageSize (Implamented with a Getter)
 = NEW STUFF  =======================================================================================================================
+		| 																	| new Matrix([]);
+		| 																	| Math.degToRad(a)
+		| 																	| Math.radToDeg(a)
+		| 																	| Math.PI_2
+		| 																	| Math.PI_4
+		| 																	| new Vector3(x, y, z)
+		|																	| new Vector4(x, y, z)
+		| 																	| Math.distince(v1, v2)
+		| 																	| new Rectangle(x, y, w, h)
+		| 																	| Rectangle.intersects(r1, r2)
+		| 																	| Math.rand(min, max)
+		| 																	| Math.perlin
+		| 																	| 
+		| 																	| 
+		| 																	| 
+		| 																	| 
+		| 																	| 
+		| 																	| 
+		| 																	| 
