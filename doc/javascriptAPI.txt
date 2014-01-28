@@ -1,0 +1,129 @@
+Done	| Old Syntax														| New Syntax
+====================================================================================================================================
+==== The console API right now is pretty much identical to the standed so it will stay that way into the future					====
+	X	| console._log(level, obj)											| -
+	X	| console.clear()													| -
+	X	| console.toggle()													| -
+	X	| console.log(obj)													| -
+	X	| console.warn(obj)													| -
+	X	| console.error(obj)												| -
+	X	| console.verbose(obj)												| -
+	X	| console.writeRaw(obj)												| -
+====================================================================================================================================
+==== The sys API is a hodgepoge right now and will move to a varity of different APIs including process, global and window ???	====
+		| sys.argv()														| process.argv (inline with nodejs)
+		| sys.runFile(filename, persists)									| REMOVED
+		| sys.drawFunc(func)												| REMOVED
+		| sys.keyboardFunc(func)											| REMOVED
+		| sys.on(event, id, filter, func)									| $(event, [id], [filter], func)
+		| sys.emit(event, args)												| ???
+		| sys.clearEvent(id)												| ???
+		| sys.microtime()													| process.hrtime ???
+		| sys.heapStats()													| process.memoryUsage (inline with nodejs)
+		| sys.memoryStats()													| process.memory (inline with nodejs)
+		| sys.trace()														| process.trace()
+		| sys.exit()														| process.exit([code]) (inline with nodejs)
+		| sys.getGLVersion()												| ???
+		| sys.hasExtention(extention)										| REMOVED Not really something scripters need
+		| sys.getExtentions()												| REMOVED -
+		| sys.getMaxTextureSize()											| ??? Moved to some kind texture or renderer object
+		| sys.saveScreenshot(path)											| ???
+		| sys.resizeWindow(width, height)									| ???
+		| sys.toggleFullscreen()											| ???
+		| sys.restartRenderer()												| ???
+		| sys.getProfilerTime(zone)											| debug.profiler[zone]
+		| sys.getProfilerZones()											| for (var i in debug.profiler)
+		| sys.perf()														| ???
+		| sys.time(name, func)												| ???
+		| sys.config(key, value)											| process.runtimeConfig
+		| sys.gc()															| process.gc
+		| sys.profile(frames, filename)										| debug.saveProfile()
+		| sys.profileSet(profileZone, maxTime)								| debug.profiler[zone].setMaxTime
+		| sys.reloadRootScript()											| ??? This will become part of require or something
+		| sys.forceReload(script)											| ??? -
+		| sys.version()														| process.versions (inline with nodejs)
+		| sys.msgBox(title, msg, modal)										| ??? A very GUI task but likaly process.messageBox
+		| sys.shell(filename)												| process.shellExecute(filename, opts)
+		| sys.platform														| process.platform (inline with nodejs)
+		| sys.devMode														| process.developerMode (inline with nodejs)
+		| sys.preload														| REMOVED Internal API
+		| sys.numProcessers													| ??? Important difference between other JS runtimes
+		| sys.username														| process.username
+		| sys.screenWidth													| ???
+		| sys.screenHeight													| ???
+		| sys.deltaTime														| ??? Moved to the global object
+====================================================================================================================================
+==== Until it needs to be changed the FS API will stay the same																	====
+	X	| fs.readFile(filename, raw)										| -
+	X	| fs.writeFile(filename, content)									| -
+	X	| fs.fileExists(filename)											| -
+	X	| fs.fileSize(filename)												| -
+	X	| fs.mountFile(archivePath, mountPath)								| -
+	X	| fs.configDir(appName)												| -
+	X	| fs.mkdir(path)													| -
+====================================================================================================================================
+==== The Draw API will change quite a bit but for now will stay in the draw object												====
+	X	| draw.rect(x, y, w, h)												| -
+	X	| draw.grid(x, y, w, h)												| -
+	X	| draw.grad(x, y, w, h, col1, col2, orientation)					| -
+	X	| draw.circle(x, y, ..)												| -
+	X	| draw.line(x0, y0, x1, y1)											| -
+	X	| draw.curve(x0, y0, x1, y1, x2, y2, x3, y3)						| -
+		| draw.colorPalette(name, color)									| ??? I'm not sure how this will change but it will
+		| draw.setColorF(r, g, b)											| draw.color = new Color(r, g, b)
+		| draw.setColor(color)												| draw.color = {} (obj) or new Color() for the others
+		| draw.setColorI(r, g, b)											| ??? draw.color = Color.fromInt(r, g, b)
+		| draw.clearColor(color)											| draw.clearColor (inline with HTML5 canvas)
+		| draw.getRGBFromHSV(h, s, v)										| Color.fromHSV(h, s, v)
+	X	| draw.print(x, y, str)												| -
+	X	| draw.getStringWidth(str)											| -
+		| draw.draw(texId, x, y, w, h)										| Rather then texID it will use texture objects
+		| draw.drawSub(texId, x, y, w, h, xSub, ySub, wSub, hSub)			| Same as Above
+		| draw.drawSprite(spriteSheet, sprite, x, y, w, h)					| Rather then spriteSheet it will use objects
+		| draw.openImage(filename)											| REMOVED infavor of a better resource system
+		| draw.openSpriteSheet(filename)									| REMOVED -
+		| draw.getImageArray(filename)										| Texture.prototype.getPixels([x, y, w, h]);
+		| draw.createImageArray(w, h)										| REMOVED infavor of Typed Arrays
+		| draw.createImage(arr, w, h)										| new Texture();
+		| draw.saveImage(texId, filename)									| Texture.prototype.save(filename)
+		| draw.freeImage(texId)												| REMOVED infavor of automatic texture caching
+		| draw.isTexture(texId)												| REMOVED
+		| draw.isSpiteSheet(spriteSheet)									| REMOVED
+		| draw.cameraReset()												| draw.resetTransform() (inline with HTML5 cavas)
+		| draw.cameraPan(x, y)												| draw.translate(x, y) - 
+		| draw.cameraZoom(f)												| draw.scale(x, y) -
+		| draw.cameraRotate(r)												| draw.rotate(r)
+	X	| draw.setFont(prettyName, size)									| -
+		| draw.loadFont(prettyName, filename)								| ??? Made part of the resource system
+		| draw.isFontLoaded(prettyName)										| REMOVED
+		| draw.getVerts()													| ??? Useful but not sure where it fits in
+		| draw.setDrawOffscreen(draw)										| REMOVED, never used it
+		| draw.setCenter(x, y)												| ??? Useful but not sure where it fits in
+====================================================================================================================================
+==== Very Important but I'm not sure how it fits in 																			====
+		| input.keyDown(key)												| ???
+		| input.mouseX														| ??? Not sure but it will use a vector insteed
+		| input.mouseY														| ???
+		| input.leftMouseButton												| ???
+		| input.middleMouseButton											| ???
+		| input.rightMouseButton											| ???
+====================================================================================================================================
+==== The whole API is of limited usefulness and very unsafe, might get removed completly										====
+		| mod.open(filename)												| REMOVED
+		| mod.call(id, method)												| REMOVED
+====================================================================================================================================
+==== Really awesome API and will be extended with some ORM stuff																====
+		| db.open(filename)													| new Database(filename)
+		| db.exec(statement)												| Database.prototype.exec(statement)
+		| db.execPrepare(statement)											| Database.prototype.exec(statement)
+====================================================================================================================================
+==== Really awesome API but it will stay devmode only																			====
+		| unsafe.getNumberAddress(number)									| The long type is a real pain and should be fixed
+		| unsafe.getNative(address, length)									| ??? Should return a TypedArray view
+		| unsafe.call(address)												| ??? I'd like to extend this a little more with args
+		| unsafe.malloc(length)												| unsafe.setArrayPersistent(array, true)
+		| unsafe.free(array)												| Same as above
+	X	| unsafe.addressOf(array)											| -
+		| unsafe.mprotect(address, length, enable)							| Needs quite a bit more safety, it's a complex method
+		| unsafe.getPageSize()												| unsafe.pageSize (Implamented with a Getter)
+= NEW STUFF  =======================================================================================================================
