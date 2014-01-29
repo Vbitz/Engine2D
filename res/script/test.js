@@ -139,7 +139,18 @@ sys.getExtentions().forEach(function (i) {
 
 var firstDraw = true;
 
-sys.drawFunc(function () {
+sys.on("testTimer1", "test.timer", function () {
+	console.log("This runs every 5 seconds")
+});
+
+sys.on("testTimer2", "test.timer", function () {
+	console.log("This runs once after 10 seconds");
+});
+
+sys.createTimer(5, "testTimer1", true);
+sys.createTimer(10, "testTimer2");
+
+sys.on("draw", "test.draw", function () {
 	if (!draw.isTexture(img)) {
 		console.log("Loading Image 1");
 		img = draw.openImage("texture/testing.png");
@@ -261,8 +272,10 @@ sys.drawFunc(function () {
 	}
 });
 
-sys.keyboardFunc(function (type, key, press) {
-	console.log("[" + type + "] : " + key + " : " + press);
+sys.on("input", "test.input", function (e) {
+	var key = e["key"];
+	var press = e["state"] === "press" || e["state"] === "repeat";
+	console.log("[INPUT] : " + key + " : " + press);
 	if (key === "S" && press) {
 		sys.saveScreenshot("testing.png");
 	} else if (key === "I" && press) {

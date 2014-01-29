@@ -310,7 +310,7 @@ namespace Engine {
     }
     
     void Application::_enableV8Debugger() {
-        int debugPort = Config::GetInt("core.debug.v8DebugPort");
+        int debugPort = Config::GetInt("core.debug.v8Debug.port");
         v8::Debug::SetDebugMessageDispatchHandler(DispatchDebugMessages);
         v8::Debug::EnableAgent("Engine2D", debugPort, false);
         Config::SetBoolean("core.runOnIdle", true);
@@ -414,7 +414,8 @@ namespace Engine {
         Config::SetBoolean( "core.log.src.perfIssues",              this->_developerMode);
         Config::SetBoolean( "core.log.src.createImage",             true);
         
-        Config::SetNumber(  "core.debug.v8DebugPort",               5858);
+        Config::SetBoolean( "core.debug.v8Debug",                   this->_developerMode);
+        Config::SetNumber(  "core.debug.v8Debug.port",               5858);
     }
     
     void Application::_loadConfigFile() {
@@ -1004,18 +1005,20 @@ namespace Engine {
         this->_running = true;
         
 		while (this->_running) {
-            Profiler::StartProfileFrame();
-            FramePerfMonitor::BeginFrame();
-            Timer::Update();
-            
-			if (!this->_isFullscreen &&
+            if (!this->_isFullscreen &&
                 !glfwGetWindowAttrib(window, GLFW_FOCUSED) &&
                 !Config::GetBoolean("core.runOnIdle") &&
                 !glfwWindowShouldClose(window)) {
+                double startPauseTime = Platform::GetTime();
 				glfwWaitEvents();
                 sleep(0);
+                Timer::NotifyPause(Platform::GetTime() - startPauseTime);
 				continue;
 			}
+            
+            Profiler::StartProfileFrame();
+            FramePerfMonitor::BeginFrame();
+            Timer::Update();
             
             if (this->_debugMode) {
                 pthread_mutex_lock(&debugMesssageReadyMutex);
@@ -1160,7 +1163,7 @@ namespace Engine {
         
         ctx->Enter();
         
-        if (this->_debugMode) {
+        if (Config::GetBoolean("core.debug.v8Debug")) {
             _enableV8Debugger();
         }
         

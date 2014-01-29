@@ -9,5 +9,7 @@ namespace Engine {
         int Create(double time, std::string event);
         int Create(double time, std::string event, bool repeat);
         void Remove(int timer);
+        
+        void NotifyPause(double time);
     }
 }
