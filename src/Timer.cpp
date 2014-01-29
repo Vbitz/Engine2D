@@ -1,7 +1,7 @@
 #include "Timer.hpp"
 #include "Events.hpp"
 
-#include "FramePerfMonitor.hpp"
+#include "Platform.hpp"
 
 #include <iostream>
 #include <map>
@@ -12,7 +12,7 @@ namespace Engine {
         
         struct TimerStatus {
             std::string eventTarget;
-            double currentTime;
+            double interval;
             double targetTime;
             bool repeat;
         };
@@ -20,13 +20,12 @@ namespace Engine {
         std::map<unsigned int, TimerStatus> _timers;
         
         void Update() {
-            double dt = FramePerfMonitor::GetFrameTime();
+            double currentTime = Platform::GetTime();
             for (auto iter = _timers.begin(); iter != _timers.end(); iter++) {
-                iter->second.currentTime += dt;
-                if (iter->second.currentTime > iter->second.targetTime) {
+                if (currentTime > iter->second.targetTime) {
                     Events::Emit(iter->second.eventTarget);
                     if (iter->second.repeat) {
-                        iter->second.currentTime = 0;
+                        iter->second.targetTime += iter->second.interval;
                     } else {
                         iter = _timers.erase(iter);
                         if (_timers.size() == 0) {
@@ -38,16 +37,17 @@ namespace Engine {
         }
         
         int Create(double time, std::string event) {
-            Create(time, event, false);
+            return Create(time, event, false);
         }
         
         int Create(double time, std::string event, bool repeat) {
             TimerStatus s;
-            s.currentTime = 0.0;
-            s.targetTime = time;
+            s.interval = time;
+            s.targetTime = Platform::GetTime() + s.interval;
             s.eventTarget = event;
             s.repeat = repeat;
             _timers[++_lastTimer] = s;
+            return _lastTimer;
         }
         
         void Remove(int timer) {
