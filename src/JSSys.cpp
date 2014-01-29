@@ -5,6 +5,7 @@
 #include "common.hpp"
 #include "Application.hpp"
 #include "EngineUI.hpp"
+#include "Timer.hpp"
 
 namespace Engine {
 
@@ -101,13 +102,49 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
             
             if (args.Length() == 2) {
+                ENGINE_CHECK_ARG_OBJECT(1, "Arg1 is the Object of arguments to emit");
                 Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                              Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))));
             } else if (args.Length() == 1) {
                 Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0), Events::EventArgs());
             } else {
-                
+                ENGINE_THROW_ARGERROR("sys.emit takes 1 or 2 args");
             }
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(CreateTimer) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the time interval in seconds before triggering the timer");
+            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the Event to trigger");
+            
+            unsigned int ret = UINT_MAX;
+            
+            if (args.Length() == 2) {
+                ret = Timer::Create(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                              ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+            } else if (args.Length() == 3) {
+                ENGINE_CHECK_ARG_BOOLEAN(2, "Arg2 causes the timer to repeat if true");
+                ret = Timer::Create(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                              ENGINE_GET_ARG_CPPSTRING_VALUE(1),
+                              ENGINE_GET_ARG_BOOLEAN_VALUE(2));
+            } else {
+                ENGINE_THROW_ARGERROR("sys.createTimer takes 2 or 3 arguments");
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(ret));
+        }
+        
+        ENGINE_JS_METHOD(DeleteTimer) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the TimerID to Remove");
+            
+            Timer::Remove(ENGINE_GET_ARG_INT32_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -574,6 +611,9 @@ namespace Engine {
             addItem(sysTable, "on", EventsOn);
             addItem(sysTable, "emit", EventsEmit);
             addItem(sysTable, "clearEvent", EventsClear);
+            
+            addItem(sysTable, "createTimer", CreateTimer);
+            addItem(sysTable, "deleteTimer", DeleteTimer);
             
             addItem(sysTable, "microtime", Microtime);
             
