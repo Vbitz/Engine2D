@@ -28,11 +28,11 @@ sys.keyboardFunc = function (func) {
 	});
 }
 
-var libarys = ["ui"];
+var libarys = ["ui", "timers"];
 
-for (var i = 0; i < libarys.length; i++) {
-	sys.runFile("lib/" + libarys[i], false);
-}
+libarys.forEach(function (lib) {
+	sys.runFile("lib/" + lib, false);
+});
 
 function onPostLoad() {
 	console.log("Booting JavaScript Phase 2");
