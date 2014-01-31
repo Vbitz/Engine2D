@@ -132,16 +132,17 @@ Done	| Old Syntax														| New Syntax
 		| 																	| Math.radToDeg(a)
 	X	| 																	| Math.PI_2
 	X	| 																	| Math.PI_4
+		|																	| new Vector2(x, y)
 		| 																	| new Vector3(x, y, z)
-		|																	| new Vector4(x, y, z)
+		|																	| new Vector4(x, y, z, w)
 		| 																	| Math.distince(v1, v2)
 		| 																	| new Rectangle(x, y, w, h)
 		| 																	| Rectangle.intersects(r1, r2)
 		| 																	| Math.rand(min, max)
 		| 																	| Math.perlin
-		| 																	| 
-		| 																	| 
-		| 																	| 
+	X	| 																	| setTimeout(cb, delay)
+	X	| 																	| setInterval(cb, delay)
+		| 																	| alert(msg)
 		| 																	| 
 		| 																	| 
 		| 																	| 
