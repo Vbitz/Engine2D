@@ -1,5 +1,9 @@
 #include "JSDatabase.hpp"
 
+#include "Database.hpp"
+#include "Util.hpp"
+#include "Filesystem.hpp"
+
 namespace Engine {
     namespace JSDatabase {
         Database* currentDatabase = NULL;

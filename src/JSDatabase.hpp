@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Filesystem.hpp"
-#include "Database.hpp"
-
-#include "common.hpp"
+#include "Scripting.hpp"
 
 namespace Engine {
     namespace JSDatabase {

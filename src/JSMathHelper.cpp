@@ -1,6 +1,7 @@
 #include "JSMathHelper.hpp"
 
 #include <math.h>
+#include "Scripting.hpp"
 
 namespace Engine {
     namespace JsMathHelper {

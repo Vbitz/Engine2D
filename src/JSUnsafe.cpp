@@ -1,5 +1,7 @@
 #include "JSUnsafe.hpp"
 
+#include "Util.hpp"
+
 #include <stdlib.h>
 
 #include <sys/mman.h>

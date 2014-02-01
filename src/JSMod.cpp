@@ -1,5 +1,8 @@
 #include "JSMod.hpp"
 
+#include <map>
+
+#include "common.hpp"
 #include "Filesystem.hpp"
 
 namespace Engine {

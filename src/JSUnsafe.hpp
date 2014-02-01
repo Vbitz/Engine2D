@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Scripting.hpp"
-#include "Util.hpp"
 
 namespace Engine {
 
