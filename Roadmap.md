@@ -1,7 +1,8 @@
 # Roadmap
 
 - **Feature Freeze**
-- Split Application into Application, Window_GLFW and ScriptingManager
+- Split Application into Application and Window_GLFW
+- Split Application into Application and ScriptingManager
 - Split Draw2D into RenderGL and Draw2D
 - Split RenderGL into RenderGL2 and RenderGL3
 - Refactor Scripting
