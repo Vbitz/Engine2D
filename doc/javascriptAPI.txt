@@ -16,41 +16,41 @@ Done	| Old Syntax														| New Syntax
 		| sys.drawFunc(func)												| REMOVED
 		| sys.keyboardFunc(func)											| REMOVED
 		| sys.on(event, id, filter, func)									| $(event, [id], [filter], func)
-		| sys.emit(event, args)												| ???
-		| sys.clearEvent(id)												| ???
-		| sys.microtime()													| process.hrtime ???
+		| sys.emit(event, args)												| process.emit(event, opts)
+		| sys.clearEvent(id)												| process.clearEvent(id)
+		| sys.microtime()													| process.uptime (it's more useful as a double)
 		| sys.heapStats()													| process.memoryUsage (inline with nodejs)
 		| sys.memoryStats()													| process.memory (inline with nodejs)
 		| sys.trace()														| process.trace()
 		| sys.exit()														| process.exit([code]) (inline with nodejs)
-		| sys.getGLVersion()												| ???
+		| sys.getGLVersion()												| process.graphicsVersion
 		| sys.hasExtention(extention)										| REMOVED Not really something scripters need
 		| sys.getExtentions()												| REMOVED -
 		| sys.getMaxTextureSize()											| ??? Moved to some kind texture or renderer object
-		| sys.saveScreenshot(path)											| ???
-		| sys.resizeWindow(width, height)									| ???
-		| sys.toggleFullscreen()											| ???
-		| sys.restartRenderer()												| ???
+		| sys.saveScreenshot(path)											| process.saveScreenshot(filename)
+		| sys.resizeWindow(width, height)									| process.window.size = newSize
+		| sys.toggleFullscreen()											| REMOVED - Duplicates config options
+		| sys.restartRenderer()												| process.restartRenderer()
 		| sys.getProfilerTime(zone)											| debug.profiler[zone]
 		| sys.getProfilerZones()											| for (var i in debug.profiler)
-		| sys.perf()														| ???
-		| sys.time(name, func)												| ???
+		| sys.perf()														| debug.profile(name, func) returns the function wrapped
+		| sys.time(name, func)												| REMOVED - Duplicates debug.profile
 		| sys.config(key, value)											| process.runtimeConfig
-		| sys.gc()															| process.gc
+		| sys.gc()															| process.gc()
 		| sys.profile(frames, filename)										| debug.saveProfile()
 		| sys.profileSet(profileZone, maxTime)								| debug.profiler[zone].setMaxTime
 		| sys.reloadRootScript()											| ??? This will become part of require or something
 		| sys.forceReload(script)											| ??? -
 		| sys.version()														| process.versions (inline with nodejs)
-		| sys.msgBox(title, msg, modal)										| ??? A very GUI task but likaly process.messageBox
+		| sys.msgBox(title, msg, modal)										| process.messageBox(title, msg, modal)
 		| sys.shell(filename)												| process.shellExecute(filename, opts)
 		| sys.platform														| process.platform (inline with nodejs)
 		| sys.devMode														| process.developerMode (inline with nodejs)
 		| sys.preload														| REMOVED Internal API
 		| sys.numProcessers													| ??? Important difference between other JS runtimes
 		| sys.username														| process.username
-		| sys.screenWidth													| ???
-		| sys.screenHeight													| ???
+		| sys.screenWidth													| process.window.size a Vector2
+		| sys.screenHeight													| -
 		| sys.deltaTime														| ??? Moved to the global object
 ====================================================================================================================================
 ==== Until it needs to be changed the FS API will stay the same																	====
@@ -69,7 +69,7 @@ Done	| Old Syntax														| New Syntax
 	X	| draw.circle(x, y, ..)												| -
 	X	| draw.line(x0, y0, x1, y1)											| -
 	X	| draw.curve(x0, y0, x1, y1, x2, y2, x3, y3)						| -
-		| draw.colorPalette(name, color)									| ??? I'm not sure how this will change but it will
+		| draw.colorPalette(name, color)									| draw.colors {}
 		| draw.setColorF(r, g, b)											| draw.color = new Color(r, g, b)
 		| draw.setColor(color)												| draw.color = {} (obj) or new Color() for the others
 		| draw.setColorI(r, g, b)											| ??? draw.color = Color.fromInt(r, g, b)
@@ -127,6 +127,7 @@ Done	| Old Syntax														| New Syntax
 		| unsafe.mprotect(address, length, enable)							| Needs quite a bit more safety, it's a complex method
 		| unsafe.getPageSize()												| unsafe.pageSize (Implamented with a Getter)
 = NEW STUFF  =======================================================================================================================
+		|																	| process.supports
 		| 																	| new Matrix([]);
 		| 																	| Math.degToRad(a)
 		| 																	| Math.radToDeg(a)
@@ -143,7 +144,7 @@ Done	| Old Syntax														| New Syntax
 	X	| 																	| setTimeout(cb, delay)
 	X	| 																	| setInterval(cb, delay)
 		| 																	| alert(msg)
-		| 																	| 
+		| 																	| debug.assert(value, msg)
 		| 																	| 
 		| 																	| 
 		| 																	| 
