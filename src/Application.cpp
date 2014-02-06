@@ -45,102 +45,6 @@ namespace Engine {
     static pthread_mutex_t debugMesssageReadyMutex;
     static bool debugMessageReady = false;
     
-    // from https://github.com/glfw/glfw/blob/master/tests/events.c
-    static std::string GLFW_GetKeyName(int key)
-    {
-        if (key < 256) {
-			char* string = new char[2];
-			string[0] = (char) key;
-			string[1] = '\0';
-            return std::string(string);
-        }
-        switch (key)
-        {
-                // Function keys
-            case GLFW_KEY_ESCAPE:       return "ESCAPE";
-            case GLFW_KEY_F1:           return "F1";
-            case GLFW_KEY_F2:           return "F2";
-            case GLFW_KEY_F3:           return "F3";
-            case GLFW_KEY_F4:           return "F4";
-            case GLFW_KEY_F5:           return "F5";
-            case GLFW_KEY_F6:           return "F6";
-            case GLFW_KEY_F7:           return "F7";
-            case GLFW_KEY_F8:           return "F8";
-            case GLFW_KEY_F9:           return "F9";
-            case GLFW_KEY_F10:          return "F10";
-            case GLFW_KEY_F11:          return "F11";
-            case GLFW_KEY_F12:          return "F12";
-            case GLFW_KEY_F13:          return "F13";
-            case GLFW_KEY_F14:          return "F14";
-            case GLFW_KEY_F15:          return "F15";
-            case GLFW_KEY_F16:          return "F16";
-            case GLFW_KEY_F17:          return "F17";
-            case GLFW_KEY_F18:          return "F18";
-            case GLFW_KEY_F19:          return "F19";
-            case GLFW_KEY_F20:          return "F20";
-            case GLFW_KEY_F21:          return "F21";
-            case GLFW_KEY_F22:          return "F22";
-            case GLFW_KEY_F23:          return "F23";
-            case GLFW_KEY_F24:          return "F24";
-            case GLFW_KEY_F25:          return "F25";
-            case GLFW_KEY_UP:           return "UP";
-            case GLFW_KEY_DOWN:         return "DOWN";
-            case GLFW_KEY_LEFT:         return "LEFT";
-            case GLFW_KEY_RIGHT:        return "RIGHT";
-            case GLFW_KEY_LEFT_SHIFT:   return "LEFT SHIFT";
-            case GLFW_KEY_RIGHT_SHIFT:  return "RIGHT SHIFT";
-            case GLFW_KEY_LEFT_CONTROL: return "LEFT CONTROL";
-            case GLFW_KEY_RIGHT_CONTROL: return "RIGHT CONTROL";
-            case GLFW_KEY_LEFT_ALT:     return "LEFT ALT";
-            case GLFW_KEY_RIGHT_ALT:    return "RIGHT ALT";
-            case GLFW_KEY_TAB:          return "TAB";
-            case GLFW_KEY_ENTER:        return "ENTER";
-            case GLFW_KEY_BACKSPACE:    return "BACKSPACE";
-            case GLFW_KEY_INSERT:       return "INSERT";
-            case GLFW_KEY_DELETE:       return "DELETE";
-            case GLFW_KEY_PAGE_UP:      return "PAGE UP";
-            case GLFW_KEY_PAGE_DOWN:    return "PAGE DOWN";
-            case GLFW_KEY_HOME:         return "HOME";
-            case GLFW_KEY_END:          return "END";
-            case GLFW_KEY_KP_0:         return "KEYPAD 0";
-            case GLFW_KEY_KP_1:         return "KEYPAD 1";
-            case GLFW_KEY_KP_2:         return "KEYPAD 2";
-            case GLFW_KEY_KP_3:         return "KEYPAD 3";
-            case GLFW_KEY_KP_4:         return "KEYPAD 4";
-            case GLFW_KEY_KP_5:         return "KEYPAD 5";
-            case GLFW_KEY_KP_6:         return "KEYPAD 6";
-            case GLFW_KEY_KP_7:         return "KEYPAD 7";
-            case GLFW_KEY_KP_8:         return "KEYPAD 8";
-            case GLFW_KEY_KP_9:         return "KEYPAD 9";
-            case GLFW_KEY_KP_DIVIDE:    return "KEYPAD DIVIDE";
-            case GLFW_KEY_KP_MULTIPLY:  return "KEYPAD MULTPLY";
-            case GLFW_KEY_KP_SUBTRACT:  return "KEYPAD SUBTRACT";
-            case GLFW_KEY_KP_ADD:       return "KEYPAD ADD";
-            case GLFW_KEY_KP_DECIMAL:   return "KEYPAD DECIMAL";
-            case GLFW_KEY_KP_EQUAL:     return "KEYPAD EQUAL";
-            case GLFW_KEY_KP_ENTER:     return "KEYPAD ENTER";
-            case GLFW_KEY_PRINT_SCREEN: return "PRINT SCREEN";
-            case GLFW_KEY_NUM_LOCK:     return "NUM LOCK";
-            case GLFW_KEY_CAPS_LOCK:    return "CAPS LOCK";
-            case GLFW_KEY_SCROLL_LOCK:  return "SCROLL LOCK";
-            case GLFW_KEY_PAUSE:        return "PAUSE";
-            case GLFW_KEY_LEFT_SUPER:   return "LEFT SUPER";
-            case GLFW_KEY_RIGHT_SUPER:  return "RIGHT SUPER";
-            case GLFW_KEY_MENU:         return "MENU";
-                
-            default:                    return NULL;
-        }
-    }
-    
-    static std::string GLFW_GetStateName(int state) {
-        switch (state) {
-            case GLFW_PRESS:    return "press";
-            case GLFW_REPEAT:   return "repeat";
-            case GLFW_RELEASE:  return "release";
-            default:            return "unknown";
-        }
-    }
-    
     // It's just the v8 code fitted closer to the engine's coding style
     static void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch) {
         std::stringstream ss;
@@ -324,9 +228,7 @@ namespace Engine {
 	}
 	
 	void Application::_updateMousePos() {
-		double x = 0;
-		double y = 0;
-		glfwGetCursorPos(window, &x, &y);
+        glm::vec2 mouse = _window->GetCursorPos();
         
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
@@ -334,22 +236,28 @@ namespace Engine {
         
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("input")));
-		input_table->Set(v8::String::New("mouseX"), v8::Number::New(x));
-		input_table->Set(v8::String::New("mouseY"), v8::Number::New(y));
-		input_table->Set(v8::String::New("leftMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS));
-		input_table->Set(v8::String::New("middleMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS));
-		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS));
+		input_table->Set(v8::String::New("mouseX"), v8::Number::New(mouse.x));
+		input_table->Set(v8::String::New("mouseY"), v8::Number::New(mouse.y));
+		input_table->Set(v8::String::New("leftMouseButton"), v8::Boolean::New(this->_window->GetMouseButtonPressed(MouseButton_Left)));
+		input_table->Set(v8::String::New("middleMouseButton"), v8::Boolean::New(this->_window->GetMouseButtonPressed(MouseButton_Middle)));
+		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(this->_window->GetMouseButtonPressed(MouseButton_Right)));
 	}
 	
-	void Application::_updateScreen() {
+	void Application::UpdateScreen() {
+        if (!this->_running) {
+            return false;
+        }
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
         v8::Context::Scope ctx_scope(ctx);
         
 		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
 		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
-		sys_table->Set(v8::String::New("screenWidth"), v8::Number::New(_screenWidth));
-		sys_table->Set(v8::String::New("screenHeight"), v8::Number::New(_screenHeight));
+        
+        glm::vec2 size = this->_window->GetWindowSize();
+        
+		sys_table->Set(v8::String::New("screenWidth"), v8::Number::New(size.x));
+		sys_table->Set(v8::String::New("screenHeight"), v8::Number::New(size.y));
 	}
     
     void Application::_updateFrameTime() {
@@ -458,113 +366,21 @@ namespace Engine {
         }
     }
 	
-    void Application::_resizeWindow(GLFWwindow* window, int w, int h) {
+    void _resizeWindow(Json::Value val) {
+        int w = val["width"].asInt(),
+            h = val["height"].asInt();
         Application* app = GetAppSingilton();
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
-		app->_screenWidth = w;
-		app->_screenHeight = h;
-		if (app->_running)
-		{
-			app->_updateScreen();
-		}
-		glViewport(0, 0, w, h);
+		app->UpdateScreen();
+        glViewport(0, 0, w, h);
         Draw2D::CheckGLError("Post Viewpoint");
     }
-	
-	 void Application::_keyPress(GLFWwindow* window, int rawKey, int scanCode, int state, int mods) {
-        if (!glfwGetWindowAttrib(window, GLFW_FOCUSED) && !GetAppSingilton()->_isFullscreen) {
-            return;
-        }
-        
-        std::string key = GLFW_GetKeyName(rawKey);
-        
-        EngineUI::OnKeyPress(rawKey, state, mods & GLFW_MOD_SHIFT);
-        
-        // everything after this is to handle the JS Function.
-        
-        if (EngineUI::ConsoleActive()) {
-            return;
-        }
-        
-        Events::EventArgs e = Events::EventArgs({
-            {"key", key},
-            {"state", GLFW_GetStateName(state)},
-            {"mod", (mods & GLFW_MOD_SHIFT) ? "true" : "false"}
-        });
-        
-        Events::Emit("input", [&](Events::EventArgs e) {
-            return e.equalsValue("key", key.c_str(), false);
-        }, e);
-	}
     
-    void Application::_openWindow(int width, int height, bool fullscreen, std::string openGL3Context) {
-        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Window/Context" << Logger::end();
-        
-        if (openGL3Context == "3.2") {
-            //Logger::begin("Window", Logger::LogLevel_Warning) << "Loading OpenGL 3.2" << Logger::end();
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-            
-            isGL3Context = true;
-        } else {
-            isGL3Context = false;
-        }
-        
-        if (Config::GetBoolean("core.render.aa")) {
-            glfwWindowHint(GLFW_SAMPLES, 4);
-        }
-        
-        if (Config::GetBoolean("core.debug.debugRenderer")) {
-            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-        }
-        
-		window = glfwCreateWindow(width, height, Config::GetString("core.window.title").c_str(), fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL); // you can resize how ever much you like
-        
-        if (window == NULL) {
-            Logger::begin("Window", Logger::LogLevel_Error) << "Error Creating Window" << Logger::end();
-            exit(EXIT_FAILURE); // can't continue if we have no window
-        }
-        
-        glfwMakeContextCurrent(window);
-        
-        glfwSwapInterval(Config::GetBoolean("core.window.vsync") ? 1 : 0);
-        
-        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLEW" << Logger::end();
-        
-        Draw2D::CheckGLError("PostCreateContext");
-        
-        glewExperimental = GL_TRUE;
-        
-        GLenum err = glewInit();
-        
-        if (err != GLEW_OK) {
-            Logger::begin("Window", Logger::LogLevel_Error) << "Error starting GLEW: " << glewGetErrorString(err) << Logger::end();
-            exit(EXIT_FAILURE); // can't continue if we have no glew
-        }
-        
-        glGetError(); // We don't care about the error
-        
-        Draw2D::CheckGLError("Ignore Me, Mostly");
-        
-        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init Callbacks" << Logger::end();
-        
-        this->_resizeWindow(window, width, height);
-        
-        glfwSetWindowSizeCallback(window, this->_resizeWindow);
-		glfwSetKeyCallback(window, this->_keyPress);
-        
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        
-        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init OpenGL State" << Logger::end();
-        
-        Draw2D::CheckGLError("PostSetCallback");
-        
-		glEnable(GL_BLEND);
+    void Application::_initGLContext(GraphicsVersion v) {
+        glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
         
-        if (!isGL3Context) {
+        if (v == Graphics_OpenGL_Legacy) {
             glDisable(GL_LIGHTING);
         }
         
@@ -582,15 +398,69 @@ namespace Engine {
         Draw2D::Init2d();
     }
     
+    void Application::_openWindow(int width, int height, bool fullscreen, std::string openGL3Context) {
+        Logger::begin("Window", Logger::LogLevel_Log) << "Loading OpenGL : Init Window/Context" << Logger::end();
+        
+        GraphicsVersion v;
+        
+        if (openGL3Context == "3.2") {
+            v = Graphics_OpenGL_Modern;
+        } else {
+            v = Graphics_OpenGL_Legacy;
+        }
+        
+        this->_window = CreateWindow(v);
+        
+        this->_window->SetWindowSize(glm::vec2(width, height));
+        this->_window->SetTitle(Config::GetString("core.window.title"));
+        this->_window->SetFullscreen(fullscreen);
+        this->_window->SetAntiAlias(Config::GetInt("core.render.aa"));
+        this->_window->SetDebug(Config::GetBoolean("core.debug.debugRenderer"));
+        
+        this->_window->Show();
+        
+        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init OpenGL State" << Logger::end();
+        
+        Draw2D::CheckGLError("PostSetCallback");
+    }
+    
     void Application::_closeWindow() {
         Logger::begin("Window", Logger::LogLevel_Log) << "Terminating Window" << Logger::end();
-        this->_shutdownFonts();
+        delete this->_window;
+        this->_window = NULL;
+    }
+    
+    void RawInputHandler(Json::Value val) {
+        EngineUI::OnKeyPress(val["rawKey"].asInt(), val["rawPress"].asInt(), val["shift"].asBool());
+        
+        if (EngineUI::ConsoleActive()) {
+            return;
+        }
+        
+        std::string key = val["key"].asString();
+        
+        Events::Emit("input", [&](Json::Value v) {
+            return v.get("key", key) == key;
+        }, val);
+    }
+    
+    void Application::_rendererKillHandler(Json::Value val) {
+        Logger::begin("Window", Logger::LogLevel_Verbose) << "Window Destroyed" << Logger::end();
+        GetAppSingilton()->_shutdownFonts();
         ResourceManager::UnloadAll();
-        glfwDestroyWindow(window);
+    }
+    
+    void Application::_postCreateContext(Json::Value val) {
+        Application* app = GetAppSingilton();
+        app->_initGLContext(app->_window->GetGraphicsVersion());
     }
 	
 	void Application::_initOpenGL() {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLFW" << Logger::end();
+        
+        Events::On("destroyWindow", "Application::RendererKillHandler", _rendererKillHandler);
+        Events::On("rawInput", "Application::RawInputHandler", RawInputHandler);
+        Events::On("postCreateContext", "Application::_postCreateContext", _postCreateContext);
         
         glfwSetErrorCallback(OnGLFWError);
         
@@ -768,15 +638,15 @@ namespace Engine {
     }
 	
 	int Application::GetScreenWidth() {
-		return _screenWidth;
+		return this->_window->GetWindowSize().x;
 	}
 	
 	int Application::GetScreenHeight() {
-		return _screenHeight;
+		return this->_window->GetWindowSize().y;
 	}
 
     void Application::SetScreenSize(int width, int height) {
-        glfwSetWindowSize(window, width, height);
+        this->_window->SetWindowSize(glm::vec2(width, height));
     }
 	
 	GLFT_Font* Application::GetFont(std::string fontName, int size) {
@@ -873,10 +743,10 @@ namespace Engine {
     }
     
     void Application::_restartRenderer() {
-        this->_closeWindow();
-        this->_openWindow(Config::GetInt("core.window.width"), Config::GetInt("core.window.height"),
-                          Config::GetBoolean("core.window.fullscreen"), Config::GetString("core.render.openGL"));
-        this->_updateScreen();
+        Logger::begin("Window", Logger::LogLevel_Log) << "Restarting renderer" << Logger::end();
+        this->_window->Reset();
+        this->_initGLContext(this->_window->GetGraphicsVersion());
+        this->UpdateScreen();
     }
     
     void Application::ToggleFullscreen() {
@@ -885,20 +755,8 @@ namespace Engine {
     }
     
     void Application::_toggleFullscreen() {
-        if (this->_isFullscreen) {
-            this->_closeWindow();
-            this->_openWindow(Config::GetInt("core.window.width"), Config::GetInt("core.window.height"), false,
-                              Config::GetString("core.render.openGL"));
-            this->_isFullscreen = false;
-            this->_updateScreen();
-        } else {
-            const GLFWvidmode* desktopMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            this->_closeWindow();
-            this->_openWindow(desktopMode->width, desktopMode->height, true,
-                              Config::GetString("core.render.openGL"));
-            this->_isFullscreen = true;
-            this->_updateScreen();
-        }
+        this->_window->SetFullscreen(!this->_window->GetFullscreen());
+        this->UpdateScreen();
     }
     
 	void Application::SaveScreenshot(std::string screenshotFilename) {
@@ -908,7 +766,8 @@ namespace Engine {
     
     void Application::_saveScreenshot() {
         int width, height;
-        glfwGetWindowSize(window, &width, &height);
+        width = this->_window->GetWindowSize().x;
+        height = this->_window->GetWindowSize().y;
         BYTE* pixels = new BYTE[4 * width * height];
         glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
         
@@ -922,7 +781,7 @@ namespace Engine {
     }
     
     bool Application::UsingGL3() {
-        return isGL3Context;
+        return this->_window->GetGlVersion().major > 3;
     }
     
     void Application::DumpProfile() {
@@ -980,17 +839,11 @@ namespace Engine {
     }
     
     bool Application::GetKeyPressed(int key) {
-        return glfwGetKey(window, key) == GLFW_PRESS;
+        return this->_window->GetKeyStatus(key) == Key_Press;
     }
     
     OpenGLVersion Application::GetOpenGLVersion() {
-        OpenGLVersion ret;
-        
-        ret.major = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MAJOR);
-        ret.minor = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MINOR);
-        ret.revision = glfwGetWindowAttrib(window, GLFW_CONTEXT_REVISION);
-        
-        return ret;
+        return this->_window->GetGlVersion();
     }
     
     EffectShaderTypes::Type Application::GetBestEffectShaderType() {
@@ -1005,12 +858,12 @@ namespace Engine {
         this->_running = true;
         
 		while (this->_running) {
-            if (!this->_isFullscreen &&
-                !glfwGetWindowAttrib(window, GLFW_FOCUSED) &&
+            if (!this->_window->GetFullscreen() &&
+                !this->_window->IsFocused() &&
                 !Config::GetBoolean("core.runOnIdle") &&
-                !glfwWindowShouldClose(window)) {
+                !this->_window->ShouldClose()) {
                 double startPauseTime = Platform::GetTime();
-				glfwWaitEvents();
+                this->_window->WaitEvents();
                 sleep(0);
                 Timer::NotifyPause(Platform::GetTime() - startPauseTime);
 				continue;
@@ -1046,7 +899,7 @@ namespace Engine {
             Draw2D::Begin2d();
             
             Profiler::Begin("EventDraw", Config::GetFloat("core.render.targetFrameTime") / 3 * 2);
-            Events::Emit("draw", Events::EventArgs());
+            Events::Emit("draw");
             Profiler::End("EventDraw");
             
             Draw2D::End2d();
@@ -1062,16 +915,12 @@ namespace Engine {
             Profiler::End("Draw");
             
             Profiler::Begin("SwapBuffers");
-            glfwSwapBuffers(window);
+            this->_window->Present();
             Profiler::End("SwapBuffers");
-            
-            Profiler::Begin("PollEvents");
-            glfwPollEvents();
-            Profiler::End("PollEvents");
             
             Profiler::End("Frame");
             
-			if (glfwWindowShouldClose(window)) {
+			if (this->_window->ShouldClose()) {
 				Logger::begin("Window", Logger::LogLevel_Log) << "Exiting" << Logger::end();
 				this->_running = false;
 				break;
@@ -1177,13 +1026,13 @@ namespace Engine {
         
         this->_disablePreload();
         
-        Events::Emit("postLoad", Events::EventArgs());
+        Events::Emit("postLoad");
         
         Draw2D::CheckGLError("On JS Post Load");
         
         FreeImage_Initialise();
         
-        this->_updateScreen();
+        this->UpdateScreen();
         
         Draw2D::CheckGLError("Post Finish Loading");
         

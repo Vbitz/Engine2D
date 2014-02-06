@@ -12,18 +12,16 @@
 
 #include <sys/stat.h>
 
+#include "Window.hpp"
+
 // system includes
 #ifdef _WIN32
-    #include <GL\glew.h>
-    #include <GLFW\glfw3.h>
 	#include <sys\timeb.h>
 	#include <Windows.h>
     #define _PLATFORM "Windows"
     #define _PLATFORM_DYLINK ".dll"
 	#define _PLATFORM_WIN32
 #else
-    #include <GL/glew.h>
-    #include <GLFW/glfw3.h>
     #include <sys/time.h>
     #ifdef __APPLE__
         #ifdef __MACH__

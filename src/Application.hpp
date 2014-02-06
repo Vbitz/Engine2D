@@ -2,15 +2,13 @@
 
 #include "common.hpp"
 
+#include "ScriptingManager.hpp"
+
 #include "ResourceManager.hpp"
 
 #include "extern/GLFT_Font.hpp"
 
 namespace Engine {
-    
-    typedef struct _openGLVersion {
-        int major, minor, revision;
-    } OpenGLVersion;
     
     class Application {
     public:
@@ -52,11 +50,10 @@ namespace Engine {
         
         static std::string GetEngineVersion();
         
+        void UpdateScreen();
+        
     private:
         void _mainLoop();
-        
-        static void _keyPress(GLFWwindow* window, int rawKey, int scanCode, int state, int mods);
-        static void _resizeWindow(GLFWwindow* window, int w, int h);
         
         int  _postStart();
         void _dumpProfile();
@@ -77,7 +74,6 @@ namespace Engine {
         void _loadBasicConfigs();
         void _disablePreload();
         void _updateFrameTime();
-        void _updateScreen();
         void _updateMousePos();
         void _shutdownScripting();
         void _printConfigVars();
@@ -86,10 +82,12 @@ namespace Engine {
         void _handleDebugMessage();
         v8::Handle<v8::Context> _initScripting();
         void _enableTypedArrays();
+        void _initGLContext(GraphicsVersion v);
+        
+        static void _rendererKillHandler(Json::Value v);
+        static void _postCreateContext(Json::Value v);
         
         bool _running = false;
-        
-        bool _isFullscreen = false;
         
         bool _toggleNextframe = false;
         bool _screenshotNextframe = false;
@@ -98,14 +96,9 @@ namespace Engine {
         
         std::string _screenshotFilename;
         
-        int _screenWidth = 0;
-        int _screenHeight = 0;
-        
         std::vector<std::string> _jsArgs;
         
-        bool isGL3Context;
-        
-        GLFWwindow* window = NULL;
+        Window* _window = NULL;
         
         std::map<std::string, ResourceManager::FontResource*> _fonts;
         

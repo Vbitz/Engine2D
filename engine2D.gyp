@@ -18,6 +18,7 @@
 				"src/Filesystem.cpp",
 				"src/extern/GLFT_Font.cpp",
 				"src/extern/jsoncpp.cpp",
+				"src/extern/sqlite3.c",
 				"src/GL3Buffer.cpp",
 				"src/Shader.cpp",
 				"src/EngineUI.cpp",
@@ -38,7 +39,8 @@
 				"src/SpriteSheet.cpp",
 				"src/TextureLoader.cpp",
 				"src/Timer.cpp",
-				"src/extern/sqlite3.c"
+				"src/ScriptingManager.cpp",
+				"src/Window_glfw.cpp"
 			],
 			"conditions": [
 				["OS == \"mac\"", {

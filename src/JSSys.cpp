@@ -82,7 +82,7 @@ namespace Engine {
                 v8::Persistent<v8::Function>* func = new v8::Persistent<v8::Function>(v8::Isolate::GetCurrent(), args[3].As<v8::Function>());
                 res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                                  ENGINE_GET_ARG_CPPSTRING_VALUE(1),
-                                 Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(2))),
+                                 ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(2))),
                                  func);
             } else if (args.Length() == 3) {
                 v8::Persistent<v8::Function>* func = new v8::Persistent<v8::Function>(v8::Isolate::GetCurrent(), args[2].As<v8::Function>());
@@ -104,9 +104,9 @@ namespace Engine {
             if (args.Length() == 2) {
                 ENGINE_CHECK_ARG_OBJECT(1, "Arg1 is the Object of arguments to emit");
                 Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
-                             Events::EventArgs(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))));
+                             ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))));
             } else if (args.Length() == 1) {
-                Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0), Events::EventArgs());
+                Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0), Json::nullValue);
             } else {
                 ENGINE_THROW_ARGERROR("sys.emit takes 1 or 2 args");
             }
