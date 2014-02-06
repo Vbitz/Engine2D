@@ -19,14 +19,14 @@ console.writeRaw = makeLog("raw");
 sys.drawFunc = function (func) {
 	sys.clearEvent("sys.drawFunc");
 	sys.on("draw", "sys.drawFunc", func);
-}
+};
 
 sys.keyboardFunc = function (func) {
 	sys.clearEvent("sys.keyboardFunc");
 	sys.on("input", "sys.keyboardFunc", function (e) {
-		func("", e["key"], e["state"] === "press" || e["state"] === "repeat");
+		func("", e.key, e.state === "press" || e.state === "repeat");
 	});
-}
+};
 
 var libarys = ["ui", "timers"];
 
@@ -42,8 +42,8 @@ function onPostLoad() {
 	}
 	var glInfo = sys.getGLVersion();
 	console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
-	sys.screenWidth = sys.config("core.window.width");
-	sys.screenHeight = sys.config("core.window.height");
+	sys.screenWidth = parseInt(sys.config("core.window.width"), 10);
+	sys.screenHeight = parseInt(sys.config("core.window.height"), 10);
 	sys.clearEvent("bootloaderLoad");
 	if (!sys.runFile(sys.config("core.script.entryPoint"), true)) {
 		console.error("Could not load core.script.entryPoint=" + sys.config("core.script.entryPoint"));
