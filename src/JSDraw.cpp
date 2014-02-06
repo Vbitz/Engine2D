@@ -827,11 +827,13 @@ namespace Engine {
                     }
                 }
                 
+                Texture* t = ImageReader::TextureFromBuffer(texID, pixels, width, height);
+                
                 if (!arr->HasIndexedPropertiesInExternalArrayData()) {
                     free(pixels);
                 }
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::External::New(ImageReader::TextureFromBuffer(texID, pixels, width, height)));
+                ENGINE_JS_SCOPE_CLOSE(v8::External::New(t));
             }
             
             ENGINE_JS_METHOD(SaveImage) {
