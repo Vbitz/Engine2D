@@ -3,6 +3,34 @@
 
 this.global = this; // Global object exposed as global
 
+/**
+ * Runs cb after timeout seconds
+ * @param {Function} cb      The function to call once the timer expires
+ * @param {Number}   timeout The number of seconds to wait before cb is called
+ * @return {Number} The ID to manage the timer
+ */
+global.setTimeout = function (cb, timeout) {};
+
+/**
+ * Runs cb every timeout seconds
+ * @param {Function} cb       The function to call each time the timer expires
+ * @param {Number}   interval The number of seconds between calls to cb
+ * @return {Numver} The ID to manage the timer
+ */
+global.setInterval = function (cb, interval) {};
+
+/**
+ * Stops timeout id from being called
+ * @param  {Number} id       The timer to remove
+ */
+global.clearTimeout = function (id) {};
+
+/**
+ * Stops interval id from being called
+ * @param  {Number} id       The interval to remove
+ */
+global.clearInterval = function (id) {};
+
 /** @namespace */
 global.console = {};
 
