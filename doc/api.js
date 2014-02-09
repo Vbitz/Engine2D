@@ -1,6 +1,7 @@
 // Engine2D Javascript API Documentation
 // Correct as of 18th Jan 2014
 
+/** @namespace */
 this.global = this; // Global object exposed as global
 
 /**
