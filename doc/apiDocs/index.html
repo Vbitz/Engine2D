@@ -43,61 +43,29 @@
     <section>
         <article><h2 id="osx-build-guide">OSX Build Guide</h2>
 <ul>
-<li>Install xcode or xcode Command Line Tools</li>
+<li>Install xcode</li>
 <li>Install Homebrew</li>
 <li>Clone the project to a directory of your choice</li>
 <li>Install <code>glew physfs v8 freeimage glm freetype</code> using Homebrew</li>
 <li>Clone and install https://github.com/glfw/glfw (You can also get a Homebrew formula from https://github.com/Homebrew/homebrew-versions/blob/master/glfw3.rb)</li>
-<li>Run <code>make run</code> in the project directory</li>
-<li>If you want a .app then Run <code>make release</code>. The bundle will then be generated to release-osx/</li>
+<li><code>svn checkout http://gyp.googlecode.com/svn/trunk third_party/gyp</code></li>
+<li><code>./tasks.py build_bin</code></li>
 </ul>
-<h2 id="windows-build-guide">Windows Build Guide</h2>
-<p>Windows binarys are avalible from: http://vbitz.com/public/engine2d-bins-win32-01.zip
-This is not for the faint of heart. In the future I will provide project files or some kind of binary dependancys.</p>
-<ul>
-<li>Install Visual Studio (Express 2012 for Windows Desktop) is what I tested the compile on)</li>
-<li>Install CMake (For GLFW and PhysFS)</li>
-<li>Install Git for Windows (Or any git client)</li>
-<li>Clone the project into an empty directory, any directory works</li>
-<li>Make a new directory to store collected libs and headers</li>
-<li>Create a new C++ Console Application Project and add all the files in src and src/extern</li>
-<li>Download and extract v8 from https://github.com/v8/v8/archive/3.19.18.4.tar.gz (The latest version breaks the way I create methods in C++)</li>
-<li>Compile V8 in Release mode, this is complex so I will just link their guide https://code.google.com/p/v8/wiki/BuildingWithGYP</li>
-<li>Copy the .lib files from the output folder to your collected libary folder</li>
-<li>Copy the contents of the include folder to your collected include folder</li>
-<li>Clone https://github.com/glfw/glfw and generate VS project files</li>
-<li>You need to change the Code Generation setting in visual stuido from <code>/MD</code> to <code>/MT</code></li>
-<li>Now you can build glfw in release mode</li>
-<li>Copy the .lib files from the output folder to your collected libary folder</li>
-<li>Copy the contents of the include folder to your collected include folder</li>
-<li>Do the same with PhysFS</li>
-<li>FreeImage, Glew and FreeType all come in binary forms so just download those and copy the DLL's and other files into the collected folders</li>
-<li>GLM is header only so just download it and copy the files into your collected Include directory</li>
-<li>That should be all the dependancys sorted so now you need to configure the VS project</li>
-<li>Engine2D only compiles in release mode right now so switch it now</li>
-<li>You need to change the Code Generation Setting in visual stuido for Engine2D from <code>/MD</code> to <code>/MT</code></li>
-<li>Under Linker\Input in the project properties you need to add <code>MSVCRT.lib</code> to Ignore Specifc Default Libarys</li>
-<li>Under Additional Dependancys in the same window you need to link <code>OpenGL32.lib;Freeimage.lib;freetype.lib;glew32.lib;glfw3.lib;physfs.lib;v8_snapshot.lib;v8_base.ia32.lib;wsock32.lib;winmm.lib</code>. All of these other then OpenGL, wsock and winmm should be in your collected project folder</li>
-<li>Make sure SubSystem is set as console under Linker\System in the project properties</li>
-<li>Now you should be able to complie the project. When it goes to run it will fail with a dialog, don't worry we just need to copy the DLL's and resources</li>
-<li>Copy the contents of res\ into your solution Release folder</li>
-<li>Copy <code>freetype6.dll</code>, <code>glew32.dll</code> and <code>FreeImage.dll</code> into the same folder</li>
-<li>Finaly set the Working Directroy under Debugging to <code>$(TargetDir)</code> so it finds all the resources</li>
-<li>It should compile and run correctly, if it does not then post the Error as a new Issue</li>
-</ul>
+<p>If you want to build without Homebrew I've started to put together a automated build system inside of tasks.py</p>
 <h2 id="linux-build-guide">Linux Build Guide</h2>
 <p>I have not tested a Linux version yet but you should be able to mostly follow the OSX instructions</p>
 <h2 id="sample-code">Sample Code</h2>
-<pre><code class="lang-javascript">sys.on(&quot;draw&quot;, &quot;helloWorld&quot;, function () {
+<pre><code class="lang-javascript">sys.on(&quot;draw&quot;, &quot;helloWorld&quot;, function (e) {
     draw.setColor(&quot;blue&quot;);
     draw.rect(100, 100, 100, 100);
 });</code></pre>
+<h2 id="documentation">Documentation</h2>
+<p>The latest version of the documentaion generated using JSDoc can be found under doc/apiDocs or hosted at http://vbitz.com/public/EngineAPIDocs/</p>
 <h2 id="getting-started">Getting Started</h2>
 <p>Right now the engine is in beta but if you want to try it out then you can start writing JS code by</p>
 <ul>
-<li>Creating a JS file with the sample code</li>
-<li>Editing the js_startupScript key in res/config/config.json with your own script filename</li>
-<li>Run the engine with <code>make run</code></li>
+<li>Creating a JS file with the sample code and save it under res/script/helloWorld.js</li>
+<li>Run <code>build/Default/engine2D -devmode -debug script/helloWorld</code> (You can substiute the path for any path under res/)</li>
 <li>If you want to edit your script then just change the file and save, the engine reloads automaticly by default</li>
 </ul></article>
     </section>
@@ -116,7 +84,7 @@ This is not for the faint of heart. In the future I will provide project files o
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha3</a> on Fri Jan 24 2014 11:11:40 GMT+1300 (NZDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha3</a> on Sun Feb 09 2014 19:05:40 GMT+1300 (NZDT)
 </footer>
 
 <script> prettyPrint(); </script>
