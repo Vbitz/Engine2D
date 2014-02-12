@@ -4,7 +4,7 @@
 #include "Draw2D.hpp"
 #include "Filesystem.hpp"
 
-#include "extern/GLFT_Font.hpp"
+#include "vendor/GLFT_Font.hpp"
 
 #include "TextureLoader.hpp"
 

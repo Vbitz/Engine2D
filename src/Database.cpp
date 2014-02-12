@@ -1,6 +1,6 @@
 #include "Database.hpp"
 
-#include "extern/sqlite3.h"
+#include "vendor/sqlite3.h"
 
 namespace Engine {
     sqlite3* _database;

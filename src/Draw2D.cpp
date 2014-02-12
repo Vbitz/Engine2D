@@ -5,6 +5,8 @@
 #include "GL3Buffer.hpp"
 #include "EffectParameters.hpp"
 
+#include "vendor/GLFT_Font.hpp"
+
 namespace Engine {
     namespace Draw2D {
         bool _drawOffScreen = true;

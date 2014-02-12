@@ -5,7 +5,7 @@
 #include <functional>
 #include <stdarg.h>
 
-#include "extern/json/json.h"
+#include "vendor/json/json.h"
 
 #include "ScriptingManager.hpp"
 

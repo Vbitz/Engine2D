@@ -2,8 +2,6 @@
 
 #include "common.hpp"
 
-#include "extern/GLFT_Font.hpp"
-
 #include "TextureLoader.hpp"
 #include "SpriteSheet.hpp"
 

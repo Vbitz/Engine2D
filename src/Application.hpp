@@ -6,7 +6,7 @@
 
 #include "ResourceManager.hpp"
 
-#include "extern/GLFT_Font.hpp"
+#include "vendor/GLFT_Font.hpp"
 
 namespace Engine {
     

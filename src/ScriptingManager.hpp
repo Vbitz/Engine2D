@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Scripting.hpp"
-#include "extern/json/json.h"
+#include "vendor/json/json.h"
 
 namespace Engine {
     namespace ScriptingManager {

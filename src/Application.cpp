@@ -2,9 +2,9 @@
 
 #include <cstring>
 
-#include "extern/OpenSans-Regular.ttf.hpp"
+#include "vendor/OpenSans-Regular.ttf.hpp"
 
-#include "extern/json/json.h"
+#include "vendor/json/json.h"
 
 #include "ResourceManager.hpp"
 
