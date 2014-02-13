@@ -30,7 +30,7 @@
 				"src/Config.cpp",
 				"src/LogGraphEvents.cpp",
 				"src/Util.cpp",
-				"src/PlatformOSX.cpp",
+				"src/Platform_mac.cpp",
 				"src/Events.cpp",
 				"src/TestSuite.cpp",
 				"src/Application.cpp",
