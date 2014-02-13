@@ -31,6 +31,7 @@
 				"src/LogGraphEvents.cpp",
 				"src/Util.cpp",
 				"src/Platform_mac.cpp",
+				"src/Platform_win.cpp",
 				"src/Events.cpp",
 				"src/TestSuite.cpp",
 				"src/Application.cpp",
@@ -43,6 +44,18 @@
 				"src/Window_glfw.cpp"
 			],
 			"conditions": [
+				['OS != "win"', {
+					'sources!': [
+						# Windows-only; exclude on other platforms.
+						"src/Platform_win.cpp",
+					]
+				}],
+				['OS != "mac"', {
+					'sources!': [
+						# Mac-only; exclude on other platforms.
+						"src/Platform_mac.cpp",
+					]
+				}],
 				["OS == \"mac\"", {
 					"xcode_settings": {
 						"OTHER_CPLUSPLUSFLAGS": [
