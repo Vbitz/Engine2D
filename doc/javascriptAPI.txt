@@ -26,7 +26,7 @@ Done	| Old Syntax														| New Syntax
 		| sys.getGLVersion()												| process.graphicsVersion
 		| sys.hasExtention(extention)										| REMOVED Not really something scripters need
 		| sys.getExtentions()												| REMOVED -
-		| sys.getMaxTextureSize()											| ??? Moved to some kind texture or renderer object
+		| sys.getMaxTextureSize()											| Texture.getMaxSize()
 		| sys.saveScreenshot(path)											| process.saveScreenshot(filename)
 		| sys.resizeWindow(width, height)									| process.window.size = newSize
 		| sys.toggleFullscreen()											| REMOVED - Duplicates config options
@@ -39,19 +39,19 @@ Done	| Old Syntax														| New Syntax
 		| sys.gc()															| process.gc()
 		| sys.profile(frames, filename)										| debug.saveProfile()
 		| sys.profileSet(profileZone, maxTime)								| debug.profiler[zone].setMaxTime
-		| sys.reloadRootScript()											| ??? This will become part of require or something
-		| sys.forceReload(script)											| ??? -
+		| sys.reloadRootScript()											| REMOVED duplicates functionailty with forceReload
+		| sys.forceReload(script)											| require.reloadScript(script)
 		| sys.version()														| process.versions (inline with nodejs)
 		| sys.msgBox(title, msg, modal)										| process.messageBox(title, msg, modal)
 		| sys.shell(filename)												| process.shellExecute(filename, opts)
 		| sys.platform														| process.platform (inline with nodejs)
 		| sys.devMode														| process.developerMode (inline with nodejs)
 		| sys.preload														| REMOVED Internal API
-		| sys.numProcessers													| ??? Important difference between other JS runtimes
+		| sys.numProcessers													| process.cpuCount
 		| sys.username														| process.username
 		| sys.screenWidth													| process.window.size a Vector2
 		| sys.screenHeight													| -
-		| sys.deltaTime														| ??? Moved to the global object
+		| sys.deltaTime														| $dt
 ====================================================================================================================================
 ==== Until it needs to be changed the FS API will stay the same																	====
 	X	| fs.readFile(filename, raw)										| -
@@ -72,7 +72,7 @@ Done	| Old Syntax														| New Syntax
 		| draw.colorPalette(name, color)									| draw.colors {}
 		| draw.setColorF(r, g, b)											| draw.color = new Color(r, g, b)
 		| draw.setColor(color)												| draw.color = {} (obj) or new Color() for the others
-		| draw.setColorI(r, g, b)											| ??? draw.color = Color.fromInt(r, g, b)
+		| draw.setColorI(r, g, b)											| draw.color = Color.fromInt(r, g, b)
 		| draw.clearColor(color)											| draw.clearColor (inline with HTML5 canvas)
 		| draw.getRGBFromHSV(h, s, v)										| Color.fromHSV(h, s, v)
 	X	| draw.print(x, y, str)												| -
@@ -80,33 +80,33 @@ Done	| Old Syntax														| New Syntax
 		| draw.draw(texId, x, y, w, h)										| Rather then texID it will use texture objects
 		| draw.drawSub(texId, x, y, w, h, xSub, ySub, wSub, hSub)			| Same as Above
 		| draw.drawSprite(spriteSheet, sprite, x, y, w, h)					| Rather then spriteSheet it will use objects
-		| draw.openImage(filename)											| REMOVED infavor of a better resource system
-		| draw.openSpriteSheet(filename)									| REMOVED -
+		| draw.openImage(filename)											| resource.openImage(filename)
+		| draw.openSpriteSheet(filename)									| resource.openSpriteSheet(filename)
 		| draw.getImageArray(filename)										| Texture.prototype.getPixels([x, y, w, h]);
 		| draw.createImageArray(w, h)										| REMOVED infavor of Typed Arrays
-		| draw.createImage(arr, w, h)										| new Texture();
+		| draw.createImage(arr, w, h)										| new Texture(arr, w, h);
 		| draw.saveImage(texId, filename)									| Texture.prototype.save(filename)
 		| draw.freeImage(texId)												| REMOVED infavor of automatic texture caching
-		| draw.isTexture(texId)												| REMOVED
-		| draw.isSpiteSheet(spriteSheet)									| REMOVED
+		| draw.isTexture(texId)												| Texture.prototype.isValid()
+		| draw.isSpiteSheet(spriteSheet)									| SpriteSheet.prototype.isValid();
 		| draw.cameraReset()												| draw.resetTransform() (inline with HTML5 cavas)
 		| draw.cameraPan(x, y)												| draw.translate(x, y) - 
 		| draw.cameraZoom(f)												| draw.scale(x, y) -
 		| draw.cameraRotate(r)												| draw.rotate(r)
-	X	| draw.setFont(prettyName, size)									| -
-		| draw.loadFont(prettyName, filename)								| ??? Made part of the resource system
-		| draw.isFontLoaded(prettyName)										| REMOVED
-		| draw.getVerts()													| ??? Useful but not sure where it fits in
+		| draw.setFont(prettyName, size)									| draw.font = fontObj; draw.fontSize = size
+		| draw.loadFont(prettyName, filename)								| fontObj = resource.loadFont(filename);
+		| draw.isFontLoaded(prettyName)										| Font.prototype.isValid();
+		| draw.getVerts()													| draw.currentVerts
 		| draw.setDrawOffscreen(draw)										| REMOVED, never used it
-		| draw.setCenter(x, y)												| ??? Useful but not sure where it fits in
+		| draw.setCenter(x, y)												| REMOVED - Not really needed with mature camera controls
 ====================================================================================================================================
 ==== Very Important but I'm not sure how it fits in 																			====
-		| input.keyDown(key)												| ???
-		| input.mouseX														| ??? Not sure but it will use a vector insteed
-		| input.mouseY														| ???
-		| input.leftMouseButton												| ???
-		| input.middleMouseButton											| ???
-		| input.rightMouseButton											| ???
+		| input.keyDown(key)												| input.keyState[key]
+		| input.mouseX														| input.mousePos a vec2
+		| input.mouseY														| -
+		| input.leftMouseButton												| input.mouseState[input.LEFT_MOUSE_BUTTON]
+		| input.middleMouseButton											| input.mouseState[input.MIDDLE_MOUSE_BUTTON]
+		| input.rightMouseButton											| input.mouseState[input.RIGHT_MOUSE_BUTTON]
 ====================================================================================================================================
 ==== The whole API is of limited usefulness and very unsafe, might get removed completly										====
 		| mod.open(filename)												| REMOVED
@@ -119,8 +119,8 @@ Done	| Old Syntax														| New Syntax
 ====================================================================================================================================
 ==== Really awesome API but it will stay devmode only																			====
 		| unsafe.getNumberAddress(number)									| The long type is a real pain and should be fixed
-		| unsafe.getNative(address, length)									| ??? Should return a TypedArray view
-		| unsafe.call(address)												| ??? I'd like to extend this a little more with args
+		| unsafe.getNative(address, length)									| Same but returns a typed array
+		| unsafe.call(address)												| unsafe.call(address, callingConvention, argTypes, args)
 		| unsafe.malloc(length)												| unsafe.setArrayPersistent(array, true)
 		| unsafe.free(array)												| Same as above
 	X	| unsafe.addressOf(array)											| -
@@ -143,8 +143,21 @@ Done	| Old Syntax														| New Syntax
 		| 																	| Math.perlin
 	X	| 																	| setTimeout(cb, delay)
 	X	| 																	| setInterval(cb, delay)
+	X	|																	| clearTimeout(id)
+	X	|																	| clearInterval(id)
 		| 																	| alert(msg)
 		| 																	| debug.assert(value, msg)
+		| 																	| unsafe.bindCall(address, callingConvention, argTypes)
+		| 																	| new SpriteSheet(texture)
+		| 																	| SpriteSheet.prototype.bindSprite(name, x, y, w, h)
+		| 																	| SpriteSheet.prototype.bindAnimation(name, [frames], delay)
+		| 																	| 
+		| 																	| 
+		| 																	| 
+		| 																	| 
+		| 																	| 
+		| 																	| 
+		| 																	| 
 		| 																	| 
 		| 																	| 
 		| 																	| 
