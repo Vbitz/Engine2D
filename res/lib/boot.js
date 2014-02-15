@@ -28,7 +28,7 @@ sys.keyboardFunc = function (func) {
 	});
 };
 
-var libarys = ["ui", "timers"];
+var libarys = ["ui", "timers", "perlin"];
 
 libarys.forEach(function (lib) {
 	sys.runFile("lib/" + lib, false);
