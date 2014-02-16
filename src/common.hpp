@@ -42,6 +42,7 @@
 
 #define STR(val) #val
 
+// TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 

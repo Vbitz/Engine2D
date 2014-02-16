@@ -19,6 +19,7 @@
 				"src/vendor/GLFT_Font.cpp",
 				"src/vendor/jsoncpp.cpp",
 				"src/vendor/sqlite3.c",
+				"src/vendor/glew.c",
 				"src/GL3Buffer.cpp",
 				"src/Shader.cpp",
 				"src/EngineUI.cpp",
@@ -65,7 +66,6 @@
 						],
 						"OTHER_LDFLAGS": [
 							"-lfreetype "
-							"-lglew",
 							"-lglfw3",
 							"-lphysfs",
 							"-lv8",

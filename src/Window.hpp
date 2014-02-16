@@ -2,7 +2,8 @@
 
 #include <string>
 
-#include <GL/glew.h>
+#define GLEW_STATIC
+#include "vendor/GL/glew.h"
 #include <glm/glm.hpp>
 
 namespace Engine {
