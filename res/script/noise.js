@@ -3,7 +3,7 @@
 var IMAGE_WIDTH = 1024;
 var IMAGE_HEIGHT = 1024;
 var SCALE = 2;
-var NOISE_SCALE = 0.05;
+var NOISE_SCALE = 0.03;
 IMAGE_WIDTH = IMAGE_WIDTH / SCALE;
 IMAGE_HEIGHT = IMAGE_HEIGHT / SCALE;
 
@@ -20,9 +20,10 @@ function _noise(arr, level, width, height) {
 		noise.seed(Math.random());
 		for (var x = 0; x < width; x++) {
 			for (var y = 0; y < height; y++) {
-				setXY(arr, x, y, 0, noise.perlin3(x * NOISE_SCALE, y * NOISE_SCALE, 0.0));
-				setXY(arr, x, y, 1, noise.perlin3(x * NOISE_SCALE, y * NOISE_SCALE, 0.5));
-				setXY(arr, x, y, 2, noise.perlin3(x * NOISE_SCALE, y * NOISE_SCALE, 0.25));
+				var val = Math.abs(noise.simplex2(x * NOISE_SCALE, y * NOISE_SCALE));
+				setXY(arr, x, y, 0, val);
+				setXY(arr, x, y, 1, val);
+				setXY(arr, x, y, 2, val);
 				setXY(arr, x, y, 3, 1.0);
 			}
 		}
