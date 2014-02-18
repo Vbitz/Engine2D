@@ -1,35 +1,43 @@
-OSX Build Guide
--------------------
-- Install xcode
-- Install Homebrew
-- Clone the project to a directory of your choice
-- Install `glew physfs v8 freeimage glm freetype` using Homebrew
-- Clone and install https://github.com/glfw/glfw (You can also get a Homebrew formula from https://github.com/Homebrew/homebrew-versions/blob/master/glfw3.rb)
-- `svn checkout http://gyp.googlecode.com/svn/trunk third_party/gyp`
-- `./tasks.py build_bin`
+# "Engine2D" 2D Game Engine
 
-If you want to build without Homebrew I've started to put together a automated build system inside of tasks.py
+## Building
+Right now the engine **only** builds out of the box on Mac OSX. To build it for other platforms you need...
 
-Linux Build Guide
--------------------
-I have not tested a Linux version yet but you should be able to mostly follow the OSX instructions
+- A modern C++ compiler supporting C++11. It's built using [clang](http://clang.llvm.org/) right now
+- [Python](http://www.python.org/) v2.7 (For GYP and tasks.py)
+- [Subversion](https://subversion.apache.org/) (For GYP)
+- [GYP](https://code.google.com/p/gyp/)
+- [FreeType](http://www.freetype.org/) v2.5.x
+- [FreeImage](http://freeimage.sourceforge.net/) v3.15.x
+- [GLFW](http://www.glfw.org/) v3.0.x
+- [PhysFS](https://icculus.org/physfs/) v2.0.x
+- [V8](https://code.google.com/p/v8/) v3.21.x
 
-Sample Code
--------------------
+On a source level you will need to fill in or stub out `Platform_{x}.cpp`.
+
+Once you have the dependancys installed you can run `./tasks.py gyp` and then build the project using XCode on OSX, Visual Studio on Windows or make on linux.
+
+If your having trouble locating or building the dependancys then there are incomplete instructions in tasks.py. You can also fetch almost all of the dependancys using Homebrew with `brew install physfs v8 freeimage glm freetype`.##Sample Code
+
 ```javascript
-sys.on("draw", "helloWorld", function (e) {
-	draw.setColor("blue");
-	draw.rect(100, 100, 100, 100);
+sys.on("draw", "helloWorld.draw", function (e) {
+        draw.setColor("blue");
+        draw.rect(100, 100, 100, 100);
 });
 ```
 
-Documentation
--------------------
-The latest version of the documentaion generated using JSDoc can be found under doc/apiDocs or hosted at http://vbitz.com/public/EngineAPIDocs/
+##Documentation
 
-Getting Started
--------------------
-Right now the engine is in beta but if you want to try it out then you can start writing JS code by
-- Creating a JS file with the sample code and save it under res/script/helloWorld.js
-- Run `build/Default/engine2D -devmode -debug script/helloWorld` (You can substiute the path for any path under res/)
-- If you want to edit your script then just change the file and save, the engine reloads automaticly by default
+The latest version of the documentaion generated using JSDoc can be found under doc/apiDocs or hosted at [http://vbitz.com/public/EngineAPIDocs/](http://vbitz.com/public/EngineAPIDocs/).
+
+## Getting Started
+
+- Copy the sample code and save it under res/script/helloWorld.js.
+- Run `build/Default/engine2D -devmode -debug script/helloWorld` (You can substiute the path for any path under res/).
+- If you want to edit your script then just change the file and save, the engine reloads automaticly if `-devmode` is enabled.
+
+## Contributing
+Code Contibutions are welcome. If you don't like coding then open a issue.
+
+## Licence
+Engine2D is licenced under the Apache 2 Licence. A copy can be found in LICENCE.
