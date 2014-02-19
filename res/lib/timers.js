@@ -26,4 +26,4 @@
 	global.clearInterval = function (cb) {
 		sys.deleteTimer(id);
 	};
-})(global);
+})(this);
