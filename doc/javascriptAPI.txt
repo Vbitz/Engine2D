@@ -146,7 +146,7 @@ Done	| Old Syntax														| New Syntax
 	X	|																	| clearTimeout(id)
 	X	|																	| clearInterval(id)
 		| 																	| alert(msg)
-		| 																	| debug.assert(value, msg)
+	X	| 																	| debug.assert(value, msg)
 		| 																	| unsafe.bindCall(address, callingConvention, argTypes)
 		| 																	| new SpriteSheet(texture)
 		| 																	| SpriteSheet.prototype.bindSprite(name, x, y, w, h)

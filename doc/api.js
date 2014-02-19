@@ -32,6 +32,14 @@ global.clearTimeout = function (id) {};
  */
 global.clearInterval = function (id) {};
 
+/**
+ * Force Quits the engine if value converts to false.
+ * @param  {*} value The value to check
+ * @param  {String} msg   The message to print to the console if value == false
+ * @return {*}       value
+ */
+global.assert = function (value, msg) {};
+
 /** @namespace */
 global.console = {};
 
