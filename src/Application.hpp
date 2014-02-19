@@ -8,6 +8,8 @@
 
 #include "vendor/GLFT_Font.hpp"
 
+#define ENGINE_ASSERT(value, msg) GetAppSingilton()->Assert(value, msg, __FILE__, __LINE__)
+
 namespace Engine {
     
     class Application {
@@ -49,8 +51,11 @@ namespace Engine {
         EffectShaderTypes::Type GetBestEffectShaderType();
         
         static std::string GetEngineVersion();
+        bool IsDebugMode();
         
         void UpdateScreen();
+        
+        void Assert(bool value, std::string reason, std::string line, int lineNumber);
         
     private:
         void _mainLoop();

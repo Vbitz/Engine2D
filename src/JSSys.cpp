@@ -601,6 +601,23 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(Assert) {
+            ENGINE_JS_SCOPE_OPEN;
+            if (GetAppSingilton()->IsDebugMode()) {
+                if (args[0]->ToBoolean() == v8::False()) {
+                    if (args.Length() > 1 && args[1]->IsString()) {
+                        ENGINE_ASSERT(false, ENGINE_GET_ARG_CPPSTRING_VALUE(1));
+                    } else {
+                        ENGINE_ASSERT(false, "");
+                    }
+                } else {
+                    ENGINE_JS_SCOPE_CLOSE(args[0]);
+                }
+            } else {
+                ENGINE_JS_SCOPE_CLOSE(args[0]);
+            }
+        }
+        
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
         
         void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {

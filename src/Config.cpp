@@ -1,7 +1,5 @@
 #include "Config.hpp"
 
-#include <iostream>
-
 namespace Engine {
     namespace Config {
         std::unordered_map<std::string, float> _numberCvars;

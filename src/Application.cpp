@@ -114,6 +114,8 @@ namespace Engine {
         
         global->SetAccessor(v8::String::NewSymbol("global"), globalAccessor);
         
+        addItem(global, "assert", JsSys::Assert);
+        
         // consoleTable
         v8::Handle<v8::ObjectTemplate> consoleTable = v8::ObjectTemplate::New();
         
@@ -852,6 +854,17 @@ namespace Engine {
     
     std::string Application::GetEngineVersion() {
         return std::string("Engine2D v ") + std::string(ENGINE_VERSION);
+    }
+    
+    bool Application::IsDebugMode() {
+        return this->_debugMode;
+    }
+    
+    void Application::Assert(bool value, std::string reason, std::string line, int lineNumber) {
+        if (value || !this->_debugMode) return;
+        Logger::begin("Assert", Logger::LogLevel_Error) << "ASSERT FAILED : (" << line << ":" << lineNumber << ") " << reason << Logger::end();
+        Platform::DumpStackTrace();
+        exit(EXIT_FAILURE); // Can't recover from this
     }
     
     void Application::_mainLoop() {
