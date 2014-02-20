@@ -109,19 +109,6 @@ def fetch_freetype():
 		# and also http://sourceforge.net/projects/gnuwin32/files/freetype/2.3.5-1/freetype-2.3.5-1-bin.zip/download
 		pass;
 
-@command(usage="Fetch a glew binary distribution or compile one")
-def fetch_glew():
-	if sys.platform == "win32": # windows
-		# windows needs https://sourceforge.net/projects/glew/files/glew/1.10.0/glew-1.10.0-win32.zip/download
-		pass;
-	elif sys.platform == "darwin": # osx
-		# osx (and other unixes) need https://sourceforge.net/projects/glew/files/glew/1.10.0/glew-1.10.0.tgz/download (567,605 bytes)
-		# extracts to glew-1.10.0
-		# run make glew.lib (takes a while)
-		# copy include/GL to third_party/include
-		# copy lib/libGLEW.a to third_party/lib
-		pass;
-
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def fetch_glfw3():
 	# both platforms need https://github.com/glfw/glfw/archive/3.0.3.zip (400,137 bytes)
