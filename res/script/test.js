@@ -32,7 +32,7 @@ var tests = {
 		}
 
 		// disassembled:
-		// 		ret
+		//		ret
 		var instructions = [0xc3];
 
 		// add some more space to the buffer for page alignment
@@ -140,7 +140,7 @@ sys.getExtentions().forEach(function (i) {
 var firstDraw = true;
 
 sys.on("testTimer1", "test.timer", function () {
-	console.log("This runs every 5 seconds")
+	console.log("This runs every 5 seconds");
 });
 
 sys.on("testTimer2", "test.timer", function () {
@@ -267,14 +267,14 @@ sys.on("draw", "test.draw", function () {
 		y += 20;
 	});
 
-	for (var i = 0; i < 20; i++) {
-		draw.curve(i * 100, 500, i * 100, 600, 850, 600, input.mouseX, input.mouseY);
+	for (var curveX = 0; curveX < 2000; curveX += 100) {
+		draw.curve(curveX, 500, curveX, 600, 850, 600, input.mouseX, input.mouseY);
 	}
 });
 
 sys.on("input", "test.input", function (e) {
-	var key = e["key"];
-	var press = e["state"] === "press" || e["state"] === "repeat";
+	var key = e.key;
+	var press = e.state === "press" || e.state === "repeat";
 	console.log("[INPUT] : " + key + " : " + press);
 	if (key === "S" && press) {
 		sys.saveScreenshot("testing.png");
@@ -282,7 +282,7 @@ sys.on("input", "test.input", function (e) {
 		for (var i = 0; i < 20; i++) {
 			try {
 				draw.saveImage(i, "img" + i + ".png");
-			} catch (e) { }
+			} catch (ex) { }
 		}
 	} else if (key === "F" && press) {
 		sys.toggleFullscreen();
