@@ -133,7 +133,7 @@ namespace Engine {
             }
         };
         
-        std::vector<Event> _events;
+        std::vector<Event> _events; // YIKES
         
         int lastEventID = 0;
         
@@ -160,30 +160,31 @@ namespace Engine {
             Emit(evnt, [](Json::Value e) { return true; }, Json::nullValue);
         }
         
-        int On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
+        void On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
+            Clear(name);
             _events.push_back(Event(std::string(evnt.c_str()), std::string(evnt.c_str()),
                                     new CPPEventTarget(target, e)));
-            return lastEventID++;
         }
         
-        int On(std::string evnt, std::string name, Json::Value e, v8::Persistent<v8::Function>* target) {
+        void On(std::string evnt, std::string name, Json::Value e, v8::Persistent<v8::
+            Function>* target) {
+            Clear(name);
             _events.push_back(Event(std::string(evnt.c_str()), std::string(name.c_str()),
                                     new JSEventTarget(target, e)));
-            return lastEventID++;
         }
         
-        int On(std::string evnt, std::string name, EventTargetFunc target) {
-            return On(evnt, name, Json::nullValue, target);
+        void On(std::string evnt, std::string name, EventTargetFunc target) {
+            On(evnt, name, Json::nullValue, target);
         }
         
-        int On(std::string evnt, std::string name, v8::Persistent<v8::Function>* target) {
-            return On(evnt, name, Json::nullValue, target);
+        void On(std::string evnt, std::string name, v8::Persistent<v8::Function>* target) {
+            On(evnt, name, Json::nullValue, target);
         }
         
         void Clear(std::string eventID) {
             for (auto iter = _events.begin(); iter != _events.end(); iter++) {
                 if (iter->Label == eventID) {
-                    iter->Active = false;
+                    iter->Active = false; // YIKES
                 }
             }
         }

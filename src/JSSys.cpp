@@ -76,24 +76,22 @@ namespace Engine {
         ENGINE_JS_METHOD(EventsOn) {
             ENGINE_JS_SCOPE_OPEN;
             
-            int res = -1;
-            
             if (args.Length() == 4) {
                 v8::Persistent<v8::Function>* func = new v8::Persistent<v8::Function>(v8::Isolate::GetCurrent(), args[3].As<v8::Function>());
-                res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                                  ENGINE_GET_ARG_CPPSTRING_VALUE(1),
                                  ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(2))),
                                  func);
             } else if (args.Length() == 3) {
                 v8::Persistent<v8::Function>* func = new v8::Persistent<v8::Function>(v8::Isolate::GetCurrent(), args[2].As<v8::Function>());
-                res = Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                                  ENGINE_GET_ARG_CPPSTRING_VALUE(1),
                                  func);
             } else {
                 
             }
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(res));
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
         ENGINE_JS_METHOD(EventsEmit) {
