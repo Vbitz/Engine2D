@@ -89,8 +89,10 @@ namespace Engine {
         void _enableTypedArrays();
         void _initGLContext(GraphicsVersion v);
         
+        static void _rawInputHandler(Json::Value v);
         static void _rendererKillHandler(Json::Value v);
         static void _postCreateContext(Json::Value v);
+        static void _rawResizeHandler(Json::Value v);
         
         bool _running = false;
         

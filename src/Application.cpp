@@ -432,7 +432,7 @@ namespace Engine {
         this->_window = NULL;
     }
     
-    void RawInputHandler(Json::Value val) {
+    void Application::_rawInputHandler(Json::Value val) {
         EngineUI::OnKeyPress(val["rawKey"].asInt(), val["rawPress"].asInt(), val["shift"].asBool());
         
         if (EngineUI::ConsoleActive()) {
@@ -456,13 +456,18 @@ namespace Engine {
         Application* app = GetAppSingilton();
         app->_initGLContext(app->_window->GetGraphicsVersion());
     }
+    
+    void Application::_rawResizeHandler(Json::Value val) {
+        GetAppSingilton()->UpdateScreen();
+    }
 	
 	void Application::_initOpenGL() {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLFW" << Logger::end();
         
         Events::On("destroyWindow", "Application::RendererKillHandler", _rendererKillHandler);
-        Events::On("rawInput", "Application::RawInputHandler", RawInputHandler);
+        Events::On("rawInput", "Application::RawInputHandler", _rawInputHandler);
         Events::On("postCreateContext", "Application::_postCreateContext", _postCreateContext);
+        Events::On("rawResize", "Application::RawResizeHandler", _rawResizeHandler);
         
         glfwSetErrorCallback(OnGLFWError);
         
