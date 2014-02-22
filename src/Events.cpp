@@ -1,6 +1,7 @@
 #include "Events.hpp"
 
 #include <vector>
+#include <unordered_map>
 
 #include "Logger.hpp"
 
@@ -55,8 +56,10 @@ namespace Engine {
                 }
             }
             
+            virtual bool IsScript() { return true; }
+            
         protected:
-            Json::Value _filter;
+            Json::Value _filter = Json::nullValue;
             
             void setFilter(Json::Value filter) {
                 _filter = filter;
@@ -67,7 +70,7 @@ namespace Engine {
         
         class CPPEventTarget : public EventTarget {
         public:
-            CPPEventTarget(EventTargetFunc func, Json::Value filter)
+            CPPEventTarget(EventTargetFunc func, Json::Value* filter)
                 : _func(func) {
                     setFilter(filter);
                 }
@@ -84,7 +87,7 @@ namespace Engine {
         
         class JSEventTarget : public EventTarget {
         public:
-            JSEventTarget(v8::Persistent<v8::Function>* func, Json::Value filter)
+            JSEventTarget(v8::Persistent<v8::Function>* func, Json::Value* filter)
                 : _func(func) {
                     setFilter(filter);
                 }
@@ -121,33 +124,44 @@ namespace Engine {
         };
         
         struct Event {
-            std::string TargetName, Label;
-            EventTarget* Target;
-            bool Active;
+            std::string Label;
+            EventTarget* Target = NULL;
+            bool Active = false;
             
-            Event(std::string targetName, std::string label, EventTarget* target) {
-                this->TargetName = targetName;
-                this->Label = label;
-                this->Target = target;
-                this->Active = true;
-            }
+            Event() : Label(""), Active(false) {}
+            Event(std::string Label, EventTarget* target) : Label(Label), Target(target), Active(true) { }
         };
         
-        std::vector<Event> _events; // YIKES
+        struct EventClassSecurity {
+            bool NoScript = false;
+        };
+        
+        struct EventClass {
+            bool Valid = false;
+            std::string TargetName;
+            EventClassSecurity Security;
+            std::unordered_map<std::string, Event> Events;
+        };
+        
+        std::unordered_map<std::string, EventClass> _events;
         
         int lastEventID = 0;
         
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args) {
             std::vector<Event> targets;
-            for (auto iter = _events.begin(); iter != _events.end(); iter++) {
-                if (iter->TargetName == evnt && iter->Active) {
-                    targets.push_back(*iter);
-                }
+            EventClass& cls = _events[evnt];
+            if (!cls.Valid) return;
+            for (auto iter = cls.Events.begin(); iter != cls.Events.end(); iter++) {
+                targets.push_back(iter->second);
             }
             for (auto iter = targets.begin(); iter != targets.end(); iter++) {
-                Event e = *iter;
-                if (e.Active) {
-                    e.Target->Run(filter, args);
+                if (iter->Target == NULL) { throw "Invalid Target"; }
+                if (iter->Active) {
+                    iter->Target->Run(filter, args);
+                } else {
+                    std::cout << "Deleting: " << iter->Label << std::endl;
+                    delete cls.Events[iter->Label].Target;
+                    cls.Events.erase(iter->Label);
                 }
             }
         }
@@ -161,16 +175,28 @@ namespace Engine {
         }
         
         void On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
-            Clear(name);
-            _events.push_back(Event(std::string(evnt.c_str()), std::string(evnt.c_str()),
-                                    new CPPEventTarget(target, e)));
+            std::string evnt_copy = std::string(evnt.c_str());
+            std::string name_copy = std::string(name.c_str());
+            Event newEvent = Event(name_copy, new CPPEventTarget(target, new Json::Value(e)));
+            EventClass& cls = _events[evnt_copy];
+            if (!cls.Valid) {
+                cls.Valid = true;
+                cls.TargetName = evnt_copy;
+            }
+            cls.Events[name_copy] = newEvent;
         }
         
         void On(std::string evnt, std::string name, Json::Value e, v8::Persistent<v8::
             Function>* target) {
-            Clear(name);
-            _events.push_back(Event(std::string(evnt.c_str()), std::string(name.c_str()),
-                                    new JSEventTarget(target, e)));
+            std::string evnt_copy = std::string(evnt.c_str());
+            std::string name_copy = std::string(name.c_str());
+            Event newEvent = Event(name_copy, new JSEventTarget(target, new Json::Value(e)));
+            EventClass& cls = _events[evnt_copy];
+            if (!cls.Valid) {
+                cls.Valid = true;
+                cls.TargetName = evnt_copy;
+            }
+            cls.Events[name_copy] = newEvent;
         }
         
         void On(std::string evnt, std::string name, EventTargetFunc target) {
@@ -183,8 +209,11 @@ namespace Engine {
         
         void Clear(std::string eventID) {
             for (auto iter = _events.begin(); iter != _events.end(); iter++) {
-                if (iter->Label == eventID) {
-                    iter->Active = false; // YIKES
+                for (auto iter2 = iter->second.Events.begin();
+                     iter2 != iter->second.Events.end(); iter2++) {
+                    if (iter2->first == eventID) {
+                        iter2->second.Active = false;
+                    }
                 }
             }
         }

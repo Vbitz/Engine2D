@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <map>
 #include <functional>
 #include <stdarg.h>
 
