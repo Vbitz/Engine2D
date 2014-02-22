@@ -38,7 +38,7 @@ namespace Engine {
             Events::On("testingEvent2", "TestEvent2", NoOp2);
             
             double endTime = Platform::GetTime();
-            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "Basic C++ Event Create Performance Test: " << (endTime - startTime) << "s" << Logger::end();
+            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::On Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();
             if (endTime - startTime > 5.0e-05) {
                 this->FailTest();
             }
@@ -52,7 +52,7 @@ namespace Engine {
             Events::Emit("testingEvent2");
             
             endTime = Platform::GetTime();
-            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "Basic C++ Event Call Performance Test: " << (endTime - startTime) << "s" << Logger::end();
+            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::Emit Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();
             //if (endTime - startTime > 1.5e-05) {
             //    this->FailTest();
             //}
@@ -65,7 +65,7 @@ namespace Engine {
             }
             
             endTime = Platform::GetTime();
-            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "Stress C++ Event Call Performance Test: " << (endTime - startTime) << "s" << Logger::end();
+            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::Emit Performance Test x 200000: " << (endTime - startTime) << "s" << Logger::end();
             //if (endTime - startTime > 0.5) {
             //    this->FailTest();
             //}
@@ -78,7 +78,7 @@ namespace Engine {
             }
             
             endTime = Platform::GetTime();
-            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "Stress No Event Call Performance Test: " << (endTime - startTime) << "s" << Logger::end();
+            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::Emit No Target Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();
             //if (endTime - startTime > 1.0e-1) {
             //    this->FailTest();
             //}
@@ -93,7 +93,7 @@ namespace Engine {
             Events::Emit("testingEventJS2");
             
             endTime = Platform::GetTime();
-            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "Basic JS Event Call Performance Test: " << (endTime - startTime) << "s" << Logger::end();
+            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ -> JavaScript Event::Emit Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();
             //if (endTime - startTime > 1.0e-03) {
             //    this->FailTest();
             //}
@@ -106,7 +106,7 @@ namespace Engine {
             }
             
             endTime = Platform::GetTime();
-            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "Stress JS Event Call Performance Test: " << (endTime - startTime) << "s" << Logger::end();
+            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ -> JavaScript Event::Emit Performance Test x 100000: " << (endTime - startTime) << "s" << Logger::end();
             //if (endTime - startTime > 0.5) {
             //    this->FailTest();
             //}
