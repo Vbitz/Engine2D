@@ -290,9 +290,7 @@ namespace Engine {
             val["state"] = glfwGetKeyStateName(state);
             val["shift"] = (mods & GLFW_MOD_SHIFT);
             
-            Events::Emit("rawInput", [&](Json::Value e) {
-                return e.get("key", key) == key;
-            }, val);
+            Events::Emit("rawInput", val);
         }
         
         static void WindowResize(GLFWwindow* window, int width, int height) {
@@ -306,6 +304,10 @@ namespace Engine {
         }
         
         void _create() {
+            glfwDefaultWindowHints();
+            
+            glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+            
             if (this->_version == Graphics_OpenGL_Modern) {
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);

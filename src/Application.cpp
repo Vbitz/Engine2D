@@ -14,6 +14,7 @@
 #include "Timer.hpp"
 
 #include "PlatformTests.hpp"
+#include "CoreTests.hpp"
 
 #include "EngineUI.hpp"
 
@@ -441,9 +442,7 @@ namespace Engine {
         
         std::string key = val["key"].asString();
         
-        Events::Emit("input", [&](Json::Value v) {
-            return v.get("key", key) == key;
-        }, val);
+        Events::Emit("input", val);
     }
     
     void Application::_rendererKillHandler(Json::Value val) {
@@ -617,6 +616,7 @@ namespace Engine {
             TestSuite::LoadTestSuiteTests();
         }
         LoadPlatformTests();
+        LoadCoreTests();
     }
     
 	// semi-realtime time loading

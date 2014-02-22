@@ -192,6 +192,13 @@ def run():
 			"-debug"
 		]);
 
+@command(requires=["build_env"], usage="Runs the engine in Development Mode")
+def test():
+	shell_command([
+			resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
+			"-test"
+		]);
+
 @command(usage="Build documentation using jsdoc")
 def docs():
 	shell_command([

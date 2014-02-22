@@ -37,6 +37,7 @@
 				"src/TestSuite.cpp",
 				"src/Application.cpp",
 				"src/PlatformTests.cpp",
+				"src/CoreTests.cpp",
 				"src/EffectParameters.cpp",
 				"src/SpriteSheet.cpp",
 				"src/TextureLoader.cpp",

@@ -35,6 +35,22 @@
 		sys.runFile("lib/" + lib, false);
 	});
 
+	var testNum = 0;
+
+	global.sys.on("testingEventJS1", "boot.TestEventJS1", function () {
+		if ((testNum % 50000) === 0) {
+			console.log("[1] testNum = " + testNum);
+		}
+		testNum++;
+	});
+
+	global.sys.on("testingEventJS2", "boot.TestEventJS2", function () {
+		if ((testNum % 50000) === 0) {
+			console.log("[2] testNum = " + testNum);
+		}
+		testNum++;
+	});
+
 	function onPostLoad() {
 		console.log("Booting JavaScript Phase 2");
 		var argv = sys.argv();
