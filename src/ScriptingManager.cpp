@@ -5,11 +5,21 @@
 
 namespace Engine {
     namespace ScriptingManager {
+        Json::Value _getValueFromV8Object(v8::Handle<v8::Value> val) {
+            if (val->IsNull() || val->IsUndefined()) { return Json::Value(Json::nullValue); }
+            else if (val->IsNumber()) { return Json::Value(val->NumberValue()); }
+            else if (val->IsString()) { return Json::Value(*v8::String::Utf8Value(val)); }
+            else if (val->IsBoolean()) { return Json::Value(val->BooleanValue()); }
+            else if (val->IsArray() || val->IsObject()) {
+                throw "_getValueFromV8Object array/object unimplamented";
+            } else {
+                throw "_getValueFromV8Object type unimplamented";
+            }
+        }
+        
         Json::Value ObjectToJson(v8::Handle<v8::Object> obj) {
             v8::HandleScope scp(v8::Isolate::GetCurrent());
-            Json::Value ret(Json::objectValue);
-            
-            return ret;
+            return _getValueFromV8Object(obj);
         }
         
         v8::Handle<v8::Value> _getValueFromJson(Json::Value val) {

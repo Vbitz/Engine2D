@@ -78,7 +78,7 @@ namespace Engine {
             }
             
             endTime = Platform::GetTime();
-            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::Emit No Target Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();
+            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::Emit No Target Performance Test x 200000: " << (endTime - startTime) << "s" << Logger::end();
             //if (endTime - startTime > 1.0e-1) {
             //    this->FailTest();
             //}
