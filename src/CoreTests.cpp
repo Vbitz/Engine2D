@@ -113,7 +113,36 @@ namespace Engine {
         }
     };
     
+    class CoreLoggerTest : public Test {
+    public:
+        
+        std::string GetName() { return "CoreLoggerTest"; }
+        
+        void Run() {
+            double startTime, endTime;
+            
+            startTime = Platform::GetTime();
+            
+            for (int i = 0; i < 10; i++) {
+                Logger::begin("Hello", Logger::LogLevel_Log) << "World" << Logger::end();
+            }
+            
+            endTime = Platform::GetTime();
+            Logger::begin("CoreLoggerTest", Logger::LogLevel_Log) << "Logger::begin Performance Test x 10: " << (endTime - startTime) << "s" << Logger::end();
+            
+            startTime = Platform::GetTime();
+            
+            for (int i = 0; i < 10; i++) {
+                Logger::LogText("Hello", Logger::LogLevel_Log, "World");
+            }
+            
+            endTime = Platform::GetTime();
+            Logger::begin("CoreLoggerTest", Logger::LogLevel_Log) << "Logger::LogText Performance Test x 10: " << (endTime - startTime) << "s" << Logger::end();
+        }
+    };
+    
     void LoadCoreTests() {
         TestSuite::RegisterTest(new CoreEventTest());
+        TestSuite::RegisterTest(new CoreLoggerTest());
     }
 }
