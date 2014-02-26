@@ -1,10 +1,46 @@
 #include "ScriptingManager.hpp"
 
-#include <assert.h>
-#include <iostream>
-
 namespace Engine {
     namespace ScriptingManager {
+        // ScriptingContext
+        
+        ScriptingContext::ScriptingContext() {
+            
+        }
+        
+        ScriptingContext::~ScriptingContext() {
+            
+        }
+        
+        // ScriptingStackTrace
+        ScriptingStackTrace::ScriptingStackTrace() {
+            
+        }
+        
+        // ScriptingObject
+        
+        // V8ScriptingContext
+        
+        // V8ScriptingObject
+        
+        bool V8ScriptingContext::_globalInit() {
+            return true;
+        }
+        
+        void V8ScriptingContext::_runString(std::string code, std::string sourceFile) {
+            
+        }
+        
+        ScriptingStackTrace V8ScriptingContext::_makeStackTrace() {
+            return ScriptingStackTrace();
+        }
+        
+        // globals
+        
+        ScriptingContext* CreateScriptingContext(std::string providorName) {
+            return new V8ScriptingContext();
+        }
+        
         Json::Value _getValueFromV8Object(v8::Handle<v8::Value> val) {
             if (val->IsNull() || val->IsUndefined()) { return Json::Value(Json::nullValue); }
             else if (val->IsNumber()) { return Json::Value(val->NumberValue()); }
