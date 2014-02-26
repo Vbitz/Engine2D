@@ -8,7 +8,9 @@ namespace Engine {
         char *convertToUpper(char *str){
             char *newstr, *p;
             p = newstr = strdup(str);
-            while((*p++=toupper(*p)));
+            while(*p++ != 0x00) {
+                *p = toupper(*p);
+            }
             return newstr;
         }
         

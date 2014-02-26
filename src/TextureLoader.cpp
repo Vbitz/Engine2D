@@ -104,9 +104,11 @@ namespace Engine {
             
             FreeImage_CloseMemory(mem);
             
+            Texture* tex = TextureFromBuffer(texture, width, height);
+            
             delete [] texture; // that should fix some anoying memory leaks
             
-            return TextureFromBuffer(texture, width, height);
+            return tex;
         }
         
         Texture* TextureFromBuffer(unsigned char *texture, int width, int heigth) {

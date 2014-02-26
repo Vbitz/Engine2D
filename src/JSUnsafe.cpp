@@ -17,6 +17,7 @@ namespace Engine {
             
             *numAddr = ENGINE_GET_ARG_INT32_VALUE(0);
             
+            // MEMORY LEAK: Kind of the point of this
             ENGINE_JS_SCOPE_CLOSE(v8::Number::New((long) numAddr));
         }
 
