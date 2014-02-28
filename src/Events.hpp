@@ -12,6 +12,7 @@ namespace Engine {
     namespace Events {
         typedef void (*EventTargetFunc)(Json::Value e);
         
+        void Init();
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args);
         void Emit(std::string evnt, Json::Value args);
         void Emit(std::string evnt);

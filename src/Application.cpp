@@ -1007,6 +1007,7 @@ namespace Engine {
         }
         
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
+        Events::Init();
         
         for (auto iter = this->_archivePaths.begin(); iter != this->_archivePaths.end(); iter++) {
             Filesystem::Mount(*iter);

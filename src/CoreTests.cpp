@@ -9,16 +9,16 @@ namespace Engine {
     
     static int adder = 0;
     
-    void NoOp1(Json::Value val) {
+    void AdderTest1(Json::Value val) {
         if ((adder % 50000) == 0) {
 			Logger::begin("Script", Logger::LogLevel_Log) << "[1] adder = " << adder << Logger::end();
 		}
         adder++;
     }
     
-    void NoOp2(Json::Value val) {
+    void AdderTest2(Json::Value val) {
         if ((adder % 50000) == 0) {
-			Logger::begin("Script", Logger::LogLevel_Log) << "[1] adder = " << adder << Logger::end();
+			Logger::begin("Script", Logger::LogLevel_Log) << "[2] adder = " << adder << Logger::end();
 		}
         adder++;
     }
@@ -34,8 +34,8 @@ namespace Engine {
         void Run() {
             double startTime = Platform::GetTime();
             
-            Events::On("testingEvent1", "TestEvent1", NoOp1);
-            Events::On("testingEvent2", "TestEvent2", NoOp2);
+            Events::On("testingEvent1", "TestEvent1", AdderTest1);
+            Events::On("testingEvent2", "TestEvent2", AdderTest2);
             
             double endTime = Platform::GetTime();
             Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::On Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();

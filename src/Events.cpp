@@ -75,6 +75,8 @@ namespace Engine {
                     setFilter(filter);
                 }
             
+            bool IsScript() override { return false; }
+            
         protected:
             bool _run(Json::Value e) {
                 this->_func(e);
@@ -134,6 +136,12 @@ namespace Engine {
         
         struct EventClassSecurity {
             bool NoScript = false;
+            
+            std::string ToString() {
+                std::stringstream ss;
+                ss << "NoScript=" << this->NoScript;
+                return ss.str();
+            }
         };
         
         struct EventClass {
@@ -146,6 +154,39 @@ namespace Engine {
         std::unordered_map<std::string, EventClass> _events;
         
         int lastEventID = 0;
+        
+        void _debug(Json::Value args) {
+            Logger::begin("Events", Logger::LogLevel_Log) << " == EVENT DEBUG ==" << Logger::end();
+            
+            for (auto iter = _events.begin();
+                 iter != _events.end();
+                 iter++) {
+                Logger::begin("Events", Logger::LogLevel_Log)
+                    << "    ==========================="
+                    << Logger::end();
+                Logger::begin("Events", Logger::LogLevel_Log)
+                    << "    Event Class: " << iter->first
+                    << Logger::end();
+                Logger::begin("Events", Logger::LogLevel_Log)
+                    << "    Event Security: " << iter->second.Security.ToString()
+                    << Logger::end();
+                Logger::begin("Events", Logger::LogLevel_Log)
+                    << "    Event Members: "
+                    << Logger::end();
+                
+                for (auto iter2 = iter->second.Events.begin();
+                     iter2 != iter->second.Events.end();
+                     iter2++) {
+                    Logger::begin("Events", Logger::LogLevel_Log)
+                    << "        " << (iter2->second.Target->IsScript() ? "Script" : "C++   ") << " | " << iter2->first
+                        << Logger::end();
+                }
+            }
+        }
+        
+        void Init() {
+            Events::On("eventDebug", "Events::_debug", _debug);
+        }
         
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args) {
             std::vector<Event> targets;

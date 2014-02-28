@@ -69,7 +69,7 @@
 	}
 
 	if (sys.preload) {
-		sys.on("postLoad", "bootloaderLoad", onPostLoad);
+		sys.on("postLoad", "boot.bootloaderLoad", onPostLoad);
 	} else {
 		console.log("Rebooting");
 		sys.restartRenderer();
