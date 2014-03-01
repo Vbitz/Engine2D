@@ -876,20 +876,21 @@ namespace Engine {
         this->_running = true;
         
 		while (this->_running) {
-            if (!this->_window->GetFullscreen() &&
-                !this->_window->IsFocused() &&
+            if (!this->_window->GetFullscreen() && // Check to make sure were not in fullscreen mode
+                !this->_window->IsFocused() && // Check to make sure were not focused
                 !Config::GetBoolean("core.runOnIdle") &&
-                !this->_window->ShouldClose()) {
+                !this->_window->ShouldClose()) { // Check to make sure were not going to close
                 double startPauseTime = Platform::GetTime();
                 this->_window->WaitEvents();
                 sleep(0);
+                // notify the timer that it needs to offset the values to keep time acurate for user interation and physics
                 Timer::NotifyPause(Platform::GetTime() - startPauseTime);
 				continue;
 			}
             
             Profiler::StartProfileFrame();
             FramePerfMonitor::BeginFrame();
-            Timer::Update();
+            Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
             
             if (this->_debugMode) {
                 pthread_mutex_lock(&debugMesssageReadyMutex);
@@ -917,7 +918,7 @@ namespace Engine {
             Draw2D::Begin2d();
             
             Profiler::Begin("EventDraw", Config::GetFloat("core.render.targetFrameTime") / 3 * 2);
-            Events::Emit("draw");
+            Events::Emit("draw"); // this is when most Javascript runs
             Profiler::End("EventDraw");
             
             Draw2D::End2d();
@@ -1007,15 +1008,21 @@ namespace Engine {
         }
         
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
+        
         Events::Init();
+        // The events system is now ready
         
         for (auto iter = this->_archivePaths.begin(); iter != this->_archivePaths.end(); iter++) {
             Filesystem::Mount(*iter);
         }
         
+        // The filesystem is now ready for reading files
+        
         this->_loadConfigFile();
         
         this->_applyDelayedConfigs();
+        
+        // Configuration is now setup
         
         if (this->_configVarsMode) {
             this->_printConfigVars();
@@ -1031,6 +1038,8 @@ namespace Engine {
         
         ctx->Enter();
         
+        // Scripting has now initalized, Javascript may punch in during any event
+        
         if (Config::GetBoolean("core.debug.v8Debug")) {
             _enableV8Debugger();
         }
@@ -1038,6 +1047,8 @@ namespace Engine {
         Profiler::Begin("InitOpenGL");
         this->_initOpenGL();
         Profiler::End("InitOpenGL");
+        
+        // The window is now ready
         
         Draw2D::CheckGLError("Post InitOpenGL");
         
@@ -1061,6 +1072,7 @@ namespace Engine {
             this->_loadTests();
             TestSuite::Run();
         } else {
+            // Let's get this going
             this->_mainLoop();
         }
         
@@ -1077,6 +1089,7 @@ namespace Engine {
     }
 	
 	int Application::Start(int argc, char const *argv[]) {
+        // At this point Logger is not avalible
         Config::SetBoolean("core.log.enableConsole", true); // make sure we can log to the console right from the start
         
         Platform::SetRawCommandLine(argc, argv);
@@ -1085,10 +1098,13 @@ namespace Engine {
             return 1;
         }
         
+        // The applicaiton has now parsed the command line
+        
         Config::SetBoolean("core.log.enableConsole", false);
         
         this->_loadBasicConfigs();
         
+        // Run _postStart
         if (Config::GetBoolean("core.catchErrors")) {
             try {
                 return this->_postStart();

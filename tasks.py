@@ -160,7 +160,7 @@ def fetch_freeimage():
 		# Copy the files from dist to third_party/lib and third_party/include
 		pass;
 
-@command(requires=["fetch_glm", "fetch_freetype", "fetch_glew", "fetch_glfw3", "fetch_physfs", "fetch_v8", "fetch_freeimage"], usage="Fetches Build Dependancys", check=check_depends)
+@command(requires=["fetch_glm", "fetch_freetype", "fetch_glfw3", "fetch_physfs", "fetch_v8", "fetch_freeimage"], usage="Fetches Build Dependancys", check=check_depends)
 def fetch_build_deps():
 	pass;
 
