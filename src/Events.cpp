@@ -189,22 +189,22 @@ namespace Engine {
         }
         
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args) {
-            std::vector<Event> targets;
+            std::vector<Event> deleteTargets;
             EventClass& cls = _events[evnt];
             if (!cls.Valid) return;
             for (auto iter = cls.Events.begin(); iter != cls.Events.end(); iter++) {
-                targets.push_back(iter->second);
-            }
-            for (auto iter = targets.begin(); iter != targets.end(); iter++) {
-                if (iter->Target == NULL) { throw "Invalid Target"; }
-                if (iter->Active) {
-                    if (!(cls.Security.NoScript && iter->Target->IsScript())) {
-                        iter->Target->Run(filter, args);
+                if (iter->second.Target == NULL) { throw "Invalid Target"; }
+                if (iter->second.Active) {
+                    if (!(cls.Security.NoScript && iter->second.Target->IsScript())) {
+                        iter->second.Target->Run(filter, args);
                     }
                 } else {
-                    delete cls.Events[iter->Label].Target;
-                    cls.Events.erase(iter->Label);
+                    deleteTargets.push_back(iter->second);
                 }
+            }
+            for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
+                delete cls.Events[iter->Label].Target;
+                cls.Events.erase(iter->Label);
             }
         }
         
