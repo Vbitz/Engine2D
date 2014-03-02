@@ -1,5 +1,7 @@
 #include "ScriptingManager.hpp"
 
+#include "Logger.hpp"
+
 namespace Engine {
     namespace ScriptingManager {
         // ScriptingContext
@@ -12,28 +14,35 @@ namespace Engine {
             
         }
         
-        // ScriptingStackTrace
-        ScriptingStackTrace::ScriptingStackTrace() {
+        bool ScriptingContext::Create() {
+            if (!_globalInit()) {
+                Logger::begin("ScriptingContext", Logger::LogLevel_Error) << "Could not preform global init on ScriptingContext" << Logger::end();
+                return false;
+            }
             
+            // TODO: Create all methods using Context specfic API
+            
+            // TODO: Run bootloader
         }
+        
+        ScriptingObject* ScriptingContext::operator[](std::string name) {
+            return this->_getGlobal(name);
+        }
+        
         
         // ScriptingObject
         
         // V8ScriptingContext
-        
-        // V8ScriptingObject
         
         bool V8ScriptingContext::_globalInit() {
             return true;
         }
         
         void V8ScriptingContext::_runString(std::string code, std::string sourceFile) {
-            
+            // TODO: this is basicly just runFile modded from Application
         }
         
-        ScriptingStackTrace V8ScriptingContext::_makeStackTrace() {
-            return ScriptingStackTrace();
-        }
+        // V8ScriptingObject
         
         // globals
         

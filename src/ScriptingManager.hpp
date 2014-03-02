@@ -8,7 +8,6 @@
 namespace Engine {
     namespace ScriptingManager {
         class ScriptingObject;
-        class ScriptingStackTrace;
         
         enum ObjectType {
             ObjectType_Null,
@@ -25,7 +24,7 @@ namespace Engine {
             ScriptingContext();
             ~ScriptingContext();
             
-            void Create();
+            bool Create();
             void RunFile(std::string filename, bool persist);
             
             ScriptingObject* operator[](std::string name);
@@ -33,19 +32,11 @@ namespace Engine {
             virtual bool _globalInit() = 0;
             virtual void _runString(std::string code, std::string sourceFile) = 0;
             
-            virtual ScriptingStackTrace _makeStackTrace() = 0;
+            virtual ScriptingObject* _getGlobal(std::string name);
+            
         private:
             bool _created = false;
             bool _destroyed = false;
-        };
-        
-        class ScriptingStackTrace {
-        public:
-            ScriptingStackTrace();
-        protected:
-            
-        private:
-            
         };
         
         class ScriptingObject {
@@ -65,7 +56,7 @@ namespace Engine {
             virtual std::string GetStringValue(std::string defaultValue = "") = 0;
             virtual bool GetBooleanValue(bool defaultValue = false) = 0;
             
-            virtual bool Call(ScriptingContext* context, ScriptingObject* args,ScriptingStackTrace& error) = 0;
+            virtual bool Call(ScriptingContext* context, ScriptingObject* args) = 0;
             
             virtual int Length();
             
@@ -83,14 +74,13 @@ namespace Engine {
             bool _globalInit() override;
             void _runString(std::string code, std::string sourceFile) override;
             
-            ScriptingStackTrace _makeStackTrace();
         private:
             
         };
         
         class V8ScriptingObject : public ScriptingObject {
         public:
-            
+            V8ScriptingObject();
         protected:
             
         private:
