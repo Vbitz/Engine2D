@@ -17,9 +17,9 @@ namespace Engine {
         void Emit(std::string evnt, Json::Value args);
         void Emit(std::string evnt);
         void On(std::string evnt, std::string label, Json::Value e, EventTargetFunc target);
-        void On(std::string evnt, std::string label, Json::Value e, v8::Persistent<v8::Function>* target);
+        void On(std::string evnt, std::string label, Json::Value e, v8::Handle<v8::Function> target);
         void On(std::string evnt, std::string label, EventTargetFunc target);
-        void On(std::string evnt, std::string label, v8::Persistent<v8::Function>* target);
+        void On(std::string evnt, std::string label, v8::Handle<v8::Function> target);
         void Clear(std::string eventID);
     }
 }

@@ -89,8 +89,8 @@ namespace Engine {
         
         class JSEventTarget : public EventTarget {
         public:
-            JSEventTarget(v8::Persistent<v8::Function>* func, Json::Value* filter)
-                : _func(func) {
+            JSEventTarget(v8::Handle<v8::Function> func, Json::Value* filter){
+                _func.Reset(v8::Isolate::GetCurrent(), func);
                     setFilter(filter);
                 }
             
@@ -109,7 +109,7 @@ namespace Engine {
                 
                 args[0] = obj;
                 
-                v8::Handle<v8::Function> func = v8::Handle<v8::Function>::New(v8::Isolate::GetCurrent(), *_func);
+                v8::Local<v8::Function> func = v8::Local<v8::Function>::New(v8::Isolate::GetCurrent(), _func);
                 
                 func->Call(ctx->Global(), 1, args);
             
@@ -122,7 +122,7 @@ namespace Engine {
             }
             
         private:
-            v8::Persistent<v8::Function>* _func;
+            v8::Persistent<v8::Function> _func;
         };
         
         struct Event {
@@ -198,9 +198,10 @@ namespace Engine {
             for (auto iter = targets.begin(); iter != targets.end(); iter++) {
                 if (iter->Target == NULL) { throw "Invalid Target"; }
                 if (iter->Active) {
-                    iter->Target->Run(filter, args);
+                    if (!(cls.Security.NoScript && iter->Target->IsScript())) {
+                        iter->Target->Run(filter, args);
+                    }
                 } else {
-                    std::cout << "Deleting: " << iter->Label << std::endl;
                     delete cls.Events[iter->Label].Target;
                     cls.Events.erase(iter->Label);
                 }
@@ -227,8 +228,8 @@ namespace Engine {
             cls.Events[name_copy] = newEvent;
         }
         
-        void On(std::string evnt, std::string name, Json::Value e, v8::Persistent<v8::
-            Function>* target) {
+        void On(std::string evnt, std::string name, Json::Value e, v8::Handle<v8::
+            Function> target) {
             std::string evnt_copy = std::string(evnt.c_str());
             std::string name_copy = std::string(name.c_str());
             Event newEvent = Event(name_copy, new JSEventTarget(target, new Json::Value(e)));
@@ -244,7 +245,7 @@ namespace Engine {
             On(evnt, name, Json::nullValue, target);
         }
         
-        void On(std::string evnt, std::string name, v8::Persistent<v8::Function>* target) {
+        void On(std::string evnt, std::string name, v8::Handle<v8::Function> target) {
             On(evnt, name, Json::nullValue, target);
         }
         
