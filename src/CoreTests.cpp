@@ -106,7 +106,7 @@ namespace Engine {
             }
             
             endTime = Platform::GetTime();
-            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ -> JavaScript Event::Emit Performance Test x 100000: " << (endTime - startTime) << "s" << Logger::end();
+            Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ -> JavaScript Event::Emit Performance Test x 200000: " << (endTime - startTime) << "s" << Logger::end();
             //if (endTime - startTime > 0.5) {
             //    this->FailTest();
             //}
