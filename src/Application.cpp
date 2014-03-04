@@ -15,6 +15,7 @@
 
 #include "PlatformTests.hpp"
 #include "CoreTests.hpp"
+#include "ScriptingTests.hpp"
 
 #include "EngineUI.hpp"
 
@@ -617,6 +618,7 @@ namespace Engine {
         }
         LoadPlatformTests();
         LoadCoreTests();
+        LoadScriptingTests();
     }
     
 	// semi-realtime time loading

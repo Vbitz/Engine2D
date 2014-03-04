@@ -38,6 +38,7 @@
 				"src/Application.cpp",
 				"src/PlatformTests.cpp",
 				"src/CoreTests.cpp",
+				"src/ScriptingTests.cpp",
 				"src/EffectParameters.cpp",
 				"src/SpriteSheet.cpp",
 				"src/TextureLoader.cpp",
