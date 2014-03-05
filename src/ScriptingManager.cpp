@@ -25,6 +25,14 @@ namespace Engine {
             // TODO: Run bootloader
         }
         
+        void ScriptingContext::RunFile(std::string filename) {
+            
+        }
+        
+        void ScriptingContext::Set(std::string str, ScriptingObject* obj) {
+            this->_setGlobal(str, obj);
+        }
+        
         ScriptingObject* ScriptingContext::operator[](std::string name) {
             return this->_getGlobal(name);
         }
@@ -32,14 +40,34 @@ namespace Engine {
         
         // ScriptingObject
         
+        void ScriptingObject::Set(std::string str, ScriptingObject *obj) {
+            this->_setChild(str, obj);
+        }
+        
+        ScriptingObject* FunctionCallbackArgs::operator[](int index) {
+            return this->_getArg(index);
+        }
+        
         // V8ScriptingContext
+        
+        void V8ScriptingContext::RunString(std::string code, std::string sourceFile) {
+            
+        }
+        
+        ScriptingObject* V8ScriptingContext::CreateObject(ObjectType type) {
+            return new V8ScriptingObject();
+        }
+        
+        ScriptingObject* V8ScriptingContext::CreateFunction(ScriptingFunctionCallback cb) {
+            return new V8ScriptingObject();
+        }
         
         bool V8ScriptingContext::_globalInit() {
             return true;
         }
         
-        void V8ScriptingContext::_runString(std::string code, std::string sourceFile) {
-            // TODO: this is basicly just runFile modded from Application
+        void V8ScriptingContext::_setGlobal(std::string name, ScriptingObject* obj) {
+            
         }
         
         ScriptingObject* V8ScriptingContext::_getGlobal(std::string name) {
@@ -70,6 +98,14 @@ namespace Engine {
         
         int V8ScriptingObject::Length() {
             return 0;
+        }
+        
+        ScriptingObject* V8ScriptingObject::_getChild(std::string name) {
+            return new V8ScriptingObject();
+        }
+        
+        void V8ScriptingObject::_setChild(std::string name, ScriptingObject* obj) {
+            
         }
         
         // globals
