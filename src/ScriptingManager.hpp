@@ -32,7 +32,7 @@ namespace Engine {
             virtual bool _globalInit() = 0;
             virtual void _runString(std::string code, std::string sourceFile) = 0;
             
-            virtual ScriptingObject* _getGlobal(std::string name);
+            virtual ScriptingObject* _getGlobal(std::string name) = 0;
             
         private:
             bool _created = false;
@@ -58,7 +58,7 @@ namespace Engine {
             
             virtual bool Call(ScriptingContext* context, ScriptingObject* args) = 0;
             
-            virtual int Length();
+            virtual int Length() = 0;
             
         protected:
             
@@ -73,7 +73,7 @@ namespace Engine {
         protected:
             bool _globalInit() override;
             void _runString(std::string code, std::string sourceFile) override;
-            
+            ScriptingObject* _getGlobal(std::string name) override;
         private:
             
         };
@@ -81,6 +81,14 @@ namespace Engine {
         class V8ScriptingObject : public ScriptingObject {
         public:
             V8ScriptingObject();
+            
+            double GetNumberValue(double defaultValue = 0.0) override;
+            std::string GetStringValue(std::string defaultValue = "") override;
+            bool GetBooleanValue(bool defaultValue = false) override;
+            
+            bool Call(ScriptingContext* context, ScriptingObject* args) override;
+            
+            int Length() override;
         protected:
             
         private:

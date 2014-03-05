@@ -42,7 +42,35 @@ namespace Engine {
             // TODO: this is basicly just runFile modded from Application
         }
         
+        ScriptingObject* V8ScriptingContext::_getGlobal(std::string name) {
+            return new V8ScriptingObject();
+        }
+        
         // V8ScriptingObject
+        
+        V8ScriptingObject::V8ScriptingObject() {
+            
+        }
+        
+        double V8ScriptingObject::GetNumberValue(double defaultValue) {
+            return defaultValue;
+        }
+        
+        std::string V8ScriptingObject::GetStringValue(std::string defaultValue) {
+            return defaultValue;
+        }
+        
+        bool V8ScriptingObject::GetBooleanValue(bool defaultValue) {
+            return defaultValue;
+        }
+        
+        bool V8ScriptingObject::Call(ScriptingContext* context, ScriptingObject* args) {
+            return true;
+        }
+        
+        int V8ScriptingObject::Length() {
+            return 0;
+        }
         
         // globals
         
