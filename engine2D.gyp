@@ -71,8 +71,7 @@
 							"-lglfw3",
 							"-lphysfs",
 							"-lv8",
-							"-lfreeimage",
-							"-pthread"
+							"-lfreeimage"
 						]
 					},
 					"include_dirs": [
