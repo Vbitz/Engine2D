@@ -3,12 +3,25 @@
 - **Feature Freeze**
 - **DONE** - Split Application into Application and Window_GLFW
 - Split Application into Application and ScriptingManager
+	- **DONE** Stub out ScriptingManager
+	- Implament ScriptingManager
+	- Intergrate ScriptingManager with Application
 - Split Draw2D into RenderGL and Draw2D
+	- Move AddItem and buffer management into RenderGL
+	- Intergrate RenderGL and Draw2D
 - Split RenderGL into RenderGL2 and RenderGL3
-- Refactor Scripting
+	- Split OGL2 and OGL3 codepaths between the 2 versions
+- Remove dependancy on FreeType
+- Remove dependancy on FreeImage
 - Report to Windows
+	- Stub Out Platform_win.cpp
+	- Use GYP to generate a VS2013 project
+	- Fix linking issues and install libarys
+	- Implament Platform_win.cpp
+	- Update engine2D.gyp
 - **Unfreeze Feature Additions**
 - Add new Scripting Features
+	- Implament new fucntions in javascriptAPI.txt
 - Audio Support
 - Port to Linux
 - Entity System
