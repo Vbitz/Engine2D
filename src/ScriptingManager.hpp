@@ -22,15 +22,17 @@ namespace Engine {
         
         typedef void (*ScriptingFunctionCallback)(FunctionCallbackArgs&);
         
+        void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch);
+        
         class ScriptingContext {
         public:
             ScriptingContext();
             ~ScriptingContext();
             
             bool Create();
-            void RunFile(std::string filename);
+            bool RunFile(std::string filename);
             
-            virtual void RunString(std::string code, std::string sourceFile) = 0;
+            virtual bool RunString(std::string code, std::string sourceFile) = 0;
             
             void Set(std::string str, ScriptingObject* obj);
             
@@ -98,7 +100,7 @@ namespace Engine {
         
         class V8ScriptingContext : public ScriptingContext {
         public:
-            void RunString(std::string code, std::string sourceFile) override;
+            bool RunString(std::string code, std::string sourceFile) override;
             
             ScriptingObject* CreateObject(ObjectType type) override;
             ScriptingObject* CreateFunction(ScriptingFunctionCallback cb) override;
@@ -108,7 +110,7 @@ namespace Engine {
             void _setGlobal(std::string name, ScriptingObject* obj) override;
             ScriptingObject* _getGlobal(std::string name) override;
         private:
-            
+            v8::Isolate* _isolate = NULL;
         };
         
         class V8ScriptingObject : public ScriptingObject {

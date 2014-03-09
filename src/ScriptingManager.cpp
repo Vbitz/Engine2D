@@ -1,9 +1,50 @@
 #include "ScriptingManager.hpp"
 
 #include "Logger.hpp"
+#include "Filesystem.hpp"
 
 namespace Engine {
     namespace ScriptingManager {
+        
+        // It's just the v8 code fitted closer to the engine's coding style
+        void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch) {
+            std::stringstream ss;
+            v8::HandleScope handle_scope(isolate);
+            v8::String::Utf8Value exception(try_catch->Exception());
+            const char* exception_string = *exception;
+            v8::Handle<v8::Message> message = try_catch->Message();
+            if (message.IsEmpty()) {
+                // V8 didn't provide any extra information about this error; just
+                // print the exception.
+                ss << exception_string << std::endl;
+            } else {
+                // Print (filename):(line number): (message).
+                v8::String::Utf8Value filename(message->GetScriptResourceName());
+                const char* filename_string = *filename;
+                int linenum = message->GetLineNumber();
+                ss << filename_string << ":" << linenum << ": " << exception_string << std::endl;
+                // Print line of source code.
+                v8::String::Utf8Value sourceline(message->GetSourceLine());
+                const char* sourceline_string = *sourceline;
+                ss << sourceline_string << std::endl;
+                // Print wavy underline (GetUnderline is deprecated).
+                int start = message->GetStartColumn();
+                for (int i = 0; i < start; i++) {
+                    ss << " ";
+                }
+                int end = message->GetEndColumn();
+                for (int i = start; i < end; i++) {
+                    ss << "^";
+                }
+                v8::String::Utf8Value stack_trace(try_catch->StackTrace());
+                if (stack_trace.length() > 0) {
+                    const char* stack_trace_string = *stack_trace;
+                    ss << std::endl << stack_trace_string;
+                }
+            }
+            Logger::LogText("Scripting", Logger::LogLevel_Error, ss.str());
+        }
+        
         // ScriptingContext
         
         ScriptingContext::ScriptingContext() {
@@ -25,8 +66,10 @@ namespace Engine {
             // TODO: Run bootloader
         }
         
-        void ScriptingContext::RunFile(std::string filename) {
-            
+        bool ScriptingContext::RunFile(std::string filename) {
+            long filesize = 0;
+            char* fileContent = Filesystem::GetFileContent(filename, filesize);
+            return this->RunString(std::string(fileContent, filesize), filename);
         }
         
         void ScriptingContext::Set(std::string str, ScriptingObject* obj) {
@@ -50,8 +93,30 @@ namespace Engine {
         
         // V8ScriptingContext
         
-        void V8ScriptingContext::RunString(std::string code, std::string sourceFile) {
+        bool V8ScriptingContext::RunString(std::string code, std::string sourceFile) {
+            // TODO: Assert this->_isolate != null
+            v8::HandleScope scp(this->_isolate);
             
+            v8::Handle<v8::String> codeHandle = v8::String::New(code.c_str());
+            v8::Handle<v8::String> fileHandle = v8::String::New(sourceFile.c_str());
+            
+            v8::TryCatch tryCatch;
+            
+            v8::Handle<v8::Script> script = v8::Script::New(codeHandle, fileHandle);
+            
+            if (script.IsEmpty()) {
+                Logger::begin("Scripting", Logger::LogLevel_Error) << "Error Loading Script: " << sourceFile << Logger::end();
+                ReportException(v8::Isolate::GetCurrent(), &tryCatch);
+                return false;
+            } else {
+                script->Run();
+                if (!tryCatch.StackTrace().IsEmpty()) {
+                    Logger::begin("Scripting", Logger::LogLevel_Error) << "Error Loading Script: " << sourceFile << Logger::end();
+                    ReportException(v8::Isolate::GetCurrent(), &tryCatch);
+                    return false;
+                }
+                return true;
+            }
         }
         
         ScriptingObject* V8ScriptingContext::CreateObject(ObjectType type) {
