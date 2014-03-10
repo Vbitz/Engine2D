@@ -1,5 +1,6 @@
 /*
-   [FILENAME] - [Purpose of Source File]
+   Filename: [FILENAME]
+   Purpose:  [Purpose of Source File]
 
    Part of Engine2D
 
