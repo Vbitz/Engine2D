@@ -1,5 +1,4 @@
-#ifndef __COMMONH
-#define __COMMONH
+#pragma once
 
 // system includes
 #include <iostream>
@@ -66,5 +65,3 @@ namespace Engine {
 #include "Platform.hpp"
 
 #include "Events.hpp"
-
-#endif
