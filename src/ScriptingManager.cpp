@@ -156,11 +156,16 @@ namespace Engine {
         }
         
         void ScriptingFunctionDispatch(const v8::FunctionCallbackInfo<v8::Value>& args) {
+            v8::HandleScope scp(args.GetIsolate());
+            
+            v8::Handle<v8::External> ex = v8::Handle<v8::External>::Cast(args.Data());
+            ScriptingFunctionCallback cb = (ScriptingFunctionCallback) ex->Value();
         }
         
         ScriptingObject* V8ScriptingContext::CreateFunction(ScriptingFunctionCallback cb) {
             // TODO: assert to see if we have a valid scope
-            v8::Handle<v8::FunctionTemplate> func = v8::FunctionTemplate::New(ScriptingFunctionDispatch);
+            v8::Handle<v8::FunctionTemplate> func = v8::FunctionTemplate::New();
+            func->SetCallHandler(ScriptingFunctionDispatch, v8::External::New((void*) cb));
         }
         
         void V8ScriptingContext::Enter() {

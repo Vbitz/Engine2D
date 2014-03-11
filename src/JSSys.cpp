@@ -618,6 +618,12 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(TestAccess) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_JS_SCOPE_CLOSE(args.Data());
+        }
+        
         ENGINE_JS_METHOD(Assert) {
             ENGINE_JS_SCOPE_OPEN;
             if (GetAppSingilton()->IsDebugMode()) {
@@ -688,6 +694,8 @@ namespace Engine {
             
             addItem(sysTable, "msgBox", MsgBox);
             addItem(sysTable, "shell", ShellExec);
+            
+            //addItem(sysTable, "testAccess", TestAccess);
             
             //addItem(sysTable, "testGraph", TestGraph);
         }
