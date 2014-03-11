@@ -104,9 +104,19 @@ namespace Engine {
         
         // ScriptingObject
         
+        ObjectType ScriptingObject::GetType() {
+            return this->_type;
+        }
+        
         void ScriptingObject::Set(std::string str, ScriptingObject *obj) {
             this->_setChild(str, obj);
         }
+        
+        void ScriptingObject::_setType(ObjectType type) {
+            this->_type = type;
+        }
+        
+        // FunctionCallbackArgs
         
         ScriptingObject* FunctionCallbackArgs::operator[](int index) {
             return this->_getArg(index);
@@ -141,11 +151,24 @@ namespace Engine {
         }
         
         ScriptingObject* V8ScriptingContext::CreateObject(ObjectType type) {
-            return new V8ScriptingObject();
+            // TODO: assert to see if we have a valid scope
+            
+        }
+        
+        void ScriptingFunctionDispatch(const v8::FunctionCallbackInfo<v8::Value>& args) {
         }
         
         ScriptingObject* V8ScriptingContext::CreateFunction(ScriptingFunctionCallback cb) {
-            return new V8ScriptingObject();
+            // TODO: assert to see if we have a valid scope
+            v8::Handle<v8::FunctionTemplate> func = v8::FunctionTemplate::New(ScriptingFunctionDispatch);
+        }
+        
+        void V8ScriptingContext::Enter() {
+            // TODO: Enter a v8::HandleScope
+        }
+        
+        void V8ScriptingContext::Exit() {
+            
         }
         
         bool V8ScriptingContext::_globalInit() {
@@ -157,12 +180,12 @@ namespace Engine {
         }
         
         ScriptingObject* V8ScriptingContext::_getGlobal(std::string name) {
-            return new V8ScriptingObject();
+            return new V8ScriptingObject(v8::Undefined());
         }
         
         // V8ScriptingObject
         
-        V8ScriptingObject::V8ScriptingObject() {
+        V8ScriptingObject::V8ScriptingObject(v8::Handle<v8::Value> val) {
             
         }
         
@@ -187,7 +210,7 @@ namespace Engine {
         }
         
         ScriptingObject* V8ScriptingObject::_getChild(std::string name) {
-            return new V8ScriptingObject();
+            return new V8ScriptingObject(v8::Undefined());
         }
         
         void V8ScriptingObject::_setChild(std::string name, ScriptingObject* obj) {

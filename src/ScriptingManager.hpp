@@ -32,6 +32,7 @@ namespace Engine {
         class FunctionCallbackArgs;
         
         enum ObjectType {
+            ObjectType_Invalid,
             ObjectType_Null,
             ObjectType_Number,
             ObjectType_String,
@@ -59,6 +60,9 @@ namespace Engine {
             
             virtual ScriptingObject* CreateObject(ObjectType type) = 0;
             virtual ScriptingObject* CreateFunction(ScriptingFunctionCallback cb) = 0;
+            
+            virtual void Enter() = 0;
+            virtual void Exit() = 0;
             
             ScriptingObject* operator[](std::string name);
         protected:
@@ -101,10 +105,11 @@ namespace Engine {
             
             virtual ScriptingObject* _getChild(std::string name) = 0;
             virtual void _setChild(std::string name, ScriptingObject* obj) = 0;
+            void _setType(ObjectType type);
             
         private:
             ScriptingContext* parent;
-            ObjectType _type = ObjectType_Null;
+            ObjectType _type = ObjectType_Invalid;
         };
         
         class FunctionCallbackArgs {
@@ -125,6 +130,9 @@ namespace Engine {
             
             ScriptingObject* CreateObject(ObjectType type) override;
             ScriptingObject* CreateFunction(ScriptingFunctionCallback cb) override;
+            
+            void Enter() override;
+            void Exit() override;
         protected:
             bool _globalInit() override;
             
@@ -136,7 +144,7 @@ namespace Engine {
         
         class V8ScriptingObject : public ScriptingObject {
         public:
-            V8ScriptingObject();
+            V8ScriptingObject(v8::Handle<v8::Value> value);
             
             double GetNumberValue(double defaultValue = 0.0) override;
             std::string GetStringValue(std::string defaultValue = "") override;
