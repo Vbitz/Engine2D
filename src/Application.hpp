@@ -108,6 +108,7 @@ namespace Engine {
         void _handleDebugMessage();
         v8::Handle<v8::Context> _initScripting();
         void _enableTypedArrays();
+        void _enableHarmony();
         void _initGLContext(GraphicsVersion v);
         
         static void _rawInputHandler(Json::Value v);

@@ -1,3 +1,5 @@
+/* jshint esnext: true */
+
 fs.configDir("testSuite");
 
 var tests = {
@@ -65,6 +67,32 @@ var tests = {
 
 		// finaly free the buffer
 		unsafe.free(bufAddr);
+
+		return true;
+	},
+	"Harmony": function () {
+		"use strict";
+
+		function* testGenerator() {
+			yield "hello";
+			yield "world";
+			yield "this";
+			yield "is";
+			yield "a";
+			yield "test";
+		}
+
+		var items = ["hello", "world", "this", "is", "a", "test"];
+
+		var iter = testGenerator();
+
+		for (var i = 0; i < items.length; i++) {
+			let iterValue = iter.next().value;
+			if (iterValue !== items[i]) {
+				console.error("failed: ", iterValue, items[i]);
+				return false;
+			}
+		}
 
 		return true;
 	}

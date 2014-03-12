@@ -84,6 +84,11 @@ namespace Engine {
     void Application::_enableTypedArrays() {
         v8::V8::SetArrayBufferAllocator(new MallocArrayBufferAllocator());
     }
+    
+    void Application::_enableHarmony() {
+        const char* harmony = "-harmony";
+        v8::V8::SetFlagsFromString(harmony, std::strlen(harmony));
+    }
 	
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
     
@@ -91,6 +96,7 @@ namespace Engine {
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
         
         this->_enableTypedArrays();
+        this->_enableHarmony();
         
 		v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
         
