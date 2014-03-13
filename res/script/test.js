@@ -311,7 +311,9 @@ sys.on("draw", "test.draw", function () {
 sys.on("input", "test.input", function (e) {
 	var key = e.key;
 	var press = e.state === "press" || e.state === "repeat";
+
 	console.log("[INPUT] : " + key + " : " + press);
+	
 	if (key === "S" && press) {
 		sys.saveScreenshot("testing.png");
 	} else if (key === "I" && press) {
