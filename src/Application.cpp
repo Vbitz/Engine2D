@@ -866,17 +866,20 @@ namespace Engine {
         this->_running = true;
         
 		while (this->_running) {
-            if (!this->_window->GetFullscreen() && // Check to make sure were not in fullscreen mode
-                !this->_window->IsFocused() && // Check to make sure were not focused
-                !Config::GetBoolean("core.runOnIdle") &&
-                !this->_window->ShouldClose()) { // Check to make sure were not going to close
-                double startPauseTime = Platform::GetTime();
-                this->_window->WaitEvents();
-                sleep(0);
-                // notify the timer that it needs to offset the values to keep time acurate for user interation and physics
-                Timer::NotifyPause(Platform::GetTime() - startPauseTime);
-				continue;
-			}
+            if (!this->_window->ShouldClose() &&  // Check to make sure were not going to close
+                !this->_window->IsFocused()) { // Check to make sure were not focused
+                if (!this->_window->GetFullscreen() && // Check to make sure were not in fullscreen mode
+                    !Config::GetBoolean("core.runOnIdle")) {
+                    double startPauseTime = Platform::GetTime();
+                    this->_window->WaitEvents();
+                    sleep(0);
+                    // notify the timer that it needs to offset the values to keep time acurate for user interation and physics
+                    Timer::NotifyPause(Platform::GetTime() - startPauseTime);
+                    continue;
+                } else {
+                    usleep(150000);
+                }
+            }
             
             Profiler::StartProfileFrame();
             FramePerfMonitor::BeginFrame();
