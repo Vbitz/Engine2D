@@ -6,6 +6,7 @@
 	global.setTimeout = function (cb, delay) {
 		var eId = "timeout_" + uuid();
 		sys.on(eId, eId, function () {
+			sys.clearEvent(eId);
 			cb();
 		});
 		return sys.createTimer(Math.floor(delay / 1000), eId);

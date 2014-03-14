@@ -168,15 +168,23 @@ sys.getExtentions().forEach(function (i) {
 var firstDraw = true;
 
 sys.on("testTimer1", "test.timer", function () {
-	console.log("This runs every 5 seconds");
+	console.log("[createTimer interval] This runs every 5 seconds");
 });
 
 sys.on("testTimer2", "test.timer", function () {
-	console.log("This runs once after 10 seconds");
+	console.log("[createTimer] This runs once after 10 seconds");
 });
 
 sys.createTimer(5, "testTimer1", true);
 sys.createTimer(10, "testTimer2");
+
+setInterval(function () {
+	console.log("[setInterval] This runs every 5 seconds");
+}, 5000);
+
+setTimeout(function () {
+	console.log("[setTimeout] This runs once after 10 seconds");
+}, 10000);
 
 sys.on("draw", "test.draw", function () {
 	if (!draw.isTexture(img)) {
