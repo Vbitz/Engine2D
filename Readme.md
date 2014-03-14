@@ -17,12 +17,44 @@ On a source level you will need to fill in or stub out `Platform_{x}.cpp`.
 
 Once you have the dependancys installed you can run `./tasks.py gyp` and then build the project using XCode on OSX, Visual Studio on Windows or make on linux.
 
-If your having trouble locating or building the dependancys then there are incomplete instructions in tasks.py. You can also fetch almost all of the dependancys using Homebrew with `brew install physfs v8 freeimage glm freetype`.##Sample Code
+If your having trouble locating or building the dependancys then there are incomplete instructions in tasks.py. You can also fetch almost all of the dependancys using Homebrew with `brew install physfs v8 freeimage glm freetype`.
+
+##Sample Code
 
 ```javascript
 sys.on("draw", "helloWorld.draw", function (e) {
-        draw.setColor("blue");
-        draw.rect(100, 100, 100, 100);
+	draw.setColor("blue");
+	draw.rect(100, 100, 100, 100);
+});
+```
+
+##Sample Code 2
+
+```javascript
+/* jshint esnext: true */
+
+var counter = 0;
+var circleColor = 0x101010;
+
+function* genGradient() {
+	while (true) {
+		for (var x = 0; x < 360; x++) {
+			yield draw.getRGBFromHSV(x, 1.0, 0.5);
+		}
+	}
+}
+
+var generator = genGradient();
+
+setInterval(function () {
+	circleColor = generator.next().value;
+}, 100);
+
+sys.on("draw", "helloWorld2.draw", function () {
+	draw.setColor(circleColor);
+	draw.rect(Math.sin(counter) * 100 + 150,
+		Math.sin(counter) * 100 + 150, 100, 100);
+	counter += sys.deltaTime + (Math.random() / 16);
 });
 ```
 
