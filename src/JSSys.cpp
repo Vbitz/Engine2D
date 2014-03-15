@@ -610,6 +610,27 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Platform::ShellExecute(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
+        ENGINE_JS_METHOD(DumpLog) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to save the log as");
+            
+            if (!Filesystem::HasSetUserDir()) {
+                ENGINE_THROW_ARGERROR("You need to call fs.configDir before you can call sys.dumpLog");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            std::string log = Logger::DumpAllEvents();
+            
+            const char* logC = log.c_str();
+            
+            Filesystem::WriteFile(ENGINE_GET_ARG_CPPSTRING_VALUE(0), logC, log.length());
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(TestGraph) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -694,6 +715,8 @@ namespace Engine {
             
             addItem(sysTable, "msgBox", MsgBox);
             addItem(sysTable, "shell", ShellExec);
+            
+            addItem(sysTable, "dumpLog", DumpLog);
             
             //addItem(sysTable, "testAccess", TestAccess);
             

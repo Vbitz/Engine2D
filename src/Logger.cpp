@@ -46,7 +46,7 @@ namespace Engine {
         }
         
         std::string getEscapeCode(int color, bool bold) {
-            return "\x1b[" + std::string(bold ? "1;" : "0;") + std::to_string(color + 30) + "m| ";
+            return "\x1b[" + std::string(bold ? "1;" : "0;") + std::to_string(color + 30) + "m";
         }
         
         std::string GetLevelColor(LogLevel level) {
@@ -58,8 +58,8 @@ namespace Engine {
                 case LogLevel_Log:          return getEscapeCode(7, false);
                 case LogLevel_Warning:      return getEscapeCode(3, true);
                 case LogLevel_Error:        return getEscapeCode(1, true);
-                case LogLevel_TestLog:      return "\x1b[0;47m\x1b[1;30m| ";
-                case LogLevel_TestError:    return "\x1b[0;41m\x1b[1;37m| ";
+                case LogLevel_TestLog:      return "\x1b[0;47m\x1b[1;30m";
+                case LogLevel_TestError:    return "\x1b[0;41m\x1b[1;37m";
 				default:					return "";
             }
 #else
@@ -112,6 +112,12 @@ namespace Engine {
             this->time = Platform::GetTime();
         }
         
+        std::string LogEvent::FormatConsole() {
+            std::stringstream ss;
+            ss << "| " << this->time << " : [" << GetLevelString(this->Level) << "] " << this->Domain << " | " << this->Event;
+            return ss.str();
+        }
+        
         void LogText(std::string domain, LogLevel level, std::string str) {
             bool logConsole = Config::GetBoolean("core.log.enableConsole")
                 && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
@@ -120,16 +126,16 @@ namespace Engine {
             if (str.find('\n') == -1) {
                 std::string newStr = cleanString(str);
                 
+                LogEvent newEvent(domain, level, newStr);
+                
                 try {
-                    _logEvents.push_back(LogEvent(domain, level, newStr));
+                    _logEvents.push_back(newEvent);
                 } catch (std::exception e) {
                     std::cout << "Could not log: " << e.what() << std::endl;
                 }
 
                 if (logConsole) {
-                    std::cout << colorCode << Platform::GetTime()
-                    << " : [" << GetLevelString(level) << "] "
-                    << domain << " | " << newStr << "\x1b[0;37m" << std::endl;
+                    std::cout << colorCode << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
                 }
             } else {
                 std::string strCopy = str;
@@ -137,13 +143,13 @@ namespace Engine {
                 
                 while (newLinePos != std::string::npos) {
                     std::string newStr = cleanString(strCopy.substr(0, newLinePos));
-
-                    _logEvents.push_back(LogEvent(domain, level, newStr));
+                    
+                    LogEvent newEvent(domain, level, newStr);
+                    
+                    _logEvents.push_back(newEvent);
                     
                     if (logConsole) {
-                        std::cout << colorCode << Platform::GetTime()
-                            << " : [" << GetLevelString(level) << "] "
-                            << domain << " | " << newStr << "\x1b[0;37m" << std::endl;
+                        std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
                     }
                     
                     strCopy.erase(0, newLinePos + 1);
@@ -187,6 +193,14 @@ namespace Engine {
         
         std::vector<LogEvent>* GetEvents() {
             return &_logEvents;
+        }
+        
+        std::string DumpAllEvents() {
+            std::stringstream ss;
+            for (auto iter = _logEvents.begin(); iter != _logEvents.end(); iter++) {
+                ss << iter->FormatConsole() << std::endl;
+            }
+            return ss.str();
         }
         
         void HideAllEvents() {

@@ -143,7 +143,7 @@ namespace Engine {
 			return fBuffer;
 		}
         
-        void WriteFile(std::string path, char* content, long length) {
+        void WriteFile(std::string path, const char* content, long length) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
                 return;

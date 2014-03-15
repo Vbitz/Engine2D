@@ -67,6 +67,8 @@ namespace Engine {
             LogEvent(std::string domain, LogLevel level, std::string event);
             LogEvent(std::string domain, LogLevel level, LogGraphEvent* event);
             
+            std::string FormatConsole();
+            
             std::string Domain;
             LogLevel Level;
             LogType Type;
@@ -83,6 +85,8 @@ namespace Engine {
         
         std::ostream& begin(std::string domain, LogLevel level);
         StreamFlusher end();
+        
+        std::string DumpAllEvents();
         
         void HideAllEvents();
         
