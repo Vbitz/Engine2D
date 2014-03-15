@@ -616,13 +616,19 @@ namespace Engine {
             for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
                 long lastMod = Filesystem::GetFileModifyTime(iterator->first);
                 if (lastMod > iterator->second) {
+                    Json::Value args = Json::Value(Json::objectValue);
+                    args["filename"] = iterator->first;
                     this->RunFile(iterator->first, true);
+                    Events::Emit("scriptReloaded", args);
                 }
             }
         } else {
             for(auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
                 if (iterator->second < 0) {
+                    Json::Value args = Json::Value(Json::objectValue);
+                    args["filename"] = iterator->first;
                     this->RunFile(iterator->first, true);
+                    Events::Emit("scriptReloaded", args);
                 }
             }
         }
@@ -773,6 +779,12 @@ namespace Engine {
         Logger::begin("Screenshot", Logger::LogLevel_Log)
         << "Saved Screenshot as: " << Filesystem::GetRealPath(_screenshotFilename)
         << Logger::end();
+        
+        Json::Value args(Json::objectValue);
+        
+        args["filename"] = Filesystem::GetRealPath(_screenshotFilename);
+        
+        Events::Emit("onSaveScreenshot", args);
         
         delete [] pixels;
     }
