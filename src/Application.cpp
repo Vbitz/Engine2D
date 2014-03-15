@@ -277,6 +277,7 @@ namespace Engine {
         // I still need to think though and make sure these match up
         
         Config::SetBoolean( "core.runOnIdle",                       false);
+        Config::SetBoolean( "core.throttleOnIdle",                  true);
         Config::SetBoolean( "core.catchErrors",                     !this->_debugMode);
         
         Config::SetNumber(  "core.window.width",                    800);
@@ -889,7 +890,9 @@ namespace Engine {
                     Timer::NotifyPause(Platform::GetTime() - startPauseTime);
                     continue;
                 } else {
-                    usleep(150000);
+                    if (Config::GetBoolean("core.throttleOnIdle")) {
+                        usleep(150000);
+                    }
                 }
             }
             
