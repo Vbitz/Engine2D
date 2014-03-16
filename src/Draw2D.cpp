@@ -579,6 +579,7 @@ namespace Engine {
         
         void CameraPan(float x, float y) {
             if (GetAppSingilton()->UsingGL3()) {
+                FlushAll();
                 _currentModelMatrix = glm::translate(_currentModelMatrix, glm::vec3(x, y, 0.0f));
             } else {
                 glTranslatef(x, y, 0.0f);
@@ -587,6 +588,7 @@ namespace Engine {
         
         void CameraZoom(float f) {
             if (GetAppSingilton()->UsingGL3()) {
+                FlushAll();
                 _currentModelMatrix = glm::scale(_currentModelMatrix, glm::vec3(f, f, 0.0f));
             } else {
                 glScalef(f, f, 0.0f);
@@ -595,6 +597,7 @@ namespace Engine {
         
         void CameraRotate(float r) {
             if (GetAppSingilton()->UsingGL3()) {
+                FlushAll();
                 _currentModelMatrix = glm::rotate(_currentModelMatrix, r, glm::vec3(0, 0, 1));
             } else {
                 glRotatef(r, 0.0f, 0.0f, 1.0f);
