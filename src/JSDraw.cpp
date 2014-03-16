@@ -55,10 +55,6 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
-            if (Draw2D::IsOffscreen(x, y, w, h)) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
-            
             Draw2D::Rect(x, y, w, h);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -82,10 +78,6 @@ namespace Engine {
 			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            
-            if (Draw2D::IsOffscreen(x, y, w, h)) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
             
             Draw2D::Grid(x, y, w, h);
             
@@ -117,10 +109,6 @@ namespace Engine {
 			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            
-            if (Draw2D::IsOffscreen(x, y, w, h)) {
-                return;
-            }
             
 			col1 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(4);
 			col2 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(5);
@@ -990,18 +978,6 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(Draw2D::GetVerts()));
             }
             
-            ENGINE_JS_METHOD(SetDrawOffscreen) {
-                ENGINE_JS_SCOPE_OPEN;
-                
-                ENGINE_CHECK_ARGS_LENGTH(1);
-                
-                ENGINE_CHECK_ARG_BOOLEAN(0, "Set Arg0 to false to disable drawing offscreen");
-                
-                Draw2D::SetDrawOffscreen(ENGINE_GET_ARG_BOOLEAN_VALUE(0));
-                
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
-            
             ENGINE_JS_METHOD(SetCenter) {
                 ENGINE_JS_SCOPE_OPEN;
                 
@@ -1063,7 +1039,6 @@ namespace Engine {
                 addItem(drawTable, "isFontLoaded", IsFontLoaded);
                 
                 addItem(drawTable, "getVerts", GetVerts);
-                addItem(drawTable, "setDrawOffscreen", SetDrawOffscreen);
                 addItem(drawTable, "setCenter", SetCenter);
             }
             

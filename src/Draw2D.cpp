@@ -269,10 +269,6 @@ namespace Engine {
             _predefinedColors[name] = col;
         }
         
-        bool IsOffscreen(int x, int y, int w, int h) {
-            return false;
-        }
-        
         void BeginRendering(GLenum mode) {
             if (GetAppSingilton()->UsingGL3()) {
                 if (_currentMode != mode || _currentMode == GL_LINE_STRIP) { // it's a hack, I really need to fix this

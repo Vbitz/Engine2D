@@ -44,8 +44,6 @@ namespace Engine {
         
         void ResetMatrix();
         
-        bool IsOffscreen(int x, int y, int w, int h);
-        
         void BeginRendering(GLenum mode);
         
         void EndRendering();
@@ -88,8 +86,6 @@ namespace Engine {
         void GLSetColor();
         
         int GetVerts();
-        
-        void SetDrawOffscreen(bool drawOffscreen);
         
         void SetCenter(float x, float y);
         void CameraPan(float x, float y);
