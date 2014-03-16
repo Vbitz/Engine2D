@@ -381,6 +381,12 @@ global.sys.msgBox = function (title, msg, modal) {};
 global.sys.shell = function (filename) {};
 
 /**
+ * Saves the entire log to filename, fs.configDir has be called beforehand.
+ * @param  {string} filename The filename to save the log to
+ */
+global.sys.dumpLog = function (filename) { };
+
+/**
  * The current platform the engine is running on, the value can be "Windows"|"Darwin (OSX)"|"Linux"
  * @type {String}
  */
@@ -784,13 +790,6 @@ global.draw.isFontLoaded = function (prettyName) {};
  * @return {number}
  */
 global.draw.getVerts = function () {};
-
-/**
- * Should offscreen objects be rendered
- * @deprecated Not Implamented
- * @param {boolean} draw
- */
-global.draw.setDrawOffscreen = function (draw) {};
 
 /**
  * Set's the point to center drawing around
