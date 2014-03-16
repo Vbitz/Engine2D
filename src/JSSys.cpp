@@ -451,6 +451,16 @@ namespace Engine {
             } else if (args.Length() == 1) {
                 // get config option
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Config Key to Get");
+                switch (Config::GetType(ENGINE_GET_ARG_CPPSTRING_VALUE(0))) {
+                    case Config::ConfigType_Bool:
+                        ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Config::GetBoolean(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+                    case Config::ConfigType_Number:
+                        ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Config::GetFloat(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+                    case Config::ConfigType_String:
+                        ENGINE_JS_SCOPE_CLOSE(v8::String::New(Config::GetString(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str()));
+                    default:
+                        ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                }
                 ENGINE_JS_SCOPE_CLOSE(v8::String::New(Config::Get(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str()));
             } else if (args.Length() == 2) {
                 // set config option

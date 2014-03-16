@@ -42,6 +42,7 @@ namespace Engine {
         std::map<unsigned int, TimerStatus> _timers;
         
         void Update() {
+            std::vector<unsigned int> deleteTargets;
             double currentTime = Platform::GetTime() - _pauseTime;
             for (auto iter = _timers.begin(); iter != _timers.end(); iter++) {
                 if (currentTime > iter->second.targetTime) {
@@ -49,10 +50,12 @@ namespace Engine {
                     if (iter->second.repeat) {
                         iter->second.targetTime += iter->second.interval;
                     } else {
-                        iter = _timers.erase(iter);
-                        iter--;
+                        deleteTargets.push_back(iter->first);
                     }
                 }
+            }
+            for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
+                _timers.erase(*iter);
             }
         }
         

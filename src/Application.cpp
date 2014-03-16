@@ -316,7 +316,8 @@ namespace Engine {
         Config::SetBoolean( "core.log.src.createImage",             true);
         
         Config::SetBoolean( "core.debug.v8Debug",                   this->_developerMode);
-        Config::SetNumber(  "core.debug.v8Debug.port",               5858);
+        Config::SetNumber(  "core.debug.v8Debug.port",              5858);
+        Config::SetBoolean( "core.debug.slowload",                  false);
     }
     
     void Application::_loadConfigFile() {
