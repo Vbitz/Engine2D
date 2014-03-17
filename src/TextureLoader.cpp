@@ -57,7 +57,13 @@ namespace Engine {
     }
     
     void Texture::Begin() {
+        if (!this->IsValid()) {
+            throw "Invalid Texture";
+        }
+        
+        Draw2D::CheckGLError("Texture::Begin::PreBind");
         glBindTexture(GL_TEXTURE_2D, this->_textureID);
+        Draw2D::CheckGLError("Texture::Begin::PostBind");
     }
     
     void Texture::End() {

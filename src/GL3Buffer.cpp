@@ -79,8 +79,12 @@ namespace Engine {
     }
     
     void GL3Buffer::Upload(float *buffer, int count) {
+        this->Update();
+        
         glBindVertexArray(this->_vertexArrayPointer);
         glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
+        
+        Draw2D::CheckGLError("GL3Buffer::Upload::PreUploadBufferData");
         
         glBufferData(GL_ARRAY_BUFFER, count, buffer, GL_STATIC_DRAW);
         

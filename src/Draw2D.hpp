@@ -34,6 +34,16 @@ namespace Engine {
     class SpriteSheet;
     
     namespace Draw2D {
+        class GLError {
+        public:
+            GLenum Error;
+            std::string Source, ErrorString;
+            
+            GLError(const char* source, GLenum err, std::string errorString) : Source(source), Error(err), ErrorString(errorString) {
+                
+            }
+        };
+        
         typedef struct _Color3f {
             float r, g, b;
         } Color3f;

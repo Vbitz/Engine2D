@@ -62,7 +62,7 @@ namespace Engine {
         
         Texture* _defaultTexture;
         
-        Texture* _currentTexture;
+        Texture* _currentTexture = NULL;
         
         glm::mat4 _currentModelMatrix;;
         
@@ -249,6 +249,7 @@ namespace Engine {
             while ((err = glGetError()) != GL_NO_ERROR) {
                 oneError = true;
                 Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : " << GLErrorString(err) << Logger::end();
+                throw new GLError(source, err, GLErrorString(err));
             }
             return oneError;
         }
@@ -442,9 +443,14 @@ namespace Engine {
             if (buf.Update()) {
                 Logger::begin("Draw2D", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
             }
-
-            _currentTexture->Begin();
             
+            try {
+                _currentTexture->Begin();
+            } catch (...) {
+                _currentTexture->End();
+                _currentTexture = _defaultTexture;
+                _currentTexture->Begin();
+            }
             buf.Upload(_buffer, _currentVerts * 9 * sizeof(float));
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
             buf.Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
