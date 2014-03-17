@@ -34,12 +34,10 @@
 	global.console.writeRaw = makeLog("raw");
 
 	global.sys.drawFunc = function (func) {
-		sys.clearEvent("sys.drawFunc");
 		sys.on("draw", "sys.drawFunc", func);
 	};
 
 	global.sys.keyboardFunc = function (func) {
-		sys.clearEvent("sys.keyboardFunc");
 		sys.on("input", "sys.keyboardFunc", function (e) {
 			func("", e.key, e.state === "press" || e.state === "repeat");
 		});
