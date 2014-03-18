@@ -135,6 +135,13 @@ global.sys.drawFunc = function (func) {};
 global.sys.keyboardFunc = function (func) {};
 
 /**
+ * Called each frame for draw code to be called.
+ * All draw code should be performed during this event.
+ * 
+ * @event draw
+ */
+
+/**
  * @callback EventCallback
  * @param {Object} args - Event Arguments
  */
@@ -365,7 +372,7 @@ global.sys.forceReload = function (script) {};
 global.sys.version = function () {};
 
 /**
- * Shows a platform dependent MessageBox
+ * Shows a platform MessageBox
  * @param  {string} title
  * @param  {string} msg
  * @param  {boolean} modal - Should the code block until the box is closed
