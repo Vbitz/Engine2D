@@ -86,6 +86,7 @@ namespace Engine {
         
         void ClearColor(int col);
         void ClearColor(std::string colorName);
+        void ClearColor(float r, float g, float b);
         
         Color3f GetColor();
         

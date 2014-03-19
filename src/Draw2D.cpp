@@ -531,6 +531,10 @@ namespace Engine {
             ClearColor(_predefinedColors[colorName]);
         }
         
+        void ClearColor(float r, float g, float b) {
+            glClearColor(r, g, b, 1.0f);
+        }
+        
         void SetColor(int col) {
             SetColor((float)((col & 0xff0000) >> 16 )   / 255,
                      (float)((col & 0x00ff00) >> 8  )   / 255,

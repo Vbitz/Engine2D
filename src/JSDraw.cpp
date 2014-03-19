@@ -412,6 +412,12 @@ namespace Engine {
                     Draw2D::ClearColor(col); // yay now draw2d handles it
                 } else if (args[0]->IsString()) {
                     Draw2D::ClearColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                } else if (args[0]->IsObject()) {
+                    v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
+                    double r = obj->Get(v8::String::NewSymbol("r"))->NumberValue();
+                    double g = obj->Get(v8::String::NewSymbol("g"))->NumberValue();
+                    double b = obj->Get(v8::String::NewSymbol("b"))->NumberValue();
+                    Draw2D::ClearColor(r, g, b);
                 } else {
                     ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb)");
                 }
