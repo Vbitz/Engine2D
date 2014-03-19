@@ -56,7 +56,7 @@ namespace Engine {
                 case LogLevel_User:         return getEscapeCode(5, true);
                 case LogLevel_ConsoleInput: return getEscapeCode(6, true);
                 case LogLevel_Log:          return getEscapeCode(7, false);
-                case LogLevel_Warning:      return getEscapeCode(3, true);
+                case LogLevel_Warning:      return getEscapeCode(3, false);
                 case LogLevel_Error:        return getEscapeCode(1, true);
                 case LogLevel_TestLog:      return "\x1b[0;47m\x1b[1;30m";
                 case LogLevel_TestError:    return "\x1b[0;41m\x1b[1;37m";
