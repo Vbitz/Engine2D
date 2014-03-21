@@ -223,11 +223,11 @@ sys.on("draw", "test.draw", function () {
 	}
 
 	draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
-	draw.setColor(0x000000);
+	draw.setColor("black");
 	draw.setFont("basic", 16);
 	draw.print(10, 35, "Engine2D Test Suite");
 
-	draw.setColor(0xffffff);
+	draw.setColor("white");
 	draw.print(10, 70, "Automated Tests");
 	draw.print(400, 70, "Rendering Tests");
 
@@ -235,12 +235,12 @@ sys.on("draw", "test.draw", function () {
 	var x = 2;
 	for (var i in testResults) {
 		if (testResults[i]) {
-			draw.setColor(0x00ff00);
+			draw.setColor("green");
 		} else {
-			draw.setColor(0xff0000);
+			draw.setColor("red");
 		}
 		draw.rect(15, x * 30 + 35, 220, 20);
-		draw.setColor(0x000000);
+		draw.setColor("black");
 		draw.print(20, x * 30 + 40, i);
 		x++;
 	}
