@@ -1075,7 +1075,7 @@ namespace Engine {
         
         Draw2D::CheckGLError("Post Finish Loading");
         
-        Logger::begin("Application", Logger::LogLevel_Log) << "Loaded" << Logger::end();
+        Logger::begin("Application", Logger::LogLevel_Highlight) << "Loaded" << Logger::end();
         
         if (this->_testMode) {
             this->_loadTests();

@@ -137,8 +137,13 @@ namespace Engine {
                         Draw2D::Rect(0, i + 2, app->GetScreenWidth(), 2);
                     } else {
                         i -= 22;
-                        Draw2D::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
-                        Draw2D::Rect(60, i + 1, app->GetScreenWidth() - 60, 20);
+                        if (iterator->Level == Logger::LogLevel_Highlight) {
+                            Draw2D::SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
+                            Draw2D::Rect(0, i + 1, app->GetScreenWidth(), 20);
+                        } else {
+                            Draw2D::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+                            Draw2D::Rect(60, i + 1, app->GetScreenWidth() - 60, 20);
+                        }
                     }
                 }
                 
@@ -160,6 +165,9 @@ namespace Engine {
                         break;
                     case Logger::LogLevel_Error:
                         Draw2D::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
+                        break;
+                    case Logger::LogLevel_Highlight:
+                        Draw2D::SetColor(0.1f, 0.1f, 0.1f);
                         break;
                     case Logger::LogLevel_TestLog:
                         Draw2D::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);

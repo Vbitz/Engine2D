@@ -58,6 +58,7 @@ namespace Engine {
                 case LogLevel_Log:          return getEscapeCode(7, false);
                 case LogLevel_Warning:      return getEscapeCode(3, false);
                 case LogLevel_Error:        return getEscapeCode(1, true);
+                case LogLevel_Highlight:    return "\x1b[0;47m\x1b[1;30m";
                 case LogLevel_TestLog:      return "\x1b[0;47m\x1b[1;30m";
                 case LogLevel_TestError:    return "\x1b[0;41m\x1b[1;37m";
 				default:					return "";
@@ -81,6 +82,8 @@ namespace Engine {
                     return "Warning";
                 case LogLevel_Error:
                     return "Error";
+                case LogLevel_Highlight:
+                    return "Highlight";
                 case LogLevel_TestLog:
                     return "TestLog";
                 case LogLevel_TestError:

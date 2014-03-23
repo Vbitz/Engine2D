@@ -39,6 +39,7 @@ namespace Engine {
             LogLevel_User,
             LogLevel_Verbose,
             LogLevel_ConsoleInput,
+            LogLevel_Highlight,
             LogLevel_TestLog,
             LogLevel_TestError
         };
