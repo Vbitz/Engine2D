@@ -36,6 +36,7 @@ namespace Engine {
             if (str == "warning") return Logger::LogLevel_Warning;
             if (str == "verbose") return Logger::LogLevel_Verbose;
             if (str == "error") return Logger::LogLevel_Error;
+            if (str == "highlight") return Logger::LogLevel_Highlight;
             return Logger::LogLevel_User;
         }
 
