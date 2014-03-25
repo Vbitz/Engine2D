@@ -127,6 +127,24 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(Lsdir) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path of the directory to list");
+            
+            v8::Handle<v8::Array> ret = v8::Array::New();
+            
+            std::vector<std::string> files = Filesystem::GetDirectoryContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            
+            for (size_t i = 0; i < files.size(); i++) {
+                ret->Set(i, v8::String::New(files[i].c_str()));
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE(ret);
+        }
+        
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
         
         void InitFS(v8::Handle<v8::ObjectTemplate> fsTable) {
@@ -137,6 +155,7 @@ namespace Engine {
             addItem(fsTable, "mountFile", MountFile);
             addItem(fsTable, "configDir", ConfigDir);
             addItem(fsTable, "mkdir", Mkdir);
+            addItem(fsTable, "lsdir", Lsdir);
         }
         
 #undef addItem
