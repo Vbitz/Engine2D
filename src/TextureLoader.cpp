@@ -114,6 +114,8 @@ namespace Engine {
             int width = FreeImage_GetWidth(img);
             int height = FreeImage_GetHeight(img);
             
+            FreeImage_FlipVertical(img); // a fix for freeimage
+            
             unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
             unsigned char* texture = new unsigned char[4 * width * height];
             

@@ -697,7 +697,7 @@ namespace Engine {
                 
                 FIBITMAP *img = 0;
                 
-                if (FreeImage_GetBPP(lImg) == 24) {
+                if (FreeImage_GetBPP(lImg) != 32) {
                     Logger::begin("JSDraw", Logger::LogLevel_Warning) << "Converting image to 32bit" << Logger::end();
                     img = FreeImage_ConvertTo32Bits(lImg);
                 } else {
@@ -707,6 +707,8 @@ namespace Engine {
                 int imageWidth = FreeImage_GetWidth(img);
                 int imageHeight = FreeImage_GetHeight(img);
                 int imageSize = imageWidth * imageHeight * 4;
+                
+                FreeImage_FlipVertical(img); // a fix for freeimage
                 
                 float* rawArray = new float[imageSize]; // sadly this is a memory leak right now
                 
