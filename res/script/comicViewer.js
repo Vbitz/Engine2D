@@ -16,10 +16,18 @@ function loadComic(index) {
 }
 
 sys.on("draw", "comicViewer.draw", function (e) {
-	draw.print(40, 40, "currentComic = " + comics[currentComicIndex]);
+
+	draw.setColor("white");
+	var y = 0;
+	for (var i = currentComicIndex; i < comics.length && i < currentComicIndex + 20; i++) {
+		draw.print(20, (y++ * 16) + 40, i.toString(10) + " : " + comics[i]);
+		draw.setColor("grey");
+	}
+
+	draw.setColor("white");
 
 	if (draw.isTexture(currentComic)) {
-		draw.draw(currentComic, 40, 60, currentComicWidth, currentComicHeight);
+		draw.draw(currentComic, 280, 40, currentComicWidth, currentComicHeight);
 	} else {
 		loadComic(currentComicIndex);
 	}
