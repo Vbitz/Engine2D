@@ -1,3 +1,5 @@
+sys.config("core.render.forceMipmaps", false);
+
 var comics = fs.lsdir("comics");
 var comicCount = 1000;
 
