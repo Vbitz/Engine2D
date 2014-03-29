@@ -492,6 +492,13 @@ global.fs.configDir = function (appName) {};
  */
 global.fs.mkdir = function (path) {};
 
+/**
+ * Returns a list of all filenames in path
+ * @param  {string} path The path to list
+ * @return {string[]}
+ */
+global.fs.lsdir = function (path) {};
+
 /** @namespace */
 global.draw = {};
 
