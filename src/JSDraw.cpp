@@ -36,6 +36,18 @@ namespace Engine {
     
 	namespace JsDraw {
         
+        static void ReadBufferWeakCallback(v8::Isolate* isolate, v8::Persistent<v8::Object>* arr, float* cppArray) {
+            v8::Handle<v8::Object> realArr =
+                v8::Handle<v8::Object>::New(isolate, *arr);
+            size_t byte_length =
+                realArr->Get(v8::String::NewSymbol("byteLength"))->Int32Value();
+            isolate->AdjustAmountOfExternalAllocatedMemory(
+                                        -static_cast<intptr_t>(byte_length));
+            
+            delete[] cppArray;
+            arr->Dispose();
+        }
+        
 		ENGINE_JS_METHOD(Rect) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -719,6 +731,13 @@ namespace Engine {
                     rawArray[i + 3] = 1.0f;
                 }
                 
+                v8::Persistent<v8::Object> arr;
+                
+                arr.Reset(isolate, array);
+                
+                arr.MarkIndependent();
+                arr.MakeWeak<float>(rawArray, ReadBufferWeakCallback);
+                
                 isolate->AdjustAmountOfExternalAllocatedMemory(imageSize * sizeof(float));
                 
                 array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, imageSize * sizeof(float));
@@ -726,6 +745,8 @@ namespace Engine {
                 array->Set(v8::String::New("length"), v8::Number::New(imageSize));
                 array->Set(v8::String::New("width"), v8::Number::New(imageWidth));
                 array->Set(v8::String::New("height"), v8::Number::New(imageHeight));
+                array->Set(v8::String::NewSymbol("byteLength"),
+                           v8::Int32::New(static_cast<int32_t>(imageSize), isolate), v8::ReadOnly);
                 
                 unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
                 
@@ -774,6 +795,13 @@ namespace Engine {
                     rawArray[i + 3] = 1.0f;
                 }
                 
+                v8::Persistent<v8::Object> arr;
+                
+                arr.Reset(isolate, array);
+                
+                arr.MarkIndependent();
+                arr.MakeWeak<float>(rawArray, ReadBufferWeakCallback);
+                
                 isolate->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
                 
                 array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));
@@ -781,6 +809,8 @@ namespace Engine {
                 array->Set(v8::String::New("length"), v8::Number::New(arraySize));
                 array->Set(v8::String::New("width"), v8::Number::New(imageWidth));
                 array->Set(v8::String::New("height"), v8::Number::New(imageHeight));
+                array->Set(v8::String::NewSymbol("byteLength"),
+                           v8::Int32::New(static_cast<int32_t>(arraySize), isolate), v8::ReadOnly);
                 
                 ENGINE_JS_SCOPE_CLOSE(array);
             }
