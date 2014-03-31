@@ -39,8 +39,10 @@ namespace Engine {
         static void ReadBufferWeakCallback(v8::Isolate* isolate, v8::Persistent<v8::Object>* arr, float* cppArray) {
             v8::Handle<v8::Object> realArr =
                 v8::Handle<v8::Object>::New(isolate, *arr);
+            
             size_t byte_length =
                 realArr->Get(v8::String::NewSymbol("byteLength"))->Int32Value();
+            
             isolate->AdjustAmountOfExternalAllocatedMemory(
                                         -static_cast<intptr_t>(byte_length));
             
@@ -213,14 +215,14 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(8);
             
-            ENGINE_CHECK_ARG_NUMBER(0, "");
-            ENGINE_CHECK_ARG_NUMBER(1, "");
-            ENGINE_CHECK_ARG_NUMBER(2, "");
-            ENGINE_CHECK_ARG_NUMBER(3, "");
-            ENGINE_CHECK_ARG_NUMBER(4, "");
-            ENGINE_CHECK_ARG_NUMBER(5, "");
-            ENGINE_CHECK_ARG_NUMBER(6, "");
-            ENGINE_CHECK_ARG_NUMBER(7, "");
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the x value of point 1");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the y value of point 1");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the x value of point 2");
+            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the y value of point 2");
+            ENGINE_CHECK_ARG_NUMBER(4, "Arg4 is the x value of point 3");
+            ENGINE_CHECK_ARG_NUMBER(5, "Arg5 is the y value of point 3");
+            ENGINE_CHECK_ARG_NUMBER(6, "Arg6 is the x value of point 4");
+            ENGINE_CHECK_ARG_NUMBER(7, "Arg7 is the y value of point 4");
             
             Draw2D::BezierCurve(ENGINE_GET_ARG_NUMBER_VALUE(0),
                                 ENGINE_GET_ARG_NUMBER_VALUE(1),
