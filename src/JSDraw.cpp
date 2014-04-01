@@ -327,6 +327,20 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
         
+        ENGINE_JS_METHOD(GetColor) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            v8::Handle<v8::Object> ret = v8::Object::New();
+            
+            Draw2D::Color3f col = Draw2D::GetColor();
+            
+            ret->Set(v8::String::NewSymbol("r"), v8::Number::New(col.r));
+            ret->Set(v8::String::NewSymbol("g"), v8::Number::New(col.g));
+            ret->Set(v8::String::NewSymbol("b"), v8::Number::New(col.b));
+            
+            ENGINE_JS_SCOPE_CLOSE(ret);
+        }
+        
         ENGINE_JS_METHOD(GetRGBFromHSV) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -1050,6 +1064,7 @@ namespace Engine {
                 addItem(drawTable, "setColorF", SetColorF);
                 addItem(drawTable, "setColor", SetColor);
                 addItem(drawTable, "setColorI", SetColorI);
+                addItem(drawTable, "getColor", GetColor);
                 addItem(drawTable, "clearColor", ClearColor);
                 addItem(drawTable, "getRGBFromHSV", GetRGBFromHSV);
                 

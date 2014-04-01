@@ -45,7 +45,7 @@ namespace Engine {
         };
         
         typedef struct _Color3f {
-            float r, g, b;
+            double r, g, b;
         } Color3f;
         
         bool CheckGLError(const char* source);
