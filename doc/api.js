@@ -598,6 +598,12 @@ global.draw.setColorF = function (r, g, b) {};
  */
 
 /**
+ * Returns the current draw color
+ * @return {Color}
+ */
+global.draw.getColor = function () {};
+
+/**
  * Set's the current drawing color
  * @param {string|number|Color} color
  * @example <caption>Passing a string set's the color to a predefined color</caption>
