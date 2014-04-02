@@ -76,14 +76,18 @@ namespace Engine {
         for (int i = 0; i < shadersNode.size(); i++) {
             this->_shaders.push_back(readShaderSpec(basePath, shadersNode[i]));
         }
-        this->_textureCount = root["textures"].asInt();
-        this->_shaderSettings.vertexParam = root["vertexBufferParams"]["vertex"].asString();
-        this->_shaderSettings.colorParam = root["vertexBufferParams"]["color"].asString();
-        this->_shaderSettings.texCoardParam = root["vertexBufferParams"]["texCoard"].asString();
         
-        this->_shaderSettings.modelMatrixParam = root["cameraSettings"]["model"].asString();
-        this->_shaderSettings.viewMatrixParam = root["cameraSettings"]["view"].asString();
-        this->_shaderSettings.projectionMatrixParam = root["cameraSettings"]["projection"].asString();
+        Json::Value vertexBufferParams = root["vertexBufferParams"];
+        Json::Value cameraSettings = root["cameraSettings"];
+        
+        this->_textureCount = root["textures"].asInt();
+        this->_shaderSettings.vertexParam = vertexBufferParams["vertex"].asString();
+        this->_shaderSettings.colorParam = vertexBufferParams["color"].asString();
+        this->_shaderSettings.texCoardParam = vertexBufferParams["texCoard"].asString();
+        
+        this->_shaderSettings.modelMatrixParam = cameraSettings["model"].asString();
+        this->_shaderSettings.viewMatrixParam = cameraSettings["view"].asString();
+        this->_shaderSettings.projectionMatrixParam = cameraSettings["projection"].asString();
         
         this->_userParams = root["userParams"];
     }
