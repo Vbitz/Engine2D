@@ -200,6 +200,9 @@ namespace Engine {
                                                 NULL, NULL, NULL, _title, _text, NULL);
             }
             
+            CFRelease(_title);
+            CFRelease(_text);
+            
             return true;
         }
         

@@ -30,7 +30,7 @@ namespace Engine {
             char *newstr, *p;
             p = newstr = strdup(str);
             while(*p++ != 0x00) {
-                *p = toupper(*p);
+                *p = std::toupper(*p);
             }
             return newstr;
         }

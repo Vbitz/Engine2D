@@ -247,7 +247,6 @@ namespace Engine {
             GLenum err;
             bool oneError = false;
             while ((err = glGetError()) != GL_NO_ERROR) {
-                oneError = true;
                 Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : " << GLErrorString(err) << Logger::end();
                 throw new GLError(source, err, GLErrorString(err));
             }
