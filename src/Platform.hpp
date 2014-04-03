@@ -28,6 +28,8 @@
 typedef void* (*FARPROC)(void);
 #endif
 
+typedef void* (*ThreadMethod)(void*);
+
 namespace Engine {
     namespace Platform {
         
@@ -45,6 +47,14 @@ namespace Engine {
             }
         };
         
+        class Thread {
+        public:
+            virtual ~Thread() {}
+            
+            virtual void Terminate() = 0;
+            virtual void Exit(void* ret) = 0;
+        };
+        
         typedef struct {
             long totalVirtual, totalVirtualFree, myVirtualUsed;
             long totalPhysical, totalPhysicalFree, myPhysicalUsed;
@@ -60,6 +70,9 @@ namespace Engine {
         
         Libary* OpenLibary(std::string path);
         Libary* GetThisLibary();
+        
+        Thread* CreateThread(ThreadMethod entry, void* threadArgs);
+        Thread* GetCurrentThread();
         
         bool ShowMessageBox(std::string title, std::string text, bool modal);
         

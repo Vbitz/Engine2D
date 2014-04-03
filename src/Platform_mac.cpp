@@ -42,6 +42,8 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 
+#include <pthread.h>
+
 namespace Engine {
     namespace Platform {
         
@@ -91,6 +93,34 @@ namespace Engine {
             
         private:
             void* modulePointer;
+        };
+        
+        class OSXThread : public Thread {
+        public:
+            OSXThread(ThreadMethod entry, void* args) {
+                if (pthread_create(&this->_thread, NULL, entry, args)) {
+                    std::cout << "ERROR: pthread_create failed" << std::endl;
+                }
+            }
+            
+            OSXThread(pthread_t thread) {
+                _thread = thread;
+            }
+            
+            ~OSXThread() override {
+                
+            }
+            
+            void Terminate() override {
+                
+            }
+            
+            void Exit(void* ret) override {
+                pthread_exit(ret);
+            }
+            
+        private:
+            pthread_t _thread;
         };
         
         int _argc;
@@ -168,6 +198,14 @@ namespace Engine {
         
         Libary* GetThisLibary() {
             return new OSXLibary();
+        }
+        
+        Thread* CreateThread(ThreadMethod entry, void* threadArgs) {
+            return new OSXThread(entry, threadArgs);
+        }
+        
+        Thread* GetCurrentThread() {
+            return new OSXThread(pthread_self());
         }
         
         double GetTime() {
