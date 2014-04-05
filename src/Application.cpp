@@ -886,13 +886,13 @@ namespace Engine {
                     !Config::GetBoolean("core.runOnIdle")) {
                     double startPauseTime = Platform::GetTime();
                     this->_window->WaitEvents();
-                    sleep(0);
+                    Platform::Sleep(0);
                     // notify the timer that it needs to offset the values to keep time acurate for user interation and physics
                     Timer::NotifyPause(Platform::GetTime() - startPauseTime);
                     continue;
                 } else {
                     if (Config::GetBoolean("core.throttleOnIdle")) {
-                        usleep(150000);
+                        Platform::NanoSleep(150000);
                     }
                 }
             }
