@@ -273,5 +273,13 @@ namespace Engine {
         int ShellExecute(std::string path) {
             return system(("open " + path).c_str());
         }
+        
+        void Sleep(int timeS) {
+            sleep(timeS);
+        }
+        
+        void NanoSleep(int timeNS) {
+            usleep(timeNS);
+        }
     }
 }

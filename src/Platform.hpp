@@ -83,5 +83,8 @@ namespace Engine {
         void DumpStackTrace();
         
         int ShellExecute(std::string path);
+        
+        void Sleep(int timeS);
+        void NanoSleep(int timeNS);
     }
 }
