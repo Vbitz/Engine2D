@@ -44,7 +44,8 @@
 				"src/TextureLoader.cpp",
 				"src/Timer.cpp",
 				"src/ScriptingManager.cpp",
-				"src/Window_glfw.cpp"
+				"src/Window_glfw.cpp",
+				"src/WorkerThreadPool.cpp"
 			],
 			"conditions": [
 				['OS != "win"', {
