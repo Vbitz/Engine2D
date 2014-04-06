@@ -44,6 +44,8 @@
 
 #include <pthread.h>
 
+#include <uuid/uuid.h>
+
 namespace Engine {
     namespace Platform {
         
@@ -101,6 +103,10 @@ namespace Engine {
                 if (pthread_create(&this->_thread, NULL, entry, args)) {
                     std::cout << "ERROR: pthread_create failed" << std::endl;
                 }
+                
+                unsigned char* uuid = new unsigned char[16];
+                uuid_generate(uuid);
+                this->_uuid = uuid;
             }
             
             OSXThread(pthread_t thread) {
@@ -108,7 +114,7 @@ namespace Engine {
             }
             
             ~OSXThread() override {
-                
+                delete [] this->_uuid;
             }
             
             void Terminate() override {
@@ -119,8 +125,13 @@ namespace Engine {
                 pthread_exit(ret);
             }
             
+            unsigned char* GetThreadID() override {
+                return this->_uuid;
+            }
+            
         private:
             pthread_t _thread;
+            unsigned char* _uuid;
         };
         
         class OSXMutex : public Mutex {

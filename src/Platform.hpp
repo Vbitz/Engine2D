@@ -53,6 +53,8 @@ namespace Engine {
             
             virtual void Terminate() = 0;
             virtual void Exit(void* ret) = 0;
+            
+            virtual unsigned char* GetThreadID() = 0;
         };
         
         class Mutex {
