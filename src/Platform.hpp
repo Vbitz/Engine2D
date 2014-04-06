@@ -86,6 +86,10 @@ namespace Engine {
         
         Mutex* CreateMutex();
         
+        unsigned char* GenerateUUID();
+        std::string StringifyUUID(unsigned char* uuidArr);
+        unsigned char* ParseUUID(std::string uuidStr);
+        
         bool ShowMessageBox(std::string title, std::string text, bool modal);
         
         double GetTime();
