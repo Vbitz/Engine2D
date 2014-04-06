@@ -123,6 +123,27 @@ namespace Engine {
             pthread_t _thread;
         };
         
+        class OSXMutex : public Mutex {
+        public:
+            OSXMutex() {
+                pthread_mutex_init(&this->_mutex, NULL);
+            }
+            
+            ~OSXMutex() override {
+                pthread_mutex_destroy(&this->_mutex);
+            }
+            
+            void Enter() override {
+                pthread_mutex_lock(&this->_mutex);
+            }
+            
+            void Exit() override {
+                pthread_mutex_unlock(&this->_mutex);
+            }
+        private:
+            pthread_mutex_t _mutex;
+        };
+        
         int _argc;
         const char** _argv;
         
@@ -206,6 +227,10 @@ namespace Engine {
         
         Thread* GetCurrentThread() {
             return new OSXThread(pthread_self());
+        }
+        
+        Mutex* CreateMutex() {
+            return new OSXMutex();
         }
         
         double GetTime() {

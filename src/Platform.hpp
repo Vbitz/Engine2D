@@ -55,6 +55,14 @@ namespace Engine {
             virtual void Exit(void* ret) = 0;
         };
         
+        class Mutex {
+        public:
+            virtual ~Mutex() {}
+            
+            virtual void Enter() = 0;
+            virtual void Exit() = 0;
+        };
+        
         typedef struct {
             long totalVirtual, totalVirtualFree, myVirtualUsed;
             long totalPhysical, totalPhysicalFree, myPhysicalUsed;
@@ -73,6 +81,8 @@ namespace Engine {
         
         Thread* CreateThread(ThreadMethod entry, void* threadArgs);
         Thread* GetCurrentThread();
+        
+        Mutex* CreateMutex();
         
         bool ShowMessageBox(std::string title, std::string text, bool modal);
         
