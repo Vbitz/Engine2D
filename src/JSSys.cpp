@@ -27,6 +27,7 @@
 #include "Application.hpp"
 #include "EngineUI.hpp"
 #include "Timer.hpp"
+#include "WorkerThreadPool.hpp"
 
 namespace Engine {
 
@@ -642,6 +643,16 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(CreateWorker) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            WorkerThreadPool::CreateScriptWorker(std::string(*v8::String::Utf8Value(args[0]->ToString())));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(TestGraph) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -728,6 +739,8 @@ namespace Engine {
             addItem(sysTable, "shell", ShellExec);
             
             addItem(sysTable, "dumpLog", DumpLog);
+            
+            addItem(sysTable, "createWorker", CreateWorker);
             
             //addItem(sysTable, "testAccess", TestAccess);
             
