@@ -95,6 +95,13 @@ var tests = {
 		}
 
 		return true;
+	},
+	"Threading": function () {
+		sys.createWorker(function ($thread) {
+			$thread.log("Hello World");
+		});
+
+		return true;
 	}
 };
 
