@@ -23,6 +23,8 @@
 
 #include <vector>
 
+#include "Logger.hpp"
+
 namespace Engine {
     namespace WorkerThreadPool {
         
@@ -58,9 +60,11 @@ namespace Engine {
         
         struct ScriptWorkerArgs {
             std::string scriptSource;
-            int threadID;
+            unsigned char* threadID;
             
-            ScriptWorker* worker;
+            ScriptWorker* worker = NULL;
+            
+            Platform::Mutex* threadIDMutex = NULL;
         };
         
         std::vector<ScriptWorker> _workers;
@@ -71,7 +75,12 @@ namespace Engine {
             args->worker->RunScript(args->scriptSource);
             args->worker->Start();
             
-            // Enter Event loop
+            args->threadIDMutex->Enter();
+            
+            unsigned char* threadID = args->threadID;
+            
+            args->threadIDMutex->Exit();
+            
             while (args->worker->IsRunning()) {
                 // TODO: Recieve events using Events::PollThreadWorker(threadID)
                 // TODO: Dispatch events
@@ -83,11 +92,14 @@ namespace Engine {
             ScriptWorkerArgs* args = new ScriptWorkerArgs;
             args->scriptSource = scriptSource;
             args->worker = new ScriptWorker();
-            // TODO: Enter threadID mutex
+            args->threadIDMutex = Platform::CreateMutex();
+            args->threadIDMutex->Enter();
             Platform::Thread* thread =
                 Platform::CreateThread(ScriptWorkerFunc, args);
-            // TODO: Add threadID to args->threadID
-            // TODO: Exit threadID mutex
+            args->threadID = thread->GetThreadID();
+            args->threadIDMutex->Exit();
+            
+            Logger::begin("WorkerThreadPool", Logger::LogLevel_Log) << "Created ScriptWorkerThread {" << Platform::StringifyUUID(args->threadID) << "}" << Logger::end();
         }
     }
 }
