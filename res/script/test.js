@@ -2,6 +2,8 @@
 
 fs.configDir("testSuite");
 
+console.log("Loading Test Suite");
+
 var tests = {
 	"Filesystem": function () {
 		fs.writeFile("testing.txt", "Hello world");
@@ -97,14 +99,19 @@ var tests = {
 		return true;
 	},
 	"Threading": function () {
+		sys.on("testThreadTarget", "test.testThreadTarget", function (e) {
+			console.log("From TestThread: " + e.value);
+		});
+
 		sys.createWorker(function (thread) {
 			var t = 0;
-			for (var i = 0; i < 20; i++) {
+			for (var i = 0; i < 5; i++) {
 				thread.log("t = " + t);
 				t++;
 				thread.sleep(0.2);
 			}
 			thread.log(t);
+			thread.emit("testThreadTarget", {value: Math.random()});
 		});
 
 		return true;

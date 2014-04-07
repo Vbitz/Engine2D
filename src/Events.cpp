@@ -23,8 +23,10 @@
 
 #include <vector>
 #include <unordered_map>
+#include <queue>
 
 #include "Logger.hpp"
+#include "Platform.hpp"
 
 namespace Engine {
     namespace Events {
@@ -130,8 +132,10 @@ namespace Engine {
             std::string TargetName;
             EventClassSecurity Security;
             std::unordered_map<std::string, Event> Events;
+            std::queue<Json::Value> DeferedMessages;
         };
         
+        Platform::Mutex* _eventMutex;
         std::unordered_map<std::string, EventClass> _events;
         
         int lastEventID = 0;
@@ -166,13 +170,15 @@ namespace Engine {
         }
         
         void Init() {
+            _eventMutex = Platform::CreateMutex();
             Events::On("eventDebug", "Events::_debug", _debug);
         }
         
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args) {
             std::vector<Event> deleteTargets;
+            
             EventClass& cls = _events[evnt];
-            if (!cls.Valid) return;
+            if (!cls.Valid) { _eventMutex->Exit(); return; }
             for (auto iter = cls.Events.begin(); iter != cls.Events.end(); iter++) {
                 if (iter->second.Target == NULL) { throw "Invalid Target"; }
                 if (iter->second.Active) {
@@ -200,6 +206,7 @@ namespace Engine {
         void On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
             std::string evnt_copy = std::string(evnt.c_str());
             std::string name_copy = std::string(name.c_str());
+            
             Event newEvent = Event(name_copy, new CPPEventTarget(target, new Json::Value(e)));
             EventClass& cls = _events[evnt_copy];
             if (!cls.Valid) {
@@ -213,6 +220,7 @@ namespace Engine {
             Function> target) {
             std::string evnt_copy = std::string(evnt.c_str());
             std::string name_copy = std::string(name.c_str());
+            
             Event newEvent = Event(name_copy, new JSEventTarget(target, new Json::Value(e)));
             EventClass& cls = _events[evnt_copy];
             if (!cls.Valid) {
@@ -239,6 +247,40 @@ namespace Engine {
                     }
                 }
             }
+        }
+        
+        // Only called from the main thread
+        void PollDeferedMessages() {
+            _eventMutex->Enter();
+            
+            for (auto iter = _events.begin(); iter != _events.end(); iter++) {
+                while (iter->second.DeferedMessages.size() > 0) {
+                    for (auto iter2 = iter->second.Events.begin(); iter2 != iter->second.Events.end(); iter2++) {
+                        if (iter2->second.Target == NULL) { throw "Invalid Target"; }
+                        if (iter2->second.Active) {
+                            if (!(iter->second.Security.NoScript && iter2->second.Target->IsScript())) {
+                                iter2->second.Target->Run(
+                                    [](Json::Value e) { return true; },
+                                    iter->second.DeferedMessages.front());
+                            }
+                        }
+                    }
+                    iter->second.DeferedMessages.pop();
+                }
+            }
+            
+            _eventMutex->Exit();
+        }
+        
+        // Called from any worker thread
+        void EmitThread(std::string threadID, std::string evnt, Json::Value e) {
+            _eventMutex->Enter();
+            
+            if (_events.count(evnt) > 0) {
+                _events[evnt].DeferedMessages.push(e);
+            }
+            
+            _eventMutex->Exit();
         }
     }
 }

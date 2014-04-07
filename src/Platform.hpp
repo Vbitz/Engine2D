@@ -61,6 +61,7 @@ namespace Engine {
         public:
             virtual ~Mutex() {}
             
+            virtual bool SafeEnter() = 0;
             virtual void Enter() = 0;
             virtual void Exit() = 0;
         };

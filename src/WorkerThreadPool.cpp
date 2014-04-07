@@ -62,7 +62,10 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the event to target");
             ENGINE_CHECK_ARG_OBJECT(1, "Arg1 is the object to submit to the event handler");
             
-            //Events::EmitThread(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ScriptingManager::ObjectToJson(args[0].As<v8::Object>()));
+            Events::EmitThread(
+                    std::string(*v8::String::Utf8Value(args.Data()->ToString())),
+                    ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                    ScriptingManager::ObjectToJson(args[1].As<v8::Object>()));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -116,7 +119,12 @@ namespace Engine {
                 globals->Set("log", threadLog);
                 
                 addItem(globals, "sleep", ThreadSleep);
-                addItem(globals, "emit", ThreadEventEmit);
+                
+                v8::Handle<v8::FunctionTemplate> threadEventEmit = v8::FunctionTemplate::New();
+                
+                threadEventEmit->SetCallHandler(ThreadEventEmit, v8::String::New(threadIDSS.str().c_str()));
+                
+                globals->Set("emit", threadEventEmit);
                 
                 this->_globalTemplate.Reset(this->_isolate, globals);
                 
@@ -132,7 +140,7 @@ namespace Engine {
             bool RunScript(std::string src, std::string fileName) {
                 std::stringstream realSrc;
                 
-                realSrc << "(" << src << ")";
+                realSrc << "(" << src << ")"; // needed to return the variable
                 
                 // Only called from Worker thread
                 v8::HandleScope scp(this->_isolate);
@@ -175,7 +183,7 @@ namespace Engine {
             Platform::Mutex* threadIDMutex = NULL;
         };
         
-        std::vector<ScriptWorker> _workers;
+        std::vector<ScriptWorker*> _workers;
         
         void* ScriptWorkerFunc(void* scriptWorkerArgs) {
             ScriptWorkerArgs* args = (ScriptWorkerArgs*) scriptWorkerArgs;
@@ -186,8 +194,10 @@ namespace Engine {
             
             args->threadIDMutex->Exit();
             
-            args->worker->CreateScriptContext(Platform::StringifyUUID(args->threadID));
-            args->worker->RunScript(args->scriptSource, Platform::StringifyUUID(args->threadID));
+            std::string strThreadID = Platform::StringifyUUID(args->threadID);
+            
+            args->worker->CreateScriptContext(strThreadID);
+            args->worker->RunScript(args->scriptSource, strThreadID);
             args->worker->Start();
             
             while (args->worker->IsRunning()) {
@@ -199,14 +209,20 @@ namespace Engine {
         
         void CreateScriptWorker(std::string scriptSource) {
             ScriptWorkerArgs* args = new ScriptWorkerArgs;
+            
             args->scriptSource = scriptSource;
             args->worker = new ScriptWorker();
+            
             args->threadIDMutex = Platform::CreateMutex();
             args->threadIDMutex->Enter();
+            
             Platform::Thread* thread =
                 Platform::CreateThread(ScriptWorkerFunc, args);
             args->threadID = thread->GetThreadID();
+            
             args->threadIDMutex->Exit();
+            
+            _workers.push_back(args->worker);
             
             Logger::begin("WorkerThreadPool", Logger::LogLevel_Log) << "Created ScriptWorkerThread {" << Platform::StringifyUUID(args->threadID) << "}" << Logger::end();
         }

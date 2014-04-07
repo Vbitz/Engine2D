@@ -900,6 +900,7 @@ namespace Engine {
             Profiler::StartProfileFrame();
             FramePerfMonitor::BeginFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
+            Events::PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
             
             if (this->_debugMode) {
                 pthread_mutex_lock(&debugMesssageReadyMutex);

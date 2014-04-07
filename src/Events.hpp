@@ -42,5 +42,8 @@ namespace Engine {
         void On(std::string evnt, std::string label, EventTargetFunc target);
         void On(std::string evnt, std::string label, v8::Handle<v8::Function> target);
         void Clear(std::string eventID);
+    
+        void PollDeferedMessages();
+        void EmitThread(std::string threadID, std::string evnt, Json::Value e);
     }
 }

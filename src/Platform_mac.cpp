@@ -144,15 +144,27 @@ namespace Engine {
                 pthread_mutex_destroy(&this->_mutex);
             }
             
+            bool SafeEnter() override {
+                if (!this->_entered) {
+                    this->Enter();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            
             void Enter() override {
                 pthread_mutex_lock(&this->_mutex);
+                this->_entered = true;
             }
             
             void Exit() override {
                 pthread_mutex_unlock(&this->_mutex);
+                this->_entered = false;
             }
         private:
             pthread_mutex_t _mutex;
+            bool _entered = false;
         };
         
         int _argc;
