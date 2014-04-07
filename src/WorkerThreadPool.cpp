@@ -31,15 +31,27 @@
 namespace Engine {
     namespace WorkerThreadPool {
         
-        ENGINE_JS_METHOD(RawLog) {
-            ENGINE_JS_SCOPE_OPEN;
+        ENGINE_JS_METHOD(ThreadLog) {
+			ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            std::stringstream logStr;
             
-            std::cout << ENGINE_GET_ARG_CPPSTRING_VALUE(0) << std::endl;
+			bool first = true;
+			for (int i = 0; i < args.Length(); i++) {
+				if (first) {
+					first = false;
+				} else {
+					logStr << " ";
+				}
+				v8::String::Utf8Value str(args[i]->ToString());
+				const char* cstr = *str;
+				logStr << cstr;
+			}
+        
+            Logger::LogText(std::string(*v8::String::Utf8Value(args.Data()->ToString())), Logger::LogLevel_User, logStr.str());
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
+		}
         
         ENGINE_JS_METHOD(ThreadSleep) {
             ENGINE_JS_SCOPE_OPEN;
@@ -70,7 +82,7 @@ namespace Engine {
             
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
             
-            void CreateScriptContext() {
+            void CreateScriptContext(std::string threadID) {
                 // ONLY called from Worker thread, this will kill scripting if called from the main thread
                 this->_isolate = v8::Isolate::New();
                 this->_isolate->Enter();
@@ -79,7 +91,16 @@ namespace Engine {
                 
                 v8::Handle<v8::ObjectTemplate> globals = v8::ObjectTemplate::New();
                 
-                addItem(globals, "log", RawLog);
+                v8::Handle<v8::FunctionTemplate> threadLog = v8::FunctionTemplate::New();
+                
+                std::stringstream threadIDSS;
+                
+                threadIDSS << "WorkerThread {" << threadID.substr(0, 13) << "}";
+                
+                threadLog->SetCallHandler(ThreadLog, v8::String::New(threadIDSS.str().c_str()));
+                
+                globals->Set("log", threadLog);
+                
                 addItem(globals, "sleep", ThreadSleep);
                 
                 this->_globalTemplate.Reset(this->_isolate, globals);
@@ -150,7 +171,7 @@ namespace Engine {
             
             args->threadIDMutex->Exit();
             
-            args->worker->CreateScriptContext();
+            args->worker->CreateScriptContext(Platform::StringifyUUID(args->threadID));
             args->worker->RunScript(args->scriptSource, Platform::StringifyUUID(args->threadID));
             args->worker->Start();
             
