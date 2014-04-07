@@ -25,6 +25,7 @@
 
 #include "Logger.hpp"
 #include "Util.hpp"
+#include "Events.hpp"
 
 #include "JSSys.hpp"
 
@@ -52,6 +53,19 @@ namespace Engine {
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
+        
+        ENGINE_JS_METHOD(ThreadEventEmit) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the event to target");
+            ENGINE_CHECK_ARG_OBJECT(1, "Arg1 is the object to submit to the event handler");
+            
+            //Events::EmitThread(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ScriptingManager::ObjectToJson(args[0].As<v8::Object>()));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
         
         ENGINE_JS_METHOD(ThreadSleep) {
             ENGINE_JS_SCOPE_OPEN;
@@ -102,6 +116,7 @@ namespace Engine {
                 globals->Set("log", threadLog);
                 
                 addItem(globals, "sleep", ThreadSleep);
+                addItem(globals, "emit", ThreadEventEmit);
                 
                 this->_globalTemplate.Reset(this->_isolate, globals);
                 
