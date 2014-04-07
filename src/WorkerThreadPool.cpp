@@ -24,9 +24,34 @@
 #include <vector>
 
 #include "Logger.hpp"
+#include "Util.hpp"
+
+#include "JSSys.hpp"
 
 namespace Engine {
     namespace WorkerThreadPool {
+        
+        ENGINE_JS_METHOD(RawLog) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            std::cout << ENGINE_GET_ARG_CPPSTRING_VALUE(0) << std::endl;
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(ThreadSleep) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is how long to sleep the thread for");
+            
+            Platform::NanoSleep((int) (ENGINE_GET_ARG_NUMBER_VALUE(0) * 1000000));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
         
         class ScriptWorker {
         public:
@@ -43,19 +68,66 @@ namespace Engine {
                 return this->_running;
             }
             
+#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+            
             void CreateScriptContext() {
-                // Only called from Worker thread
-                // TODO: Init V8 context with a new v8::Isolate
-                // TODO: Build globals from JSWorker.cpp
+                // ONLY called from Worker thread, this will kill scripting if called from the main thread
+                this->_isolate = v8::Isolate::New();
+                this->_isolate->Enter();
+                
+                v8::HandleScope scp(this->_isolate);
+                
+                v8::Handle<v8::ObjectTemplate> globals = v8::ObjectTemplate::New();
+                
+                addItem(globals, "log", RawLog);
+                addItem(globals, "sleep", ThreadSleep);
+                
+                this->_globalTemplate.Reset(this->_isolate, globals);
+                
+                v8::Handle<v8::Context> context = v8::Context::New(this->_isolate);
+                
+                context->Enter();
+                
+                this->_context.Reset(this->_isolate, context);
             }
             
-            void RunScript(std::string src) {
+#undef addItem
+            
+            bool RunScript(std::string src, std::string fileName) {
+                std::stringstream realSrc;
+                
+                realSrc << "(" << src << ")";
+                
                 // Only called from Worker thread
-                // TODO: Run src as a new script in the thread v8 context
+                v8::HandleScope scp(this->_isolate);
+                v8::Handle<v8::Context> ctx = v8::Handle<v8::Context>::New(this->_isolate, _context);
+                v8::Context::Scope ctxScope(ctx);
+                
+                v8::Handle<v8::Script> script = v8::Script::Compile(v8::String::New(realSrc.str().c_str()), v8::String::New(fileName.c_str()));
+                
+                if (script.IsEmpty()) {
+                    return false;
+                } else {
+                    v8::Handle<v8::Value> rawFunc = script->Run();
+                    v8::Handle<v8::Function> func = rawFunc.As<v8::Function>();
+                    
+                    v8::Handle<v8::Value> args[1];
+                    
+                    v8::Handle<v8::ObjectTemplate> globalObject = v8::Handle<v8::ObjectTemplate>::New(this->_isolate, this->_globalTemplate);
+                    
+                    args[0] = globalObject->NewInstance();
+                    
+                    func->Call(ctx->Global(), 1, args);
+                    
+                    return true;
+                }
             }
             
         private:
             bool _running = false;
+            v8::Isolate* _isolate;
+            v8::Persistent<v8::ObjectTemplate> _globalTemplate;
+            v8::Persistent<v8::Context> _context;
         };
         
         struct ScriptWorkerArgs {
@@ -71,15 +143,16 @@ namespace Engine {
         
         void* ScriptWorkerFunc(void* scriptWorkerArgs) {
             ScriptWorkerArgs* args = (ScriptWorkerArgs*) scriptWorkerArgs;
-            args->worker->CreateScriptContext();
-            args->worker->RunScript(args->scriptSource);
-            args->worker->Start();
             
             args->threadIDMutex->Enter();
             
             unsigned char* threadID = args->threadID;
             
             args->threadIDMutex->Exit();
+            
+            args->worker->CreateScriptContext();
+            args->worker->RunScript(args->scriptSource, Platform::StringifyUUID(args->threadID));
+            args->worker->Start();
             
             while (args->worker->IsRunning()) {
                 // TODO: Recieve events using Events::PollThreadWorker(threadID)

@@ -97,8 +97,14 @@ var tests = {
 		return true;
 	},
 	"Threading": function () {
-		sys.createWorker(function ($thread) {
-			$thread.log("Hello World");
+		sys.createWorker(function (thread) {
+			var t = 0;
+			for (var i = 0; i < 20; i++) {
+				thread.log("t = " + t);
+				t++;
+				thread.sleep(0.2);
+			}
+			thread.log(t);
 		});
 
 		return true;
