@@ -37,6 +37,8 @@ namespace Engine {
         
         double _startTime = -1;
         
+        Platform::Mutex* _logMutex;
+        
         std::ostream& operator<<(std::ostream& os, const StreamFlusher& rhs) {
 			LogText(_currentDomain, _currentLogLevel, _ss.str());
             _ss.str("");
@@ -66,6 +68,10 @@ namespace Engine {
 #else
 			return ""; // windows is not a very sane OS
 #endif
+        }
+        
+        void Init() {
+            _logMutex = Platform::CreateMutex();
         }
         
         std::string GetLevelString(LogLevel level) {
@@ -126,6 +132,8 @@ namespace Engine {
                 && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
             std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
             
+            _logMutex->Enter();
+            
             if (str.find('\n') == -1) {
                 std::string newStr = cleanString(str);
                 
@@ -167,6 +175,8 @@ namespace Engine {
                         << domain << " | " << strCopy << std::endl;
                 }
             }
+            
+            _logMutex->Exit();
         }
         
         void LogGraph(std::string domain, LogLevel level, LogGraphEvent* event) {
@@ -174,7 +184,11 @@ namespace Engine {
             && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
             std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
             
+            _logMutex->Enter();
+            
             _logEvents.push_back(LogEvent(domain, level, event));
+            
+            _logMutex->Exit();
             
             if (logConsole) {
                 std::cout << colorCode << Platform::GetTime()

@@ -79,6 +79,8 @@ namespace Engine {
             double time;
         };
         
+        void Init();
+        
         std::string GetLevelString(LogLevel level);
         
         void LogText(std::string domain, LogLevel level, std::string str);

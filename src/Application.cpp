@@ -1099,6 +1099,7 @@ namespace Engine {
 	
 	int Application::Start(int argc, char const *argv[]) {
         // At this point Logger is not avalible
+        Logger::Init();
         Config::SetBoolean("core.log.enableConsole", true); // make sure we can log to the console right from the start
         
         Platform::SetRawCommandLine(argc, argv);
