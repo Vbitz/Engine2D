@@ -233,8 +233,29 @@ namespace Engine {
             else if (val->IsNumber()) { return Json::Value(val->NumberValue()); }
             else if (val->IsString()) { return Json::Value(*v8::String::Utf8Value(val)); }
             else if (val->IsBoolean()) { return Json::Value(val->BooleanValue()); }
-            else if (val->IsArray() || val->IsObject()) {
-                throw "_getValueFromV8Object array/object unimplamented";
+            else if (val->IsArray()) {
+                v8::Handle<v8::Object> obj = val.As<v8::Object>();
+                v8::Local<v8::Array> objNames = obj->GetPropertyNames();
+                
+                Json::Value ret(Json::arrayValue);
+                
+                for (int i = 0; i < objNames->Length(); i++) {
+                    v8::Local<v8::Value> objItem = obj->Get(i);
+                    ret[i] = _getValueFromV8Object(objItem);
+                }
+                return ret;
+            } else if (val->IsObject()) {
+                v8::Handle<v8::Object> obj = val.As<v8::Object>();
+                v8::Local<v8::Array> objNames = obj->GetPropertyNames();
+                
+                Json::Value ret(Json::objectValue);
+                
+                for (int i = 0; i < objNames->Length(); i++) {
+                    v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
+                    v8::Local<v8::Value> objItem = obj->Get(objKey);
+                    ret[*v8::String::Utf8Value(objKey)] = _getValueFromV8Object(objItem);
+                }
+                return ret;
             } else {
                 throw "_getValueFromV8Object type unimplamented";
             }
