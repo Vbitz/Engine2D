@@ -174,7 +174,7 @@ var spriteSheet = spriteSheet ? spriteSheet : draw.openSpriteSheet("texture/spri
 
 var t = 0;
 
-var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object");
+var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object") || sys.hasExtention("GL_EXT_framebuffer_object");
 
 console.log("Loading Test Suite");
 
@@ -267,6 +267,7 @@ sys.on("draw", "test.draw", function () {
 
 	draw.setColor(0xffffff);
 	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + supportsFramebuffer);
+	draw.print(10, x++ * 30 + 40, "Number of Processers: " + sys.numProcessers);
 
 	draw.setFont("light", 8);
 	draw.print(20, x * 30 + 40, "Custom Loaded Font");
