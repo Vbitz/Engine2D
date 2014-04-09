@@ -393,6 +393,42 @@ global.sys.shell = function (filename) {};
  */
 global.sys.dumpLog = function (filename) { };
 
+function ThreadAPI () { }
+
+/**
+ * The same as console.log but identifys the line with the thread that created it
+ * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ */
+ThreadAPI.prototype.log = function () { };
+
+/**
+ * Suspends the thread for secs
+ * @param  {Number} secs mesured in seconds
+ */
+ThreadAPI.prototype.sleep = function (secs) { };
+
+/**
+ * Sends a event to functions listening for target event.
+ * If the target is on another thread it will be defered to be dispatched by the event loop on the main thread
+ * @param  {String} target
+ * @param  {*} args
+ */
+ThreadAPI.prototype.emit = function (target, args) { };
+
+/**
+ * @callback WorkerFunction
+ * This API uses a little black magic, internaly the source of the function is fetched and dispatched to a worker thread where
+ * it's compiled and executed in a brand new V8 instance, this meens that any globals or most regular API's don't work insided.
+ * To reduce confusion the Threading API is provided as a argument
+ * @param {ThreadAPI} $thread
+ */
+
+/**
+ * Creates a new thread executing workerFunc
+ * @param  {WorkerFunction} workerFunc
+ */
+global.sys.createWorker = function (workerFunc) { };
+
 /**
  * The current platform the engine is running on, the value can be "Windows"|"Darwin (OSX)"|"Linux"
  * @type {String}
