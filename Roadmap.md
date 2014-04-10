@@ -23,7 +23,15 @@
 - Add new Scripting Features
 	- Implament new fucntions in javascriptAPI.txt
 - Audio Support
+	- Add OpenAL Depend (maybe another libary, something to really look into)
+	- Write C++ Clases
+	- Write JS API
 - Port to Linux
+	- Stub Out Platform_linux.cpp
+	- Use GYP to generate a Makefile
+	- Fix linking issues and record package details
+	- Implament Platform_linux.cpp
+	- Update engine2D.gyp
 - Entity System
 - UI System
 - 3D Support
