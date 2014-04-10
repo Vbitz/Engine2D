@@ -29,10 +29,11 @@
 namespace Engine {
     class Database {
     public:
-        Database(std::string database);
-        ~Database();
+        virtual ~Database() {}
         
-        bool Execute(std::string statement);
-        std::vector< std::map<std::string, std::string> > ExecutePrepare(std::string statement);
+        virtual bool Execute(std::string statement) = 0;
+        virtual std::vector< std::map<std::string, std::string> > ExecutePrepare(std::string statement) = 0;
+        
+        static Database* CreateDatabase(std::string filename);
     };
 }

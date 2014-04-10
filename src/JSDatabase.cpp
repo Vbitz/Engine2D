@@ -45,7 +45,7 @@ namespace Engine {
             
             Filesystem::TouchFile(path);
             
-            currentDatabase = new Database(Filesystem::GetRealPath(path));
+            currentDatabase = Database::CreateDatabase(Filesystem::GetRealPath(path));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
