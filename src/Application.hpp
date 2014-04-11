@@ -101,6 +101,7 @@ namespace Engine {
         void _openWindow(int width, int height, bool fullscreen, std::string openGLVersion);
         void _loadBasicConfigs();
         void _hookConfigs();
+        void _hookEvents();
         void _disablePreload();
         void _updateFrameTime();
         void _updateMousePos();

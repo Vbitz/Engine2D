@@ -328,9 +328,15 @@ namespace Engine {
         GetAppSingilton()->GetWindow()->SetVSync(Config::GetBoolean("core.window.vsync"));
     }
     
+    void Config_CoreWindowSize(Json::Value args) {
+        GetAppSingilton()->GetWindow()->SetWindowSize(glm::vec2(Config::GetInt("core.window.width"), Config::GetInt("core.window.height")));
+    }
+    
     void Application::_hookConfigs() {
         Events::On("config:core.render.aa", "Application::Config_CoreRenderAA", Config_CoreRenderAA);
         Events::On("config:core.window.vsync", "Application::Config_CoreWindowVSync", Config_CoreWindowVSync);
+        Events::On("config:core.window.width", "Application::ConfigWindowSize_Width", Config_CoreWindowSize);
+        Events::On("config:core.window.height", "Application::ConfigWindowSize_Height", Config_CoreWindowSize);
     }
     
     void Application::_loadConfigFile() {
@@ -371,6 +377,14 @@ namespace Engine {
         for (auto iter = items.begin(); iter != items.end(); iter++) {
             Logger::begin("Config", Logger::LogLevel_Log) << *iter << Logger::end();
         }
+    }
+    
+    void AppEvent_Exit(Json::Value val) {
+        GetAppSingilton()->Exit();
+    }
+    
+    void Application::_hookEvents() {
+        Events::On("exit", "Application::AppEvent_Exit", AppEvent_Exit);
     }
 	
     void _resizeWindow(Json::Value val) {
@@ -1038,6 +1052,7 @@ namespace Engine {
         
         Events::Init();
         Config::EnableConfigEvents();
+        this->_hookEvents();
         // The events system is now ready
         
         for (auto iter = this->_archivePaths.begin(); iter != this->_archivePaths.end(); iter++) {
