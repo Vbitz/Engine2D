@@ -282,7 +282,7 @@ namespace Engine {
         
         Config::SetNumber(  "core.window.width",                    800);
         Config::SetNumber(  "core.window.height",                   600);
-        Config::SetBoolean( "core.render.aa",                       true);
+        Config::SetNumber(  "core.render.aa",                       4);
         Config::SetBoolean( "core.window.vsync",                    false); // lack of vsync causes FPS issues
         Config::SetBoolean( "core.window.fullscreen",               false);
         Config::SetString(  "core.render.openGL",                   "3.2");
@@ -318,6 +318,19 @@ namespace Engine {
         Config::SetBoolean( "core.debug.v8Debug",                   this->_developerMode);
         Config::SetNumber(  "core.debug.v8Debug.port",              5858);
         Config::SetBoolean( "core.debug.slowload",                  false);
+    }
+    
+    void Config_CoreRenderAA(Json::Value args) {
+        GetAppSingilton()->GetWindow()->SetAntiAlias(Config::GetInt("core.render.aa"));
+    }
+    
+    void Config_CoreWindowVSync(Json::Value args) {
+        GetAppSingilton()->GetWindow()->SetVSync(Config::GetBoolean("core.window.vsync"));
+    }
+    
+    void Application::_hookConfigs() {
+        Events::On("config:core.render.aa", "Application::Config_CoreRenderAA", Config_CoreRenderAA);
+        Events::On("config:core.window.vsync", "Application::Config_CoreWindowVSync", Config_CoreWindowVSync);
     }
     
     void Application::_loadConfigFile() {
@@ -652,6 +665,10 @@ namespace Engine {
 
     void Application::SetScreenSize(int width, int height) {
         this->_window->SetWindowSize(glm::vec2(width, height));
+    }
+    
+    Window* Application::GetWindow() {
+        return this->_window;
     }
 	
 	GLFT_Font* Application::GetFont(std::string fontName, int size) {
@@ -1078,6 +1095,8 @@ namespace Engine {
         Draw2D::CheckGLError("Post Finish Loading");
         
         Logger::begin("Application", Logger::LogLevel_Highlight) << "Loaded" << Logger::end();
+        
+        this->_hookConfigs(); // this is the last stage of the boot process so previous code does'nt interfere.
         
         if (this->_testMode) {
             this->_loadTests();

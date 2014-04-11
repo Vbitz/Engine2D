@@ -49,6 +49,8 @@ namespace Engine {
         int GetScreenHeight();
         void SetScreenSize(int width, int height);
         
+        Window* GetWindow();
+        
         bool RunFile(std::string path, bool persist);
         
         void Exit();
@@ -98,6 +100,7 @@ namespace Engine {
         void _closeWindow();
         void _openWindow(int width, int height, bool fullscreen, std::string openGLVersion);
         void _loadBasicConfigs();
+        void _hookConfigs();
         void _disablePreload();
         void _updateFrameTime();
         void _updateMousePos();
