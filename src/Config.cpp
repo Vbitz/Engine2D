@@ -21,26 +21,38 @@
 
 #include "Config.hpp"
 
+#include "Events.hpp"
+
 namespace Engine {
     namespace Config {
         std::unordered_map<std::string, float> _numberCvars;
         std::unordered_map<std::string, bool> _boolCvars;
         std::unordered_map<std::string, std::string> _stringCvars;
         
+        bool _configEventEnabled = false;
+        
+        void EnableConfigEvents() {
+            _configEventEnabled = true;
+        }
+        
         void SetNumber(std::string key, int value) {
             _numberCvars[key] = value;
+            if (_configEventEnabled) Events::Emit("config:" + key);
         }
         
         void SetNumber(std::string key, float value) {
             _numberCvars[key] = value;
+            if (_configEventEnabled) Events::Emit("config:" + key);
         }
         
         void SetBoolean(std::string key, bool value) {
             _boolCvars[key] = value;
+            if (_configEventEnabled) Events::Emit("config:" + key);
         }
         
         void SetString(std::string key, std::string value) {
             _stringCvars[key] = value;
+            if (_configEventEnabled) Events::Emit("config:" + key);
         }
         
         bool Set(std::string key, std::string value) {
@@ -64,6 +76,7 @@ namespace Engine {
                     SetString(key, value);
                     break;
             }
+            if (_configEventEnabled) Events::Emit("config:" + key);
             return true;
         }
         

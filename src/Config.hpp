@@ -34,6 +34,8 @@ namespace Engine {
             ConfigType_Unknown
         };
         
+        void EnableConfigEvents();
+        
         void SetNumber(std::string key, int value);
         void SetNumber(std::string key, float value);
         void SetBoolean(std::string key, bool value);

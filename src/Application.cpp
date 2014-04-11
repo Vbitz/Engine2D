@@ -1020,6 +1020,7 @@ namespace Engine {
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
         
         Events::Init();
+        Config::EnableConfigEvents();
         // The events system is now ready
         
         for (auto iter = this->_archivePaths.begin(); iter != this->_archivePaths.end(); iter++) {
