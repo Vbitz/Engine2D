@@ -332,11 +332,16 @@ namespace Engine {
         GetAppSingilton()->GetWindow()->SetWindowSize(glm::vec2(Config::GetInt("core.window.width"), Config::GetInt("core.window.height")));
     }
     
+    void Config_CoreWindowTitle(Json::Value args) {
+        GetAppSingilton()->GetWindow()->SetTitle(Config::GetString("core.window.title"));
+    }
+    
     void Application::_hookConfigs() {
         Events::On("config:core.render.aa", "Application::Config_CoreRenderAA", Config_CoreRenderAA);
         Events::On("config:core.window.vsync", "Application::Config_CoreWindowVSync", Config_CoreWindowVSync);
         Events::On("config:core.window.width", "Application::ConfigWindowSize_Width", Config_CoreWindowSize);
         Events::On("config:core.window.height", "Application::ConfigWindowSize_Height", Config_CoreWindowSize);
+        Events::On("config:core.window.title", "Application::Config_CoreWindowTitle", Config_CoreWindowTitle);
     }
     
     void Application::_loadConfigFile() {
