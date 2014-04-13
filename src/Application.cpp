@@ -118,16 +118,18 @@ namespace Engine {
         
         if (!val->IsFunction()) {
             ENGINE_THROW_ARGERROR("The value passed needs to be a function");
+            return;
         }
         
         v8::Handle<v8::Function> func = val.As<v8::Function>();
         
-        if (func->GetName().IsEmpty()) {
-            ENGINE_THROW_ARGERROR("The function passed needs to be named");
-        }
-        
         std::string hookName = std::string(*v8::String::Utf8Value(name));
         std::string hookId = std::string(*v8::String::Utf8Value(func->GetName()));
+        
+        if (hookId.length() < 1) {
+            ENGINE_THROW_ARGERROR("The function passed needs to be named");
+            return;
+        }
         
         Events::On(hookName, hookId, func);
     }
