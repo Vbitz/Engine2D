@@ -121,9 +121,8 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
             
             if (args.Length() == 2) {
-                ENGINE_CHECK_ARG_OBJECT(1, "Arg1 is the Object of arguments to emit");
                 Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
-                             ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(1))));
+                             ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(args[1].As<v8::Object>())));
             } else if (args.Length() == 1) {
                 Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0), Json::nullValue);
             } else {
