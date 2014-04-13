@@ -388,8 +388,13 @@ namespace Engine {
         GetAppSingilton()->Exit();
     }
     
+    void AppEvent_Screenshot(Json::Value args) {
+        GetAppSingilton()->SaveScreenshot(args["filename"].asString());
+    }
+    
     void Application::_hookEvents() {
         Events::On("exit", "Application::AppEvent_Exit", AppEvent_Exit);
+        Events::On("screenshot", "Application::AppEvent_Screenshot", AppEvent_Screenshot);
     }
 	
     void _resizeWindow(Json::Value val) {
