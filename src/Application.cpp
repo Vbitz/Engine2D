@@ -81,6 +81,57 @@ namespace Engine {
         info.GetReturnValue().Set(info.Holder());
     }
     
+    ENGINE_JS_METHOD(EventCallCallback) {
+        ENGINE_JS_SCOPE_OPEN;
+        
+        Json::Value eventArgs;
+        
+        if (args.Length() == 0) {
+            eventArgs = Json::Value(Json::objectValue);
+        } else {
+            eventArgs = ScriptingManager::ObjectToJson(args[0].As<v8::Object>());
+        }
+        
+        v8::Handle<v8::String> eventName = args.Data().As<v8::String>();
+        
+        std::string eventNameStr = std::string(*v8::String::Utf8Value(eventName));
+        
+        Events::Emit(eventNameStr, eventArgs);
+        
+        ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+    }
+    
+    static void EventGetterCallback(v8::Local<v8::String> name, const v8::PropertyCallbackInfo<v8::Value>& info) {
+        v8::HandleScope scp(info.GetIsolate());
+        
+        v8::Handle<v8::FunctionTemplate> t = v8::FunctionTemplate::New();
+        
+        t->SetCallHandler(EventCallCallback, name);
+        
+        v8::Handle<v8::Function> func = t->GetFunction();
+        
+        info.GetReturnValue().Set(func);
+    }
+    
+    static void EventSetterCallback(v8::Local<v8::String> name, v8::Local<v8::Value> val, const v8::PropertyCallbackInfo<v8::Value>& info) {
+        v8::HandleScope scp(info.GetIsolate());
+        
+        if (!val->IsFunction()) {
+            ENGINE_THROW_ARGERROR("The value passed needs to be a function");
+        }
+        
+        v8::Handle<v8::Function> func = val.As<v8::Function>();
+        
+        if (func->GetName().IsEmpty()) {
+            ENGINE_THROW_ARGERROR("The function passed needs to be named");
+        }
+        
+        std::string hookName = std::string(*v8::String::Utf8Value(name));
+        std::string hookId = std::string(*v8::String::Utf8Value(func->GetName()));
+        
+        Events::On(hookName, hookId, func);
+    }
+    
     void Application::_enableTypedArrays() {
         v8::V8::SetArrayBufferAllocator(new MallocArrayBufferAllocator());
     }
@@ -130,6 +181,12 @@ namespace Engine {
         sysTable->Set("username", v8::String::New(Platform::GetUsername().c_str()));
         
 		global->Set("sys", sysTable);
+        
+        v8::Handle<v8::ObjectTemplate> eventTable = v8::ObjectTemplate::New();
+        
+        eventTable->SetNamedPropertyHandler(EventGetterCallback, EventSetterCallback);
+        
+        global->Set("event", eventTable);
         
         // drawTable
         v8::Handle<v8::ObjectTemplate> drawTable = v8::ObjectTemplate::New();
