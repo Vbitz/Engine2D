@@ -79,25 +79,29 @@ namespace Engine {
             
         protected:
             bool _run(Json::Value e) {
-                v8::HandleScope scp(v8::Isolate::GetCurrent());
-                v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+                v8::Isolate* currentIsolate = v8::Isolate::GetCurrent();
+                v8::Local<v8::Context> ctx = currentIsolate->GetCurrentContext();
                 if (ctx.IsEmpty() || ctx->Global().IsEmpty()) return;
-                v8::Context::Scope ctx_scope(ctx);
                 
                 v8::TryCatch tryCatch;
                 
-                v8::Handle<v8::Value> args[1];
+                v8::Local<v8::Object> obj;
                 
-                v8::Handle<v8::Object> obj = ScriptingManager::GetObjectFromJson(e);
+                if ((e.isObject() || e.isArray()) &&
+                    e.getMemberNames().size() == 0) {
+                    obj = v8::Object::New();
+                } else {
+                    obj = ScriptingManager::GetObjectFromJson(e);
+                }
                 
-                args[0] = obj;
+                v8::Local<v8::Value> args[1] = {obj};
                 
-                v8::Local<v8::Function> func = v8::Local<v8::Function>::New(v8::Isolate::GetCurrent(), _func);
+                v8::Local<v8::Function> func = v8::Local<v8::Function>::New(currentIsolate, _func);
                 
                 func->Call(ctx->Global(), 1, args);
             
                 if (!tryCatch.StackTrace().IsEmpty()) {
-                    ScriptingManager::ReportException(v8::Isolate::GetCurrent(), &tryCatch);
+                    ScriptingManager::ReportException(currentIsolate, &tryCatch);
                     return false;
                 } else {
                     return true;
