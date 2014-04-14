@@ -169,7 +169,7 @@ namespace Engine {
         
         ScriptingContext* CreateScriptingContext(std::string providorName);
         
-        Json::Value ObjectToJson(v8::Handle<v8::Object> obj);
-        v8::Handle<v8::Object> GetObjectFromJson(Json::Value val);
+        Json::Value ObjectToJson(v8::Local<v8::Object> obj);
+        v8::Local<v8::Object> GetObjectFromJson(Json::Value val);
     }
 }
