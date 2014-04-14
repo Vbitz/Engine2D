@@ -48,6 +48,6 @@ namespace Engine {
     };
     
     void LoadScriptingTests() {
-        TestSuite::RegisterTest(new ScriptingLoaderTest());
+        //TestSuite::RegisterTest(new ScriptingLoaderTest());
     }
 }
