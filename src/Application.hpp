@@ -29,6 +29,8 @@
 
 #include "vendor/GLFT_Font.hpp"
 
+#include <queue>
+
 #define ENGINE_ASSERT(value, msg) GetAppSingilton()->Assert(value, msg, __FILE__, __LINE__)
 
 namespace Engine {
@@ -80,7 +82,19 @@ namespace Engine {
         
         void Assert(bool value, std::string reason, std::string line, int lineNumber);
         
+        void AddScript(const char* filename_str, size_t filename_len);
+        void DumpScripts();
+        
     private:
+        struct RawScriptInfo {
+            const char* filename_str;
+            size_t filename_len;
+        };
+        
+        struct ScriptInfo {
+            std::string filename;
+        };
+        
         void _mainLoop();
         
         int  _postStart();
@@ -115,6 +129,8 @@ namespace Engine {
         void _enableHarmony();
         void _initGLContext(GraphicsVersion v);
         
+        void _processScripts();
+        
         static void _rawInputHandler(Json::Value v);
         static void _rendererKillHandler(Json::Value v);
         static void _postCreateContext(Json::Value v);
@@ -148,6 +164,9 @@ namespace Engine {
         
         int _detailFrames = 0;
         std::string _detailFilename = "";
+        
+        std::queue<RawScriptInfo> _pendingScripts;
+        std::unordered_map<std::string, ScriptInfo> _scripts;
     };
     
     Application* GetAppSingilton();

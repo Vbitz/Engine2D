@@ -142,6 +142,12 @@ namespace Engine {
         const char* harmony = "-harmony";
         v8::V8::SetFlagsFromString(harmony, std::strlen(harmony));
     }
+    
+    static void JitEventCallback(const v8::JitCodeEvent* e) {
+        if (e != NULL && e->type == v8::JitCodeEvent::CODE_ADDED) {
+            GetAppSingilton()->AddScript(e->name.str, e->name.len);
+        }
+    }
 	
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
     
@@ -151,7 +157,11 @@ namespace Engine {
         this->_enableTypedArrays();
         this->_enableHarmony();
         
-		v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
+        
+        v8::V8::SetJitCodeEventHandler(v8::JitCodeEventOptions::kJitCodeEventDefault, JitEventCallback);
+        
+		v8::HandleScope handle_scope(isolate);
         
 		v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
         
@@ -235,7 +245,7 @@ namespace Engine {
             global->Set("unsafe", unsafeTable);
         }
         
-        v8::Handle<v8::Context> ctx = v8::Context::New(v8::Isolate::GetCurrent(), NULL, global);
+        v8::Handle<v8::Context> ctx = v8::Context::New(isolate, NULL, global);
         
         ctx->Enter();
         
@@ -451,9 +461,14 @@ namespace Engine {
         GetAppSingilton()->SaveScreenshot(args["filename"].asString());
     }
     
+    void AppEvent_DumpScripts(Json::Value args) {
+        GetAppSingilton()->DumpScripts();
+    }
+    
     void Application::_hookEvents() {
         Events::On("exit", "Application::AppEvent_Exit", AppEvent_Exit);
         Events::On("screenshot", "Application::AppEvent_Screenshot", AppEvent_Screenshot);
+        Events::On("dumpScripts", "Applicaton::AppEvent_DumpScripts", AppEvent_DumpScripts);
     }
 	
     void _resizeWindow(Json::Value val) {
@@ -976,6 +991,87 @@ namespace Engine {
         exit(EXIT_FAILURE); // Can't recover from this
     }
     
+    void Application::AddScript(const char* filename_str, size_t filename_len) {
+        this->_pendingScripts.push({
+            .filename_str = filename_str,
+            .filename_len = filename_len
+        });
+    }
+    
+    void Application::DumpScripts() {
+        Logger::begin("Application::DumpScripts", Logger::LogLevel_Log) << "Starting Application::DumpScripts" << Logger::end();
+        for (auto iter = this->_scripts.begin(); iter != this->_scripts.end(); iter++) {
+            Logger::begin("Application::DumpScripts", Logger::LogLevel_Log) << "    " << iter->second.filename << Logger::end();
+        }
+    }
+    
+    // Modifyed slightly from node.js at https://github.com/joyent/node/blob/master/src/node_win32_etw_provider.cc
+    
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+    
+    struct v8tags {
+        char prefix[32 - sizeof(size_t)];
+        size_t prelen;
+    };
+    
+    // The v8 CODE_ADDED event name has a prefix indicating the type of event.
+    // Many of these are internal to v8.
+    // The trace_codes array specifies which types are written.
+    struct v8tags trace_codes[] = {
+#define MAKE_V8TAG(s) { s, sizeof(s) - 1 }
+        MAKE_V8TAG("LazyCompile:"),
+        MAKE_V8TAG("Script:"),
+        MAKE_V8TAG("Function:"),
+        MAKE_V8TAG("RegExp:"),
+        MAKE_V8TAG("Eval:")
+#undef MAKE_V8TAG
+    };
+    
+    // v8 sometimes puts a '*' or '~' in front of the name.
+#define V8_MARKER1 '*'
+#define V8_MARKER2 '~'
+    
+    
+    // If prefix is not in filtered list return -1,
+    // else return length of prefix and marker.
+    int _filterCodeEvents(const char* name, size_t len) {
+        for (int i = 0; i < ARRAY_SIZE(trace_codes); i++) {
+            size_t prelen = trace_codes[i].prelen;
+            if (prelen < len) {
+                if (strncmp(name, trace_codes[i].prefix, prelen) == 0) {
+                    if (name[prelen] == V8_MARKER1 || name[prelen] == V8_MARKER2 || name[prelen] == ' ')
+                        prelen++;
+                    return prelen;
+                }
+            }
+        }
+        return -1;
+    }
+
+    
+    void Application::_processScripts() {
+        while (this->_pendingScripts.size() > 0) {
+            RawScriptInfo i = this->_pendingScripts.front();
+            
+            int prefixLength = _filterCodeEvents(i.filename_str, i.filename_len);
+            if (prefixLength >= 0) {
+                std::string filename = std::string(i.filename_str + prefixLength, i.filename_len - prefixLength);
+                if (filename.length() > 0) {
+                    if (this->_scripts.count(filename) > 0) {
+                        // update infomation
+                    } else {
+                        // add new
+                        this->_scripts[filename] = {
+                            .filename = filename
+                        };
+                    }
+                }
+            }
+            
+            this->_pendingScripts.pop();
+        }
+    }
+    
     void Application::_mainLoop() {
         this->_running = true;
         
@@ -1001,6 +1097,7 @@ namespace Engine {
             FramePerfMonitor::BeginFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
             Events::PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
+            this->_processScripts();
             
             if (this->_debugMode) {
                 pthread_mutex_lock(&debugMesssageReadyMutex);
