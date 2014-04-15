@@ -15,8 +15,8 @@ Done	| Old Syntax														| New Syntax
 		| sys.runFile(filename, persists)									| REMOVED
 		| sys.drawFunc(func)												| REMOVED
 		| sys.keyboardFunc(func)											| REMOVED
-		| sys.on(event, id, filter, func)									| $(event, [id], [filter], func)
-		| sys.emit(event, args)												| process.emit(event, opts)
+		| sys.on(event, id, filter, func)									| REMOVED
+		| sys.emit(event, args)												| REMOVED
 		| sys.clearEvent(id)												| process.clearEvent(id)
 		| sys.microtime()													| process.uptime (it's more useful as a double)
 		| sys.heapStats()													| process.memoryUsage (inline with nodejs)
@@ -151,8 +151,8 @@ Done	| Old Syntax														| New Syntax
 		| 																	| new SpriteSheet(texture)
 		| 																	| SpriteSheet.prototype.bindSprite(name, x, y, w, h)
 		| 																	| SpriteSheet.prototype.bindAnimation(name, [frames], delay)
-		| 																	| 
-		| 																	| 
+		| 																	| process.emit(target, ...)
+		| 																	| process.on(target, id, cb, ...)
 		| 																	| 
 		| 																	| 
 		| 																	| 

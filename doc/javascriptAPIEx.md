@@ -10,3 +10,6 @@ This will find a new home inside of some Texture object as a static propety
 
 ## process.saveScreenshot
 This might be intergrated with some sort of screen texture fetch something like `process.getWindowFramebuffer().save(filename)`
+
+## $ && process.emit
+With the adition of the event API this is not really needed anymore. There's still a place for this API as I extend the event system but for day to day tasks the event API should work fine
