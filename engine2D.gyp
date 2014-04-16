@@ -5,6 +5,7 @@
 			"type": "executable",
 			"dependencies": [],
 			"sources": [
+				"src/stdlib.cpp",
 				"src/main.cpp",
 				"src/JSInput.cpp",
 				"src/JSDraw.cpp",
@@ -39,6 +40,7 @@
 				"src/PlatformTests.cpp",
 				"src/CoreTests.cpp",
 				"src/ScriptingTests.cpp",
+				"src/StdLibTests.cpp",
 				"src/EffectParameters.cpp",
 				"src/SpriteSheet.cpp",
 				"src/TextureLoader.cpp",
