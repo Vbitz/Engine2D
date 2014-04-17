@@ -1,10 +1,25 @@
 #pragma once
 
+#include <stddef.h>
+#include <initializer_list>
+
+#include <ostream>
+
 typedef char string_char_t;
 
 namespace Engine {
     
     class String;
+    
+    template<class A, class B>
+    class Map {
+        
+    };
+    
+    template<class A, class B>
+    class HashMap {
+        
+    };
     
     template<class T>
     class Array {
@@ -19,8 +34,15 @@ namespace Engine {
         
     };
     
-    class StringStream {
+    class StringBuilder {
+    public:
+        String toString();
         
+        StringBuilder& operator<<(const String value);
+        
+        operator String();
+    private:
+        Array<String> _str;
     };
     
     class CString {
@@ -31,66 +53,74 @@ namespace Engine {
     class String {
     public:
         String(const char* cString);
-        String(const char* cString, int len);
+        String(const char* cString, size_t len);
         
-        char charAt(int index);
+        ~String();
         
-        String concat(...);
+        char charAt(size_t index) const;
         
-        bool contains(String search);
-        bool contains(String search, int startIndex);
+        String concat(Array<String> items) const;
+        String concat(std::initializer_list<String> args) const;
         
-        bool endsWith(String search);
-        bool endsWith(String search, int startIndex);
+        bool contains(String search) const;
+        bool contains(String search, size_t startIndex) const;
         
-        bool startsWith(String search);
-        bool startsWith(String search, int startIndex);
+        bool startsWith(String search) const;
+        bool startsWith(String search, size_t startIndex) const;
         
-        int indexOf(String search);
-        int indexOf(String search, int fromIndex);
+        bool endsWith(String search) const;
+        bool endsWith(String search, size_t startIndex) const;
         
-        int lastIndexOf(String search);
-        int lastIndexOf(String search, int fromIndex);
+        size_t indexOf(String search) const;
+        size_t indexOf(String search, size_t fromIndex) const;
         
-        Array<MatchResult> match(Regexp regexp);
+        size_t lastIndexOf(String search) const;
+        size_t lastIndexOf(String search, size_t fromIndex) const;
         
-        String repeat(int count);
+        Array<MatchResult> match(Regexp regexp) const;
         
-        String replace(String subStr, String newSubStr);
-        // String replace(String subStr, Function replaceFunc);
-        String replace(Regexp regexp, String newSubStr);
-        // String replace(Regexp regexp, Function replaceFunc);
+        String repeat(size_t count) const;
         
-        int search(Regexp regexp);
+        String replace(String subStr, String newSubStr) const;
+        // String replace(String subStr, Function replaceFunc) const;
+        String replace(Regexp regexp, String newSubStr) const;
+        // String replace(Regexp regexp, Function replaceFunc) const;
         
-        String slice(int beginSlice);
-        String slice(int beginSlice, int endSlice);
+        size_t search(Regexp regexp) const;
         
-        Array<String> split();
-        Array<String> split(String separator);
-        Array<String> split(String separator, int limit);
-        Array<String> split(Regexp separator);
-        Array<String> split(Regexp separator, int limit);
+        String slice(size_t beginSlice) const;
+        String slice(size_t beginSlice, size_t endSlice) const;
         
-        String substr(int start);
-        String substr(int start, int length);
+        Array<String> split() const;
+        Array<String> split(String separator) const;
+        Array<String> split(String separator, size_t limit) const;
+        Array<String> split(Regexp separator) const;
+        Array<String> split(Regexp separator, size_t limit) const;
         
-        String substring(int indexA);
-        String substring(int indexA, int indexB);
+        String substr(size_t start) const;
+        String substr(size_t start, size_t length) const;
         
-        String toLowerCase();
-        String toUpperCase();
+        String substring(size_t indexA) const;
+        String substring(size_t indexA, size_t indexB) const;
         
-        String trim();
+        String toLowerCase() const;
+        String toUpperCase() const;
         
-        int length();
+        String trim() const;
         
-        char operator[](int index);
+        size_t length() const;
         
-        CString toCString();
+        char operator[](size_t index) const;
+        operator StringBuilder() const;
+        
+        friend std::ostream& operator<< (std::ostream& stream, const String& str);
+        
+        CString toCString() const;
+        
+        const size_t MAX_LENGTH = ((size_t) - 1);
         
     private:
         string_char_t* _str;
-        int _len;
+        size_t _len;
     };
 }
