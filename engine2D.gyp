@@ -65,6 +65,7 @@
 				["OS == \"mac\"", {
 					"xcode_settings": {
 						"OTHER_CPLUSPLUSFLAGS": [
+							"-D_FORTIFY_SOURCE=2",
 							"-std=gnu++11",
 							"-stdlib=libc++",
 							"-pthread"
