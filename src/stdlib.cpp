@@ -86,7 +86,7 @@ namespace Engine {
     }
     
     size_t String::indexOf(String search, size_t fromIndex) const {
-        
+        return strcspn(this->_str, &(search._str[fromIndex]));
     }
     
     size_t String::lastIndexOf(String search) const {
