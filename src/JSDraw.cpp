@@ -50,6 +50,62 @@ namespace Engine {
             arr->Dispose();
         }
         
+#define CreateWrappedAccessor(name, type, internalValue) \
+        static void Get##type##_##name(v8::Local<v8::String> valueName, const v8::PropertyCallbackInfo<v8::Value>& info) { \
+            \
+        } \
+        \
+        static void Set##type##_##name(v8::Local<v8::String> valueName, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info) { \
+            \
+        }
+        
+    
+        CreateWrappedAccessor(r, Color4f, r);
+        CreateWrappedAccessor(g, Color4f, g);
+        CreateWrappedAccessor(b, Color4f, b);
+        CreateWrappedAccessor(a, Color4f, a);
+        
+#undef CreateWrappedAccessor
+        
+        ENGINE_JS_METHOD(CreateColor) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            if (args.Length() == 1) { // new Color(number(0xrrggbb) || string('predefined'))
+            
+            } else if (args.Length() == 2) { // new Color(number(0xrrggbb), number(alpha))
+                
+            } else if (args.Length() == 3) { // new Color(number(r), number(g), number(b))
+                
+            } else if (args.Length() == 4) { // new Color(number(r), number(g), number(b), number(a))
+                
+            } else { // undefined
+                
+            }
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        void InitColorObject(v8::Handle<v8::ObjectTemplate> drawTable) {
+            v8::HandleScope scope(v8::Isolate::GetCurrent());
+            
+            v8::Handle<v8::FunctionTemplate> newColor = v8::FunctionTemplate::New();
+            
+            newColor->SetClassName(v8::String::NewSymbol("Color"));
+            
+            v8::Handle<v8::ObjectTemplate> colorPrototypeTemplate = newColor->PrototypeTemplate();
+            v8::Handle<v8::ObjectTemplate> colorInstanceTemplate = newColor->InstanceTemplate();
+            
+            colorInstanceTemplate->SetAccessor(v8::String::New("r"), GetColor4f_r, SetColor4f_r);
+            colorInstanceTemplate->SetAccessor(v8::String::New("g"), GetColor4f_g, SetColor4f_g);
+            colorInstanceTemplate->SetAccessor(v8::String::New("b"), GetColor4f_b, SetColor4f_b);
+            colorInstanceTemplate->SetAccessor(v8::String::New("a"), GetColor4f_a, SetColor4f_a);
+            
+            v8::Handle<v8::FunctionTemplate> createColor = v8::FunctionTemplate::New();
+            
+            createColor->SetCallHandler(CreateColor);
+        }
+        
+        
 		ENGINE_JS_METHOD(Rect) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -1049,9 +1105,7 @@ namespace Engine {
 #define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
             
             void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
-                v8::HandleScope scope(v8::Isolate::GetCurrent());
-                
-                v8::Handle<v8::FunctionTemplate> createTexture = v8::FunctionTemplate::New(CreateTexture);
+                InitColorObject(drawTable);
                 
                 addItem(drawTable, "rect", Rect);
                 addItem(drawTable, "grid", Grid);
