@@ -1,0 +1,20 @@
+new Color(num /* number(0xrrggbb) */);
+new Color(str /* string('predefinedColor') */);
+new Color(num /* number(0xrrggbb) */, alpha /* number(alpha 0.0f-1.0f) */);
+new Color(r /* number(red 0.0f-1.0f) */, g /* number(green) */, b /* number(blue) */);
+new Color(r /* number(red 0.0f-1.0f) */, g /* number(green) */, b /* number(blue) */, a /* number(alpha) */);
+
+Color.fromInt(r /* number(red 0-255) */, g /* number(green) */, b /* number(blue) */);
+Color.fromInt(r /* number(red 0-255) */, g /* number(green) */, b /* number(blue) */, a /* number(alpha) */);
+Color.fromHSV(h /* number(hue 0-360) */, s /* number(saturation 0.0f-1.0f) */, v /* number(value 0.0f-1.0f) */);
+
+color.r; // read/write
+color.g; // read/write
+color.b; // read/write
+color.name; // read only, undefined if the color did not come from a predefined color
+
+Color.prototype.lerp(value2, rate);
+Color.prototype.mutliply(factor);
+Color.prototype.mutliply(rFactor, gFactor, bFactor);
+Color.prototype.mutliply(rFactor, gFactor, bFactor, aFactor);
+Color.prototype.toString();
