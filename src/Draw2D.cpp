@@ -553,13 +553,16 @@ namespace Engine {
 				_initPredefinedColors();
 				_predefFilled = true;
 			}
-            // Too many perf issues from calling count
-            //if (_predefinedColors.count(colorName) == 0) {
-            //    Logger::begin("Draw2D", Logger::LogLevel_Error) << "Color not found: " << colorName << Logger::end();
-            //    SetColor(0x123456);
-            //} else {
+            
+            if (colorName[0] == '#') {
+                unsigned int tempCol;
+                std::stringstream ss;
+                ss << std::hex << colorName.substr(1);
+                ss >> tempCol;
+                SetColor(tempCol);
+            } else {
                 SetColor(_predefinedColors[colorName]);
-            //}
+            }
         }
         
         void SetColor(float r, float g, float b) {
