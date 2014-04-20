@@ -25,6 +25,7 @@
 				"src/Shader.cpp",
 				"src/EngineUI.cpp",
 				"src/Draw2D.cpp",
+				"src/RenderGL.cpp",
 				"src/Logger.cpp",
 				"src/Profiler.cpp",
 				"src/FramePerfMonitor.cpp",
