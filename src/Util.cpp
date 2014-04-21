@@ -21,7 +21,7 @@
 
 #include "Util.hpp"
 
-namespace engine {
+namespace Engine {
 
     bool _hasGLContext = false;
 

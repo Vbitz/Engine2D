@@ -30,7 +30,7 @@
 #include <unistd.h>
 #endif
 
-namespace engine {
+namespace Engine {
     bool HasGLContext();
     
     void EnableGLContext();
@@ -72,4 +72,4 @@ namespace engine {
 #define ENGINE_JS_SCOPE_CLOSE(value) args.GetReturnValue().Set(value); return
 #define ENGINE_JS_SCOPE_CLOSE_UNDEFINED return
 
-#define ENGINE_CHECK_GL if (!engine::HasGLContext()) { ENGINE_THROW_ARGERROR("No OpenGL Context"); ENGINE_JS_SCOPE_CLOSE_UNDEFINED; }
+#define ENGINE_CHECK_GL if (!Engine::HasGLContext()) { ENGINE_THROW_ARGERROR("No OpenGL Context"); ENGINE_JS_SCOPE_CLOSE_UNDEFINED; }

@@ -1282,7 +1282,7 @@ namespace Engine {
         
         Draw2D::CheckGLError("Post InitOpenGL");
         
-        engine::EnableGLContext();
+        Engine::EnableGLContext();
         
         this->_disablePreload();
         
@@ -1308,7 +1308,7 @@ namespace Engine {
             this->_mainLoop();
         }
         
-        engine::DisableGLContext();
+        Engine::DisableGLContext();
         
 		this->_shutdownOpenGL();
 		this->_shutdownScripting();
