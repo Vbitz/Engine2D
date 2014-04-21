@@ -593,6 +593,14 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Platform::ShellExecute(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
+        ENGINE_JS_METHOD(GetUuid) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            unsigned char* uuid = Platform::GenerateUUID();
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::String::New(Platform::StringifyUUID(uuid).c_str()));
+        }
+        
         ENGINE_JS_METHOD(DumpLog) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -704,6 +712,7 @@ namespace Engine {
             
             addItem(sysTable, "msgBox", MsgBox);
             addItem(sysTable, "shell", ShellExec);
+            addItem(sysTable, "uuid", GetUuid);
             
             addItem(sysTable, "dumpLog", DumpLog);
             
