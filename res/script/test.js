@@ -115,6 +115,18 @@ var tests = {
 		});
 
 		return true;
+	},
+	"EventMagic": function () {
+		var count = 0;
+		sys.on("eventMagicTestTarget", "test.eventMagicTestTarget2", function (e) {
+			count++;
+		});
+		sys.on("eventMagicTestTarget", "test.eventMagicTestTarget1", function (e) {
+			count++;
+			return event.EM_CANCEL;
+		});
+		sys.emit("eventMagicTestTarget");
+		return count === 1;
 	}
 };
 
@@ -126,7 +138,11 @@ for (var i in tests) {
 		sys.perf(i + "_test", function () {
 			testResults[i] = tests[i]();
 		});
-		console.log("Test passed : " + i);
+		if (testResults[i]) {
+			console.log("Test passed : " + i);
+		} else {
+			console.error("Test failed : " + i);
+		}
 	} catch (e) {
 		console.error("Test failed : " + i + " : " + e.message);
 		testResults[i] = false;

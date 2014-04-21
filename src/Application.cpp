@@ -69,6 +69,8 @@ namespace Engine {
     static pthread_mutex_t debugMesssageReadyMutex;
     static bool debugMessageReady = false;
     
+    static v8::Persistent<v8::External> _EM_CANCEL;
+    
     void OnGLFWError(int error, const char* msg) {
         Logger::begin("Window", Logger::LogLevel_Error) << "GLFW Error : " << error << " : " << msg << Logger::end();
     }
@@ -105,13 +107,19 @@ namespace Engine {
     static void EventGetterCallback(v8::Local<v8::String> name, const v8::PropertyCallbackInfo<v8::Value>& info) {
         v8::HandleScope scp(info.GetIsolate());
         
-        v8::Handle<v8::FunctionTemplate> t = v8::FunctionTemplate::New();
+        std::string nameStr = std::string(*v8::String::Utf8Value(name));
         
-        t->SetCallHandler(EventCallCallback, name);
+        if (nameStr == "EM_CANCEL") {
+            info.GetReturnValue().Set(_EM_CANCEL);
+        } else {
+            v8::Handle<v8::FunctionTemplate> t = v8::FunctionTemplate::New();
         
-        v8::Handle<v8::Function> func = t->GetFunction();
+            t->SetCallHandler(EventCallCallback, name);
         
-        info.GetReturnValue().Set(func);
+            v8::Handle<v8::Function> func = t->GetFunction();
+        
+            info.GetReturnValue().Set(func);
+        }
     }
     
     static void EventSetterCallback(v8::Local<v8::String> name, v8::Local<v8::Value> val, const v8::PropertyCallbackInfo<v8::Value>& info) {
@@ -144,6 +152,12 @@ namespace Engine {
         v8::V8::SetFlagsFromString(harmony, std::strlen(harmony));
     }
     
+    void Application::_createEventMagic() {
+        if (_EM_CANCEL.IsEmpty()) {
+            _EM_CANCEL.Reset(v8::Isolate::GetCurrent(), v8::External::New(new EventMagic(EM_CANCEL)));
+        }
+    }
+    
     static void JitEventCallback(const v8::JitCodeEvent* e) {
         if (e != NULL && e->type == v8::JitCodeEvent::CODE_ADDED) {
             GetAppSingilton()->AddScript(e->name.str, e->name.len);
@@ -157,6 +171,7 @@ namespace Engine {
         
         this->_enableTypedArrays();
         this->_enableHarmony();
+        this->_createEventMagic();
         
         v8::Isolate* isolate = v8::Isolate::GetCurrent();
         

@@ -127,6 +127,7 @@ namespace Engine {
         v8::Handle<v8::Context> _initScripting();
         void _enableTypedArrays();
         void _enableHarmony();
+        void _createEventMagic();
         void _initGLContext(GraphicsVersion v);
         
         void _processScripts();
