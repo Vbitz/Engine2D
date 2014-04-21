@@ -125,6 +125,7 @@ namespace Engine {
         void _enableV8Debugger();
         void _handleDebugMessage();
         v8::Handle<v8::Context> _initScripting();
+        v8::Local<v8::Object> _getScriptTable(std::string name);
         void _enableTypedArrays();
         void _enableHarmony();
         void _createEventMagic();

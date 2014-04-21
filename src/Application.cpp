@@ -303,16 +303,20 @@ namespace Engine {
 		//_globalIsolate->Exit();
 		//_globalIsolate->Dispose();
 	}
+    
+    v8::Local<v8::Object> Application::_getScriptTable(std::string name) {
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
+        v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
+        
+		v8::Local<v8::Object> obj = ctx->Global();
+		return v8::Local<v8::Object>::Cast(obj->Get(v8::String::New(name.c_str())));
+    }
 	
 	void Application::_updateMousePos() {
         glm::vec2 mouse = _window->GetCursorPos();
         
-		v8::HandleScope scp(v8::Isolate::GetCurrent());
-        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
-        v8::Context::Scope ctx_scope(ctx);
+        v8::Local<v8::Object> input_table = _getScriptTable("input");
         
-		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
-		v8::Local<v8::Object> input_table = v8::Object::Cast(*obj->Get(v8::String::New("input")));
 		input_table->Set(v8::String::New("mouseX"), v8::Number::New(mouse.x));
 		input_table->Set(v8::String::New("mouseY"), v8::Number::New(mouse.y));
 		input_table->Set(v8::String::New("leftMouseButton"), v8::Boolean::New(this->_window->GetMouseButtonPressed(MouseButton_Left)));
@@ -324,12 +328,8 @@ namespace Engine {
         if (!this->_running) {
             return false;
         }
-		v8::HandleScope scp(v8::Isolate::GetCurrent());
-        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
-        v8::Context::Scope ctx_scope(ctx);
         
-		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
-		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
+        v8::Local<v8::Object> sys_table = _getScriptTable("sys");
         
         glm::vec2 size = this->_window->GetWindowSize();
         
@@ -338,22 +338,14 @@ namespace Engine {
 	}
     
     void Application::_updateFrameTime() {
-		v8::HandleScope scp(v8::Isolate::GetCurrent());
-        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
-        v8::Context::Scope ctx_scope(ctx);
+		v8::Local<v8::Object> sys_table = _getScriptTable("sys");
         
-		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
-		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
         sys_table->Set(v8::String::NewSymbol("deltaTime"), v8::Number::New(FramePerfMonitor::GetFrameTime()));
     }
     
     void Application::_disablePreload() {
-		v8::HandleScope scp(v8::Isolate::GetCurrent());
-        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
-        v8::Context::Scope ctx_scope(ctx);
+		v8::Local<v8::Object> sys_table = _getScriptTable("sys");
         
-		v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
-		v8::Local<v8::Object> sys_table = v8::Object::Cast(*obj->Get(v8::String::New("sys")));
         sys_table->Set(v8::String::New("preload"), v8::Boolean::New(false));
     }
     
