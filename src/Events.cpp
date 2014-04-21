@@ -33,9 +33,11 @@ namespace Engine {
         
         class EventTarget {
         public:
-            void Run(std::function<bool(Json::Value)> filter, Json::Value e) {
+            EventMagic Run(std::function<bool(Json::Value)> filter, Json::Value e) {
                 if (filter(_filter)) {
-                    _run(e);
+                    return _run(e);
+                } else {
+                    return EM_BADFILTER;
                 }
             }
             
@@ -48,7 +50,7 @@ namespace Engine {
                 _filter = filter;
             }
             
-            virtual bool _run(Json::Value e) { return false; }
+            virtual EventMagic _run(Json::Value e) { return EM_BADTARGET; }
         };
         
         class CPPEventTarget : public EventTarget {
@@ -61,14 +63,24 @@ namespace Engine {
             bool IsScript() override { return false; }
             
         protected:
-            bool _run(Json::Value e) {
-                this->_func(e);
-                return true;
+            EventMagic _run(Json::Value e) {
+                return this->_func(e);
             }
             
         private:
             EventTargetFunc _func;
         };
+        
+        EventMagic GetScriptingReturnType(v8::Local<v8::Value> ret) {
+            if (!ret->IsExternal()) {
+                return EM_OK;
+            } else {
+                v8::Local<v8::External> exVal = ret.As<v8::External>();
+                void* value = exVal->Value();
+                EventMagic* magic = (EventMagic*) value;
+                return *magic;
+            }
+        }
         
         class JSEventTarget : public EventTarget {
         public:
@@ -78,10 +90,10 @@ namespace Engine {
                 }
             
         protected:
-            bool _run(Json::Value e) {
+            EventMagic _run(Json::Value e) {
                 v8::Isolate* currentIsolate = v8::Isolate::GetCurrent();
                 v8::Local<v8::Context> ctx = currentIsolate->GetCurrentContext();
-                if (ctx.IsEmpty() || ctx->Global().IsEmpty()) return;
+                if (ctx.IsEmpty() || ctx->Global().IsEmpty()) return EM_BADTARGET;
                 
                 v8::TryCatch tryCatch;
                 
@@ -98,13 +110,13 @@ namespace Engine {
                 
                 v8::Local<v8::Function> func = v8::Local<v8::Function>::New(currentIsolate, _func);
                 
-                func->Call(ctx->Global(), 1, args);
+                v8::Local<v8::Value> ret = func->Call(ctx->Global(), 1, args);
             
                 if (!tryCatch.StackTrace().IsEmpty()) {
                     ScriptingManager::ReportException(currentIsolate, &tryCatch);
-                    return false;
+                    return EM_BADTARGET;
                 } else {
-                    return true;
+                    return GetScriptingReturnType(ret);
                 }
             }
             
@@ -144,7 +156,7 @@ namespace Engine {
         
         int lastEventID = 0;
         
-        void _debug(Json::Value args) {
+        EventMagic _debug(Json::Value args) {
             Logger::begin("Events", Logger::LogLevel_Log) << " == EVENT DEBUG ==" << Logger::end();
             
             for (auto iter = _events.begin();
@@ -171,6 +183,7 @@ namespace Engine {
                         << Logger::end();
                 }
             }
+            return EM_OK;
         }
         
         void Init() {
@@ -187,7 +200,10 @@ namespace Engine {
                 if (iter->second.Target == NULL) { throw "Invalid Target"; }
                 if (iter->second.Active) {
                     if (!(cls.Security.NoScript && iter->second.Target->IsScript())) {
-                        iter->second.Target->Run(filter, args);
+                        EventMagic ret = iter->second.Target->Run(filter, args);
+                        if (ret == EM_CANCEL) {
+                            break;
+                        }
                     }
                 } else {
                     deleteTargets.push_back(iter->second);

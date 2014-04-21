@@ -131,10 +131,10 @@ namespace Engine {
         
         void _processScripts();
         
-        static void _rawInputHandler(Json::Value v);
-        static void _rendererKillHandler(Json::Value v);
-        static void _postCreateContext(Json::Value v);
-        static void _rawResizeHandler(Json::Value v);
+        static EventMagic _rawInputHandler(Json::Value v);
+        static EventMagic _rendererKillHandler(Json::Value v);
+        static EventMagic _postCreateContext(Json::Value v);
+        static EventMagic _rawResizeHandler(Json::Value v);
         
         bool _running = false;
         

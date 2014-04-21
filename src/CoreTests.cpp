@@ -30,18 +30,20 @@ namespace Engine {
     
     static int adder = 0;
     
-    void AdderTest1(Json::Value val) {
+    EventMagic AdderTest1(Json::Value val) {
         if ((adder % 50000) == 0) {
 			Logger::begin("Script", Logger::LogLevel_Log) << "[1] adder = " << adder << Logger::end();
 		}
         adder++;
+        return EM_OK;
     }
     
-    void AdderTest2(Json::Value val) {
+    EventMagic AdderTest2(Json::Value val) {
         if ((adder % 50000) == 0) {
 			Logger::begin("Script", Logger::LogLevel_Log) << "[2] adder = " << adder << Logger::end();
 		}
         adder++;
+        return EM_OK;
     }
     
     class CoreEventTest : public Test {

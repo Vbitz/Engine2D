@@ -390,20 +390,24 @@ namespace Engine {
         Config::SetBoolean( "core.debug.slowload",                  false);
     }
     
-    void Config_CoreRenderAA(Json::Value args) {
+    EventMagic Config_CoreRenderAA(Json::Value args) {
         GetAppSingilton()->GetWindow()->SetAntiAlias(Config::GetInt("core.render.aa"));
+        return EM_OK;
     }
     
-    void Config_CoreWindowVSync(Json::Value args) {
+    EventMagic Config_CoreWindowVSync(Json::Value args) {
         GetAppSingilton()->GetWindow()->SetVSync(Config::GetBoolean("core.window.vsync"));
+        return EM_OK;
     }
     
-    void Config_CoreWindowSize(Json::Value args) {
+    EventMagic Config_CoreWindowSize(Json::Value args) {
         GetAppSingilton()->GetWindow()->SetWindowSize(glm::vec2(Config::GetInt("core.window.width"), Config::GetInt("core.window.height")));
+        return EM_OK;
     }
     
-    void Config_CoreWindowTitle(Json::Value args) {
+    EventMagic Config_CoreWindowTitle(Json::Value args) {
         GetAppSingilton()->GetWindow()->SetTitle(Config::GetString("core.window.title"));
+        return EM_OK;
     }
     
     void Application::_hookConfigs() {
@@ -454,16 +458,19 @@ namespace Engine {
         }
     }
     
-    void AppEvent_Exit(Json::Value val) {
+    EventMagic AppEvent_Exit(Json::Value val) {
         GetAppSingilton()->Exit();
+        return EM_OK;
     }
     
-    void AppEvent_Screenshot(Json::Value args) {
+    EventMagic AppEvent_Screenshot(Json::Value args) {
         GetAppSingilton()->SaveScreenshot(args["filename"].asString());
+        return EM_OK;
     }
     
-    void AppEvent_DumpScripts(Json::Value args) {
+    EventMagic AppEvent_DumpScripts(Json::Value args) {
         GetAppSingilton()->DumpScripts();
+        return EM_OK;
     }
     
     void Application::_hookEvents() {
@@ -536,7 +543,7 @@ namespace Engine {
         this->_window = NULL;
     }
     
-    void Application::_rawInputHandler(Json::Value val) {
+    EventMagic Application::_rawInputHandler(Json::Value val) {
         EngineUI::OnKeyPress(val["rawKey"].asInt(), val["rawPress"].asInt(), val["shift"].asBool());
         
         if (EngineUI::ConsoleActive()) {
@@ -546,21 +553,26 @@ namespace Engine {
         std::string key = val["key"].asString();
         
         Events::Emit("input", val);
+        
+        return EM_OK;
     }
     
-    void Application::_rendererKillHandler(Json::Value val) {
+    EventMagic Application::_rendererKillHandler(Json::Value val) {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Window Destroyed" << Logger::end();
         GetAppSingilton()->_shutdownFonts();
         ResourceManager::UnloadAll();
+        return EM_OK;
     }
     
-    void Application::_postCreateContext(Json::Value val) {
+    EventMagic Application::_postCreateContext(Json::Value val) {
         Application* app = GetAppSingilton();
         app->_initGLContext(app->_window->GetGraphicsVersion());
+        return EM_OK;
     }
     
-    void Application::_rawResizeHandler(Json::Value val) {
+    EventMagic Application::_rawResizeHandler(Json::Value val) {
         GetAppSingilton()->UpdateScreen();
+        return EM_OK;
     }
 	
 	void Application::_initOpenGL() {

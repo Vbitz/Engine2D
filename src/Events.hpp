@@ -30,8 +30,17 @@
 #include "ScriptingManager.hpp"
 
 namespace Engine {
+    enum EventMagic {
+        EM_OK,
+        EM_CANCEL,
+        
+        // internal values
+        EM_BADFILTER,
+        EM_BADTARGET
+    };
+    
     namespace Events {
-        typedef void (*EventTargetFunc)(Json::Value e);
+        typedef EventMagic (*EventTargetFunc)(Json::Value e);
         
         void Init();
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args);
