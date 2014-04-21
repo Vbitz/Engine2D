@@ -397,32 +397,32 @@ namespace Engine {
         Config::SetBoolean( "core.debug.slowload",                  false);
     }
     
-    EventMagic Config_CoreRenderAA(Json::Value args) {
+    EventMagic Application::_config_CoreRenderAA(Json::Value args) {
         GetAppSingilton()->GetWindow()->SetAntiAlias(Config::GetInt("core.render.aa"));
         return EM_OK;
     }
     
-    EventMagic Config_CoreWindowVSync(Json::Value args) {
+    EventMagic Application::_config_CoreWindowVSync(Json::Value args) {
         GetAppSingilton()->GetWindow()->SetVSync(Config::GetBoolean("core.window.vsync"));
         return EM_OK;
     }
     
-    EventMagic Config_CoreWindowSize(Json::Value args) {
+    EventMagic Application::_config_CoreWindowSize(Json::Value args) {
         GetAppSingilton()->GetWindow()->SetWindowSize(glm::vec2(Config::GetInt("core.window.width"), Config::GetInt("core.window.height")));
         return EM_OK;
     }
     
-    EventMagic Config_CoreWindowTitle(Json::Value args) {
+    EventMagic Application::_config_CoreWindowTitle(Json::Value args) {
         GetAppSingilton()->GetWindow()->SetTitle(Config::GetString("core.window.title"));
         return EM_OK;
     }
     
     void Application::_hookConfigs() {
-        Events::On("config:core.render.aa", "Application::Config_CoreRenderAA", Config_CoreRenderAA);
-        Events::On("config:core.window.vsync", "Application::Config_CoreWindowVSync", Config_CoreWindowVSync);
-        Events::On("config:core.window.width", "Application::ConfigWindowSize_Width", Config_CoreWindowSize);
-        Events::On("config:core.window.height", "Application::ConfigWindowSize_Height", Config_CoreWindowSize);
-        Events::On("config:core.window.title", "Application::Config_CoreWindowTitle", Config_CoreWindowTitle);
+        Events::On("config:core.render.aa", "Application::Config_CoreRenderAA", _config_CoreRenderAA);
+        Events::On("config:core.window.vsync", "Application::Config_CoreWindowVSync", _config_CoreWindowVSync);
+        Events::On("config:core.window.width", "Application::ConfigWindowSize_Width", _config_CoreWindowSize);
+        Events::On("config:core.window.height", "Application::ConfigWindowSize_Height", _config_CoreWindowSize);
+        Events::On("config:core.window.title", "Application::Config_CoreWindowTitle", _config_CoreWindowTitle);
     }
     
     void Application::_loadConfigFile() {
@@ -465,19 +465,19 @@ namespace Engine {
         }
     }
     
-    EventMagic AppEvent_Exit(Json::Value val) {
+    EventMagic Application::_appEvent_Exit(Json::Value val) {
         GetAppSingilton()->Exit();
         return EM_OK;
     }
     
-    EventMagic AppEvent_DumpScripts(Json::Value args) {
+    EventMagic Application::_appEvent_DumpScripts(Json::Value args) {
         GetAppSingilton()->DumpScripts();
         return EM_OK;
     }
     
     void Application::_hookEvents() {
-        Events::On("exit", "Application::AppEvent_Exit", AppEvent_Exit);
-        Events::On("dumpScripts", "Applicaton::AppEvent_DumpScripts", AppEvent_DumpScripts);
+        Events::On("exit", "Application::_appEvent_Exit", _appEvent_Exit);
+        Events::On("dumpScripts", "Applicaton::_appEvent_DumpScripts", _appEvent_DumpScripts);
         
         Events::On("toggleFullscreen", "Application::_toggleFullscreen", _toggleFullscreen);
         Events::On("restartRenderer", "Application::_restartRenderer", _restartRenderer);
@@ -954,9 +954,7 @@ namespace Engine {
         
 		v8::TryCatch tryCatch;
         
-		v8::Handle<v8::Script> script = v8::Script::Compile(
-                                                            v8::String::New(str.c_str()),
-                                                            v8::String::NewSymbol("Console"));
+		v8::Handle<v8::Script> script = v8::Script::Compile(v8::String::New(str.c_str()), v8::String::NewSymbol("Console"));
         
 		if (script.IsEmpty()) {
 			v8::Handle<v8::Value> exception = tryCatch.StackTrace();

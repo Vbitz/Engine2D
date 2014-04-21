@@ -37,49 +37,47 @@ namespace Engine {
     
     class Application {
     public:
+        // Startup/Shutdown
         int Start(int argc, char const *argv[]);
+        void Exit();
         
-        bool IsDelayedConfig(std::string configKey);
-      
+        // Public font functions
         GLFT_Font* GetFont(std::string fontName, int fontSize);
         bool LoadFont(std::string prettyName, std::string filename);
         bool IsFontLoaded(std::string fontName);
         
+        // Public application functions
         std::vector<std::string> GetCommandLineArgs();
+        bool IsDelayedConfig(std::string configKey);
         
+        // Public window functions
         int GetScreenWidth();
         int GetScreenHeight();
         void SetScreenSize(int width, int height);
-        
         Window* GetWindow();
-        
-        bool RunFile(std::string path, bool persist);
-        
-        void Exit();
-        
-        bool UsingGL3();
-        
-        void RunCommand(std::string str);
-        
-        void DetailProfile(int frames, std::string filename);
-        
-        void InvalidateScript(std::string filename);
-        
         bool GetKeyPressed(int key);
-        
-        OpenGLVersion GetOpenGLVersion();
-        
-        EffectShaderTypes::Type GetBestEffectShaderType();
-        
-        static std::string GetEngineVersion();
-        bool IsDebugMode();
-        
         void UpdateScreen();
         
-        void Assert(bool value, std::string reason, std::string line, int lineNumber);
+        // Public rendering functions
+        OpenGLVersion GetOpenGLVersion();
+        EffectShaderTypes::Type GetBestEffectShaderType();
+        bool UsingGL3();
+        
+        // Public script functions
+        bool RunFile(std::string path, bool persist);
+        void RunCommand(std::string str);
+        void InvalidateScript(std::string filename);
         
         void AddScript(const char* filename_str, size_t filename_len);
         void DumpScripts();
+        
+        // Public debug functions
+        void DetailProfile(int frames, std::string filename);
+        bool IsDebugMode();
+        void Assert(bool value, std::string reason, std::string line, int lineNumber);
+        
+        // Static functions
+        static std::string GetEngineVersion();
         
     private:
         struct RawScriptInfo {
@@ -91,34 +89,37 @@ namespace Engine {
             std::string filename;
         };
         
+        // Main Loop
         void _mainLoop();
+        void _updateFrameTime();
+        void _updateMousePos();
+        void _processScripts();
         
-        int  _postStart();
+        // System Events
         static EventMagic _dumpProfile(Json::Value args);
         static EventMagic _saveScreenshot(Json::Value args);
         static EventMagic _toggleFullscreen(Json::Value args);
         static EventMagic _restartRenderer(Json::Value args);
         static EventMagic _dumpLog(Json::Value args);
+        static EventMagic _appEvent_Exit(Json::Value v);
+        static EventMagic _appEvent_DumpScripts(Json::Value v);
+        
+        // Window Events
+        static EventMagic _rawInputHandler(Json::Value v);
+        static EventMagic _rendererKillHandler(Json::Value v);
+        static EventMagic _postCreateContext(Json::Value v);
+        static EventMagic _rawResizeHandler(Json::Value v);
+        
+        // Config Events
+        static EventMagic _config_CoreRenderAA(Json::Value args);
+        static EventMagic _config_CoreWindowVSync(Json::Value args);
+        static EventMagic _config_CoreWindowSize(Json::Value args);
+        static EventMagic _config_CoreWindowTitle(Json::Value args);
+        
+        // Scripting
         bool _runFile(std::string path, bool persist);
         void _checkUpdate();
-        void _loadTests();
-        bool _parseCommandLine(int argc, const char* argv[]);
-        void _applyDelayedConfigs();
-        void _shutdownFonts();
-        void _initFonts();
-        void _shutdownOpenGL();
-        void _initOpenGL();
-        void _closeWindow();
-        void _openWindow(int width, int height, bool fullscreen, std::string openGLVersion);
-        void _loadBasicConfigs();
-        void _hookConfigs();
-        void _hookEvents();
-        void _disablePreload();
-        void _updateFrameTime();
-        void _updateMousePos();
         void _shutdownScripting();
-        void _printConfigVars();
-        void _loadConfigFile();
         void _enableV8Debugger();
         void _handleDebugMessage();
         v8::Handle<v8::Context> _initScripting();
@@ -126,15 +127,41 @@ namespace Engine {
         void _enableTypedArrays();
         void _enableHarmony();
         void _createEventMagic();
+        void _disablePreload();
+        
+        // Testing
+        void _loadTests();
+        
+        // Init
+        int  _postStart();
+        bool _parseCommandLine(int argc, const char* argv[]);
+        void _applyDelayedConfigs();
+        void _loadBasicConfigs();
+        void _hookConfigs();
+        void _hookEvents();
+        void _printConfigVars();
+        void _loadConfigFile();
+        
+        // Fonts
+        void _shutdownFonts();
+        void _initFonts();
+        
+        // OpenGL
+        void _shutdownOpenGL();
+        void _initOpenGL();
         void _initGLContext(GraphicsVersion v);
         
-        void _processScripts();
+        // Windowing
+        void _closeWindow();
+        void _openWindow(int width, int height, bool fullscreen, std::string openGLVersion);
         
-        static EventMagic _rawInputHandler(Json::Value v);
-        static EventMagic _rendererKillHandler(Json::Value v);
-        static EventMagic _postCreateContext(Json::Value v);
-        static EventMagic _rawResizeHandler(Json::Value v);
+        // Modes
+        bool _developerMode = false;
+        bool _debugMode = false;
+        bool _testMode = false;
+        bool _configVarsMode = false;
         
+        // Vars
         bool _running = false;
         
         std::vector<std::string> _jsArgs;
@@ -148,11 +175,6 @@ namespace Engine {
         std::map<std::string, long> _loadedFiles;
         
         std::vector<std::string> _archivePaths;
-        
-        bool _developerMode = false;
-        bool _debugMode = false;
-        bool _testMode = false;
-        bool _configVarsMode = false;
         
         int _detailFrames = 0;
         std::string _detailFilename = "";
