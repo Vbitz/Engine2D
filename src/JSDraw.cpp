@@ -50,23 +50,6 @@ namespace Engine {
             arr->Dispose();
         }
         
-#define CreateWrappedAccessor(name, type, internalValue) \
-        static void Get##type##_##name(v8::Local<v8::String> valueName, const v8::PropertyCallbackInfo<v8::Value>& info) { \
-            \
-        } \
-        \
-        static void Set##type##_##name(v8::Local<v8::String> valueName, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info) { \
-            \
-        }
-        
-    
-        CreateWrappedAccessor(r, Color4f, r);
-        CreateWrappedAccessor(g, Color4f, g);
-        CreateWrappedAccessor(b, Color4f, b);
-        CreateWrappedAccessor(a, Color4f, a);
-        
-#undef CreateWrappedAccessor
-        
         ENGINE_JS_METHOD(CreateColor) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -95,14 +78,11 @@ namespace Engine {
             v8::Handle<v8::ObjectTemplate> colorPrototypeTemplate = newColor->PrototypeTemplate();
             v8::Handle<v8::ObjectTemplate> colorInstanceTemplate = newColor->InstanceTemplate();
             
-            colorInstanceTemplate->SetAccessor(v8::String::New("r"), GetColor4f_r, SetColor4f_r);
-            colorInstanceTemplate->SetAccessor(v8::String::New("g"), GetColor4f_g, SetColor4f_g);
-            colorInstanceTemplate->SetAccessor(v8::String::New("b"), GetColor4f_b, SetColor4f_b);
-            colorInstanceTemplate->SetAccessor(v8::String::New("a"), GetColor4f_a, SetColor4f_a);
-            
             v8::Handle<v8::FunctionTemplate> createColor = v8::FunctionTemplate::New();
             
             createColor->SetCallHandler(CreateColor);
+            
+            drawTable->Set("Color", createColor);
         }
         
         
