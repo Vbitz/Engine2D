@@ -352,7 +352,7 @@ sys.on("input", "test.input", function (e) {
 	console.log("[INPUT] : " + key + " : " + press);
 	
 	if (key === "S" && press) {
-		sys.saveScreenshot("testing.png");
+		event.screenshot({filename: "testing.png"});
 	} else if (key === "I" && press) {
 		for (var i = 0; i < 20; i++) {
 			try {
@@ -360,6 +360,6 @@ sys.on("input", "test.input", function (e) {
 			} catch (ex) { }
 		}
 	} else if (key === "F" && press) {
-		sys.toggleFullscreen();
+		event.toggleFullscreen();
 	}
 });

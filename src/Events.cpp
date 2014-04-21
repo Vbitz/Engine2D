@@ -145,6 +145,7 @@ namespace Engine {
         
         struct EventClass {
             bool Valid = false;
+            bool AlwaysDefered = false;
             std::string TargetName;
             EventClassSecurity Security;
             std::unordered_map<std::string, Event> Events;
@@ -195,23 +196,27 @@ namespace Engine {
             std::vector<Event> deleteTargets;
             
             EventClass& cls = _events[evnt];
-            if (!cls.Valid) { _eventMutex->Exit(); return; }
-            for (auto iter = cls.Events.begin(); iter != cls.Events.end(); iter++) {
-                if (iter->second.Target == NULL) { throw "Invalid Target"; }
-                if (iter->second.Active) {
-                    if (!(cls.Security.NoScript && iter->second.Target->IsScript())) {
-                        EventMagic ret = iter->second.Target->Run(filter, args);
-                        if (ret == EM_CANCEL) {
-                            break;
+            if (!cls.Valid) { return; }
+            if (cls.AlwaysDefered) {
+                cls.DeferedMessages.push(args);
+            } else {
+                for (auto iter = cls.Events.begin(); iter != cls.Events.end(); iter++) {
+                    if (iter->second.Target == NULL) { throw "Invalid Target"; }
+                    if (iter->second.Active) {
+                        if (!(cls.Security.NoScript && iter->second.Target->IsScript())) {
+                            EventMagic ret = iter->second.Target->Run(filter, args);
+                            if (ret == EM_CANCEL) {
+                                break;
+                            }
                         }
+                    } else {
+                        deleteTargets.push_back(iter->second);
                     }
-                } else {
-                    deleteTargets.push_back(iter->second);
                 }
-            }
-            for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
-                delete cls.Events[iter->Label].Target;
-                cls.Events.erase(iter->Label);
+                for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
+                    delete cls.Events[iter->Label].Target;
+                    cls.Events.erase(iter->Label);
+                }
             }
         }
         
@@ -269,6 +274,16 @@ namespace Engine {
             }
         }
         
+        void SetDefered(std::string eventName, bool defered) {
+            std::string evnt_copy = std::string(eventName.c_str());
+            EventClass& cls = _events[evnt_copy];
+            if (!cls.Valid) {
+                cls.Valid = true;
+                cls.TargetName = evnt_copy;
+            }
+            cls.AlwaysDefered = defered;
+        }
+        
         // Only called from the main thread
         void PollDeferedMessages() {
             _eventMutex->Enter();
@@ -290,6 +305,27 @@ namespace Engine {
             }
             
             _eventMutex->Exit();
+        }
+        
+        // Only called from main thread, does not interact with other threads right now
+        void PollDeferedMessages(std::string eventName) {
+            EventClass& cls = _events[eventName];
+            if (!cls.Valid) { return; }
+            
+            while (cls.DeferedMessages.size() > 0) {
+                for (auto iter2 = cls.Events.begin(); iter2 != cls.Events.end(); iter2++) {
+                    if (iter2->second.Target == NULL) { throw "Invalid Target"; }
+                    if (iter2->second.Active) {
+                        if (!(cls.Security.NoScript && iter2->second.Target->IsScript())) {
+                            EventMagic ret = iter2->second.Target->Run([](Json::Value e) { return true; }, cls.DeferedMessages.front());
+                            if (ret == EM_CANCEL) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                cls.DeferedMessages.pop();
+            }
         }
         
         // Called from any worker thread

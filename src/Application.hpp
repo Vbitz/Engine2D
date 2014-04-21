@@ -56,10 +56,6 @@ namespace Engine {
         bool RunFile(std::string path, bool persist);
         
         void Exit();
-        void ToggleFullscreen();
-        void SaveScreenshot(std::string filename);
-        void DumpProfile();
-        void RestartRenderer();
         
         bool UsingGL3();
         
@@ -98,10 +94,10 @@ namespace Engine {
         void _mainLoop();
         
         int  _postStart();
-        void _dumpProfile();
-        void _saveScreenshot();
-        void _toggleFullscreen();
-        void _restartRenderer();
+        static EventMagic _dumpProfile(Json::Value args);
+        static EventMagic _saveScreenshot(Json::Value args);
+        static EventMagic _toggleFullscreen(Json::Value args);
+        static EventMagic _restartRenderer(Json::Value args);
         bool _runFile(std::string path, bool persist);
         void _checkUpdate();
         void _loadTests();
@@ -139,13 +135,6 @@ namespace Engine {
         static EventMagic _rawResizeHandler(Json::Value v);
         
         bool _running = false;
-        
-        bool _toggleNextframe = false;
-        bool _screenshotNextframe = false;
-        bool _dumpProfileAtFrameEnd = false;
-        bool _restartNextFrame = false;
-        
-        std::string _screenshotFilename;
         
         std::vector<std::string> _jsArgs;
         

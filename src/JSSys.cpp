@@ -257,18 +257,6 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(result));
         }
         
-        ENGINE_JS_METHOD(SaveScreenshot) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to save the screenshot as");
-            
-            GetAppSingilton()->SaveScreenshot(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
         ENGINE_JS_METHOD(Microtime) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -321,22 +309,6 @@ namespace Engine {
             ret->Set(v8::String::NewSymbol("myPhysicalUsed"), v8::Number::New(mem_info.myPhysicalUsed));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
-        }
-        
-        ENGINE_JS_METHOD(ToggleFullscreen) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            GetAppSingilton()->ToggleFullscreen();
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
-        ENGINE_JS_METHOD(RestartRenderer) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            GetAppSingilton()->RestartRenderer();
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
         ENGINE_JS_METHOD(Trace) {
@@ -710,11 +682,7 @@ namespace Engine {
             addItem(sysTable, "getExtentions", GetExtentions);
             addItem(sysTable, "getMaxTextureSize", GetMaxTextureSize);
             
-            addItem(sysTable, "saveScreenshot", SaveScreenshot);
-            
             addItem(sysTable, "resizeWindow", ResizeWindow);
-            addItem(sysTable, "toggleFullscreen", ToggleFullscreen);
-            addItem(sysTable, "restartRenderer", RestartRenderer);
             
             addItem(sysTable, "getProfilerTime", GetProfilerTime);
             addItem(sysTable, "getProfilerZones", GetProfileZones);

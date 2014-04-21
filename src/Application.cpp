@@ -470,11 +470,6 @@ namespace Engine {
         return EM_OK;
     }
     
-    EventMagic AppEvent_Screenshot(Json::Value args) {
-        GetAppSingilton()->SaveScreenshot(args["filename"].asString());
-        return EM_OK;
-    }
-    
     EventMagic AppEvent_DumpScripts(Json::Value args) {
         GetAppSingilton()->DumpScripts();
         return EM_OK;
@@ -482,8 +477,17 @@ namespace Engine {
     
     void Application::_hookEvents() {
         Events::On("exit", "Application::AppEvent_Exit", AppEvent_Exit);
-        Events::On("screenshot", "Application::AppEvent_Screenshot", AppEvent_Screenshot);
         Events::On("dumpScripts", "Applicaton::AppEvent_DumpScripts", AppEvent_DumpScripts);
+        
+        Events::On("toggleFullscreen", "Application::_toggleFullscreen", _toggleFullscreen);
+        Events::On("restartRenderer", "Application::_restartRenderer", _restartRenderer);
+        Events::On("screenshot", "Application::_saveScreenshot", _saveScreenshot);
+        Events::On("dumpProfile", "Application::_dumpProfile", _dumpProfile);
+        
+        Events::SetDefered("toggleFullscreen", true);
+        Events::SetDefered("restartRenderer", true);
+        Events::SetDefered("screenshot", true);
+        Events::SetDefered("dumpProfile", true);
     }
 	
     void _resizeWindow(Json::Value val) {
@@ -878,65 +882,51 @@ namespace Engine {
         this->_running = false;
     }
     
-    void Application::RestartRenderer() {
-        Logger::begin("Window", Logger::LogLevel_Log) << "Restarting renderer on next frame" << Logger::end();
-        _restartNextFrame = true;
-    }
-    
-    void Application::_restartRenderer() {
+    EventMagic Application::_restartRenderer(Json::Value args) {
+        Application* app = GetAppSingilton();
         Logger::begin("Window", Logger::LogLevel_Log) << "Restarting renderer" << Logger::end();
-        this->_window->Reset();
-        this->_initGLContext(this->_window->GetGraphicsVersion());
-        this->UpdateScreen();
+        app->_window->Reset();
+        app->_initGLContext(app->_window->GetGraphicsVersion());
+        app->UpdateScreen();
     }
     
-    void Application::ToggleFullscreen() {
-        Logger::begin("Window", Logger::LogLevel_Log) << "Switching to fullscreen on next frame" << Logger::end();
-        this->_toggleNextframe = true;
+    EventMagic Application::_toggleFullscreen(Json::Value args) {
+        Application* app = GetAppSingilton();
+        app->_window->SetFullscreen(!app->_window->GetFullscreen());
+        app->UpdateScreen();
     }
     
-    void Application::_toggleFullscreen() {
-        this->_window->SetFullscreen(!this->_window->GetFullscreen());
-        this->UpdateScreen();
-    }
-    
-	void Application::SaveScreenshot(std::string screenshotFilename) {
-        this->_screenshotFilename = screenshotFilename;
-        this->_screenshotNextframe = true;
-    }
-    
-    void Application::_saveScreenshot() {
+    EventMagic Application::_saveScreenshot(Json::Value args) {
+        Application* app = GetAppSingilton();
+        std::string targetFilename = args["filename"].asString();
+        
         int width, height;
-        width = this->_window->GetWindowSize().x;
-        height = this->_window->GetWindowSize().y;
+        
+        width = app->_window->GetWindowSize().x;
+        height = app->_window->GetWindowSize().y;
+        
         BYTE* pixels = new BYTE[4 * width * height];
         glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
         
-        ImageWriter::SaveBufferToFile(this->_screenshotFilename, pixels, width, height);
+        ImageWriter::SaveBufferToFile(targetFilename, pixels, width, height);
         
-        Logger::begin("Screenshot", Logger::LogLevel_Log)
-        << "Saved Screenshot as: " << Filesystem::GetRealPath(_screenshotFilename)
-        << Logger::end();
+        Logger::begin("Screenshot", Logger::LogLevel_Log) << "Saved Screenshot as: " << Filesystem::GetRealPath(targetFilename) << Logger::end();
         
-        Json::Value args(Json::objectValue);
+        Json::Value saveArgs(Json::objectValue);
         
-        args["filename"] = Filesystem::GetRealPath(_screenshotFilename);
+        saveArgs["filename"] = Filesystem::GetRealPath(targetFilename);
         
-        Events::Emit("onSaveScreenshot", args);
+        Events::Emit("onSaveScreenshot", saveArgs);
         
         delete [] pixels;
     }
     
+    EventMagic Application::_dumpProfile(Json::Value args) {
+        Profiler::DumpProfile();
+    }
+    
     bool Application::UsingGL3() {
         return this->_window->GetGlVersion().major > 3;
-    }
-    
-    void Application::DumpProfile() {
-        _dumpProfileAtFrameEnd = true;
-    }
-    
-    void Application::_dumpProfile() {
-        Profiler::DumpProfile();
     }
     
     void Application::RunCommand(std::string str) {
@@ -1181,31 +1171,10 @@ namespace Engine {
                 Profiler::End("ScriptGC");
             }
             
-            if (this->_toggleNextframe) {
-                Profiler::Begin("ToggleFullscreen");
-                this->_toggleFullscreen();
-                Profiler::End("ToggleFullscreen");
-                this->_toggleNextframe = false;
-            }
-            
-            if (this->_restartNextFrame) {
-                Profiler::Begin("RestartRenderer");
-                this->_restartRenderer();
-                Profiler::End("RestartRenderer");
-                this->_restartNextFrame = false;
-            }
-            
-            if (this->_screenshotNextframe) {
-                Profiler::Begin("SaveScreenshot");
-                this->_saveScreenshot();
-                Profiler::End("SaveScreenshot");
-                this->_screenshotNextframe = false;
-            }
-            
-            if (this->_dumpProfileAtFrameEnd) {
-                this->_dumpProfile();
-                this->_dumpProfileAtFrameEnd = false;
-            }
+            Events::PollDeferedMessages("toggleFullscreen");
+            Events::PollDeferedMessages("restartRenderer");
+            Events::PollDeferedMessages("screenshot");
+            Events::PollDeferedMessages("dumpProfile");
             
             if (this->_detailFrames > 0) {
                 Profiler::CaptureDetail();
