@@ -483,6 +483,7 @@ namespace Engine {
         Events::On("restartRenderer", "Application::_restartRenderer", _restartRenderer);
         Events::On("screenshot", "Application::_saveScreenshot", _saveScreenshot);
         Events::On("dumpProfile", "Application::_dumpProfile", _dumpProfile);
+        Events::On("dumpLog", "Application::_dumpLog", _dumpLog);
         
         Events::SetDefered("toggleFullscreen", true);
         Events::SetDefered("restartRenderer", true);
@@ -923,6 +924,21 @@ namespace Engine {
     
     EventMagic Application::_dumpProfile(Json::Value args) {
         Profiler::DumpProfile();
+    }
+    
+    EventMagic Application::_dumpLog(Json::Value args) {
+        std::string targetFilename = args["filename"].asString();
+        std::string log = Logger::DumpAllEvents();
+        
+        Filesystem::WriteFile(targetFilename, log.c_str(), log.length());
+        
+        Logger::begin("DumpLog", Logger::LogLevel_Log) << "Saved Logfile as: " << Filesystem::GetRealPath(targetFilename) << Logger::end();
+        
+        Json::Value saveArgs(Json::objectValue);
+        
+        saveArgs["filename"] = Filesystem::GetRealPath(targetFilename);
+        
+        Events::Emit("onSaveLog", saveArgs);
     }
     
     bool Application::UsingGL3() {

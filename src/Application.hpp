@@ -98,6 +98,7 @@ namespace Engine {
         static EventMagic _saveScreenshot(Json::Value args);
         static EventMagic _toggleFullscreen(Json::Value args);
         static EventMagic _restartRenderer(Json::Value args);
+        static EventMagic _dumpLog(Json::Value args);
         bool _runFile(std::string path, bool persist);
         void _checkUpdate();
         void _loadTests();
