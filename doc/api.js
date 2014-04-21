@@ -247,28 +247,11 @@ global.sys.getExtentions = function () {};
 global.sys.getMaxTextureSize = function () {};
 
 /**
- * Save a screenshot at the end of the frame to path
- * requires that fs.configDir has been called beforehand
- * @param  {string} path
- */
-global.sys.saveScreenshot = function (path) {};
-
-/**
  * Resizes the current window to width by height
  * @param  {number} width
  * @param  {number} height
  */
 global.sys.resizeWindow = function (width, height) {};
-
-/**
- * Toggles the window into fullscreen mode
- */
-global.sys.toggleFullscreen = function () {};
-
-/**
- * Closes and reopens the window resetting any render paramters
- */
-global.sys.restartRenderer = function () {};
 
 /**
  * Returns the last timespan zone took in seconds
