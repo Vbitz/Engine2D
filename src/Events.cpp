@@ -172,6 +172,7 @@ namespace Engine {
                 Logger::begin("Events", Logger::LogLevel_Log)
                     << "    Event Security: " << iter->second.Security.ToString()
                     << Logger::end();
+                Logger::begin("Events", Logger::LogLevel_Log) << "    Event Defered Messages: " << iter->second.DeferedMessages.size() << Logger::end();
                 Logger::begin("Events", Logger::LogLevel_Log)
                     << "    Event Members: "
                     << Logger::end();
