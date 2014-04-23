@@ -44,9 +44,9 @@ namespace Engine {
             }
         };
         
-        typedef struct _Color3f {
-            double r, g, b;
-        } Color3f;
+        struct Color4f {
+            float r, g, b, a;
+        };
         
         bool CheckGLError(const char* source);
         
@@ -59,9 +59,9 @@ namespace Engine {
         void EndRendering();
         
         void AddVert(float x, float y, float z);
-        void AddVert(float x, float y, float z, double r, double g, double b, double a);
+        void AddVert(float x, float y, float z, Color4f col);
         void AddVert(float x, float y, float z, float s, float t);
-        void AddVert(float x, float y, float z, double r, double g, double b, double a, float s, float t);
+        void AddVert(float x, float y, float z, Color4f col, float s, float t);
         
         void EnableTexture(Texture* texId);
         void DisableTexture();
@@ -84,12 +84,14 @@ namespace Engine {
         
         void Reset();
         
+        void ClearColor(Color4f col);
         void ClearColor(int col);
         void ClearColor(std::string colorName);
         void ClearColor(float r, float g, float b);
         
-        Color3f GetColor();
+        Color4f GetColor();
         
+        void SetColor(Color4f col);
         void SetColor(int col);
         void SetColor(std::string colorName);
         void SetColor(float r, float g, float b);
@@ -103,6 +105,7 @@ namespace Engine {
         void CameraZoom(float f);
         void CameraRotate(float r);
         
+        // Primatives
         void Rect(float x, float y, float w, float h);
         void Grid(float x, float y, float w, float h);
         

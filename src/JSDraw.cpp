@@ -368,11 +368,12 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New();
             
-            Draw2D::Color3f col = Draw2D::GetColor();
+            Draw2D::Color4f col = Draw2D::GetColor();
             
             ret->Set(v8::String::NewSymbol("r"), v8::Number::New(col.r));
             ret->Set(v8::String::NewSymbol("g"), v8::Number::New(col.g));
             ret->Set(v8::String::NewSymbol("b"), v8::Number::New(col.b));
+            ret->Set(v8::String::NewSymbol("a"), v8::Number::New(col.b));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }

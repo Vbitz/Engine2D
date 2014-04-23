@@ -32,10 +32,9 @@ namespace Engine {
     namespace Draw2D {
         bool _drawOffScreen = true;
 		
-		double _currentColorR = 1.0f;
-		double _currentColorG = 1.0f;
-		double _currentColorB = 1.0f;
-        double _currentColorA = 1.0f;
+		Color4f _currentColor = {
+            1.0f, 1.0f, 1.0f, 1.0f
+        };
         
         int _polygons = 0;
         int _drawCalls = 0;
@@ -277,7 +276,7 @@ namespace Engine {
                 }
             } else {
                 glBegin(mode);
-                glColor4f(_currentColorR, _currentColorG, _currentColorB, _currentColorA);
+                GLSetColor();
             }
         }
         
@@ -295,48 +294,48 @@ namespace Engine {
         
         void AddVert(float x, float y, float z) {
             if (GetAppSingilton()->UsingGL3()) {
-                AddVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, _currentColorA, 0.0, 0.0);
+                AddVert(x, y, z, _currentColor, 0.0, 0.0);
             } else {
                 glVertex3f(x - _centerX, y - _centerY, z);
                 _currentVerts++;
             }
         }
         
-        void AddVert(float x, float y, float z, double r, double g, double b, double a) {
+        void AddVert(float x, float y, float z, Color4f col) {
             if (GetAppSingilton()->UsingGL3()) {
-                AddVert(x, y, z, r, g, b, a, 0.0, 0.0);
+                AddVert(x, y, z, col, 0.0, 0.0);
             } else {
-                glColor3f(r, g, b);
+                glColor4f(col.r, col.g, col.b, col.a);
                 AddVert(x, y, z);
             }
         }
         
         void AddVert(float x, float y, float z, float s, float t) {
             if (GetAppSingilton()->UsingGL3()) {
-                AddVert(x, y, z, _currentColorR, _currentColorG, _currentColorB, _currentColorA, s, t);
+                AddVert(x, y, z, _currentColor, s, t);
             } else {
                 glTexCoord2f(s, t);
                 AddVert(x, y, z);
             }
         }
         
-        void AddVert(float x, float y, float z, double r, double g, double b, double a, float s, float t) {
+        void AddVert(float x, float y, float z, Color4f col, float s, float t) {
             if (GetAppSingilton()->UsingGL3()) {
                 _buffer[_currentVerts * 9 + 0] = x - _centerX;
                 _buffer[_currentVerts * 9 + 1] = y - _centerY;
                 _buffer[_currentVerts * 9 + 2] = z;
                 
-                _buffer[_currentVerts * 9 + 3] = r;
-                _buffer[_currentVerts * 9 + 4] = g;
-                _buffer[_currentVerts * 9 + 5] = b;
-                _buffer[_currentVerts * 9 + 6] = a;
+                _buffer[_currentVerts * 9 + 3] = col.r;
+                _buffer[_currentVerts * 9 + 4] = col.g;
+                _buffer[_currentVerts * 9 + 5] = col.b;
+                _buffer[_currentVerts * 9 + 6] = col.a;
                 
                 _buffer[_currentVerts * 9 + 7] = s;
                 _buffer[_currentVerts * 9 + 8] = t;
                 _currentVerts++;
             } else {
                 glTexCoord2f(s, t);
-                AddVert(x, y, z, r, g, b, a);
+                AddVert(x, y, z, col);
             }
         }
         
@@ -380,8 +379,7 @@ namespace Engine {
                 
                 GLFT_Font* drawingFont = GetAppSingilton()->GetFont(_currentFontName, _currentFontSize);
                 
-                drawingFont->drawTextGL3(x - _centerX, y - _centerY, &_currentEffect, _currentColorR,
-                                         _currentColorG, _currentColorB, string);
+                drawingFont->drawTextGL3(x - _centerX, y - _centerY, &_currentEffect, _currentColor.r, _currentColor.g, _currentColor.b, string);
                 
                 CheckGLError("Post GL3 Print");
                 
@@ -519,11 +517,21 @@ namespace Engine {
             _polygons = oldVertCount;
         }
         
+        Color4f IntToColor(int col) {
+            return {
+                .r = (float)((col & 0xff0000) >> 16) / 255,
+                .g = (float)((col & 0x00ff00) >> 8) / 255,
+                .b = (float)( col & 0x0000ff) / 255,
+                .a = 1.0f
+            };
+        }
+        
+        void ClearColor(Color4f col) {
+            glClearColor(col.r, col.g, col.b, col.a);
+        }
         
         void ClearColor(int col) {
-            glClearColor((float)((col & 0xff0000) >> 16 )   / 255,
-                         (float)((col & 0x00ff00) >> 8  )   / 255,
-                         (float)((col & 0x0000ff)       )   / 255, 1.0f);
+            ClearColor(IntToColor(col));
         }
         
         void ClearColor(std::string colorName) {
@@ -531,21 +539,20 @@ namespace Engine {
         }
         
         void ClearColor(float r, float g, float b) {
-            glClearColor(r, g, b, 1.0f);
+            ClearColor({
+                .r = r,
+                .g = g,
+                .b = b,
+                .a = 1.0f
+            });
         }
         
-        Color3f GetColor() {
-            return {
-                .r = _currentColorR,
-                .g = _currentColorG,
-                .b = _currentColorB
-            };
+        Color4f GetColor() {
+            return _currentColor;
         }
         
         void SetColor(int col) {
-            SetColor((float)((col & 0xff0000) >> 16 )   / 255,
-                     (float)((col & 0x00ff00) >> 8  )   / 255,
-                     (float)((col & 0x0000ff)       )   / 255);
+            SetColor(IntToColor(col));
         }
         
         void SetColor(std::string colorName) {
@@ -570,14 +577,16 @@ namespace Engine {
         }
         
         void SetColor(float r, float g, float b, float a) {
-            _currentColorR = r;
-            _currentColorG = g;
-            _currentColorB = b;
-            _currentColorA = a;
+            _currentColor = {
+                .r = r,
+                .g = g,
+                .b = b,
+                .a = a
+            };
         }
         
         void GLSetColor() {
-            glColor4f(_currentColorR, _currentColorG, _currentColorB, _currentColorA);
+            glColor4f(_currentColor.r, _currentColor.g, _currentColor.b, _currentColor.a);
         }
         
         int GetVerts() {
@@ -697,29 +706,25 @@ namespace Engine {
                 return;
 			}
             
-            float col1R = (float)((col1 & 0xff0000) >> 16) / 255;
-            float col1G = (float)((col1 & 0x00ff00) >> 8) / 255;
-            float col1B = (float)(col1 & 0x0000ff) / 255;
+            Color4f color1 = IntToColor(col1);
             
-            float col2R = (float)((col2 & 0xff0000) >> 16) / 255;
-            float col2G = (float)((col2 & 0x00ff00) >> 8) / 255;
-            float col2B = (float)(col2 & 0x0000ff) / 255;
+            Color4f color2 = IntToColor(col2);
             
             Draw2D::BeginRendering(GL_TRIANGLES);
             if (vert) {
-                Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
-                Draw2D::AddVert(x + w, y, 0, col1R, col1G, col1B, 1.0f);
-                Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
-                Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
-                Draw2D::AddVert(x, y + h, 0, col2R, col2G, col2B, 1.0f);
-                Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
+                Draw2D::AddVert(x, y, 0, color1);
+                Draw2D::AddVert(x + w, y, 0, color1);
+                Draw2D::AddVert(x + w, y + h, 0, color2);
+                Draw2D::AddVert(x, y, 0, color1);
+                Draw2D::AddVert(x, y + h, 0, color2);
+                Draw2D::AddVert(x + w, y + h, 0, color2);
             } else {
-                Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
-                Draw2D::AddVert(x + w, y, 0, col2R, col2G, col2B, 1.0f);
-                Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
-                Draw2D::AddVert(x, y, 0, col1R, col1G, col1B, 1.0f);
-                Draw2D::AddVert(x, y + h, 0, col1R, col1G, col1B, 1.0f);
-                Draw2D::AddVert(x + w, y + h, 0, col2R, col2G, col2B, 1.0f);
+                Draw2D::AddVert(x, y, 0, color1);
+                Draw2D::AddVert(x + w, y, 0, color2);
+                Draw2D::AddVert(x + w, y + h, 0, color2);
+                Draw2D::AddVert(x, y, 0, color1);
+                Draw2D::AddVert(x, y + h, 0, color1);
+                Draw2D::AddVert(x + w, y + h, 0, color2);
             }
             Draw2D::EndRendering();
         }
