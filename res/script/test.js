@@ -118,12 +118,12 @@ var tests = {
 	},
 	"EventMagic": function () {
 		var count = 0;
-		sys.on("eventMagicTestTarget", "test.eventMagicTestTarget2", function (e) {
-			count++;
-		});
 		sys.on("eventMagicTestTarget", "test.eventMagicTestTarget1", function (e) {
 			count++;
 			return event.EM_CANCEL;
+		});
+		sys.on("eventMagicTestTarget", "test.eventMagicTestTarget2", function (e) {
+			count++;
 		});
 		sys.emit("eventMagicTestTarget");
 		return count === 1;

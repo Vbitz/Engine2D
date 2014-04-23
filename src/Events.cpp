@@ -31,10 +31,12 @@
 namespace Engine {
     namespace Events {
         
+        static std::function<bool(Json::Value)> emptyFilter = [](Json::Value e) { return true; };
+        
         class EventTarget {
         public:
-            EventMagic Run(std::function<bool(Json::Value)> filter, Json::Value e) {
-                if (filter(_filter)) {
+            EventMagic Run(std::function<bool(Json::Value)> filter, Json::Value& e) {
+                if (_hasFilter && filter(_filter)) {
                     return _run(e);
                 } else {
                     return EM_BADFILTER;
@@ -45,17 +47,19 @@ namespace Engine {
             
         protected:
             Json::Value _filter = Json::nullValue;
+            bool _hasFilter = false;
             
             void setFilter(Json::Value filter) {
                 _filter = filter;
+                _hasFilter = !filter.isNull();
             }
             
-            virtual EventMagic _run(Json::Value e) { return EM_BADTARGET; }
+            virtual EventMagic _run(Json::Value& e) { return EM_BADTARGET; }
         };
         
         class CPPEventTarget : public EventTarget {
         public:
-            CPPEventTarget(EventTargetFunc func, Json::Value* filter)
+            CPPEventTarget(EventTargetFunc func, Json::Value filter)
                 : _func(func) {
                     setFilter(filter);
                 }
@@ -63,7 +67,7 @@ namespace Engine {
             bool IsScript() override { return false; }
             
         protected:
-            EventMagic _run(Json::Value e) {
+            EventMagic _run(Json::Value& e) {
                 return this->_func(e);
             }
             
@@ -71,7 +75,7 @@ namespace Engine {
             EventTargetFunc _func;
         };
         
-        EventMagic GetScriptingReturnType(v8::Local<v8::Value> ret) {
+        inline EventMagic GetScriptingReturnType(v8::Local<v8::Value> ret) {
             if (!ret->IsExternal()) {
                 return EM_OK;
             } else {
@@ -84,29 +88,29 @@ namespace Engine {
         
         class JSEventTarget : public EventTarget {
         public:
-            JSEventTarget(v8::Handle<v8::Function> func, Json::Value* filter){
+            JSEventTarget(v8::Handle<v8::Function> func, Json::Value filter){
                 _func.Reset(v8::Isolate::GetCurrent(), func);
                     setFilter(filter);
                 }
             
         protected:
-            EventMagic _run(Json::Value e) {
+            EventMagic _run(Json::Value& e) {
                 v8::Isolate* currentIsolate = v8::Isolate::GetCurrent();
                 v8::Local<v8::Context> ctx = currentIsolate->GetCurrentContext();
                 if (ctx.IsEmpty() || ctx->Global().IsEmpty()) return EM_BADTARGET;
                 
                 v8::TryCatch tryCatch;
                 
-                v8::Local<v8::Object> obj;
+                v8::Local<v8::Value> args[1];
                 
                 if ((e.isObject() || e.isArray()) &&
                     e.getMemberNames().size() == 0) {
-                    obj = v8::Object::New();
+                    args[0] = v8::Object::New();
+                } else if (e.isNull()) {
+                    args[0] = v8::Null();
                 } else {
-                    obj = ScriptingManager::GetObjectFromJson(e);
+                    args[0] = ScriptingManager::GetObjectFromJson(e);
                 }
-                
-                v8::Local<v8::Value> args[1] = {obj};
                 
                 v8::Local<v8::Function> func = v8::Local<v8::Function>::New(currentIsolate, _func);
                 
@@ -148,7 +152,7 @@ namespace Engine {
             bool AlwaysDefered = false;
             std::string TargetName;
             EventClassSecurity Security;
-            std::unordered_map<std::string, Event> Events;
+            std::vector<Event> Events;
             std::queue<Json::Value> DeferedMessages;
         };
         
@@ -181,7 +185,7 @@ namespace Engine {
                      iter2 != iter->second.Events.end();
                      iter2++) {
                     Logger::begin("Events", Logger::LogLevel_Log)
-                    << "        " << (iter2->second.Target->IsScript() ? "Script" : "C++   ") << " | " << iter2->first
+                    << "        " << (iter2->Target->IsScript() ? "Script" : "C++   ") << " | " << iter2->Label
                         << Logger::end();
                 }
             }
@@ -193,40 +197,54 @@ namespace Engine {
             Events::On("eventDebug", "Events::_debug", _debug);
         }
         
+        EventClass& _getEvent(std::string eventName) {
+            std::string evnt_copy = std::string(eventName.c_str());
+            EventClass& cls = _events[evnt_copy];
+            if (!cls.Valid) {
+                cls.Valid = true;
+                cls.TargetName = evnt_copy;
+            }
+            return cls;
+        }
+        
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args) {
-            std::vector<Event> deleteTargets;
+            static std::vector<int> deleteTargets;
             
             EventClass& cls = _events[evnt];
             if (!cls.Valid) { return; }
             if (cls.AlwaysDefered) {
                 cls.DeferedMessages.push(args);
             } else {
+                int index = 0;
                 for (auto iter = cls.Events.begin(); iter != cls.Events.end(); iter++) {
-                    if (iter->second.Target == NULL) { throw "Invalid Target"; }
-                    if (iter->second.Active) {
-                        if (!(cls.Security.NoScript && iter->second.Target->IsScript())) {
-                            EventMagic ret = iter->second.Target->Run(filter, args);
+                    if (iter->Target != NULL && iter->Active) {
+                        if (!(cls.Security.NoScript && iter->Target->IsScript())) {
+                            EventMagic ret = iter->Target->Run(filter, args);
                             if (ret == EM_CANCEL) {
                                 break;
                             }
                         }
                     } else {
-                        deleteTargets.push_back(iter->second);
+                        deleteTargets.push_back(index);
                     }
+                    index++;
                 }
-                for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
-                    delete cls.Events[iter->Label].Target;
-                    cls.Events.erase(iter->Label);
+                if (deleteTargets.size() > 0) {
+                    for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
+                        delete cls.Events[*iter].Target;
+                        cls.Events.erase(cls.Events.begin() + *iter);
+                    }
+                    deleteTargets.empty();
                 }
             }
         }
         
         void Emit(std::string evnt, Json::Value args) {
-            Emit(evnt, [](Json::Value e) { return true; }, args);
+            Emit(evnt, emptyFilter, args);
         }
         
         void Emit(std::string evnt) {
-            Emit(evnt, [](Json::Value e) { return true; }, Json::nullValue);
+            Emit(evnt, emptyFilter, Json::nullValue);
         }
         
         void On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
@@ -239,7 +257,7 @@ namespace Engine {
                 cls.Valid = true;
                 cls.TargetName = evnt_copy;
             }
-            cls.Events[name_copy] = newEvent;
+            cls.Events.push_back(newEvent);
         }
         
         void On(std::string evnt, std::string name, Json::Value e, v8::Handle<v8::
@@ -253,7 +271,7 @@ namespace Engine {
                 cls.Valid = true;
                 cls.TargetName = evnt_copy;
             }
-            cls.Events[name_copy] = newEvent;
+            cls.Events.push_back(newEvent);
         }
         
         void On(std::string evnt, std::string name, EventTargetFunc target) {
@@ -268,21 +286,19 @@ namespace Engine {
             for (auto iter = _events.begin(); iter != _events.end(); iter++) {
                 for (auto iter2 = iter->second.Events.begin();
                      iter2 != iter->second.Events.end(); iter2++) {
-                    if (iter2->first == eventID) {
-                        iter2->second.Active = false;
-                    }
+                     if (iter2->Label == eventID) {
+                         iter2->Active = false;
+                     }
                 }
             }
         }
         
         void SetDefered(std::string eventName, bool defered) {
-            std::string evnt_copy = std::string(eventName.c_str());
-            EventClass& cls = _events[evnt_copy];
-            if (!cls.Valid) {
-                cls.Valid = true;
-                cls.TargetName = evnt_copy;
-            }
-            cls.AlwaysDefered = defered;
+            _getEvent(eventName).AlwaysDefered = defered;
+        }
+        
+        void SetNoScript(std::string eventName, bool noScript) {
+            _getEvent(eventName).Security.NoScript = noScript;
         }
         
         // Only called from the main thread
@@ -292,11 +308,11 @@ namespace Engine {
             for (auto iter = _events.begin(); iter != _events.end(); iter++) {
                 while (iter->second.DeferedMessages.size() > 0) {
                     for (auto iter2 = iter->second.Events.begin(); iter2 != iter->second.Events.end(); iter2++) {
-                        if (iter2->second.Target == NULL) { throw "Invalid Target"; }
-                        if (iter2->second.Active) {
-                            if (!(iter->second.Security.NoScript && iter2->second.Target->IsScript())) {
-                                iter2->second.Target->Run(
-                                    [](Json::Value e) { return true; },
+                        if (iter2->Target == NULL) { throw "Invalid Target"; }
+                        if (iter2->Active) {
+                            if (!(iter->second.Security.NoScript && iter2->Target->IsScript())) {
+                                iter2->Target->Run(
+                                    emptyFilter,
                                     iter->second.DeferedMessages.front());
                             }
                         }
@@ -315,10 +331,10 @@ namespace Engine {
             
             while (cls.DeferedMessages.size() > 0) {
                 for (auto iter2 = cls.Events.begin(); iter2 != cls.Events.end(); iter2++) {
-                    if (iter2->second.Target == NULL) { throw "Invalid Target"; }
-                    if (iter2->second.Active) {
-                        if (!(cls.Security.NoScript && iter2->second.Target->IsScript())) {
-                            EventMagic ret = iter2->second.Target->Run([](Json::Value e) { return true; }, cls.DeferedMessages.front());
+                    if (iter2->Target == NULL) { throw "Invalid Target"; }
+                    if (iter2->Active) {
+                        if (!(cls.Security.NoScript && iter2->Target->IsScript())) {
+                            EventMagic ret = iter2->Target->Run(emptyFilter, cls.DeferedMessages.front());
                             if (ret == EM_CANCEL) {
                                 break;
                             }
