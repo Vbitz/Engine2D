@@ -23,6 +23,8 @@
 
 #include "common.hpp"
 
+#include "EngineUI.hpp"
+
 #include "ScriptingManager.hpp"
 
 #include "ResourceManager.hpp"
@@ -34,6 +36,8 @@
 #define ENGINE_ASSERT(value, msg) GetAppSingilton()->Assert(value, msg, __FILE__, __LINE__)
 
 namespace Engine {
+    
+    class EngineUI;
     
     class Application {
     public:
@@ -57,6 +61,9 @@ namespace Engine {
         Window* GetWindow();
         bool GetKeyPressed(int key);
         void UpdateScreen();
+        
+        // Public EngineUI functions
+        EngineUI* GetEngineUI();
         
         // Public rendering functions
         OpenGLVersion GetOpenGLVersion();
@@ -167,6 +174,7 @@ namespace Engine {
         std::vector<std::string> _jsArgs;
         
         Window* _window = NULL;
+        EngineUI* _engineUI = NULL;
         
         std::map<std::string, ResourceManager::FontResource*> _fonts;
         

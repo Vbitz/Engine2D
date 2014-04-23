@@ -85,6 +85,9 @@ namespace Engine {
             drawTable->Set("Color", createColor);
         }
         
+        Draw2D* GetDraw2D(v8::Local<v8::Object> thisValue) {
+            return (Draw2D*) thisValue->GetHiddenValue(v8::String::NewSymbol("_draw")).As<v8::External>()->Value();
+        }
         
 		ENGINE_JS_METHOD(Rect) {
             ENGINE_JS_SCOPE_OPEN;
@@ -105,7 +108,7 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
-            Draw2D::Rect(x, y, w, h);
+            GetDraw2D(args.This())->Rect(x, y, w, h);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -129,7 +132,7 @@ namespace Engine {
 			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
 			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
-            Draw2D::Grid(x, y, w, h);
+            GetDraw2D(args.This())->Grid(x, y, w, h);
             
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -165,7 +168,7 @@ namespace Engine {
             
 			vert = ENGINE_GET_ARG_BOOLEAN_VALUE(6);
             
-            Draw2D::Grad(x, y, w, h, col1, col2, vert);
+            GetDraw2D(args.This())->Grad(x, y, w, h, col1, col2, vert);
             
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -181,14 +184,14 @@ namespace Engine {
             
             if (args.Length() == 4) {
                 ENGINE_CHECK_ARG_BOOLEAN(3, "Arg4 sets the fill style of the circle");
-                Draw2D::Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                GetDraw2D(args.This())->Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
                                ENGINE_GET_ARG_NUMBER_VALUE(1),
                                ENGINE_GET_ARG_NUMBER_VALUE(2),
                                ENGINE_GET_ARG_BOOLEAN_VALUE(3));
             } else if (args.Length() == 5) {
                 ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the number of sides to the circle");
                 ENGINE_CHECK_ARG_BOOLEAN(4, "Arg4 sets the fill style of the circle");
-                Draw2D::Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                GetDraw2D(args.This())->Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
                                ENGINE_GET_ARG_NUMBER_VALUE(1),
                                ENGINE_GET_ARG_NUMBER_VALUE(2),
                                ENGINE_GET_ARG_NUMBER_VALUE(3),
@@ -198,7 +201,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_NUMBER(4, "Arg4 is the start % of the circle");
                 ENGINE_CHECK_ARG_NUMBER(5, "Arg5 is the end % of the circle");
                 ENGINE_CHECK_ARG_BOOLEAN(6, "Arg6 sets the fill style of the circle");
-                Draw2D::Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                GetDraw2D(args.This())->Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
                                ENGINE_GET_ARG_NUMBER_VALUE(1),
                                ENGINE_GET_ARG_NUMBER_VALUE(2),
                                ENGINE_GET_ARG_NUMBER_VALUE(3),
@@ -211,7 +214,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_NUMBER(5, "Arg4 is the start % of the circle");
                 ENGINE_CHECK_ARG_NUMBER(6, "Arg5 is the end % of the circle");
                 ENGINE_CHECK_ARG_BOOLEAN(7, "Arg6 sets the fill style of the circle");
-                Draw2D::Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                GetDraw2D(args.This())->Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
                                ENGINE_GET_ARG_NUMBER_VALUE(1),
                                ENGINE_GET_ARG_NUMBER_VALUE(2),
                                ENGINE_GET_ARG_NUMBER_VALUE(3),
@@ -238,7 +241,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Second X point of the line");
             ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the Second Y point of the line");
             
-            Draw2D::Line(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1),
+            GetDraw2D(args.This())->Line(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1),
                          ENGINE_GET_ARG_NUMBER_VALUE(2), ENGINE_GET_ARG_NUMBER_VALUE(3));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -260,7 +263,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(6, "Arg6 is the x value of point 4");
             ENGINE_CHECK_ARG_NUMBER(7, "Arg7 is the y value of point 4");
             
-            Draw2D::BezierCurve(ENGINE_GET_ARG_NUMBER_VALUE(0),
+            GetDraw2D(args.This())->BezierCurve(ENGINE_GET_ARG_NUMBER_VALUE(0),
                                 ENGINE_GET_ARG_NUMBER_VALUE(1),
                                 ENGINE_GET_ARG_NUMBER_VALUE(2),
                                 ENGINE_GET_ARG_NUMBER_VALUE(3),
@@ -608,7 +611,7 @@ namespace Engine {
                 w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
                 h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
                 
-                Draw2D::DrawImage(tex, x, y, w, h);
+                GetDraw2D(args.This())->DrawImage(tex, x, y, w, h);
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -653,7 +656,7 @@ namespace Engine {
                 w2 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(7);
                 h2 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(8);
                 
-                Draw2D::DrawImage(tex, x1, y1, w1, h1, x2, y2, w2, h2);
+                GetDraw2D(args.This())->DrawImage(tex, x1, y1, w1, h1, x2, y2, w2, h2);
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -687,7 +690,7 @@ namespace Engine {
                 w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
                 h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(5);
                 
-                Draw2D::DrawSprite(sheet, sprite, x, y, w, h);
+                GetDraw2D(args.This())->DrawSprite(sheet, sprite, x, y, w, h);
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }

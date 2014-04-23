@@ -32,7 +32,6 @@
 				"src/FramePerfMonitor.cpp",
 				"src/ResourceManager.cpp",
 				"src/Config.cpp",
-				"src/LogGraphEvents.cpp",
 				"src/Util.cpp",
 				"src/Platform_mac.cpp",
 				"src/Platform_win.cpp",

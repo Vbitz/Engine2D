@@ -21,269 +21,251 @@
 
 #include "EngineUI.hpp"
 
-#include "Application.hpp"
-
 #include "FramePerfMonitor.hpp"
 
 namespace Engine {
-    namespace EngineUI {
-        std::stringstream ss;
-        
-        std::stringstream currentConsoleInput;
-        
-        bool _active = true;
-        bool _showConsole = false;
-        
-        char getSpecialChars(int key) {
-            switch (key) {
-                case '[':       return '{';
-                case ']':       return '}';
-                case '-':       return '_';
-                case '=':       return '+';
-                case '\\':      return '|';
-                case '`':       return '~';
-                case '1':       return '!';
-                case '2':       return '@';
-                case '3':       return '#';
-                case '4':       return '$';
-                case '5':       return '%';
-                case '6':       return '^';
-                case '7':       return '&';
-                case '8':       return '*';
-                case '9':       return '(';
-                case '0':       return ')';
-                case ',':       return '<';
-                case '.':       return '>';
-                case ';':       return ':';
-                case '\'':      return '"';
-                case '/':       return '?';
-                default:        return key;
-            }
+    char getSpecialChars(int key) {
+        switch (key) {
+            case '[':       return '{';
+            case ']':       return '}';
+            case '-':       return '_';
+            case '=':       return '+';
+            case '\\':      return '|';
+            case '`':       return '~';
+            case '1':       return '!';
+            case '2':       return '@';
+            case '3':       return '#';
+            case '4':       return '$';
+            case '5':       return '%';
+            case '6':       return '^';
+            case '7':       return '&';
+            case '8':       return '*';
+            case '9':       return '(';
+            case '0':       return ')';
+            case ',':       return '<';
+            case '.':       return '>';
+            case ';':       return ':';
+            case '\'':      return '"';
+            case '/':       return '?';
+            default:        return key;
         }
-        
-        // just temporey until the profiler has this built in
-        float lastDrawTimes[100];
-        int currentLastDrawTimePos = 0;
+    }
     
-        std::vector<std::string> commandHistory;
-        size_t currentHistoryLine = 0;
-        
-        void Draw() {
-            if (!Config::GetBoolean("core.debug.engineUI")) {
-                return;
-            }
-            
-            RenderGL3::ResetMatrix();
-            
-            Application* app = GetAppSingilton();
-            
-            if (!_showConsole) {
-                RenderGL3::SetColor(25 / 255.0f, 25 / 255.0f, 25 / 255.0f);
-            } else {
-                RenderGL3::SetColor(40 / 255.0f, 40 / 255.0f, 40 / 255.0f, 0.95f);
-            }
-            
-            Draw2D::Rect(0.0f, 0.0f, app->GetScreenWidth(), _showConsole ? app->GetScreenHeight() : 14);
-            
-            RenderGL3::SetFont("basic", 10);
-            if (!_showConsole) {
-                RenderGL3::SetColor(220 / 255.0f, 220 / 255.0f, 220 / 255.0f);
-            } else {
-                RenderGL3::SetColor(1.0f, 1.0f, 1.0f);
-            }
-            
-            if (Config::GetBoolean("core.debug.profiler")) {
-                double drawTime = Profiler::GetTime("Draw");
-                lastDrawTimes[currentLastDrawTimePos++] = drawTime;
-                
-                if (currentLastDrawTimePos > 100) {
-                    currentLastDrawTimePos = 0;
-                }
-                
-                ss.str("");
-                ss.precision(4);
-                ss << "FPS: " << FramePerfMonitor::GetFPS();
-                ss << " | DrawTime: " << drawTime;
-                RenderGL3::Print(app->GetScreenWidth() - 220, 4, ss.str().c_str());
-                
-                RenderGL3::DisableSmooth();
-                
-                Draw2D::LineGraph(app->GetScreenWidth() - 430, 14, 2, 200, lastDrawTimes, 100);
-                
-                RenderGL3::EnableSmooth();
-            }
-            
-            RenderGL3::Print(10, 4, "-- Engine2D --");
-            
-            if (!_showConsole) {
-                return;
-            }
-            
-            std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
-            
-            bool showVerbose = Config::GetBoolean("core.debug.engineUI.showVerboseLog"); // pretty cheap
-            
-            int i = app->GetScreenHeight() - 40;
-            
-            for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
-                if (iterator->Hidden) {
-                    continue; // don't show it if it's hidden
-                }
-                
-                if (iterator->Type == Logger::LogType_Text) {
-                    if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
-                        i -= 6; // add some padding to show that a message is there, just hidden
-                        RenderGL3::SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
-                        Draw2D::Rect(0, i + 2, app->GetScreenWidth(), 2);
-                    } else {
-                        i -= 22;
-                        if (iterator->Level == Logger::LogLevel_Highlight) {
-                            RenderGL3::SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
-                            Draw2D::Rect(0, i + 1, app->GetScreenWidth(), 20);
-                        } else {
-                            RenderGL3::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
-                            Draw2D::Rect(60, i + 1, app->GetScreenWidth() - 60, 20);
-                        }
-                    }
-                }
-                
-                switch (iterator->Level) {
-                    case Logger::LogLevel_Verbose:
-                        RenderGL3::SetColor(205 / 255.0f, 205 / 255.0f, 205 / 255.0f);
-                        break;
-                    case Logger::LogLevel_User:
-                        RenderGL3::SetColor(255 / 255.0f, 0 / 255.0f, 255 / 255.0f);
-                        break;
-                    case Logger::LogLevel_ConsoleInput:
-                        RenderGL3::SetColor(0 / 255.0f, 191 / 255.0f, 255 / 255.0f);
-                        break;
-                    case Logger::LogLevel_Log:
-                        RenderGL3::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
-                        break;
-                    case Logger::LogLevel_Warning:
-                        RenderGL3::SetColor(255 / 255.0f, 165 / 255.0f, 0 / 255.0f);
-                        break;
-                    case Logger::LogLevel_Error:
-                        RenderGL3::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
-                        break;
-                    case Logger::LogLevel_Highlight:
-                        RenderGL3::SetColor(0.1f, 0.1f, 0.1f);
-                        break;
-                    case Logger::LogLevel_TestLog:
-                        RenderGL3::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
-                        break;
-                    case Logger::LogLevel_TestError:
-                        RenderGL3::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
-                        break;
-                }
-                
-                std::string time = std::to_string(iterator->time);
-                time.resize(6, '0');
-                
-                if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
-                    RenderGL3::Print(5, i + 7, (time + "s").c_str());
-                }
-                
-                if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
-                    if (iterator->Type == Logger::LogType_Text) {
-                        RenderGL3::Print(65, i + 7, iterator->Event.c_str());
-                    } else if (iterator->Type == Logger::LogType_Graphical) {
-                        i -= (*iterator->GraphEvent)(65, i);
-                    }
-                }
-            
-                if (i < 35) {
-                    break;
-                }
-            }
-            
-            RenderGL3::SetColor(0.0f, 0.0f, 0.0f, 0.85f);
-            Draw2D::Rect(5, app->GetScreenHeight() - 30, app->GetScreenWidth() - 10, 25);
-            
-            RenderGL3::SetColor(1.0f, 1.0f, 1.0f);
-            RenderGL3::SetFont("basic", 12);
-            RenderGL3::Print(10, app->GetScreenHeight() - 22, (currentConsoleInput.str() + "_").c_str());
+    EngineUI::EngineUI(Application* app) : _app(app) {
+        this->_draw = new Draw2D();
+    }
+    
+    void EngineUI::Draw() {
+        if (!Config::GetBoolean("core.debug.engineUI")) {
+            return;
         }
         
+        RenderGL3::ResetMatrix();
+        
+        if (!_showConsole) {
+            RenderGL3::SetColor(25 / 255.0f, 25 / 255.0f, 25 / 255.0f);
+        } else {
+            RenderGL3::SetColor(40 / 255.0f, 40 / 255.0f, 40 / 255.0f, 0.95f);
+        }
+        
+        this->_draw->Rect(0.0f, 0.0f, this->_app->GetScreenWidth(), _showConsole ? this->_app->GetScreenHeight() : 14);
+        
+        RenderGL3::SetFont("basic", 10);
+        if (!this->_showConsole) {
+            RenderGL3::SetColor(220 / 255.0f, 220 / 255.0f, 220 / 255.0f);
+        } else {
+            RenderGL3::SetColor(1.0f, 1.0f, 1.0f);
+        }
+        
+        if (Config::GetBoolean("core.debug.profiler")) {
+            double drawTime = Profiler::GetTime("Draw");
+            this->_lastDrawTimes[this->_currentLastDrawTimePos++] = drawTime;
+            
+            if (this->_currentLastDrawTimePos > 100) {
+                this->_currentLastDrawTimePos = 0;
+            }
+            
+            this->_ss.str("");
+            this->_ss.precision(4);
+            this->_ss << "FPS: " << FramePerfMonitor::GetFPS();
+            this->_ss << " | DrawTime: " << drawTime;
+            RenderGL3::Print(this->_app->GetScreenWidth() - 220, 4, this->_ss.str().c_str());
+            
+            RenderGL3::DisableSmooth();
+            
+            this->_draw->LineGraph(this->_app->GetScreenWidth() - 430, 14, 2, 200, this->_lastDrawTimes, 100);
+            
+            RenderGL3::EnableSmooth();
+        }
+        
+        RenderGL3::Print(10, 4, "-- Engine2D --");
+        
+        if (!_showConsole) {
+            return;
+        }
+        
+        std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
+        
+        bool showVerbose = Config::GetBoolean("core.debug.engineUI.showVerboseLog"); // pretty cheap
+        
+        int i = this->_app->GetScreenHeight() - 40;
+        
+        for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
+            if (iterator->Hidden) {
+                continue; // don't show it if it's hidden
+            }
+            
+            if (iterator->Type == Logger::LogType_Text) {
+                if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
+                    i -= 6; // add some padding to show that a message is there, just hidden
+                    RenderGL3::SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
+                    this->_draw->Rect(0, i + 2, this->_app->GetScreenWidth(), 2);
+                } else {
+                    i -= 22;
+                    if (iterator->Level == Logger::LogLevel_Highlight) {
+                        RenderGL3::SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
+                        this->_draw->Rect(0, i + 1, this->_app->GetScreenWidth(), 20);
+                    } else {
+                        RenderGL3::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+                        this->_draw->Rect(60, i + 1, this->_app->GetScreenWidth() - 60, 20);
+                    }
+                }
+            }
+            
+            switch (iterator->Level) {
+                case Logger::LogLevel_Verbose:
+                    RenderGL3::SetColor(205 / 255.0f, 205 / 255.0f, 205 / 255.0f);
+                    break;
+                case Logger::LogLevel_User:
+                    RenderGL3::SetColor(255 / 255.0f, 0 / 255.0f, 255 / 255.0f);
+                    break;
+                case Logger::LogLevel_ConsoleInput:
+                    RenderGL3::SetColor(0 / 255.0f, 191 / 255.0f, 255 / 255.0f);
+                    break;
+                case Logger::LogLevel_Log:
+                    RenderGL3::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                    break;
+                case Logger::LogLevel_Warning:
+                    RenderGL3::SetColor(255 / 255.0f, 165 / 255.0f, 0 / 255.0f);
+                    break;
+                case Logger::LogLevel_Error:
+                    RenderGL3::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
+                    break;
+                case Logger::LogLevel_Highlight:
+                    RenderGL3::SetColor(0.1f, 0.1f, 0.1f);
+                    break;
+                case Logger::LogLevel_TestLog:
+                    RenderGL3::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                    break;
+                case Logger::LogLevel_TestError:
+                    RenderGL3::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
+                    break;
+            }
+            
+            std::string time = std::to_string(iterator->time);
+            time.resize(6, '0');
+            
+            if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
+                RenderGL3::Print(5, i + 7, (time + "s").c_str());
+            }
+            
+            if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
+                if (iterator->Type == Logger::LogType_Text) {
+                    RenderGL3::Print(65, i + 7, iterator->Event.c_str());
+                } else if (iterator->Type == Logger::LogType_Graphical) {
+                    i -= (*iterator->GraphEvent)(65, i);
+                }
+            }
+        
+            if (i < 35) {
+                break;
+            }
+        }
+        
+        RenderGL3::SetColor(0.0f, 0.0f, 0.0f, 0.85f);
+        this->_draw->Rect(5, this->_app->GetScreenHeight() - 30, this->_app->GetScreenWidth() - 10, 25);
+        
+        RenderGL3::SetColor(1.0f, 1.0f, 1.0f);
+        RenderGL3::SetFont("basic", 12);
+        RenderGL3::Print(10, this->_app->GetScreenHeight() - 22, (this->_currentConsoleInput.str() + "_").c_str());
+    }
+    
 #ifndef _PLATFORM_WIN32
 #define KEY_CONSOLE 161
 #else
 #define KEY_CONSOLE 96
 #endif
 
-        void OnKeyPress(int key, int press, bool shift) {
-            if (!Config::GetBoolean("core.debug.engineUI")) {
-                return;
-            }
-            
-            Application* app = GetAppSingilton();
+    void EngineUI::OnKeyPress(int key, int press, bool shift) {
+        if (!Config::GetBoolean("core.debug.engineUI")) {
+            return;
+        }
+        
+        if (key == KEY_CONSOLE && press == GLFW_PRESS) { // `
+            this->ToggleConsole();
+        } else if (key == GLFW_KEY_F10 && press == GLFW_PRESS) { // f10
+            Events::Emit("dumpProfile");
+        }
 
-			if (key == KEY_CONSOLE && press == GLFW_PRESS) { // `
-                ToggleConsole();
-			} else if (key == GLFW_KEY_F10 && press == GLFW_PRESS) { // f10
-				Events::Emit("dumpProfile");
-            }
+        if (!_showConsole) {
+            return;
+        }
 
-            if (!_showConsole) {
-                return;
-            }
-
-			if (key < 256 && (press == GLFW_PRESS || press == GLFW_REPEAT) && key != KEY_CONSOLE && key != GLFW_KEY_ENTER) {
+        if (key < 256 && (press == GLFW_PRESS || press == GLFW_REPEAT) && key != KEY_CONSOLE && key != GLFW_KEY_ENTER) {
 #ifndef _PLATFORM_WIN32
-				currentConsoleInput << (char) (shift ? getSpecialChars(key) : (char) std::tolower(key));
+            this->_currentConsoleInput << (char) (shift ? getSpecialChars(key) : (char) std::tolower(key));
 #else
-				currentConsoleInput << (char) (shift ? getSpecialChars(key) : tolower(key));
+            currentConsoleInput << (char) (shift ? getSpecialChars(key) : tolower(key));
 #endif
-            } else if (key == GLFW_KEY_BACKSPACE && (press == GLFW_PRESS || press == GLFW_REPEAT)) {
-                std::string str = currentConsoleInput.str();
-                if (str.length() > 0) {
-                    str.resize(str.length() - 1);
-                    currentConsoleInput.str(str);
-					if (str.length() != 0) {
-						currentConsoleInput.seekp(str.length());
-					}
+        } else if (key == GLFW_KEY_BACKSPACE && (press == GLFW_PRESS || press == GLFW_REPEAT)) {
+            std::string str = this->_currentConsoleInput.str();
+            if (str.length() > 0) {
+                str.resize(str.length() - 1);
+                this->_currentConsoleInput.str(str);
+                if (str.length() != 0) {
+                    this->_currentConsoleInput.seekp(str.length());
                 }
-            } else if (key == GLFW_KEY_UP && press == GLFW_PRESS) {
-                if (currentHistoryLine > 0) {
-                    currentHistoryLine--;
-                    currentConsoleInput.str(commandHistory[currentHistoryLine]);
-                    if (currentConsoleInput.str().length() != 0) {
-                        currentConsoleInput.seekp(currentConsoleInput.str().length());
-                    }
-                }
-            } else if (key == GLFW_KEY_DOWN && press == GLFW_PRESS) {
-                if (commandHistory.size() > 0 && currentHistoryLine < commandHistory.size() - 1) {
-                    currentHistoryLine++;
-                    currentConsoleInput.str(commandHistory[currentHistoryLine]);
-                    if (currentConsoleInput.str().length() != 0) {
-                        currentConsoleInput.seekp(currentConsoleInput.str().length());
-                    }
-                }
-            } else if (key == GLFW_KEY_ENTER && press == GLFW_PRESS) {
-                std::string command = currentConsoleInput.str();
-                app->RunCommand(command);
-                if (commandHistory.size() == 0 || commandHistory[commandHistory.size() - 1] != command) {
-                    commandHistory.push_back(command);
-                }
-                currentHistoryLine = commandHistory.size();
-                currentConsoleInput.str("");
             }
+        } else if (key == GLFW_KEY_UP && press == GLFW_PRESS) {
+            if (this->_currentHistoryLine > 0) {
+                this->_currentHistoryLine--;
+                this->_currentConsoleInput.str(this->_commandHistory[this->_currentHistoryLine]);
+                if (this->_currentConsoleInput.str().length() != 0) {
+                    this->_currentConsoleInput.seekp(this->_currentConsoleInput.str().length());
+                }
+            }
+        } else if (key == GLFW_KEY_DOWN && press == GLFW_PRESS) {
+            if (this->_commandHistory.size() > 0 && this->_currentHistoryLine < this->_commandHistory.size() - 1) {
+                this->_currentHistoryLine++;
+                this->_currentConsoleInput.str(this->_commandHistory[this->_currentHistoryLine]);
+                if (this->_currentConsoleInput.str().length() != 0) {
+                    this->_currentConsoleInput.seekp(this->_currentConsoleInput.str().length());
+                }
+            }
+        } else if (key == GLFW_KEY_ENTER && press == GLFW_PRESS) {
+            std::string command = this->_currentConsoleInput.str();
+            this->_app->RunCommand(command);
+            if (this->_commandHistory.size() == 0 || this->_commandHistory[this->_commandHistory.size() - 1] != command) {
+                this->_commandHistory.push_back(command);
+            }
+            this->_currentHistoryLine = this->_commandHistory.size();
+            this->_currentConsoleInput.str("");
         }
-        
-        void SetActive(bool active) {
-            _active = active;
-        }
-        
-        void ToggleConsole() {
-            _showConsole = !_showConsole;
-        }
-        
-        void ClearConsole() {
-            Logger::HideAllEvents();
-        }
-        
-        bool ConsoleActive() {
-            return _showConsole;
-        }
+    }
+    
+    void EngineUI::SetActive(bool active) {
+        this->_active = active;
+    }
+    
+    void EngineUI::ToggleConsole() {
+        this->_showConsole = !this->_showConsole;
+    }
+    
+    void EngineUI::ClearConsole() {
+        Logger::HideAllEvents();
+    }
+    
+    bool EngineUI::ConsoleActive() {
+        return this->_showConsole;
     }
 }

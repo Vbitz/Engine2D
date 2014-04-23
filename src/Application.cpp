@@ -267,9 +267,11 @@ namespace Engine {
         
         JsMathHelper::InitMathHelper();
         
+        ctx->Global()->Get(v8::String::New("draw")).As<v8::Object>()->SetHiddenValue(v8::String::NewSymbol("_draw"), v8::External::New(new Draw2D()));
+        
 		if (!this->_runFile(Config::GetString("core.script.loader"), true)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();
-            EngineUI::ToggleConsole(); // give them something to debug using
+            this->_engineUI->ToggleConsole(); // give them something to debug using
         }
         
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
@@ -336,6 +338,10 @@ namespace Engine {
 		sys_table->Set(v8::String::New("screenWidth"), v8::Number::New(size.x));
 		sys_table->Set(v8::String::New("screenHeight"), v8::Number::New(size.y));
 	}
+    
+    EngineUI* Application::GetEngineUI() {
+        return this->_engineUI;
+    }
     
     void Application::_updateFrameTime() {
 		v8::Local<v8::Object> sys_table = _getScriptTable("sys");
@@ -556,9 +562,11 @@ namespace Engine {
     }
     
     EventMagic Application::_rawInputHandler(Json::Value val) {
-        EngineUI::OnKeyPress(val["rawKey"].asInt(), val["rawPress"].asInt(), val["shift"].asBool());
+        Application* app = GetAppSingilton();
         
-        if (EngineUI::ConsoleActive()) {
+        app->_engineUI->OnKeyPress(val["rawKey"].asInt(), val["rawPress"].asInt(), val["shift"].asBool());
+        
+        if (app->_engineUI->ConsoleActive()) {
             return;
         }
         
@@ -1158,7 +1166,7 @@ namespace Engine {
             RenderGL3::Begin2d();
             
             Profiler::Begin("EngineUI", Config::GetFloat("core.render.targetFrameTime") / 3);
-            EngineUI::Draw();
+            this->_engineUI->Draw();
             Profiler::End("EngineUI");
             
             RenderGL3::End2d();
@@ -1260,6 +1268,8 @@ namespace Engine {
         Profiler::Begin("InitOpenGL");
         this->_initOpenGL();
         Profiler::End("InitOpenGL");
+        
+        this->_engineUI = new EngineUI(this);
         
         // The window is now ready
         

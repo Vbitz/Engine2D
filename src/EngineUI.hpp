@@ -23,10 +23,16 @@
 
 #include "common.hpp"
 
+#include "Application.hpp"
 #include "Draw2D.hpp"
 
 namespace Engine {
-    namespace EngineUI {
+    class Application;
+    
+    class EngineUI {
+    public:
+        EngineUI(Application* app);
+        
         void Draw();
         void OnKeyPress(int key, int press, bool shift);
         
@@ -37,5 +43,22 @@ namespace Engine {
         void ClearConsole();
         
         bool ConsoleActive();
-    }
+    private:
+        Application* _app;
+        Draw2D* _draw;
+        
+        std::stringstream _ss;
+        
+        std::stringstream _currentConsoleInput;
+        
+        bool _active = true;
+        bool _showConsole = false;
+        
+        // just temporey until the profiler has this built in
+        float _lastDrawTimes[100];
+        int _currentLastDrawTimePos = 0;
+        
+        std::vector<std::string> _commandHistory;
+        size_t _currentHistoryLine = 0;
+    };
 }

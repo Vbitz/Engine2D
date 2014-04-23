@@ -21,8 +21,6 @@
 
 #include "JSSys.hpp"
 
-#include "LogGraphEvents.hpp"
-
 #include "common.hpp"
 #include "Application.hpp"
 #include "EngineUI.hpp"
@@ -508,7 +506,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ClearConsole) {
             ENGINE_JS_SCOPE_OPEN;
             
-            EngineUI::ClearConsole();
+            GetAppSingilton()->GetEngineUI()->ClearConsole();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -516,7 +514,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ToggleConsole) {
             ENGINE_JS_SCOPE_OPEN;
             
-            EngineUI::ToggleConsole();
+            GetAppSingilton()->GetEngineUI()->ToggleConsole();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -634,14 +632,6 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(TestGraph) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            Logger::LogGraph("Testing", Logger::LogLevel_Log, new LogGraphEvents::TestingEvent());
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
         ENGINE_JS_METHOD(TestAccess) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -721,8 +711,6 @@ namespace Engine {
             addItem(sysTable, "createWorker", CreateWorker);
             
             //addItem(sysTable, "testAccess", TestAccess);
-            
-            //addItem(sysTable, "testGraph", TestGraph);
         }
         
 #undef addItem

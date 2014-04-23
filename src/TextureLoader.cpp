@@ -21,6 +21,8 @@
 
 #include "TextureLoader.hpp"
 
+#include "RenderGL3.hpp"
+
 namespace Engine {
     Texture::Texture() {
         
