@@ -498,7 +498,7 @@ namespace Engine {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
 		app->UpdateScreen();
         glViewport(0, 0, w, h);
-        Draw2D::CheckGLError("Post Viewpoint");
+        RenderGL3::CheckGLError("Post Viewpoint");
     }
     
     void Application::_initGLContext(GraphicsVersion v) {
@@ -515,12 +515,12 @@ namespace Engine {
             glDebugMessageCallback(DebugMessageCallback, NULL);
         }
         
-        Draw2D::CheckGLError("PostSetupContext");
+        RenderGL3::CheckGLError("PostSetupContext");
         
         Logger::begin("Window", Logger::LogLevel_Log) << "Loaded OpenGL" << Logger::end();
         
         this->_initFonts();
-        Draw2D::Init2d();
+        RenderGL3::Init2d();
     }
     
     void Application::_openWindow(int width, int height, bool fullscreen, std::string openGL3Context) {
@@ -546,7 +546,7 @@ namespace Engine {
         
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init OpenGL State" << Logger::end();
         
-        Draw2D::CheckGLError("PostSetCallback");
+        RenderGL3::CheckGLError("PostSetCallback");
     }
     
     void Application::_closeWindow() {
@@ -805,7 +805,7 @@ namespace Engine {
             << "Loading Font: " << filename << " as " << prettyName
             << Logger::end();
         
-        Draw2D::CheckGLError("PreLoadFont");
+        RenderGL3::CheckGLError("PreLoadFont");
         
 		if (Filesystem::FileExists(filename)) {
             ResourceManager::Load(filename);
@@ -815,7 +815,7 @@ namespace Engine {
             return false;
 		}
         
-        Draw2D::CheckGLError("PostLoadFont");
+        RenderGL3::CheckGLError("PostLoadFont");
         
         Logger::begin("Font", Logger::LogLevel_Verbose) << "Loaded Font: " << filename << " as " << prettyName << Logger::end();
         
@@ -1143,25 +1143,25 @@ namespace Engine {
             
             Profiler::Begin("Draw");
             
-            Draw2D::CheckGLError("startOfRendering");
+            RenderGL3::CheckGLError("startOfRendering");
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             
-            Draw2D::Begin2d();
+            RenderGL3::Begin2d();
             
             Profiler::Begin("EventDraw", Config::GetFloat("core.render.targetFrameTime") / 3 * 2);
             Events::Emit("draw"); // this is when most Javascript runs
             Profiler::End("EventDraw");
             
-            Draw2D::End2d();
+            RenderGL3::End2d();
             
-            Draw2D::Begin2d();
+            RenderGL3::Begin2d();
             
             Profiler::Begin("EngineUI", Config::GetFloat("core.render.targetFrameTime") / 3);
             EngineUI::Draw();
             Profiler::End("EngineUI");
             
-            Draw2D::End2d();
+            RenderGL3::End2d();
             
             Profiler::End("Draw");
             
@@ -1177,7 +1177,7 @@ namespace Engine {
 				break;
 			}
             
-            Draw2D::CheckGLError("endOfRendering");
+            RenderGL3::CheckGLError("endOfRendering");
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
                 Profiler::Begin("ScriptGC");
@@ -1263,7 +1263,7 @@ namespace Engine {
         
         // The window is now ready
         
-        Draw2D::CheckGLError("Post InitOpenGL");
+        RenderGL3::CheckGLError("Post InitOpenGL");
         
         Engine::EnableGLContext();
         
@@ -1271,13 +1271,13 @@ namespace Engine {
         
         Events::Emit("postLoad");
         
-        Draw2D::CheckGLError("On JS Post Load");
+        RenderGL3::CheckGLError("On JS Post Load");
         
         FreeImage_Initialise();
         
         this->UpdateScreen();
         
-        Draw2D::CheckGLError("Post Finish Loading");
+        RenderGL3::CheckGLError("Post Finish Loading");
         
         Logger::begin("Application", Logger::LogLevel_Highlight) << "Loaded" << Logger::end();
         

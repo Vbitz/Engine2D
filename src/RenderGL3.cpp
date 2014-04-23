@@ -529,6 +529,10 @@ namespace Engine {
             return _currentColor;
         }
         
+        void SetColor(Color4f col) {
+            _currentColor = col;
+        }
+        
         void SetColor(int col) {
             SetColor(IntToColor(col));
         }
