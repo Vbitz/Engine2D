@@ -21,7 +21,7 @@
 
 #include "GL3Buffer.hpp"
 
-#include "Draw2D.hpp"
+#include "RenderGL3.hpp"
 
 namespace Engine {
     GL3Buffer::GL3Buffer(EffectParameters params) : _currentEffect(params), _shaderBound(false) {
@@ -84,11 +84,11 @@ namespace Engine {
         glBindVertexArray(this->_vertexArrayPointer);
         glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
         
-        Draw2D::CheckGLError("GL3Buffer::Upload::PreUploadBufferData");
+        RenderGL3::CheckGLError("GL3Buffer::Upload::PreUploadBufferData");
         
         glBufferData(GL_ARRAY_BUFFER, count, buffer, GL_STATIC_DRAW);
         
-        Draw2D::CheckGLError("GL3Buffer::Upload::PostUploadBufferData");
+        RenderGL3::CheckGLError("GL3Buffer::Upload::PostUploadBufferData");
         
         if (!this->_shaderBound) {
             this->bindShader();
@@ -105,7 +105,7 @@ namespace Engine {
         
         this->_getShader()->Begin();
         
-        Draw2D::CheckGLError("GL3Buffer::Draw::PostBindShader");
+        RenderGL3::CheckGLError("GL3Buffer::Draw::PostBindShader");
         
         GLint viewpoint[4];
         
@@ -119,11 +119,11 @@ namespace Engine {
         this->_getShader()->UploadUniform(settings.viewMatrixParam, view);
         this->_getShader()->UploadUniform(settings.projectionMatrixParam, proj);
         
-        Draw2D::CheckGLError("GL3Buffer::Draw::PostUploadUniform");
+        RenderGL3::CheckGLError("GL3Buffer::Draw::PostUploadUniform");
         
         glDrawArrays(mode, 0, vertexCount);
         
-        Draw2D::CheckGLError("GL3Buffer::Draw::PostDraw");
+        RenderGL3::CheckGLError("GL3Buffer::Draw::PostDraw");
         
         this->_getShader()->End();
         
@@ -141,7 +141,7 @@ namespace Engine {
     void GL3Buffer::bindShader() {
         this->_getShader()->Begin();
         
-        Draw2D::CheckGLError("GL3Buffer::Upload::PostBeginShader");
+        RenderGL3::CheckGLError("GL3Buffer::Upload::PostBeginShader");
         
         ShaderSettings settings = this->_currentEffect.GetShaderSettings();
         
@@ -149,13 +149,13 @@ namespace Engine {
         this->_getShader()->BindUniform(settings.viewMatrixParam);
         this->_getShader()->BindUniform(settings.projectionMatrixParam);
         
-        Draw2D::CheckGLError("GL3Buffer::Upload::PostBindViewpointSize");
+        RenderGL3::CheckGLError("GL3Buffer::Upload::PostBindViewpointSize");
         
         this->_getShader()->BindVertexAttrib(settings.vertexParam, 3, 9, 0);
         this->_getShader()->BindVertexAttrib(settings.colorParam, 4, 9, 3);
         this->_getShader()->BindVertexAttrib(settings.texCoardParam, 2, 9, 7);
         
-        Draw2D::CheckGLError("GL3Buffer::Upload::PostBindVertexAttributes");
+        RenderGL3::CheckGLError("GL3Buffer::Upload::PostBindVertexAttributes");
         
         this->_getShader()->End();
     }

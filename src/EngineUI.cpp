@@ -73,23 +73,23 @@ namespace Engine {
                 return;
             }
             
-            Draw2D::ResetMatrix();
+            RenderGL3::ResetMatrix();
             
             Application* app = GetAppSingilton();
             
             if (!_showConsole) {
-                Draw2D::SetColor(25 / 255.0f, 25 / 255.0f, 25 / 255.0f);
+                RenderGL3::SetColor(25 / 255.0f, 25 / 255.0f, 25 / 255.0f);
             } else {
-                Draw2D::SetColor(40 / 255.0f, 40 / 255.0f, 40 / 255.0f, 0.95f);
+                RenderGL3::SetColor(40 / 255.0f, 40 / 255.0f, 40 / 255.0f, 0.95f);
             }
             
             Draw2D::Rect(0.0f, 0.0f, app->GetScreenWidth(), _showConsole ? app->GetScreenHeight() : 14);
             
-            Draw2D::SetFont("basic", 10);
+            RenderGL3::SetFont("basic", 10);
             if (!_showConsole) {
-                Draw2D::SetColor(220 / 255.0f, 220 / 255.0f, 220 / 255.0f);
+                RenderGL3::SetColor(220 / 255.0f, 220 / 255.0f, 220 / 255.0f);
             } else {
-                Draw2D::SetColor(1.0f, 1.0f, 1.0f);
+                RenderGL3::SetColor(1.0f, 1.0f, 1.0f);
             }
             
             if (Config::GetBoolean("core.debug.profiler")) {
@@ -104,16 +104,16 @@ namespace Engine {
                 ss.precision(4);
                 ss << "FPS: " << FramePerfMonitor::GetFPS();
                 ss << " | DrawTime: " << drawTime;
-                Draw2D::Print(app->GetScreenWidth() - 220, 4, ss.str().c_str());
+                RenderGL3::Print(app->GetScreenWidth() - 220, 4, ss.str().c_str());
                 
-                Draw2D::DisableSmooth();
+                RenderGL3::DisableSmooth();
                 
                 Draw2D::LineGraph(app->GetScreenWidth() - 430, 14, 2, 200, lastDrawTimes, 100);
                 
-                Draw2D::EnableSmooth();
+                RenderGL3::EnableSmooth();
             }
             
-            Draw2D::Print(10, 4, "-- Engine2D --");
+            RenderGL3::Print(10, 4, "-- Engine2D --");
             
             if (!_showConsole) {
                 return;
@@ -133,15 +133,15 @@ namespace Engine {
                 if (iterator->Type == Logger::LogType_Text) {
                     if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
                         i -= 6; // add some padding to show that a message is there, just hidden
-                        Draw2D::SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
+                        RenderGL3::SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
                         Draw2D::Rect(0, i + 2, app->GetScreenWidth(), 2);
                     } else {
                         i -= 22;
                         if (iterator->Level == Logger::LogLevel_Highlight) {
-                            Draw2D::SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
+                            RenderGL3::SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
                             Draw2D::Rect(0, i + 1, app->GetScreenWidth(), 20);
                         } else {
-                            Draw2D::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+                            RenderGL3::SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
                             Draw2D::Rect(60, i + 1, app->GetScreenWidth() - 60, 20);
                         }
                     }
@@ -149,31 +149,31 @@ namespace Engine {
                 
                 switch (iterator->Level) {
                     case Logger::LogLevel_Verbose:
-                        Draw2D::SetColor(205 / 255.0f, 205 / 255.0f, 205 / 255.0f);
+                        RenderGL3::SetColor(205 / 255.0f, 205 / 255.0f, 205 / 255.0f);
                         break;
                     case Logger::LogLevel_User:
-                        Draw2D::SetColor(255 / 255.0f, 0 / 255.0f, 255 / 255.0f);
+                        RenderGL3::SetColor(255 / 255.0f, 0 / 255.0f, 255 / 255.0f);
                         break;
                     case Logger::LogLevel_ConsoleInput:
-                        Draw2D::SetColor(0 / 255.0f, 191 / 255.0f, 255 / 255.0f);
+                        RenderGL3::SetColor(0 / 255.0f, 191 / 255.0f, 255 / 255.0f);
                         break;
                     case Logger::LogLevel_Log:
-                        Draw2D::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                        RenderGL3::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
                         break;
                     case Logger::LogLevel_Warning:
-                        Draw2D::SetColor(255 / 255.0f, 165 / 255.0f, 0 / 255.0f);
+                        RenderGL3::SetColor(255 / 255.0f, 165 / 255.0f, 0 / 255.0f);
                         break;
                     case Logger::LogLevel_Error:
-                        Draw2D::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
+                        RenderGL3::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
                         break;
                     case Logger::LogLevel_Highlight:
-                        Draw2D::SetColor(0.1f, 0.1f, 0.1f);
+                        RenderGL3::SetColor(0.1f, 0.1f, 0.1f);
                         break;
                     case Logger::LogLevel_TestLog:
-                        Draw2D::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                        RenderGL3::SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
                         break;
                     case Logger::LogLevel_TestError:
-                        Draw2D::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
+                        RenderGL3::SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
                         break;
                 }
                 
@@ -181,12 +181,12 @@ namespace Engine {
                 time.resize(6, '0');
                 
                 if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
-                    Draw2D::Print(5, i + 7, (time + "s").c_str());
+                    RenderGL3::Print(5, i + 7, (time + "s").c_str());
                 }
                 
                 if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
                     if (iterator->Type == Logger::LogType_Text) {
-                        Draw2D::Print(65, i + 7, iterator->Event.c_str());
+                        RenderGL3::Print(65, i + 7, iterator->Event.c_str());
                     } else if (iterator->Type == Logger::LogType_Graphical) {
                         i -= (*iterator->GraphEvent)(65, i);
                     }
@@ -197,12 +197,12 @@ namespace Engine {
                 }
             }
             
-            Draw2D::SetColor(0.0f, 0.0f, 0.0f, 0.85f);
+            RenderGL3::SetColor(0.0f, 0.0f, 0.0f, 0.85f);
             Draw2D::Rect(5, app->GetScreenHeight() - 30, app->GetScreenWidth() - 10, 25);
             
-            Draw2D::SetColor(1.0f, 1.0f, 1.0f);
-            Draw2D::SetFont("basic", 12);
-            Draw2D::Print(10, app->GetScreenHeight() - 22, (currentConsoleInput.str() + "_").c_str());
+            RenderGL3::SetColor(1.0f, 1.0f, 1.0f);
+            RenderGL3::SetFont("basic", 12);
+            RenderGL3::Print(10, app->GetScreenHeight() - 22, (currentConsoleInput.str() + "_").c_str());
         }
         
 #ifndef _PLATFORM_WIN32

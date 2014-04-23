@@ -29,6 +29,8 @@
 #include "Timer.hpp"
 #include "WorkerThreadPool.hpp"
 
+#include "RenderGL3.hpp"
+
 namespace Engine {
 
 	namespace JsSys {
@@ -206,7 +208,7 @@ namespace Engine {
                 glGetError(); // A bug in GLEW always throws a GL error
             }
             
-            Draw2D::CheckGLError("Post Has Extention");
+            RenderGL3::CheckGLError("Post Has Extention");
             
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(has));
         }
@@ -242,7 +244,7 @@ namespace Engine {
                 }
             }
             
-            Draw2D::CheckGLError("GetExtentions");
+            RenderGL3::CheckGLError("GetExtentions");
             
             ENGINE_JS_SCOPE_CLOSE(arr);
         }
