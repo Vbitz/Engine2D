@@ -8,7 +8,7 @@
 	- Implament ScriptingManager
 	- Intergrate ScriptingManager with Application
 **Roadmap resumes here**
-- Split Draw2D into RenderGL and Draw2D
+- **DONE** - Split Draw2D into RenderGL and Draw2D
 	- Move AddItem and buffer management into RenderGL
 	- Intergrate RenderGL and Draw2D
 - Split RenderGL into RenderGL2 and RenderGL3
