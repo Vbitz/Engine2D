@@ -4,6 +4,7 @@
 #include <initializer_list>
 
 #include <ostream>
+#include <unordered_map>
 
 typedef char string_char_t;
 
@@ -13,7 +14,17 @@ namespace Engine {
     
     class Color4f {
     public:
+        Color4f();
+        Color4f(std::string colorName);
+        Color4f(int col);
+        Color4f(float r, float g, float b, float a);
+        
+        static void SetDefinedColor(std::string name, int col);
+        
         float r, g, b, a;
+        
+    private:
+		static void _initPredefinedColors();
     };
     
     template<class A, class B>

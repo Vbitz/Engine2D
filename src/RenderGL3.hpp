@@ -57,8 +57,6 @@ namespace Engine {
         
         void Reset();
         
-        Color4f IntToColor(int col);
-        
         void ClearColor(Color4f col);
         void ClearColor(int col);
         void ClearColor(std::string colorName);
