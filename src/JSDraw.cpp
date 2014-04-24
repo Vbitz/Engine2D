@@ -371,7 +371,7 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New();
             
-            RenderGL3::Color4f col = RenderGL3::GetColor();
+            Color4f col = RenderGL3::GetColor();
             
             ret->Set(v8::String::NewSymbol("r"), v8::Number::New(col.r));
             ret->Set(v8::String::NewSymbol("g"), v8::Number::New(col.g));

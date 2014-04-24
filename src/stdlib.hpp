@@ -11,6 +11,11 @@ namespace Engine {
     
     class String;
     
+    class Color4f {
+    public:
+        float r, g, b, a;
+    };
+    
     template<class A, class B>
     class Map {
         

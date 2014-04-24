@@ -108,9 +108,9 @@ namespace Engine {
             return;
         }
         
-        RenderGL3::Color4f color1 = RenderGL3::IntToColor(col1);
+        Color4f color1 = RenderGL3::IntToColor(col1);
         
-        RenderGL3::Color4f color2 = RenderGL3::IntToColor(col2);
+        Color4f color2 = RenderGL3::IntToColor(col2);
         
         RenderGL3::BeginRendering(GL_TRIANGLES);
         if (vert) {

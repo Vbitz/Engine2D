@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "stdlib.hpp"
 
 #include "TextureLoader.hpp"
 
@@ -18,10 +19,6 @@ namespace Engine {
             GLError(const char* source, GLenum err, std::string errorString) : Source(source), Error(err), ErrorString(errorString) {
                 
             }
-        };
-        
-        struct Color4f {
-            float r, g, b, a;
         };
         
         bool CheckGLError(const char* source);
