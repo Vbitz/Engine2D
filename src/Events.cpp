@@ -231,7 +231,6 @@ namespace Engine {
                 }
                 if (deleteTargets.size() > 0) {
                     for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
-                        delete cls.Events[*iter].Target;
                         cls.Events.erase(cls.Events.begin() + *iter);
                     }
                     deleteTargets.empty();
@@ -247,17 +246,29 @@ namespace Engine {
             Emit(evnt, emptyFilter, Json::nullValue);
         }
         
+        void _On(std::string evnt, std::string name, EventTarget* target) {
+            EventClass& cls = _events[evnt];
+            if (!cls.Valid) {
+                cls.Valid = true;
+                cls.TargetName = evnt;
+            }
+            for (auto iter = cls.Events.begin(); iter != cls.Events.end(); iter++) {
+                if (iter->Label == name) {
+                    delete iter->Target;
+                    iter->Target = target;
+                    return;
+                }
+            }
+            cls.Events.push_back(Event(name, target));
+        }
+        
         void On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
             std::string evnt_copy = std::string(evnt.c_str());
             std::string name_copy = std::string(name.c_str());
             
-            Event newEvent = Event(name_copy, new CPPEventTarget(target, new Json::Value(e)));
-            EventClass& cls = _events[evnt_copy];
-            if (!cls.Valid) {
-                cls.Valid = true;
-                cls.TargetName = evnt_copy;
-            }
-            cls.Events.push_back(newEvent);
+            EventTarget* evnt_target = new CPPEventTarget(target, new Json::Value(e));
+            
+            _On(evnt_copy, name_copy, evnt_target);
         }
         
         void On(std::string evnt, std::string name, Json::Value e, v8::Handle<v8::
@@ -265,13 +276,9 @@ namespace Engine {
             std::string evnt_copy = std::string(evnt.c_str());
             std::string name_copy = std::string(name.c_str());
             
-            Event newEvent = Event(name_copy, new JSEventTarget(target, new Json::Value(e)));
-            EventClass& cls = _events[evnt_copy];
-            if (!cls.Valid) {
-                cls.Valid = true;
-                cls.TargetName = evnt_copy;
-            }
-            cls.Events.push_back(newEvent);
+            EventTarget* evnt_target = new JSEventTarget(target, new Json::Value(e));
+            
+            _On(evnt_copy, name_copy, evnt_target);
         }
         
         void On(std::string evnt, std::string name, EventTargetFunc target) {
