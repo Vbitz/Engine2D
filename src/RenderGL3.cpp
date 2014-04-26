@@ -26,7 +26,15 @@ namespace Engine {
          (r, g, b, a)   Color
          (u, v)         TexCourd
          */
-        float _buffer[BUFFER_SIZE * 9];
+        
+#pragma pack(0)
+        struct BufferFormat {
+            glm::vec3 pos;
+            Color4f col;
+            glm::vec2 uv;
+        };
+        
+        BufferFormat _buffer[BUFFER_SIZE];
         
         GLenum _currentMode = 0;
         
@@ -148,17 +156,9 @@ namespace Engine {
         
         void AddVert(float x, float y, float z, Color4f col, float s, float t) {
             if (GetAppSingilton()->UsingGL3()) {
-                _buffer[_currentVerts * 9 + 0] = x - _centerX;
-                _buffer[_currentVerts * 9 + 1] = y - _centerY;
-                _buffer[_currentVerts * 9 + 2] = z;
-                
-                _buffer[_currentVerts * 9 + 3] = col.r;
-                _buffer[_currentVerts * 9 + 4] = col.g;
-                _buffer[_currentVerts * 9 + 5] = col.b;
-                _buffer[_currentVerts * 9 + 6] = col.a;
-                
-                _buffer[_currentVerts * 9 + 7] = s;
-                _buffer[_currentVerts * 9 + 8] = t;
+                _buffer[_currentVerts].pos = glm::vec3(x - _centerX, y - _centerY, z);
+                _buffer[_currentVerts].col = col;
+                _buffer[_currentVerts].uv = glm::vec2(s, t);
                 _currentVerts++;
             } else {
                 glTexCoord2f(s, t);
@@ -275,7 +275,7 @@ namespace Engine {
                 _currentTexture = _defaultTexture;
                 _currentTexture->Begin();
             }
-            buf.Upload(_buffer, _currentVerts * 9 * sizeof(float));
+            buf.Upload((float*) _buffer, _currentVerts * sizeof(BufferFormat));
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
             buf.Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
             
