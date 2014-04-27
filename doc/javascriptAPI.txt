@@ -153,6 +153,14 @@ Done	| Old Syntax														| New Syntax
 		| 																	| SpriteSheet.prototype.bindAnimation(name, [frames], delay)
 		| 																	| process.emit(target, ...)
 		| 																	| process.on(target, id, cb, ...)
+	X	| 																	| events[target](args)
+	X	| 																	| events[target] = function name(args) {}
+		| 																	| unsafe.loadModule(filepath)
+		| 																	| unsafe.dlsym(methodNAme)
+	X	| 																	| sys.createWorker(workerFunction)
+		| 																	| event[target].mapQuery(args)
+		| 																	| event[target].setPriority(id, priority)
+		| 																	| 
 		| 																	| 
 		| 																	| 
 		| 																	| 
