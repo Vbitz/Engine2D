@@ -57,8 +57,21 @@ namespace Engine {
         void Run() {
             double startTime = Platform::GetTime();
             
-            Events::On("testingEvent1", "TestEvent1", AdderTest1);
-            Events::On("testingEvent2", "TestEvent2", AdderTest2);
+            Events::EventClassPtrRef testingEvent1 =
+                Events::GetEvent("testingEvent1");
+            Events::EventClassPtrRef testingEvent2 =
+                Events::GetEvent("testingEvent1");
+            Events::EventClassPtrRef testingEvent1Fake =
+                Events::GetEvent("testingEvent1Fake");
+            Events::EventClassPtrRef testingEvent2Fake =
+                Events::GetEvent("testingEvent1Fake");
+            Events::EventClassPtrRef testingEventJS1 =
+                Events::GetEvent("testingEventJS1");
+            Events::EventClassPtrRef testingEventJS2 =
+                Events::GetEvent("testingEventJS1");
+            
+            testingEvent1->AddListener("TestEvent1", Events::MakeTarget(AdderTest1));
+            testingEvent1->AddListener("TestEvent2", Events::MakeTarget(AdderTest2));
             
             double endTime = Platform::GetTime();
             Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::On Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();
@@ -66,13 +79,13 @@ namespace Engine {
                 this->FailTest();
             }
             
-            Events::Emit("testingEvent1");
-            Events::Emit("testingEvent2");
+            testingEvent1->Emit();
+            testingEvent2->Emit();
             
             startTime = Platform::GetTime();
             
-            Events::Emit("testingEvent1");
-            Events::Emit("testingEvent2");
+            testingEvent1->Emit();
+            testingEvent2->Emit();
             
             endTime = Platform::GetTime();
             Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::Emit Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();
@@ -83,8 +96,8 @@ namespace Engine {
             startTime = Platform::GetTime();
             
             for (int i = 0; i < 100000; i++) {
-                Events::Emit("testingEvent1");
-                Events::Emit("testingEvent2");
+                testingEvent1->Emit();
+                testingEvent2->Emit();
             }
             
             endTime = Platform::GetTime();
@@ -96,8 +109,8 @@ namespace Engine {
             startTime = Platform::GetTime();
             
             for (int i = 0; i < 100000; i++) {
-                Events::Emit("testingEvent1Fake");
-                Events::Emit("testingEvent2Fake");
+                testingEvent1Fake->Emit();
+                testingEvent2Fake->Emit();
             }
             
             endTime = Platform::GetTime();
@@ -107,13 +120,13 @@ namespace Engine {
             //}
             
             // Make sure JS has time to laxy compile the methods
-            Events::Emit("testingEventJS1");
-            Events::Emit("testingEventJS2");
+            testingEventJS1->Emit();
+            testingEventJS2->Emit();
             
             startTime = Platform::GetTime();
             
-            Events::Emit("testingEventJS1");
-            Events::Emit("testingEventJS2");
+            testingEventJS1->Emit();
+            testingEventJS2->Emit();
             
             endTime = Platform::GetTime();
             Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ -> JavaScript Event::Emit Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();
@@ -124,8 +137,8 @@ namespace Engine {
             startTime = Platform::GetTime();
             
             for (int i = 0; i < 100000; i++) {
-                Events::Emit("testingEventJS1");
-                Events::Emit("testingEventJS2");
+                testingEventJS1->Emit();
+                testingEventJS2->Emit();
             }
             
             endTime = Platform::GetTime();
