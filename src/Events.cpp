@@ -44,7 +44,11 @@ namespace Engine {
             
         protected:
             EventMagic _run(Json::Value& e) {
-                return this->_func(e);
+                if (e.isNull()) {
+                    return this->_func(Json::nullValue);
+                } else {
+                    return this->_func(e);
+                }
             }
             
         private:
@@ -151,6 +155,14 @@ namespace Engine {
             }
         }
         
+        void EventClass::Emit(Json::Value args) {
+            this->Emit(emptyFilter, args);
+        }
+        
+        void EventClass::Emit() {
+            this->Emit(emptyFilter, Json::nullValue);
+        }
+        
         void EventClass::AddListener(std::string name, EventTarget* target) {
             for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
                 if (iter->Label == name) {
@@ -252,6 +264,22 @@ namespace Engine {
             Emit(evnt, emptyFilter, Json::nullValue);
         }
         
+        EventTarget* MakeTarget(Json::Value e, EventTargetFunc target) {
+            return new CPPEventTarget(target, new Json::Value(e));
+        }
+        
+        EventTarget* MakeTarget(Json::Value e, v8::Handle<v8::Function> target) {
+            return new JSEventTarget(target, new Json::Value(e));
+        }
+        
+        EventTarget* MakeTarget(EventTargetFunc target) {
+            return MakeTarget(Json::nullValue, target);
+        }
+        
+        EventTarget* MakeTarget(v8::Handle<v8::Function> target) {
+            return MakeTarget(Json::nullValue, target);
+        }
+        
         void _On(std::string evnt, std::string name, EventTarget* target) {
             GetEvent(evnt)->AddListener(name, target);
         }
@@ -259,20 +287,14 @@ namespace Engine {
         void On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
             std::string evnt_copy = std::string(evnt.c_str());
             std::string name_copy = std::string(name.c_str());
-            
-            EventTarget* evnt_target = new CPPEventTarget(target, new Json::Value(e));
-            
-            _On(evnt_copy, name_copy, evnt_target);
+            _On(evnt_copy, name_copy, MakeTarget(e, target));
         }
         
         void On(std::string evnt, std::string name, Json::Value e, v8::Handle<v8::
             Function> target) {
             std::string evnt_copy = std::string(evnt.c_str());
             std::string name_copy = std::string(name.c_str());
-            
-            EventTarget* evnt_target = new JSEventTarget(target, new Json::Value(e));
-            
-            _On(evnt_copy, name_copy, evnt_target);
+            _On(evnt_copy, name_copy, MakeTarget(e, target));
         }
         
         void On(std::string evnt, std::string name, EventTargetFunc target) {

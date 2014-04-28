@@ -94,6 +94,8 @@ namespace Engine {
             size_t GetDeferedMessageCount();
             void LogEvents(std::string logName);
             void Emit(std::function<bool(Json::Value)> filter, Json::Value args);
+            void Emit(Json::Value args);
+            void Emit();
             void AddListener(std::string name, EventTarget* target);
             void Clear(std::string eventID);
             void SetDefered(bool defered);
@@ -116,6 +118,12 @@ namespace Engine {
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args);
         void Emit(std::string evnt, Json::Value args);
         void Emit(std::string evnt);
+        
+        EventTarget* MakeTarget(Json::Value e, EventTargetFunc target);
+        EventTarget* MakeTarget(Json::Value e, v8::Handle<v8::Function> target);
+        EventTarget* MakeTarget(EventTargetFunc target);
+        EventTarget* MakeTarget(v8::Handle<v8::Function> target);
+        
         void On(std::string evnt, std::string label, Json::Value e, EventTargetFunc target);
         void On(std::string evnt, std::string label, Json::Value e, v8::Handle<v8::Function> target);
         void On(std::string evnt, std::string label, EventTargetFunc target);
