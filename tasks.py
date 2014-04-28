@@ -191,6 +191,11 @@ def add_version_info():
 	f.write("#define ENGINE_VERSION \"GIT_%s\"\n" % (get_git_hash()));
 	f.close();
 
+@command(requires=["gyp", "add_version_info"], usage="Cleans object files")
+def clean():
+	if sys.platform == "darwin": # OSX
+		shell_command(["xcodebuild", "clean"]);
+
 @command(requires=["gyp", "add_version_info"], usage="Builds executables")
 def build_bin():
 	if sys.platform == "darwin": # OSX
@@ -216,7 +221,7 @@ def test():
 		]);
 
 @command(usage="Build documentation using jsdoc")
-def docs():
+def doc():
 	shell_command([
 			"jsdoc", "-d", "./doc/apiDocs/", "./doc/api.js", "./Readme.md"
 		]);
