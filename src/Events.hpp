@@ -22,8 +22,12 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <functional>
 #include <stdarg.h>
+
+#include <vector>
+#include <queue>
 
 #include "vendor/json/json.h"
 
@@ -41,6 +45,72 @@ namespace Engine {
     
     namespace Events {
         typedef EventMagic (*EventTargetFunc)(Json::Value e);
+        
+        class EventTarget {
+        public:
+            EventMagic Run(std::function<bool(Json::Value)> filter, Json::Value& e) {
+                if (_hasFilter && filter(_filter)) {
+                    return _run(e);
+                } else {
+                    return EM_BADFILTER;
+                }
+            }
+            
+            virtual bool IsScript() { return true; }
+            
+        protected:
+            Json::Value _filter = Json::nullValue;
+            bool _hasFilter = false;
+            
+            void setFilter(Json::Value filter) {
+                _filter = filter;
+                _hasFilter = !filter.isNull();
+            }
+            
+            virtual EventMagic _run(Json::Value& e) { return EM_BADTARGET; }
+        };
+        
+        struct Event {
+            std::string Label;
+            EventTarget* Target = NULL;
+            bool Active = false;
+            
+            Event() : Label(""), Active(false) {}
+            Event(std::string Label, EventTarget* target) : Label(Label), Target(target), Active(true) { }
+        };
+        
+        struct EventClassSecurity {
+            bool NoScript = false;
+            
+            std::string ToString() {
+                std::stringstream ss;
+                ss << "NoScript=" << this->NoScript;
+                return ss.str();
+            }
+        };
+        
+        class EventClass {
+        public:
+            size_t GetDeferedMessageCount();
+            void LogEvents(std::string logName);
+            void Emit(std::function<bool(Json::Value)> filter, Json::Value args);
+            void AddListener(std::string name, EventTarget* target);
+            void Clear(std::string eventID);
+            void SetDefered(bool defered);
+            void PollDeferedMessages();
+            void AddDeferedMessage(Json::Value e);
+            
+            std::string TargetName;
+            EventClassSecurity Security;
+        private:
+            bool _alwaysDefered = false;
+            std::vector<Event> _events;
+            std::queue<Json::Value> _deferedMessages;
+        };
+        
+        typedef EventClass*& EventClassPtrRef;
+        
+        EventClassPtrRef GetEvent(std::string eventName);
         
         void Init();
         void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args);

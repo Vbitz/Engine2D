@@ -33,30 +33,6 @@ namespace Engine {
         
         static std::function<bool(Json::Value)> emptyFilter = [](Json::Value e) { return true; };
         
-        class EventTarget {
-        public:
-            EventMagic Run(std::function<bool(Json::Value)> filter, Json::Value& e) {
-                if (_hasFilter && filter(_filter)) {
-                    return _run(e);
-                } else {
-                    return EM_BADFILTER;
-                }
-            }
-            
-            virtual bool IsScript() { return true; }
-            
-        protected:
-            Json::Value _filter = Json::nullValue;
-            bool _hasFilter = false;
-            
-            void setFilter(Json::Value filter) {
-                _filter = filter;
-                _hasFilter = !filter.isNull();
-            }
-            
-            virtual EventMagic _run(Json::Value& e) { return EM_BADTARGET; }
-        };
-        
         class CPPEventTarget : public EventTarget {
         public:
             CPPEventTarget(EventTargetFunc func, Json::Value filter)
@@ -128,124 +104,94 @@ namespace Engine {
             v8::Persistent<v8::Function> _func;
         };
         
-        struct Event {
-            std::string Label;
-            EventTarget* Target = NULL;
-            bool Active = false;
-            
-            Event() : Label(""), Active(false) {}
-            Event(std::string Label, EventTarget* target) : Label(Label), Target(target), Active(true) { }
-        };
-        
-        struct EventClassSecurity {
-            bool NoScript = false;
-            
-            std::string ToString() {
-                std::stringstream ss;
-                ss << "NoScript=" << this->NoScript;
-                return ss.str();
-            }
-        };
-        
-        class EventClass {
-        public:
-            size_t GetDeferedMessageCount() {
-                return this->_deferedMessages.size();
-            }
-            
-            void LogEvents(std::string logName) {
-                for (auto iter2 = this->_events.begin();
-                     iter2 != this->_events.end();
-                     iter2++) {
-                    Logger::begin(logName, Logger::LogLevel_Log)
-                    << "        " << (iter2->Target->IsScript() ? "Script" : "C++   ") << " | " << iter2->Label
-                    << Logger::end();
-                }
-            }
-            
-            void Emit(std::function<bool(Json::Value)> filter, Json::Value args) {
-                static std::vector<int> deleteTargets;
-                if (this->_alwaysDefered) {
-                    this->_deferedMessages.push(args);
-                } else {
-                    int index = 0;
-                    for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
-                        if (iter->Target != NULL && iter->Active) {
-                            if (!(this->Security.NoScript && iter->Target->IsScript())) {
-                                EventMagic ret = iter->Target->Run(filter, args);
-                                if (ret == EM_CANCEL) {
-                                    break;
-                                }
-                            }
-                        } else {
-                            deleteTargets.push_back(index);
-                        }
-                        index++;
-                    }
-                    if (deleteTargets.size() > 0) {
-                        for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
-                            this->_events.erase(this->_events.begin() + *iter);
-                        }
-                        deleteTargets.empty();
-                    }
-                }
-            }
-            
-            void AddListener(std::string name, EventTarget* target) {
-                for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
-                    if (iter->Label == name) {
-                        delete iter->Target;
-                        iter->Target = target;
-                        return;
-                    }
-                }
-                this->_events.push_back(Event(name, target));
-            }
-            
-            void Clear(std::string eventID) {
-                for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
-                    if (iter->Label == eventID) {
-                        iter->Active = false;
-                    }
-                }
-            }
-            
-            void SetDefered(bool defered) {
-                this->_alwaysDefered = defered;
-            }
-            
-            void PollDeferedMessages() {
-                while (this->_deferedMessages.size() > 0) {
-                    for (auto iter2 = this->_events.begin(); iter2 != this->_events.end(); iter2++) {
-                        if (iter2->Target == NULL) { throw "Invalid Target"; }
-                        if (iter2->Active) {
-                            if (!(this->Security.NoScript && iter2->Target->IsScript())) {
-                                iter2->Target->Run(emptyFilter, this->_deferedMessages.front());
-                            }
-                        }
-                    }
-                    this->_deferedMessages.pop();
-                }
-            }
-            
-            void AddDeferedMessage(Json::Value e) {
-                this->_deferedMessages.push(e);
-            }
-            
-            std::string TargetName;
-            EventClassSecurity Security;
-        private:
-            bool _alwaysDefered = false;
-            std::vector<Event> _events;
-            std::queue<Json::Value> _deferedMessages;
-        };
-        
-        typedef EventClass*& EventClassPtrRef;
-        
         Platform::Mutex* _eventMutex;
         std::unordered_map<std::string, EventClass*> _events;
         
         int lastEventID = 0;
+        
+        size_t EventClass::GetDeferedMessageCount() {
+            return this->_deferedMessages.size();
+        }
+        
+        void EventClass::LogEvents(std::string logName) {
+            for (auto iter2 = this->_events.begin();
+                 iter2 != this->_events.end();
+                 iter2++) {
+                Logger::begin(logName, Logger::LogLevel_Log)
+                << "        " << (iter2->Target->IsScript() ? "Script" : "C++   ") << " | " << iter2->Label
+                << Logger::end();
+            }
+        }
+        
+        void EventClass::Emit(std::function<bool(Json::Value)> filter, Json::Value args) {
+            static std::vector<int> deleteTargets;
+            if (this->_alwaysDefered) {
+                this->_deferedMessages.push(args);
+            } else {
+                int index = 0;
+                for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
+                    if (iter->Target != NULL && iter->Active) {
+                        if (!(this->Security.NoScript && iter->Target->IsScript())) {
+                            EventMagic ret = iter->Target->Run(filter, args);
+                            if (ret == EM_CANCEL) {
+                                break;
+                            }
+                        }
+                    } else {
+                        deleteTargets.push_back(index);
+                    }
+                    index++;
+                }
+                if (deleteTargets.size() > 0) {
+                    for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
+                        this->_events.erase(this->_events.begin() + *iter);
+                    }
+                    deleteTargets.empty();
+                }
+            }
+        }
+        
+        void EventClass::AddListener(std::string name, EventTarget* target) {
+            for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
+                if (iter->Label == name) {
+                    delete iter->Target;
+                    iter->Target = target;
+                    return;
+                }
+            }
+            this->_events.push_back(Event(name, target));
+        }
+        
+        void EventClass::Clear(std::string eventID) {
+            for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
+                if (iter->Label == eventID) {
+                    iter->Active = false;
+                }
+            }
+        }
+        
+        void EventClass::SetDefered(bool defered) {
+            this->_alwaysDefered = defered;
+        }
+        
+        void EventClass::PollDeferedMessages() {
+            while (this->_deferedMessages.size() > 0) {
+                for (auto iter2 = this->_events.begin(); iter2 != this->_events.end(); iter2++) {
+                    if (iter2->Target == NULL) { throw "Invalid Target"; }
+                    if (iter2->Active) {
+                        if (!(this->Security.NoScript && iter2->Target->IsScript())) {
+                            iter2->Target->Run(emptyFilter, this->_deferedMessages.front());
+                        }
+                    }
+                }
+                this->_deferedMessages.pop();
+            }
+        }
+        
+        void EventClass::AddDeferedMessage(Json::Value e) {
+            this->_deferedMessages.push(e);
+        }
+        
         
         EventMagic _debug(Json::Value args) {
             Logger::begin("Events", Logger::LogLevel_Log) << " == EVENT DEBUG ==" << Logger::end();
@@ -278,7 +224,7 @@ namespace Engine {
             Events::On("eventDebug", "Events::_debug", _debug);
         }
         
-        EventClassPtrRef _getEvent(std::string eventName) {
+        EventClassPtrRef GetEvent(std::string eventName) {
             std::string evnt_copy = std::string(eventName.c_str());
             EventClassPtrRef cls = _events[evnt_copy];
             if (cls == NULL) {
@@ -307,8 +253,7 @@ namespace Engine {
         }
         
         void _On(std::string evnt, std::string name, EventTarget* target) {
-            EventClassPtrRef cls = _getEvent(evnt);
-            _getEvent(evnt)->AddListener(name, target);
+            GetEvent(evnt)->AddListener(name, target);
         }
         
         void On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
@@ -346,11 +291,11 @@ namespace Engine {
         }
         
         void SetDefered(std::string eventName, bool defered) {
-            _getEvent(eventName)->SetDefered(defered);
+            GetEvent(eventName)->SetDefered(defered);
         }
         
         void SetNoScript(std::string eventName, bool noScript) {
-            _getEvent(eventName)->Security.NoScript = noScript;
+            GetEvent(eventName)->Security.NoScript = noScript;
         }
         
         // Only called from the main thread
