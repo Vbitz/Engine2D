@@ -184,7 +184,7 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New();
             
-            OpenGLVersion version = GetAppSingilton()->GetOpenGLVersion();
+            OpenGLVersion version = GetRenderGL()->GetOpenGLVersion();
 
             ret->Set(v8::String::New("major"), v8::Number::New(version.major));
             ret->Set(v8::String::New("minor"), v8::Number::New(version.minor));

@@ -949,10 +949,6 @@ namespace Engine {
         Events::Emit("onSaveLog", saveArgs);
     }
     
-    bool Application::UsingGL3() {
-        return this->_window->GetGlVersion().major > 3;
-    }
-    
     void Application::RunCommand(std::string str) {
 		v8::HandleScope scp(v8::Isolate::GetCurrent());
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
@@ -999,14 +995,6 @@ namespace Engine {
     
     bool Application::GetKeyPressed(int key) {
         return this->_window->GetKeyStatus(key) == Key_Press;
-    }
-    
-    OpenGLVersion Application::GetOpenGLVersion() {
-        return this->_window->GetGlVersion();
-    }
-    
-    EffectShaderTypes::Type Application::GetBestEffectShaderType() {
-        return EffectShaderTypes::GLSL_150;
     }
     
     std::string Application::GetEngineVersion() {

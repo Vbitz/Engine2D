@@ -35,7 +35,15 @@ namespace Engine {
     }
     
     RendererType RenderGL3::GetRendererType() {
-        return GetAppSingilton()->UsingGL3() ? RendererType_OpenGL3 : RendererType_OpenGL2;
+        return GetOpenGLVersion().major >= 3 ? RendererType_OpenGL3 : RendererType_OpenGL2;
+    }
+    
+    OpenGLVersion RenderGL3::GetOpenGLVersion() {
+        return GetAppSingilton()->GetWindow()->GetGlVersion();
+    }
+    
+    EffectShaderTypes::Type RenderGL3::GetBestEffectShaderType() {
+        return EffectShaderTypes::GLSL_150;
     }
     
     bool RenderGL3::CheckGLError(const char* source) {

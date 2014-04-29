@@ -21,7 +21,7 @@
 
 #include "EffectParameters.hpp"
 
-#include "Application.hpp"
+#include "RenderGL3.hpp"
 
 namespace Engine {
     
@@ -93,7 +93,7 @@ namespace Engine {
     }
     
     ShaderSpec EffectParameters::_getBestShaderSpec() {
-        EffectShaderTypes::Type bestType = GetAppSingilton()->GetBestEffectShaderType();
+        EffectShaderTypes::Type bestType = GetRenderGL()->GetBestEffectShaderType();
         for (auto iter = this->_shaders.begin(); iter != this->_shaders.end(); iter++) {
             if (iter->type == bestType) {
                 return *iter;

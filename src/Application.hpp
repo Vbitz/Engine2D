@@ -65,11 +65,6 @@ namespace Engine {
         // Public EngineUI functions
         EngineUI* GetEngineUI();
         
-        // Public rendering functions
-        OpenGLVersion GetOpenGLVersion();
-        EffectShaderTypes::Type GetBestEffectShaderType();
-        bool UsingGL3();
-        
         // Public script functions
         bool RunFile(std::string path, bool persist);
         void RunCommand(std::string str);

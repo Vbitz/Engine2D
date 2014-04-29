@@ -30,6 +30,8 @@ namespace Engine {
         };
         
         RendererType GetRendererType();
+        OpenGLVersion GetOpenGLVersion();
+        EffectShaderTypes::Type GetBestEffectShaderType();
         
         bool CheckGLError(const char* source);
         
