@@ -32,70 +32,76 @@
 
 namespace Engine {
     void Draw2D::Rect(float x, float y, float w, float h) {
-        RenderGL3::BeginRendering(GL_TRIANGLES);
-            RenderGL3::AddVert(x, y, 0);
-            RenderGL3::AddVert(x + w, y, 0);
-            RenderGL3::AddVert(x + w, y + h, 0);
-            RenderGL3::AddVert(x, y, 0);
-            RenderGL3::AddVert(x, y + h, 0);
-            RenderGL3::AddVert(x + w, y + h, 0);
-        RenderGL3::EndRendering();
+        RenderGL3* renderGL = GetRenderGL();
+        renderGL->BeginRendering(GL_TRIANGLES);
+            renderGL->AddVert(x, y, 0);
+            renderGL->AddVert(x + w, y, 0);
+            renderGL->AddVert(x + w, y + h, 0);
+            renderGL->AddVert(x, y, 0);
+            renderGL->AddVert(x, y + h, 0);
+            renderGL->AddVert(x + w, y + h, 0);
+        renderGL->EndRendering();
     }
     
     void Draw2D::Grid(float x, float y, float w, float h) {
-        RenderGL3::BeginRendering(GL_LINE_LOOP);
-            RenderGL3::AddVert(x, y, 0);
-            RenderGL3::AddVert(x + w, y, 0);
-            RenderGL3::AddVert(x + w, y + h, 0);
-            RenderGL3::AddVert(x, y + h, 0);
-            RenderGL3::AddVert(x, y, 0);
-        RenderGL3::EndRendering();
+        RenderGL3* renderGL = GetRenderGL();
+        renderGL->BeginRendering(GL_LINE_LOOP);
+            renderGL->AddVert(x, y, 0);
+            renderGL->AddVert(x + w, y, 0);
+            renderGL->AddVert(x + w, y + h, 0);
+            renderGL->AddVert(x, y + h, 0);
+            renderGL->AddVert(x, y, 0);
+        renderGL->EndRendering();
     }
     
     void Draw2D::DrawImage(Texture* tex, float x, float y, float w, float h) {
-        RenderGL3::EnableTexture(tex);
+        RenderGL3* renderGL = GetRenderGL();
         
-        RenderGL3::BeginRendering(GL_TRIANGLES);
+        renderGL->EnableTexture(tex);
+        
+        renderGL->BeginRendering(GL_TRIANGLES);
         
         if (GetAppSingilton()->UsingGL3()) {
-            RenderGL3::CheckGLError("Draw2D::DrawImage::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
+            renderGL->CheckGLError("Draw2D::DrawImage::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
         }
         
         //                 x         y         z   s     t
-        RenderGL3::AddVert(x,        y,        0,  0.0f, 0.0f);
-        RenderGL3::AddVert(x + w,    y,        0,  1.0f, 0.0f);
-        RenderGL3::AddVert(x + w,    y + h,    0,  1.0f, 1.0f);
-        RenderGL3::AddVert(x,        y,        0,  0.0f, 0.0f);
-        RenderGL3::AddVert(x,        y + h,    0,  0.0f, 1.0f);
-        RenderGL3::AddVert(x + w,    y + h,    0,  1.0f, 1.0f);
+        renderGL->AddVert( x,        y,        0,  0.0f, 0.0f);
+        renderGL->AddVert( x + w,    y,        0,  1.0f, 0.0f);
+        renderGL->AddVert( x + w,    y + h,    0,  1.0f, 1.0f);
+        renderGL->AddVert( x,        y,        0,  0.0f, 0.0f);
+        renderGL->AddVert( x,        y + h,    0,  0.0f, 1.0f);
+        renderGL->AddVert( x + w,    y + h,    0,  1.0f, 1.0f);
         
-        RenderGL3::EndRendering();
+        renderGL->EndRendering();
         
-        RenderGL3::CheckGLError("Draw2D::DrawImage::PostEnd");
+        renderGL->CheckGLError("Draw2D::DrawImage::PostEnd");
         
-        RenderGL3::DisableTexture();
+        renderGL->DisableTexture();
         
-        RenderGL3::CheckGLError("Draw2D::DrawImage::PostDraw");
+        renderGL->CheckGLError("Draw2D::DrawImage::PostDraw");
     }
     
     void Draw2D::DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
-        RenderGL3::EnableTexture(tex);
+        RenderGL3* renderGL = GetRenderGL();
+        
+        renderGL->EnableTexture(tex);
         
         int imageWidth = tex->GetWidth();
         int imageHeight = tex->GetHeight();
         
-        RenderGL3::BeginRendering(GL_TRIANGLES);
-        //                 x           y           z       s                       t
-        RenderGL3::AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
-        RenderGL3::AddVert(x1 + w1,    y1,         0,      (x2 + w2) / imageWidth, y2 / imageHeight);
-        RenderGL3::AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
-        RenderGL3::AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
-        RenderGL3::AddVert(x1,         y1 + h1,    0,      x2 / imageWidth,        (y2 + h2) / imageHeight);
-        RenderGL3::AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
+        renderGL->BeginRendering(GL_TRIANGLES);
+        //                x           y           z       s                       t
+        renderGL->AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
+        renderGL->AddVert(x1 + w1,    y1,         0,      (x2 + w2) / imageWidth, y2 / imageHeight);
+        renderGL->AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
+        renderGL->AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
+        renderGL->AddVert(x1,         y1 + h1,    0,      x2 / imageWidth,        (y2 + h2) / imageHeight);
+        renderGL->AddVert(x1 + w1,    y1 + h1,    0,      (x2 + w2) / imageWidth, (y2 + h2) / imageHeight);
         
-        RenderGL3::EndRendering();
+        renderGL->EndRendering();
         
-        RenderGL3::DisableTexture();
+        renderGL->DisableTexture();
     }
     
     void Draw2D::DrawSprite(SpriteSheet* sheet, std::string sprite, float x, float y, float w, float h) {
@@ -108,45 +114,50 @@ namespace Engine {
             return;
         }
         
+        RenderGL3* renderGL = GetRenderGL();
+        
         Color4f color1(col1);
         
         Color4f color2(col2);
         
-        RenderGL3::BeginRendering(GL_TRIANGLES);
+        renderGL->BeginRendering(GL_TRIANGLES);
         if (vert) {
-            RenderGL3::AddVert(x, y, 0, color1);
-            RenderGL3::AddVert(x + w, y, 0, color1);
-            RenderGL3::AddVert(x + w, y + h, 0, color2);
-            RenderGL3::AddVert(x, y, 0, color1);
-            RenderGL3::AddVert(x, y + h, 0, color2);
-            RenderGL3::AddVert(x + w, y + h, 0, color2);
+            renderGL->AddVert(x, y, 0, color1);
+            renderGL->AddVert(x + w, y, 0, color1);
+            renderGL->AddVert(x + w, y + h, 0, color2);
+            renderGL->AddVert(x, y, 0, color1);
+            renderGL->AddVert(x, y + h, 0, color2);
+            renderGL->AddVert(x + w, y + h, 0, color2);
         } else {
-            RenderGL3::AddVert(x, y, 0, color1);
-            RenderGL3::AddVert(x + w, y, 0, color2);
-            RenderGL3::AddVert(x + w, y + h, 0, color2);
-            RenderGL3::AddVert(x, y, 0, color1);
-            RenderGL3::AddVert(x, y + h, 0, color1);
-            RenderGL3::AddVert(x + w, y + h, 0, color2);
+            renderGL->AddVert(x, y, 0, color1);
+            renderGL->AddVert(x + w, y, 0, color2);
+            renderGL->AddVert(x + w, y + h, 0, color2);
+            renderGL->AddVert(x, y, 0, color1);
+            renderGL->AddVert(x, y + h, 0, color1);
+            renderGL->AddVert(x + w, y + h, 0, color2);
         }
-        RenderGL3::EndRendering();
+        renderGL->EndRendering();
     }
     
     void Draw2D::Line(float x0, float y0, float x1, float y1) {
-        RenderGL3::BeginRendering(GL_LINES);
-            RenderGL3::AddVert(x0, y0, 0.0f);
-            RenderGL3::AddVert(x1, y1, 0.0f);
-        RenderGL3::EndRendering();
+        RenderGL3* renderGL = GetRenderGL();
+        renderGL->BeginRendering(GL_LINES);
+            renderGL->AddVert(x0, y0, 0.0f);
+            renderGL->AddVert(x1, y1, 0.0f);
+        renderGL->EndRendering();
     }
     
     void Draw2D::Lines(float* points, unsigned int count) {
-        RenderGL3::BeginRendering(GL_LINE_STRIP);
+        RenderGL3* renderGL = GetRenderGL();
+        renderGL->BeginRendering(GL_LINE_STRIP);
         for (int i = 0; i < count * 2; i += 2) {
-            RenderGL3::AddVert(points[i], points[i + 1], 0);
+            renderGL->AddVert(points[i], points[i + 1], 0);
         }
-        RenderGL3::EndRendering();
+        renderGL->EndRendering();
     }
     
     void Draw2D::LineGraph(float xOff, float yOff, float xScale, float yScale, float* points, unsigned int count) {
+        RenderGL3* renderGL = GetRenderGL();
         float* newPoints = (float*) std::malloc(count * 2 * sizeof(float)); // twice the size of points
         for (int x = 0; x < count; x++) {
             newPoints[x * 2] = xOff + (x * xScale);
@@ -175,41 +186,43 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     void Draw2D::Circle(float xCenter, float yCenter, float radius, float innerRadius,
                 int segments, float start, float end, bool fill) {
         bool usingGl3 = GetAppSingilton()->UsingGL3();
+        RenderGL3* renderGL = GetRenderGL();
         static double pi2 = 2 * 3.14159265358979323846;
         float rStart = pi2 * start;
         float rEnd = pi2 * end;
         float res = pi2 / segments;
         if (usingGl3) {
-            RenderGL3::FlushAll();
+            renderGL->FlushAll();
         }
-        RenderGL3::BeginRendering(fill ? (innerRadius != radius ? GL_TRIANGLE_STRIP // doughnut
+        renderGL->BeginRendering(fill ? (innerRadius != radius ? GL_TRIANGLE_STRIP // doughnut
                                : GL_TRIANGLE_FAN) // filled circle
                        : (end == 1.0f ? GL_LINE_LOOP // circle outline
                           : GL_LINE_STRIP // circle outline segment
                           ));
         if (fill) {
             if (innerRadius == radius) {
-                RenderGL3::AddVert(xCenter, yCenter, 0.0f);
+                renderGL->AddVert(xCenter, yCenter, 0.0f);
             } else {
-                RenderGL3::AddVert(xCenter + radius * glm::cos(rStart), yCenter + radius * glm::sin(rStart), 0.0f);
-                RenderGL3::AddVert(xCenter + innerRadius * glm::cos(rStart), yCenter + innerRadius * glm::sin(rStart), 0.0f);
+                renderGL->AddVert(xCenter + radius * glm::cos(rStart), yCenter + radius * glm::sin(rStart), 0.0f);
+                renderGL->AddVert(xCenter + innerRadius * glm::cos(rStart), yCenter + innerRadius * glm::sin(rStart), 0.0f);
             }
         }
         for (float i = rStart; i < rEnd; i += res) {
-                                                RenderGL3::AddVert(xCenter + radius * glm::cos(i), yCenter + radius * glm::sin(i), 0.0f);
-            if (innerRadius != radius && fill)  RenderGL3::AddVert(xCenter + innerRadius * glm::cos(i), yCenter + innerRadius * glm::sin(i), 0.0f);
+                renderGL->AddVert(xCenter + radius * glm::cos(i), yCenter + radius * glm::sin(i), 0.0f);
+            if (innerRadius != radius && fill)
+                renderGL->AddVert(xCenter + innerRadius * glm::cos(i), yCenter + innerRadius * glm::sin(i), 0.0f);
         }
         if (fill && end == 1.0f && start == 0.0f) {
             if (innerRadius == radius) {
-                RenderGL3::AddVert(xCenter + radius * glm::cos(rStart), yCenter + radius * glm::sin(rStart), 0.0f);
+                renderGL->AddVert(xCenter + radius * glm::cos(rStart), yCenter + radius * glm::sin(rStart), 0.0f);
             } else {
-                RenderGL3::AddVert(xCenter + radius * glm::cos(rStart), yCenter + radius * glm::sin(rStart), 0.0f);
-                RenderGL3::AddVert(xCenter + innerRadius * glm::cos(rStart), yCenter + innerRadius * glm::sin(rStart), 0.0f);
+                renderGL->AddVert(xCenter + radius * glm::cos(rStart), yCenter + radius * glm::sin(rStart), 0.0f);
+                renderGL->AddVert(xCenter + innerRadius * glm::cos(rStart), yCenter + innerRadius * glm::sin(rStart), 0.0f);
             }
         }
-        RenderGL3::EndRendering();
+        renderGL->EndRendering();
         if (usingGl3) {
-            RenderGL3::FlushAll();
+            renderGL->FlushAll();
         }
     }
     
@@ -250,17 +263,18 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     }
     
     void Draw2D::BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments) {
+        RenderGL3* renderGL = GetRenderGL();
         glm::vec3 q0 = _calculateBezierPoint(0, vec1, vec2, vec3, vec4);
         
-        RenderGL3::BeginRendering(GL_LINE_STRIP);
+        renderGL->BeginRendering(GL_LINE_STRIP);
         
-        RenderGL3::AddVert(q0.x, q0.y, q0.z);
+        renderGL->AddVert(q0.x, q0.y, q0.z);
         
         for (int i = 1; i <= segments; i++) {
             float t = (1 / (float) segments) * i;
             q0 = _calculateBezierPoint(t, vec1, vec2, vec3, vec4);
-            RenderGL3::AddVert(q0.x, q0.y, q0.z);
+            renderGL->AddVert(q0.x, q0.y, q0.z);
         }
-        RenderGL3::EndRendering();
+        renderGL->EndRendering();
     }
 }

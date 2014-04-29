@@ -504,7 +504,7 @@ namespace Engine {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
 		app->UpdateScreen();
         glViewport(0, 0, w, h);
-        RenderGL3::CheckGLError("Post Viewpoint");
+        GetRenderGL()->CheckGLError("Post Viewpoint");
     }
     
     void Application::_initGLContext(GraphicsVersion v) {
@@ -521,12 +521,12 @@ namespace Engine {
             glDebugMessageCallback(DebugMessageCallback, NULL);
         }
         
-        RenderGL3::CheckGLError("PostSetupContext");
+        GetRenderGL()->CheckGLError("PostSetupContext");
         
         Logger::begin("Window", Logger::LogLevel_Log) << "Loaded OpenGL" << Logger::end();
         
         this->_initFonts();
-        RenderGL3::Init2d();
+        GetRenderGL()->Init2d();
     }
     
     void Application::_openWindow(int width, int height, bool fullscreen, std::string openGL3Context) {
@@ -552,7 +552,7 @@ namespace Engine {
         
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init OpenGL State" << Logger::end();
         
-        RenderGL3::CheckGLError("PostSetCallback");
+        GetRenderGL()->CheckGLError("PostSetCallback");
     }
     
     void Application::_closeWindow() {
@@ -813,7 +813,7 @@ namespace Engine {
             << "Loading Font: " << filename << " as " << prettyName
             << Logger::end();
         
-        RenderGL3::CheckGLError("PreLoadFont");
+        GetRenderGL()->CheckGLError("PreLoadFont");
         
 		if (Filesystem::FileExists(filename)) {
             ResourceManager::Load(filename);
@@ -823,7 +823,7 @@ namespace Engine {
             return false;
 		}
         
-        RenderGL3::CheckGLError("PostLoadFont");
+        GetRenderGL()->CheckGLError("PostLoadFont");
         
         Logger::begin("Font", Logger::LogLevel_Verbose) << "Loaded Font: " << filename << " as " << prettyName << Logger::end();
         
@@ -1106,6 +1106,8 @@ namespace Engine {
     }
     
     void Application::_mainLoop() {
+        RenderGL3* renderGL = GetRenderGL();
+        
         this->_running = true;
         
 		while (this->_running) {
@@ -1151,25 +1153,25 @@ namespace Engine {
             
             Profiler::Begin("Draw");
             
-            RenderGL3::CheckGLError("startOfRendering");
+            renderGL->CheckGLError("startOfRendering");
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             
-            RenderGL3::Begin2d();
+            renderGL->Begin2d();
             
             Profiler::Begin("EventDraw", Config::GetFloat("core.render.targetFrameTime") / 3 * 2);
             Events::Emit("draw"); // this is when most Javascript runs
             Profiler::End("EventDraw");
             
-            RenderGL3::End2d();
+            renderGL->End2d();
             
-            RenderGL3::Begin2d();
+            renderGL->Begin2d();
             
             Profiler::Begin("EngineUI", Config::GetFloat("core.render.targetFrameTime") / 3);
             this->_engineUI->Draw();
             Profiler::End("EngineUI");
             
-            RenderGL3::End2d();
+            renderGL->End2d();
             
             Profiler::End("Draw");
             
@@ -1185,7 +1187,7 @@ namespace Engine {
 				break;
 			}
             
-            RenderGL3::CheckGLError("endOfRendering");
+            renderGL->CheckGLError("endOfRendering");
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
                 Profiler::Begin("ScriptGC");
@@ -1273,7 +1275,9 @@ namespace Engine {
         
         // The window is now ready
         
-        RenderGL3::CheckGLError("Post InitOpenGL");
+        RenderGL3* renderGL = GetRenderGL();
+        
+        renderGL->CheckGLError("Post InitOpenGL");
         
         Engine::EnableGLContext();
         
@@ -1281,13 +1285,13 @@ namespace Engine {
         
         Events::Emit("postLoad");
         
-        RenderGL3::CheckGLError("On JS Post Load");
+        renderGL->CheckGLError("On JS Post Load");
         
         FreeImage_Initialise();
         
         this->UpdateScreen();
         
-        RenderGL3::CheckGLError("Post Finish Loading");
+        renderGL->CheckGLError("Post Finish Loading");
         
         Logger::begin("Application", Logger::LogLevel_Highlight) << "Loaded" << Logger::end();
         

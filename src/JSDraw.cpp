@@ -282,7 +282,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is a name for the color");
                 ENGINE_CHECK_ARG_INT32(1, "Arg1 is the color to associate the name with");
                 
-                RenderGL3::SetDefinedColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1));
+                GetRenderGL()->SetDefinedColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1));
             } else if (args.Length() == 1) {
                 ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is an object containing a list of colors");
                 
@@ -294,8 +294,7 @@ namespace Engine {
                     v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
                     v8::Local<v8::Value> objItem = obj->Get(objKey);
                     
-                    RenderGL3::SetDefinedColor(std::string(*v8::String::Utf8Value(objKey)),
-                                            (int) objItem->NumberValue());
+                    GetRenderGL()->SetDefinedColor(std::string(*v8::String::Utf8Value(objKey)), (int) objItem->NumberValue());
                 }
             } else {
                 ENGINE_THROW_ARGERROR("draw.colorPalette takes 1 or 2 args");
@@ -313,7 +312,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0.0f and 1.0f");
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0.0f and 1.0f");
             
-            RenderGL3::SetColor(ENGINE_GET_ARG_NUMBER_VALUE(0),
+            GetRenderGL()->SetColor(ENGINE_GET_ARG_NUMBER_VALUE(0),
                              ENGINE_GET_ARG_NUMBER_VALUE(1),
                              ENGINE_GET_ARG_NUMBER_VALUE(2));
             
@@ -334,15 +333,15 @@ namespace Engine {
                     ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
                 }
                 
-                RenderGL3::SetColor(col); // yay now draw2d handles it
+                GetRenderGL()->SetColor(col); // yay now draw2d handles it
             } else if (args[0]->IsString()) {
-                RenderGL3::SetColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                GetRenderGL()->SetColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             } else if (args[0]->IsObject()) {
                 v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
                 double r = obj->Get(v8::String::NewSymbol("r"))->NumberValue();
                 double g = obj->Get(v8::String::NewSymbol("g"))->NumberValue();
                 double b = obj->Get(v8::String::NewSymbol("b"))->NumberValue();
-                RenderGL3::SetColor(r, g, b);
+                GetRenderGL()->SetColor(r, g, b);
             } else {
                 ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb) or a object with r,g,b propertys");
             }
@@ -359,7 +358,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0 and 255");
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0 and 255");
             
-			RenderGL3::SetColor(ENGINE_GET_ARG_NUMBER_VALUE(0) / 255,
+			GetRenderGL()->SetColor(ENGINE_GET_ARG_NUMBER_VALUE(0) / 255,
                              ENGINE_GET_ARG_NUMBER_VALUE(1) / 255,
                              ENGINE_GET_ARG_NUMBER_VALUE(2) / 255);
             
@@ -371,7 +370,7 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New();
             
-            Color4f col = RenderGL3::GetColor();
+            Color4f col = GetRenderGL()->GetColor();
             
             ret->Set(v8::String::NewSymbol("r"), v8::Number::New(col.r));
             ret->Set(v8::String::NewSymbol("g"), v8::Number::New(col.g));
@@ -477,15 +476,15 @@ namespace Engine {
                         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
                     }
                     
-                    RenderGL3::ClearColor(col); // yay now draw2d handles it
+                    GetRenderGL()->ClearColor(col); // yay now draw2d handles it
                 } else if (args[0]->IsString()) {
-                    RenderGL3::ClearColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                    GetRenderGL()->ClearColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
                 } else if (args[0]->IsObject()) {
                     v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
                     double r = obj->Get(v8::String::NewSymbol("r"))->NumberValue();
                     double g = obj->Get(v8::String::NewSymbol("g"))->NumberValue();
                     double b = obj->Get(v8::String::NewSymbol("b"))->NumberValue();
-                    RenderGL3::ClearColor(r, g, b);
+                    GetRenderGL()->ClearColor(r, g, b);
                 } else {
                     ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb)");
                 }
@@ -503,7 +502,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name you use to refer to the font");
                 ENGINE_CHECK_ARG_STRING(1, "Arg1 is the filename of the font");
                 
-                RenderGL3::LoadFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                GetRenderGL()->LoadFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                                  ENGINE_GET_ARG_CPPSTRING_VALUE(1));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -525,7 +524,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to use");
                 ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the size of the font to use");
                 
-                RenderGL3::SetFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                GetRenderGL()->SetFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                                 ENGINE_GET_ARG_NUMBER_VALUE(1));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -540,7 +539,8 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to check");
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(RenderGL3::IsFontLoaded(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+                ENGINE_JS_SCOPE_CLOSE(
+                    v8::Boolean::New(GetRenderGL()->IsFontLoaded(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
             }
             
             ENGINE_JS_METHOD(Print) {
@@ -556,7 +556,7 @@ namespace Engine {
                 
                 std::string str = ENGINE_GET_ARG_CPPSTRING_VALUE(2);
                 
-                RenderGL3::Print(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), (const char*) str.c_str());
+                GetRenderGL()->Print(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), (const char*) str.c_str());
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -570,7 +570,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the string to get the width of");
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(RenderGL3::CalcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(GetRenderGL()->CalcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
             }
             
             // Texture Handling
@@ -586,7 +586,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_GL;
                 
-                RenderGL3::CheckGLError("JSDraw::Draw::PreDraw");
+                GetRenderGL()->CheckGLError("JSDraw::Draw::PreDraw");
                 
                 Texture* tex;
                 GLfloat x, y, w, h;
@@ -621,7 +621,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_GL;
                 
-                RenderGL3::CheckGLError("Pre Image Draw");
+                GetRenderGL()->CheckGLError("Pre Image Draw");
                 
                 Texture* tex;
                 GLfloat x1, y1, w1, h1,
@@ -704,7 +704,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the image to load");
                 
-                RenderGL3::CheckGLError("Pre Image Load");
+                GetRenderGL()->CheckGLError("Pre Image Load");
                 
                 if (!Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))) {
                     ENGINE_THROW_ARGERROR("File does not Exist");
@@ -1018,7 +1018,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_GL;
                 
-                RenderGL3::Reset();
+                GetRenderGL()->Reset();
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -1033,7 +1033,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X Distince to pan");
                 ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y Distince to pan");
                 
-                RenderGL3::CameraPan(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1));
+                GetRenderGL()->CameraPan(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -1047,7 +1047,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to zoom the camera");
                 
-                RenderGL3::CameraZoom(ENGINE_GET_ARG_NUMBER_VALUE(0));
+                GetRenderGL()->CameraZoom(ENGINE_GET_ARG_NUMBER_VALUE(0));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -1061,7 +1061,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to rotate the camera");
                 
-                RenderGL3::CameraRotate(ENGINE_GET_ARG_NUMBER_VALUE(0));
+                GetRenderGL()->CameraRotate(ENGINE_GET_ARG_NUMBER_VALUE(0));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -1069,7 +1069,7 @@ namespace Engine {
             ENGINE_JS_METHOD(GetVerts) {
                 ENGINE_JS_SCOPE_OPEN;
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(RenderGL3::GetVerts()));
+                ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(GetRenderGL()->GetVerts()));
             }
             
             ENGINE_JS_METHOD(SetCenter) {
@@ -1080,7 +1080,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_INT32(0, "Arg0 is the x to offset drawing by");
                 ENGINE_CHECK_ARG_INT32(1, "Arg1 is the y to offset drawing by");
                 
-                RenderGL3::SetCenter(ENGINE_GET_ARG_INT32_VALUE(0),
+                GetRenderGL()->SetCenter(ENGINE_GET_ARG_INT32_VALUE(0),
                                   ENGINE_GET_ARG_INT32_VALUE(1));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;

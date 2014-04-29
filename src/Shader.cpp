@@ -123,17 +123,17 @@ namespace Engine {
             Logger::begin("Shader", Logger::LogLevel_Error) << "Bad token name: " << token << Logger::end();
         }
         
-        RenderGL3::CheckGLError("Shader::BindVertexAttrib::PostGetAttribLocation");
+        GetRenderGL()->CheckGLError("Shader::BindVertexAttrib::PostGetAttribLocation");
         
         glVertexAttribPointer(attribPos, attribSize, GL_FLOAT, GL_FALSE,
                               totalSize * sizeof(float),
                               stride == 0 ? NULL : (void*)(stride * sizeof(float)));
         
-        RenderGL3::CheckGLError("Shader::BindVertexAttrib::PostVertexAttribPointer");
+        GetRenderGL()->CheckGLError("Shader::BindVertexAttrib::PostVertexAttribPointer");
         
         glEnableVertexAttribArray(attribPos);
         
-        RenderGL3::CheckGLError("Shader::BindVertexAttrib::PostEnable");
+        GetRenderGL()->CheckGLError("Shader::BindVertexAttrib::PostEnable");
     }
     
     void Shader::Init(std::string vertShaderFilename, std::string fragShaderFilename) {

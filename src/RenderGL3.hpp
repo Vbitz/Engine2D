@@ -4,13 +4,16 @@
 #include "stdlib.hpp"
 
 #include "TextureLoader.hpp"
+#include "GL3Buffer.hpp"
 
 #define BUFFER_SIZE 4096
 
 namespace Engine {
     class Texture;
+    class GL3Buffer;
     
-    namespace RenderGL3 {
+    class RenderGL3 {
+    public:
         class GLError {
         public:
             GLenum Error;
@@ -77,5 +80,48 @@ namespace Engine {
         void CameraPan(float x, float y);
         void CameraZoom(float f);
         void CameraRotate(float r);
-    }
+    private:
+        bool _drawOffScreen = true;
+		
+		Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+        
+        int _polygons = 0;
+        int _drawCalls = 0;
+        
+        int _centerX = 0;
+        int _centerY = 0;
+        
+        int _currentVerts = 0;
+        
+        /*
+         Buffer format
+         (x, y, z)      Position
+         (r, g, b, a)   Color
+         (u, v)         TexCourd
+         */
+        
+#pragma pack(0)
+        struct BufferFormat {
+            glm::vec3 pos;
+            Color4f col;
+            glm::vec2 uv;
+        };
+        
+        BufferFormat _buffer[BUFFER_SIZE];
+        
+        GLenum _currentMode = 0;
+        
+        std::string _currentFontName = "basic"; // ah there we are fonts fixed
+        int _currentFontSize = 16;
+        
+        EffectParameters _currentEffect;
+        
+        Texture* _defaultTexture;
+        
+        Texture* _currentTexture = NULL;
+        
+        glm::mat4 _currentModelMatrix;;
+    };
+    
+    RenderGL3* GetRenderGL();
 }

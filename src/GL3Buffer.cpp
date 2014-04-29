@@ -84,11 +84,11 @@ namespace Engine {
         glBindVertexArray(this->_vertexArrayPointer);
         glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
         
-        RenderGL3::CheckGLError("GL3Buffer::Upload::PreUploadBufferData");
+        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PreUploadBufferData");
         
         glBufferData(GL_ARRAY_BUFFER, count, buffer, GL_STATIC_DRAW);
         
-        RenderGL3::CheckGLError("GL3Buffer::Upload::PostUploadBufferData");
+        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PostUploadBufferData");
         
         if (!this->_shaderBound) {
             this->bindShader();
@@ -105,7 +105,7 @@ namespace Engine {
         
         this->_getShader()->Begin();
         
-        RenderGL3::CheckGLError("GL3Buffer::Draw::PostBindShader");
+        GetRenderGL()->CheckGLError("GL3Buffer::Draw::PostBindShader");
         
         GLint viewpoint[4];
         
@@ -119,11 +119,11 @@ namespace Engine {
         this->_getShader()->UploadUniform(settings.viewMatrixParam, view);
         this->_getShader()->UploadUniform(settings.projectionMatrixParam, proj);
         
-        RenderGL3::CheckGLError("GL3Buffer::Draw::PostUploadUniform");
+        GetRenderGL()->CheckGLError("GL3Buffer::Draw::PostUploadUniform");
         
         glDrawArrays(mode, 0, vertexCount);
         
-        RenderGL3::CheckGLError("GL3Buffer::Draw::PostDraw");
+        GetRenderGL()->CheckGLError("GL3Buffer::Draw::PostDraw");
         
         this->_getShader()->End();
         
@@ -141,7 +141,7 @@ namespace Engine {
     void GL3Buffer::bindShader() {
         this->_getShader()->Begin();
         
-        RenderGL3::CheckGLError("GL3Buffer::Upload::PostBeginShader");
+        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PostBeginShader");
         
         ShaderSettings settings = this->_currentEffect.GetShaderSettings();
         
@@ -149,13 +149,13 @@ namespace Engine {
         this->_getShader()->BindUniform(settings.viewMatrixParam);
         this->_getShader()->BindUniform(settings.projectionMatrixParam);
         
-        RenderGL3::CheckGLError("GL3Buffer::Upload::PostBindViewpointSize");
+        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PostBindViewpointSize");
         
         this->_getShader()->BindVertexAttrib(settings.vertexParam, 3, 9, 0);
         this->_getShader()->BindVertexAttrib(settings.colorParam, 4, 9, 3);
         this->_getShader()->BindVertexAttrib(settings.texCoardParam, 2, 9, 7);
         
-        RenderGL3::CheckGLError("GL3Buffer::Upload::PostBindVertexAttributes");
+        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PostBindVertexAttributes");
         
         this->_getShader()->End();
     }

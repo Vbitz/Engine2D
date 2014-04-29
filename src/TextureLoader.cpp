@@ -63,9 +63,9 @@ namespace Engine {
             throw "Invalid Texture";
         }
         
-        RenderGL3::CheckGLError("Texture::Begin::PreBind");
+        GetRenderGL()->CheckGLError("Texture::Begin::PreBind");
         glBindTexture(GL_TEXTURE_2D, this->_textureID);
-        RenderGL3::CheckGLError("Texture::Begin::PostBind");
+        GetRenderGL()->CheckGLError("Texture::Begin::PostBind");
     }
     
     void Texture::End() {
@@ -149,7 +149,7 @@ namespace Engine {
         Texture* TextureFromBuffer(GLuint textureID, unsigned char *texture, int width, int height) {
             GLuint text = 0;
             
-            RenderGL3::CheckGLError("Pre Image Load");
+            GetRenderGL()->CheckGLError("Pre Image Load");
             
             glGenTextures(1, &text);
             
@@ -167,7 +167,7 @@ namespace Engine {
             
             glBindTexture(GL_TEXTURE_2D, 0);
             
-            RenderGL3::CheckGLError("Post Image Load");
+            GetRenderGL()->CheckGLError("Post Image Load");
             
             return new Texture(text);
         }
@@ -179,7 +179,7 @@ namespace Engine {
         Texture* TextureFromBuffer(GLuint textureID, float* texture, int width, int height) {
             GLuint text = 0;
             
-            RenderGL3::CheckGLError("Pre Image Load");
+            GetRenderGL()->CheckGLError("Pre Image Load");
             
             glGenTextures(1, &text);
             
@@ -197,7 +197,7 @@ namespace Engine {
             
             glBindTexture(GL_TEXTURE_2D, 0);
             
-            RenderGL3::CheckGLError("Post Image Load");
+            GetRenderGL()->CheckGLError("Post Image Load");
             
             return new Texture(text);
         }

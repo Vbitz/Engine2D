@@ -206,7 +206,7 @@ namespace Engine {
                 glGetError(); // A bug in GLEW always throws a GL error
             }
             
-            RenderGL3::CheckGLError("Post Has Extention");
+            GetRenderGL()->CheckGLError("Post Has Extention");
             
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(has));
         }
@@ -242,7 +242,7 @@ namespace Engine {
                 }
             }
             
-            RenderGL3::CheckGLError("GetExtentions");
+            GetRenderGL()->CheckGLError("GetExtentions");
             
             ENGINE_JS_SCOPE_CLOSE(arr);
         }
