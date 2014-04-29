@@ -12,6 +12,11 @@ namespace Engine {
     class Texture;
     class GL3Buffer;
     
+    enum RendererType {
+        RendererType_OpenGL3,
+        RendererType_OpenGL2
+    };
+    
     class RenderGL3 {
     public:
         class GLError {
@@ -24,7 +29,12 @@ namespace Engine {
             }
         };
         
+        RendererType GetRendererType();
+        
         bool CheckGLError(const char* source);
+        
+        bool HasExtention(std::string extentionName);
+        std::vector<std::string> GetExtentions();
         
         void SetDefinedColor(std::string name, int col);
         

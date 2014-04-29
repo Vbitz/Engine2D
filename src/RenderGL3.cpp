@@ -34,6 +34,10 @@ namespace Engine {
         }
     }
     
+    RendererType RenderGL3::GetRendererType() {
+        return GetAppSingilton()->UsingGL3() ? RendererType_OpenGL3 : RendererType_OpenGL2;
+    }
+    
     bool RenderGL3::CheckGLError(const char* source) {
         GLenum err;
         bool oneError = false;
@@ -44,8 +48,52 @@ namespace Engine {
         return oneError;
     }
     
+    bool RenderGL3::HasExtention(std::string extentionName) {
+        bool has = glewGetExtension(extentionName.c_str());
+        
+        if (GetRendererType() == RendererType_OpenGL3) {
+            glGetError(); // A bug in GLEW always throws a GL error
+        }
+        
+        CheckGLError("RenderGL3::HasExtention::PostGlewGetExtention");
+        
+        return has;
+    }
+    
+    std::vector<std::string> RenderGL3::GetExtentions() {
+        std::vector<std::string> ret;
+        
+        if (GetRendererType() == RendererType_OpenGL3) {
+            int extentionCount;
+            glGetIntegerv(GL_NUM_EXTENSIONS, &extentionCount);
+            
+            for (int i = 0; i < extentionCount; i++) {
+                const GLubyte* str = glGetStringi(GL_EXTENSIONS, i);
+                if (str != NULL) {
+                    ret.push_back(std::string((const char*) str));
+                }
+            }
+        } else {
+            std::string extentionList = std::string((const char*) glGetString(GL_EXTENSIONS));
+            size_t currentPos = 0;
+            int currentIndex = 0;
+            while (currentPos < extentionList.length() && currentPos != std::string::npos) {
+                size_t nextPos = extentionList.find(' ', currentPos);
+                if (nextPos == std::string::npos) {
+                    break;
+                }
+                ret.push_back(extentionList.substr(currentPos, nextPos - currentPos));
+                currentPos = extentionList.find(' ', currentPos) + 1;
+            }
+        }
+        
+        GetRenderGL()->CheckGLError("RenderGL3::GetExtentions");
+        
+        return ret;
+    }
+    
     void RenderGL3::ResetMatrix() {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             this->_currentModelMatrix = glm::mat4();
         } else {
             //glPushMatrix();
@@ -61,7 +109,7 @@ namespace Engine {
     }
     
     void RenderGL3::BeginRendering(GLenum mode) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             if (this->_currentMode != mode ||
                     this->_currentMode == GL_LINE_STRIP) {
                     // it's a hack, I really need to fix this
@@ -75,7 +123,7 @@ namespace Engine {
     }
     
     void RenderGL3::EndRendering() {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             if (this->_currentVerts > BUFFER_SIZE - 256) {
                 FlushAll();
                 BeginRendering(_currentMode);
@@ -87,7 +135,7 @@ namespace Engine {
     }
     
     void RenderGL3::AddVert(float x, float y, float z) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             AddVert(x, y, z, _currentColor, 0.0, 0.0);
         } else {
             glVertex3f(x - _centerX, y - _centerY, z);
@@ -96,7 +144,7 @@ namespace Engine {
     }
     
     void RenderGL3::AddVert(float x, float y, float z, Color4f col) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             AddVert(x, y, z, col, 0.0, 0.0);
         } else {
             glColor4f(col.r, col.g, col.b, col.a);
@@ -105,7 +153,7 @@ namespace Engine {
     }
     
     void RenderGL3::AddVert(float x, float y, float z, float s, float t) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             AddVert(x, y, z, _currentColor, s, t);
         } else {
             glTexCoord2f(s, t);
@@ -114,7 +162,7 @@ namespace Engine {
     }
     
     void RenderGL3::AddVert(float x, float y, float z, Color4f col, float s, float t) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             _buffer[_currentVerts].pos = glm::vec3(x - _centerX, y - _centerY, z);
             _buffer[_currentVerts].col = col;
             _buffer[_currentVerts].uv = glm::vec2(s, t);
@@ -126,24 +174,24 @@ namespace Engine {
     }
     
     void RenderGL3::EnableTexture(Texture* tex) {
-        if (!GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
+            FlushAll();
+            this->_currentTexture = tex;
+        } else {
             glEnable(GL_TEXTURE_2D);
             
             tex->Begin();
-        } else {
-            FlushAll();
-            this->_currentTexture = tex;
         }
     }
     
     void RenderGL3::DisableTexture() {
-        if (!GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
+            FlushAll();
+            _currentTexture = _defaultTexture;
+        } else {
             glBindTexture(GL_TEXTURE_2D, 0);
             
             glDisable(GL_TEXTURE_2D);
-        } else {
-            FlushAll();
-            _currentTexture = _defaultTexture;
         }
     }
     
@@ -160,7 +208,7 @@ namespace Engine {
     }
     
     void RenderGL3::Print(float x, float y, const char* string) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             FlushAll();
             
             GLFT_Font* drawingFont = GetAppSingilton()->GetFont(
@@ -170,7 +218,7 @@ namespace Engine {
                 &this->_currentEffect,
                 this->_currentColor.r, this->_currentColor.g, this->_currentColor.b, string);
             
-            CheckGLError("Post GL3 Print");
+            CheckGLError("RenderGL3::Print::PostGL3Print");
             
         } else {
             glEnable(GL_TEXTURE_2D);
@@ -183,7 +231,7 @@ namespace Engine {
             
             glDisable(GL_TEXTURE_2D);
             
-            CheckGLError("postPrint");
+            CheckGLError("RenderGL3::Print::PostGL2Print");
             
             this->_polygons += strlen(string) * 4;
         }
@@ -215,7 +263,7 @@ namespace Engine {
     void RenderGL3::FlushAll() {
         static GL3Buffer buf(this->_currentEffect); // temporory
         
-        if (!GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() != RendererType_OpenGL3) {
             throw "That's a bug";
         }
         
@@ -254,7 +302,7 @@ namespace Engine {
     }
     
     void RenderGL3::Init2d() {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             std::string gl3Effect = Config::GetString("core.render.basicEffect");
             this->_currentEffect = EffectReader::GetEffectFromFile(gl3Effect);
             this->_currentEffect.CreateShader();
@@ -269,7 +317,7 @@ namespace Engine {
     void RenderGL3::Begin2d() {
         EnableSmooth();
         
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             this->_currentTexture = this->_defaultTexture;
             glDisable(GL_DEPTH_TEST);
         } else {
@@ -278,11 +326,11 @@ namespace Engine {
         
         ResetMatrix();
         
-        CheckGLError("Post Begin2D");
+        CheckGLError("RenderGL3::Begin2d");
     }
     
     void RenderGL3::End2d() {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             FlushAll();
         } else {
             //glPopMatrix();
@@ -291,7 +339,7 @@ namespace Engine {
         this->_polygons = 0;
         this->_drawCalls = 0;
         
-        CheckGLError("Post End2D");
+        CheckGLError("RenderGL3::End2d");
     }
     
     void RenderGL3::Reset() {
@@ -368,7 +416,7 @@ namespace Engine {
     }
     
     void RenderGL3::CameraPan(float x, float y) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             FlushAll();
             this->_currentModelMatrix =
                 glm::translate(this->_currentModelMatrix, glm::vec3(x, y, 0.0f));
@@ -378,7 +426,7 @@ namespace Engine {
     }
     
     void RenderGL3::CameraZoom(float f) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             FlushAll();
             this->_currentModelMatrix =
                 glm::scale(_currentModelMatrix, glm::vec3(f, f, 0.0f));
@@ -388,7 +436,7 @@ namespace Engine {
     }
     
     void RenderGL3::CameraRotate(float r) {
-        if (GetAppSingilton()->UsingGL3()) {
+        if (GetRendererType() == RendererType_OpenGL3) {
             FlushAll();
             this->_currentModelMatrix =
                 glm::rotate(this->_currentModelMatrix, r, glm::vec3(0, 0, 1));

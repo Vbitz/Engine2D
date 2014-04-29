@@ -23,8 +23,6 @@
 
 #include "RenderGL3.hpp"
 
-#include "Application.hpp"
-
 #include "GL3Buffer.hpp"
 #include "EffectParameters.hpp"
 
@@ -61,7 +59,7 @@ namespace Engine {
         
         renderGL->BeginRendering(GL_TRIANGLES);
         
-        if (GetAppSingilton()->UsingGL3()) {
+        if (renderGL->GetRendererType() == RendererType_OpenGL3) {
             renderGL->CheckGLError("Draw2D::DrawImage::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
         }
         
@@ -185,8 +183,8 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     
     void Draw2D::Circle(float xCenter, float yCenter, float radius, float innerRadius,
                 int segments, float start, float end, bool fill) {
-        bool usingGl3 = GetAppSingilton()->UsingGL3();
         RenderGL3* renderGL = GetRenderGL();
+        bool usingGl3 = renderGL->GetRendererType() == RendererType_OpenGL3;
         static double pi2 = 2 * 3.14159265358979323846;
         float rStart = pi2 * start;
         float rEnd = pi2 * end;

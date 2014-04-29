@@ -200,15 +200,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of a GL Extention to check for");
             
-            bool has = glewGetExtension(*ENGINE_GET_ARG_CSTRING_VALUE(0));
-            
-            if (GetAppSingilton()->UsingGL3()) {
-                glGetError(); // A bug in GLEW always throws a GL error
-            }
-            
-            GetRenderGL()->CheckGLError("Post Has Extention");
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(has));
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetRenderGL()->HasExtention(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(GetExtentions) {
@@ -218,31 +210,11 @@ namespace Engine {
             
             v8::Handle<v8::Array> arr = v8::Array::New();
             
-            if (GetAppSingilton()->UsingGL3()) {
-                int extentionCount;
-                glGetIntegerv(GL_NUM_EXTENSIONS, &extentionCount);
+            std::vector<std::string> extentionList = GetRenderGL()->GetExtentions();
             
-                for (int i = 0; i < extentionCount; i++) {
-                    const GLubyte* str = glGetStringi(GL_EXTENSIONS, i);
-                    if (str != NULL) {
-                        arr->Set(i, v8::String::New((const char*) str));
-                    }
-                }
-            } else {
-                std::string extentionList = std::string((const char*) glGetString(GL_EXTENSIONS));
-                size_t currentPos = 0;
-                int currentIndex = 0;
-                while (currentPos < extentionList.length() && currentPos != std::string::npos) {
-                    size_t nextPos = extentionList.find(' ', currentPos);
-                    if (nextPos == std::string::npos) {
-                        break;
-                    }
-                    arr->Set(currentIndex++, v8::String::New(extentionList.substr(currentPos, nextPos - currentPos).c_str()));
-                    currentPos = extentionList.find(' ', currentPos) + 1;
-                }
+            for (int i = 0; i < extentionList.size(); i++) {
+                arr->Set(i, v8::String::New(extentionList[i].c_str()));
             }
-            
-            GetRenderGL()->CheckGLError("GetExtentions");
             
             ENGINE_JS_SCOPE_CLOSE(arr);
         }
