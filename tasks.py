@@ -219,6 +219,11 @@ def test():
 			resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
 			"-test"
 		]);
+	shell_command([
+			resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
+			"-test",
+			"-Ccore.render.openGL=2.0"
+		]);
 
 @command(usage="Build documentation using jsdoc")
 def doc():
