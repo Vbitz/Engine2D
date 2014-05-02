@@ -22,6 +22,8 @@
 #include "JSInput.hpp"
 
 #include "Application.hpp"
+#include "Scripting.hpp"
+#include "Util.hpp"
 
 namespace Engine {
     namespace JsInput {

@@ -23,6 +23,11 @@
 
 #include "RenderGL3.hpp"
 
+#include "Filesystem.hpp"
+
+#include "Util.hpp"
+#include "Platform.hpp"
+
 namespace Engine {
     Shader::Shader() : _loaded(false) {
         

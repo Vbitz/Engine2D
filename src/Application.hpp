@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "common.hpp"
-
 #include "EngineUI.hpp"
 
 #include "ScriptingManager.hpp"
@@ -30,6 +28,8 @@
 #include "ResourceManager.hpp"
 
 #include "vendor/GLFT_Font.hpp"
+
+#include "Events.hpp"
 
 #include <queue>
 

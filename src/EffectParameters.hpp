@@ -26,12 +26,17 @@
 
 #include "vendor/json/json.h"
 
-#include "common.hpp"
-
 #include "Shader.hpp"
 
 namespace Engine {
     
+    namespace EffectShaderTypes {
+        enum Type {
+            GLSL_150,
+            Unknown
+        };
+    };
+
     typedef struct {
         EffectShaderTypes::Type type;
         std::string vertexShaderPath;

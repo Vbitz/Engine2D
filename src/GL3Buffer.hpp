@@ -21,12 +21,12 @@
 
 #pragma once
 
-#include "common.hpp"
-
 #include "Shader.hpp"
 #include "EffectParameters.hpp"
 
 namespace Engine {
+    class Shader;
+    
 	class GL3Buffer {
 	public:
 		GL3Buffer(EffectParameters params);

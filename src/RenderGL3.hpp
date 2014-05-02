@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "common.hpp"
 #include "stdlib.hpp"
 
 #include "TextureLoader.hpp"
@@ -32,6 +31,7 @@
 namespace Engine {
     class Texture;
     class GL3Buffer;
+    class EffectParameters;
     
     enum RendererType {
         RendererType_OpenGL3,

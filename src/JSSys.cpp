@@ -21,13 +21,15 @@
 
 #include "JSSys.hpp"
 
-#include "common.hpp"
 #include "Application.hpp"
 #include "EngineUI.hpp"
 #include "Timer.hpp"
 #include "WorkerThreadPool.hpp"
 
 #include "RenderGL3.hpp"
+
+#include "Config.hpp"
+#include "Profiler.hpp"
 
 namespace Engine {
 

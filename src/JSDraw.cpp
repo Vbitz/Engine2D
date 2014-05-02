@@ -32,6 +32,10 @@
 
 #include "Application.hpp"
 
+#include "Scripting.hpp"
+#include "Util.hpp"
+#include "Config.hpp"
+
 namespace Engine {
     
 	namespace JsDraw {

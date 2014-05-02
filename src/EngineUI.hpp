@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "common.hpp"
-
 #include "Application.hpp"
 #include "Draw2D.hpp"
 

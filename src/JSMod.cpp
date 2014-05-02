@@ -23,8 +23,10 @@
 
 #include <map>
 
-#include "common.hpp"
 #include "Filesystem.hpp"
+#include "Platform.hpp"
+#include "Scripting.hpp"
+#include "Util.hpp"
 
 namespace Engine {
     

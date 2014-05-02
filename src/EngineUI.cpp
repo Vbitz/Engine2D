@@ -22,6 +22,8 @@
 #include "EngineUI.hpp"
 
 #include "FramePerfMonitor.hpp"
+#include "Config.hpp"
+#include "Profiler.hpp"
 
 namespace Engine {
     char getSpecialChars(int key) {

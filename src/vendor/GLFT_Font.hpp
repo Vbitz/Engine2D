@@ -42,8 +42,6 @@
 
 #include <map>
 
-#include "../common.hpp"
-
 class GLFT_Font;
 
 namespace Engine {

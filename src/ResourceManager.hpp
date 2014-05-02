@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "common.hpp"
 #include "Filesystem.hpp"
 
 #include "vendor/GLFT_Font.hpp"

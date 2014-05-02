@@ -21,11 +21,10 @@
 
 #pragma once
 
-#include "common.hpp"
-#include "Filesystem.hpp"
-
 #include <vector>
 #include <map>
+
+#include "Window.hpp"
 
 namespace Engine {
     class Shader {

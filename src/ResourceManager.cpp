@@ -21,6 +21,8 @@
 
 #include "ResourceManager.hpp"
 
+#include "Profiler.hpp"
+
 namespace Engine {
     namespace ResourceManager {
         

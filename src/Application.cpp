@@ -27,6 +27,9 @@
 
 #include "vendor/json/json.h"
 
+#include "Config.hpp"
+#include "Profiler.hpp"
+
 #include "ResourceManager.hpp"
 
 #include "TestSuite.hpp"

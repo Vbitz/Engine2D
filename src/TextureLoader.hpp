@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "common.hpp"
-
 #include "ResourceManager.hpp"
 
 namespace Engine {

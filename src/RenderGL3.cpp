@@ -24,7 +24,13 @@
 #include "GL3Buffer.hpp"
 #include "TextureLoader.hpp"
 
+#include "Config.hpp"
+
 #include "Application.hpp"
+
+// TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace Engine {
     std::string GLErrorString(GLenum error) {
