@@ -52,7 +52,7 @@ namespace Engine {
 
             void* rawPointer = (void*) offset;
 
-            array->SetIndexedPropertiesToExternalArrayData(rawPointer, v8::kExternalByteArray, length * sizeof(char));
+            array->SetIndexedPropertiesToExternalArrayData(rawPointer, v8::kExternalUnsignedByteArray, length * sizeof(unsigned char));
 
             ENGINE_JS_SCOPE_CLOSE(array);
         }
@@ -111,6 +111,18 @@ namespace Engine {
 
             ENGINE_JS_SCOPE_CLOSE(v8::Number::New((double) address));
         }
+        
+        ENGINE_JS_METHOD(AddressOfExternal) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is the value to return the indexof");
+            
+            long exAddr = (long) ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New((double) exAddr));
+        }
 
         ENGINE_JS_METHOD(MProtect) {
             ENGINE_JS_SCOPE_OPEN;
@@ -145,8 +157,11 @@ namespace Engine {
             addItem(unsafeTable, "malloc", Malloc);
             addItem(unsafeTable, "free", Free);
             addItem(unsafeTable, "addressOf", AddressOf);
+            addItem(unsafeTable, "addressOfExternal", AddressOfExternal);
             addItem(unsafeTable, "mprotect", MProtect);
             addItem(unsafeTable, "getPageSize", GetPageSize);
+            
+            unsafeTable->Set("pageSize", v8::Number::New(getpagesize()));
         }
         
 #undef addItem
