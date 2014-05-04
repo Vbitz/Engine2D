@@ -127,6 +127,19 @@ var tests = {
 		});
 		sys.emit("eventMagicTestTarget");
 		return count === 1;
+	},
+	"DeferedEvents": function () {
+		var valid = false;
+		sys.on("deferedEventsTestRouter", "test.DeferedEventsTestRouter", function (e) {
+			sys.pollDeferedMessages("deferedEventsTestTarget");
+		});
+		sys.on("deferedEventsTestTarget", "test.DeferedEventsTestTarget", function (e) {
+			valid = true;
+		});
+		sys.setDeferedEvent("deferedEventsTestTarget", true);
+		sys.emit("deferedEventsTestTarget");
+		sys.emit("deferedEventsTestRouter");
+		return valid;
 	}
 };
 

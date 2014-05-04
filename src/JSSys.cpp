@@ -134,6 +134,31 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(EventsSetDefered) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(2);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to target");
+            ENGINE_CHECK_ARG_BOOLEAN(1, "Arg1 is set to defer messages sent to the event");
+            
+            Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->SetDefered(ENGINE_GET_ARG_BOOLEAN_VALUE(1));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(EventsPollDeferedMessages) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to target");
+            
+            Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->PollDeferedMessages();
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(CreateTimer) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -638,6 +663,8 @@ namespace Engine {
             
             addItem(sysTable, "on", EventsOn);
             addItem(sysTable, "emit", EventsEmit);
+            addItem(sysTable, "pollDeferedMessages", EventsPollDeferedMessages);
+            addItem(sysTable, "setDeferedEvent", EventsSetDefered);
             addItem(sysTable, "clearEvent", EventsClear);
             
             addItem(sysTable, "createTimer", CreateTimer);
