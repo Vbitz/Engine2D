@@ -158,7 +158,10 @@ Done	| Old Syntax														| New Syntax
 		| 																	| unsafe.loadModule(filepath)
 		| 																	| unsafe.dlsym(methodNAme)
 	X	| 																	| sys.createWorker(workerFunction)
-		| 																	| event[target].mapQuery(args)
+		|																	| Worker.prototype.on(target, id, cb, ...)
+		|																	| event[target].setDefered(bool)
+		|																	| event[target].pollDeferedMessages([func])
+		| 																	| event[target].mapQuery(args, cb)
 		| 																	| event[target].setPriority(id, priority)
 		| 																	| 
 		| 																	| 
