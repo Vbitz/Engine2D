@@ -31,6 +31,10 @@
 namespace Engine {
     namespace JsMathHelper {
         
+        void DisposeRandomCallback(const v8::WeakCallbackData<v8::External, BasicRandom*>& data) {
+            delete (BasicRandom*) data.GetValue()->Value();
+        }
+        
         ENGINE_JS_METHOD(Random_New) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -47,7 +51,13 @@ namespace Engine {
                 rand = new BasicRandom();
             }
             
-            args.This()->SetHiddenValue(v8::String::NewSymbol("__rand"), v8::External::New(rand));
+            v8::Handle<v8::External> randGen = v8::External::New(rand);
+            
+            v8::Persistent<v8::External> randGenPersist;
+            randGenPersist.Reset(v8::Isolate::GetCurrent(), randGen);
+            randGenPersist.SetWeak<BasicRandom*>(&rand, DisposeRandomCallback);
+            
+            args.This()->SetHiddenValue(v8::String::NewSymbol("__rand"), randGen);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -74,6 +84,14 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(v8::Number::New(rand->NextDouble()));
         }
         
+        ENGINE_JS_METHOD(Random_NextNormal) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewSymbol("__rand")).As<v8::External>()->Value();
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(rand->NextNormal(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1))));
+        }
+        
         void InitMathHelper() {
             v8::HandleScope scp(v8::Isolate::GetCurrent());
             v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
@@ -95,6 +113,7 @@ namespace Engine {
             
             random_proto->Set("next", v8::FunctionTemplate::New(Random_Next));
             random_proto->Set("nextDouble", v8::FunctionTemplate::New(Random_NextDouble));
+            random_proto->Set("nextNormal", v8::FunctionTemplate::New(Random_NextNormal));
             
             math_table->Set(v8::String::NewSymbol("Random"), random_template->GetFunction());
         }

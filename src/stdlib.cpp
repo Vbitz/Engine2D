@@ -350,5 +350,9 @@ namespace Engine {
     double BasicRandom::NextDouble() {
         return std::uniform_real_distribution<>(0.0, 1.0)(this->_gen);
     }
+    
+    double BasicRandom::NextNormal(double mean, double sd) {
+        return std::normal_distribution<>(mean, sd)(this->_gen);
+    }
 
 }

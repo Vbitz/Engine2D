@@ -175,6 +175,8 @@ namespace Engine {
         
         double NextDouble();
         
+        double NextNormal(double mean, double sd);
+        
     private:
         std::mt19937 _gen;
     };
