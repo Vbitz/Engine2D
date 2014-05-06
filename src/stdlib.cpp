@@ -348,7 +348,7 @@ namespace Engine {
     }
     
     double BasicRandom::NextDouble() {
-        return std::uniform_int_distribution<>(0.0, 1.0)(this->_gen);
+        return std::uniform_real_distribution<>(0.0, 1.0)(this->_gen);
     }
 
 }

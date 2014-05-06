@@ -34,6 +34,11 @@ namespace Engine {
         ENGINE_JS_METHOD(Random_New) {
             ENGINE_JS_SCOPE_OPEN;
             
+            if (!args.IsConstructCall()) {
+                ENGINE_THROW_ARGERROR("Math.Random must be called as a constrctor");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
             BasicRandom* rand;
             
             if (args.Length() == 1) {
@@ -61,6 +66,14 @@ namespace Engine {
             }
         }
         
+        ENGINE_JS_METHOD(Random_NextDouble) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewSymbol("__rand")).As<v8::External>()->Value();
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(rand->NextDouble()));
+        }
+        
         void InitMathHelper() {
             v8::HandleScope scp(v8::Isolate::GetCurrent());
             v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
@@ -81,6 +94,7 @@ namespace Engine {
             v8::Handle<v8::ObjectTemplate> random_proto = random_template->PrototypeTemplate();
             
             random_proto->Set("next", v8::FunctionTemplate::New(Random_Next));
+            random_proto->Set("nextDouble", v8::FunctionTemplate::New(Random_NextDouble));
             
             math_table->Set(v8::String::NewSymbol("Random"), random_template->GetFunction());
         }

@@ -144,7 +144,10 @@ var tests = {
 	"Random": function () {
 		var rand = new Math.Random(1337);
 
-		return rand.next() === 1125387415;
+		if (rand.next() !== 1125387415) return false;
+		if (rand.nextDouble() !== 0.15868397722033079) return false;
+
+		return true;
 	}
 };
 
