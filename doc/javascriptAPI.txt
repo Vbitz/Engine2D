@@ -139,7 +139,6 @@ Done	| Old Syntax														| New Syntax
 		| 																	| Math.distince(v1, v2)
 		| 																	| new Rectangle(x, y, w, h)
 		| 																	| Rectangle.intersects(r1, r2)
-		| 																	| Math.rand(min, max)
 		| 																	| Math.perlin
 	X	| 																	| setTimeout(cb, delay)
 	X	| 																	| setInterval(cb, delay)
@@ -163,9 +162,8 @@ Done	| Old Syntax														| New Syntax
 		|																	| event[target].pollDeferedMessages([func])
 		| 																	| event[target].mapQuery(args, cb)
 		| 																	| event[target].setPriority(id, priority)
-		| 																	| 
-		| 																	| 
-		| 																	| 
+	X	| 																	| Math.Random
+	X	| 																	| Math.Random.prototype.next([min], [max])
 		| 																	| 
 		| 																	| 
 		| 																	| 
