@@ -26,6 +26,7 @@
 
 #include <ostream>
 #include <unordered_map>
+#include <random>
 
 typedef char string_char_t;
 
@@ -159,5 +160,22 @@ namespace Engine {
     private:
         string_char_t* _str;
         size_t _len;
+    };
+    
+    class BasicRandom {
+    public:
+        BasicRandom();
+        BasicRandom(long seed);
+        
+        ~BasicRandom();
+        
+        int Next();
+        int Next(int max);
+        int Next(int min, int max);
+        
+        double NextDouble();
+        
+    private:
+        std::mt19937 _gen;
     };
 }

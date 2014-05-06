@@ -322,5 +322,33 @@ namespace Engine {
     CString String::toCString() const {
         
     }
+    
+    BasicRandom::BasicRandom() {
+        
+    }
+    
+    BasicRandom::BasicRandom(long seed) : BasicRandom() {
+        this->_gen.seed(seed);
+    }
+    
+    BasicRandom::~BasicRandom() {
+        
+    }
+    
+    int BasicRandom::Next() {
+        return this->_gen();
+    }
+    
+    int BasicRandom::Next(int max) {
+        return Next(0, max);
+    }
+    
+    int BasicRandom::Next(int min, int max) {
+        return std::uniform_int_distribution<>(min, max)(this->_gen);
+    }
+    
+    double BasicRandom::NextDouble() {
+        return std::uniform_int_distribution<>(0.0, 1.0)(this->_gen);
+    }
 
 }

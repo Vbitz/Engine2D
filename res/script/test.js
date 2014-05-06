@@ -140,6 +140,11 @@ var tests = {
 		sys.emit("deferedEventsTestTarget");
 		sys.emit("deferedEventsTestRouter");
 		return valid;
+	},
+	"Random": function () {
+		var rand = new Math.Random(1337);
+
+		return rand.next() === 1125387415;
 	}
 };
 
