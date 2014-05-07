@@ -54,7 +54,7 @@ namespace Engine {
     }
     
     EngineUI::EngineUI(Application* app) : _app(app) {
-        this->_draw = new Draw2D();
+        this->_draw = new Draw2D(GetRenderGL());
     }
     
     void EngineUI::Draw() {

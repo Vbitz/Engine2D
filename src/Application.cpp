@@ -270,7 +270,7 @@ namespace Engine {
         
         JsMathHelper::InitMathHelper();
         
-        ctx->Global()->Get(v8::String::New("draw")).As<v8::Object>()->SetHiddenValue(v8::String::NewSymbol("_draw"), v8::External::New(new Draw2D()));
+        ctx->Global()->Get(v8::String::New("draw")).As<v8::Object>()->SetHiddenValue(v8::String::NewSymbol("_draw"), v8::External::New(new Draw2D(GetRenderGL())));
         
 		if (!this->_runFile(Config::GetString("core.script.loader"), true)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();

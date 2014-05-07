@@ -30,7 +30,6 @@
 
 namespace Engine {
     void Draw2D::Rect(float x, float y, float w, float h) {
-        RenderGL3* renderGL = GetRenderGL();
         renderGL->BeginRendering(GL_TRIANGLES);
             renderGL->AddVert(x, y, 0);
             renderGL->AddVert(x + w, y, 0);
@@ -42,7 +41,6 @@ namespace Engine {
     }
     
     void Draw2D::Grid(float x, float y, float w, float h) {
-        RenderGL3* renderGL = GetRenderGL();
         renderGL->BeginRendering(GL_LINE_LOOP);
             renderGL->AddVert(x, y, 0);
             renderGL->AddVert(x + w, y, 0);
@@ -53,8 +51,6 @@ namespace Engine {
     }
     
     void Draw2D::DrawImage(Texture* tex, float x, float y, float w, float h) {
-        RenderGL3* renderGL = GetRenderGL();
-        
         renderGL->EnableTexture(tex);
         
         renderGL->BeginRendering(GL_TRIANGLES);
@@ -81,8 +77,6 @@ namespace Engine {
     }
     
     void Draw2D::DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
-        RenderGL3* renderGL = GetRenderGL();
-        
         renderGL->EnableTexture(tex);
         
         int imageWidth = tex->GetWidth();
@@ -112,8 +106,6 @@ namespace Engine {
             return;
         }
         
-        RenderGL3* renderGL = GetRenderGL();
-        
         Color4f color1(col1);
         
         Color4f color2(col2);
@@ -138,7 +130,6 @@ namespace Engine {
     }
     
     void Draw2D::Line(float x0, float y0, float x1, float y1) {
-        RenderGL3* renderGL = GetRenderGL();
         renderGL->BeginRendering(GL_LINES);
             renderGL->AddVert(x0, y0, 0.0f);
             renderGL->AddVert(x1, y1, 0.0f);
@@ -146,7 +137,6 @@ namespace Engine {
     }
     
     void Draw2D::Lines(float* points, unsigned int count) {
-        RenderGL3* renderGL = GetRenderGL();
         renderGL->BeginRendering(GL_LINE_STRIP);
         for (int i = 0; i < count * 2; i += 2) {
             renderGL->AddVert(points[i], points[i + 1], 0);
@@ -155,7 +145,6 @@ namespace Engine {
     }
     
     void Draw2D::LineGraph(float xOff, float yOff, float xScale, float yScale, float* points, unsigned int count) {
-        RenderGL3* renderGL = GetRenderGL();
         float* newPoints = (float*) std::malloc(count * 2 * sizeof(float)); // twice the size of points
         for (int x = 0; x < count; x++) {
             newPoints[x * 2] = xOff + (x * xScale);
@@ -183,7 +172,6 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     
     void Draw2D::Circle(float xCenter, float yCenter, float radius, float innerRadius,
                 int segments, float start, float end, bool fill) {
-        RenderGL3* renderGL = GetRenderGL();
         bool usingGl3 = renderGL->GetRendererType() == RendererType_OpenGL3;
         static double pi2 = 2 * 3.14159265358979323846;
         float rStart = pi2 * start;

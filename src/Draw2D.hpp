@@ -33,6 +33,8 @@ namespace Engine {
     
     class Draw2D {
     public:
+        Draw2D(RenderGL3* renderGL) : renderGL(renderGL) {}
+        
         // Primatives
         void Rect(float x, float y, float w, float h);
         void Grid(float x, float y, float w, float h);
@@ -57,5 +59,7 @@ namespace Engine {
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4);
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int segments);
         void BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments);
+    private:
+        RenderGL3* renderGL;
     };
 }
