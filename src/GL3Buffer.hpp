@@ -23,13 +23,15 @@
 
 #include "Shader.hpp"
 #include "EffectParameters.hpp"
+#include "RenderGL3.hpp"
 
 namespace Engine {
     class Shader;
+    class RenderGL3;
     
 	class GL3Buffer {
 	public:
-		GL3Buffer(EffectParameters params);
+		GL3Buffer(RenderGL3* render, EffectParameters params);
 		~GL3Buffer();
 
 		void Upload(float* buffer, int count);
@@ -49,8 +51,11 @@ namespace Engine {
         
 		void bindShader();
         
+        RenderGL3* _getRender();
+        
         GLuint _vertexArrayPointer, _vertexBufferPointer;
         
+        RenderGL3* _renderGL = NULL;
         Shader* _currentShader = NULL;
         EffectParameters _currentEffect;
         

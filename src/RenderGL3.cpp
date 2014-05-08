@@ -250,7 +250,7 @@ namespace Engine {
                 this->_currentFontName, this->_currentFontSize);
             
             drawingFont->drawTextGL3(x - this->_centerX, y - this->_centerY,
-                &this->_currentEffect,
+                this, &this->_currentEffect,
                 this->_currentColor.r, this->_currentColor.g, this->_currentColor.b, string);
             
             CheckGLError("RenderGL3::Print::PostGL3Print");
@@ -296,7 +296,7 @@ namespace Engine {
     }
     
     void RenderGL3::FlushAll() {
-        static GL3Buffer buf(this->_currentEffect); // temporory
+        static GL3Buffer buf(this, this->_currentEffect); // temporory
         
         if (GetRendererType() != RendererType_OpenGL3) {
             throw "That's a bug";

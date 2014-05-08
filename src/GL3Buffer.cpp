@@ -21,14 +21,12 @@
 
 #include "GL3Buffer.hpp"
 
-#include "RenderGL3.hpp"
-
 // TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Engine {
-    GL3Buffer::GL3Buffer(EffectParameters params) : _currentEffect(params), _shaderBound(false) {
+    GL3Buffer::GL3Buffer(RenderGL3* render, EffectParameters params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
         this->_init();
     }
     
@@ -88,11 +86,11 @@ namespace Engine {
         glBindVertexArray(this->_vertexArrayPointer);
         glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
         
-        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PreUploadBufferData");
+        this->_getRender()->CheckGLError("GL3Buffer::Upload::PreUploadBufferData");
         
         glBufferData(GL_ARRAY_BUFFER, count, buffer, GL_STATIC_DRAW);
         
-        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PostUploadBufferData");
+        this->_getRender()->CheckGLError("GL3Buffer::Upload::PostUploadBufferData");
         
         if (!this->_shaderBound) {
             this->bindShader();
@@ -109,7 +107,7 @@ namespace Engine {
         
         this->_getShader()->Begin();
         
-        GetRenderGL()->CheckGLError("GL3Buffer::Draw::PostBindShader");
+        this->_getRender()->CheckGLError("GL3Buffer::Draw::PostBindShader");
         
         GLint viewpoint[4];
         
@@ -123,11 +121,11 @@ namespace Engine {
         this->_getShader()->UploadUniform(settings.viewMatrixParam, view);
         this->_getShader()->UploadUniform(settings.projectionMatrixParam, proj);
         
-        GetRenderGL()->CheckGLError("GL3Buffer::Draw::PostUploadUniform");
+        this->_getRender()->CheckGLError("GL3Buffer::Draw::PostUploadUniform");
         
         glDrawArrays(mode, 0, vertexCount);
         
-        GetRenderGL()->CheckGLError("GL3Buffer::Draw::PostDraw");
+        this->_getRender()->CheckGLError("GL3Buffer::Draw::PostDraw");
         
         this->_getShader()->End();
         
@@ -145,7 +143,7 @@ namespace Engine {
     void GL3Buffer::bindShader() {
         this->_getShader()->Begin();
         
-        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PostBeginShader");
+        this->_getRender()->CheckGLError("GL3Buffer::Upload::PostBeginShader");
         
         ShaderSettings settings = this->_currentEffect.GetShaderSettings();
         
@@ -153,14 +151,19 @@ namespace Engine {
         this->_getShader()->BindUniform(settings.viewMatrixParam);
         this->_getShader()->BindUniform(settings.projectionMatrixParam);
         
-        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PostBindViewpointSize");
+        this->_getRender()->CheckGLError("GL3Buffer::Upload::PostBindViewpointSize");
         
         this->_getShader()->BindVertexAttrib(settings.vertexParam, 3, 9, 0);
         this->_getShader()->BindVertexAttrib(settings.colorParam, 4, 9, 3);
         this->_getShader()->BindVertexAttrib(settings.texCoardParam, 2, 9, 7);
         
-        GetRenderGL()->CheckGLError("GL3Buffer::Upload::PostBindVertexAttributes");
+        this->_getRender()->CheckGLError("GL3Buffer::Upload::PostBindVertexAttributes");
         
         this->_getShader()->End();
+    }
+    
+    RenderGL3* GL3Buffer::_getRender() {
+        
+        return this->_renderGL;
     }
 }
