@@ -37,6 +37,7 @@
 
 namespace Engine {
     
+    class RenderGL3;
     class EngineUI;
     
     class Application {
@@ -61,6 +62,7 @@ namespace Engine {
         Window* GetWindow();
         bool GetKeyPressed(int key);
         void UpdateScreen();
+        RenderGL3* GetRender();
         
         // Public EngineUI functions
         EngineUI* GetEngineUI();
@@ -170,6 +172,7 @@ namespace Engine {
         
         Window* _window = NULL;
         EngineUI* _engineUI = NULL;
+        RenderGL3* _renderGL = NULL;
         
         std::map<std::string, ResourceManager::FontResource*> _fonts;
         
