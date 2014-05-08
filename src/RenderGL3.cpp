@@ -122,7 +122,7 @@ namespace Engine {
             }
         }
         
-        GetRenderGL()->CheckGLError("RenderGL3::GetExtentions");
+        CheckGLError("RenderGL3::GetExtentions");
         
         return ret;
     }
