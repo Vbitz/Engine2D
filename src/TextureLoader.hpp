@@ -32,7 +32,7 @@ namespace Engine {
     class Texture {
     public:
         Texture();
-        Texture(GLuint textureID);
+        Texture(RenderGL3* render, GLuint textureID);
         ~Texture();
         
         void Invalidate();
@@ -50,6 +50,8 @@ namespace Engine {
     private:
         void _setTextureID(GLuint textureID);
         void _setTextureID(GLuint textureID, bool deleteOld);
+        
+        RenderGL3* _render;
         GLuint _textureID = UINT_MAX;
         int _width, _height;
     };

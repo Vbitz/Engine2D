@@ -28,7 +28,7 @@ namespace Engine {
         
     }
     
-    Texture::Texture(GLuint textureID) {
+    Texture::Texture(RenderGL3* render, GLuint textureID) : _render(render) {
         Logger::begin("Texture", Logger::LogLevel_Verbose) << "Creating Texture: " << textureID << Logger::end();
         this->_setTextureID(textureID);
     }
@@ -63,9 +63,9 @@ namespace Engine {
             throw "Invalid Texture";
         }
         
-        GetRenderGL()->CheckGLError("Texture::Begin::PreBind");
+        this->_render->CheckGLError("Texture::Begin::PreBind");
         glBindTexture(GL_TEXTURE_2D, this->_textureID);
-        GetRenderGL()->CheckGLError("Texture::Begin::PostBind");
+        this->_render->CheckGLError("Texture::Begin::PostBind");
     }
     
     void Texture::End() {
@@ -147,9 +147,11 @@ namespace Engine {
         }
         
         Texture* TextureFromBuffer(GLuint textureID, unsigned char *texture, int width, int height) {
+            RenderGL3* render = GetRenderGL();
+            
             GLuint text = 0;
             
-            GetRenderGL()->CheckGLError("Pre Image Load");
+            render->CheckGLError("Pre Image Load");
             
             glGenTextures(1, &text);
             
@@ -167,9 +169,9 @@ namespace Engine {
             
             glBindTexture(GL_TEXTURE_2D, 0);
             
-            GetRenderGL()->CheckGLError("Post Image Load");
+            render->CheckGLError("Post Image Load");
             
-            return new Texture(text);
+            return new Texture(render, text);
         }
         
         Texture* TextureFromBuffer(float* texture, int width, int height) {
@@ -177,9 +179,11 @@ namespace Engine {
         }
         
         Texture* TextureFromBuffer(GLuint textureID, float* texture, int width, int height) {
+            RenderGL3* render = GetRenderGL();
+            
             GLuint text = 0;
             
-            GetRenderGL()->CheckGLError("Pre Image Load");
+            render->CheckGLError("Pre Image Load");
             
             glGenTextures(1, &text);
             
@@ -197,9 +201,9 @@ namespace Engine {
             
             glBindTexture(GL_TEXTURE_2D, 0);
             
-            GetRenderGL()->CheckGLError("Post Image Load");
+            render->CheckGLError("Post Image Load");
             
-            return new Texture(text);
+            return new Texture(render, text);
         }
         
         ResourceManager::ImageResource* TextureFromFile(std::string filename) {
