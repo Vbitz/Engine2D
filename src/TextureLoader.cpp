@@ -21,7 +21,7 @@
 
 #include "TextureLoader.hpp"
 
-#include "RenderGL3.hpp"
+#include "Application.hpp"
 
 namespace Engine {
     Texture::Texture() {
@@ -147,7 +147,7 @@ namespace Engine {
         }
         
         Texture* TextureFromBuffer(GLuint textureID, unsigned char *texture, int width, int height) {
-            RenderGL3* render = GetRenderGL();
+            RenderGL3* render = GetAppSingilton()->GetRender();
             
             GLuint text = 0;
             
@@ -179,7 +179,7 @@ namespace Engine {
         }
         
         Texture* TextureFromBuffer(GLuint textureID, float* texture, int width, int height) {
-            RenderGL3* render = GetRenderGL();
+            RenderGL3* render = GetAppSingilton()->GetRender();
             
             GLuint text = 0;
             

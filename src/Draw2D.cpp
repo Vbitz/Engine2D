@@ -253,7 +253,6 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     }
     
     void Draw2D::BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments) {
-        RenderGL3* renderGL = GetRenderGL();
         glm::vec3 q0 = _calculateBezierPoint(0, vec1, vec2, vec3, vec4);
         
         renderGL->BeginRendering(GL_LINE_STRIP);
