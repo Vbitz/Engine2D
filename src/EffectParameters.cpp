@@ -21,7 +21,7 @@
 
 #include "EffectParameters.hpp"
 
-#include "RenderGL3.hpp"
+#include "Application.hpp"
 
 namespace Engine {
     
@@ -93,7 +93,7 @@ namespace Engine {
     }
     
     ShaderSpec EffectParameters::_getBestShaderSpec() {
-        EffectShaderTypes::Type bestType = GetRenderGL()->GetBestEffectShaderType();
+        EffectShaderTypes::Type bestType = GetAppSingilton()->GetRender()->GetBestEffectShaderType();
         for (auto iter = this->_shaders.begin(); iter != this->_shaders.end(); iter++) {
             if (iter->type == bestType) {
                 return *iter;
@@ -107,7 +107,7 @@ namespace Engine {
             return path.substr(0, path.find_last_of('/') + 1);
         }
         
-        EffectParameters GetEffectFromFile(std::string filename) {
+        EffectParameters* GetEffectFromFile(std::string filename) {
             std::string fileContent = std::string(Filesystem::GetFileContent(filename));
             
             Json::Reader reader;
@@ -115,7 +115,7 @@ namespace Engine {
             
             reader.parse(fileContent, root);
             
-            return EffectParameters(getBasePath(filename), root);
+            return new EffectParameters(getBasePath(filename), root);
         }
     }
 }

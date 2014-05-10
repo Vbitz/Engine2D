@@ -147,7 +147,7 @@ namespace Engine {
         std::string _currentFontName = "basic"; // ah there we are fonts fixed
         int _currentFontSize = 16;
         
-        EffectParameters _currentEffect;
+        EffectParameters* _currentEffect;
         
         Texture* _defaultTexture;
         

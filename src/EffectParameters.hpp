@@ -26,17 +26,13 @@
 
 #include "vendor/json/json.h"
 
+#include "EffectShaderTypes.hpp"
 #include "Shader.hpp"
 
 namespace Engine {
     
-    namespace EffectShaderTypes {
-        enum Type {
-            GLSL_150,
-            Unknown
-        };
-    };
-
+    class Shader;
+    
     typedef struct {
         EffectShaderTypes::Type type;
         std::string vertexShaderPath;
@@ -70,6 +66,6 @@ namespace Engine {
     };
     
     namespace EffectReader {
-        EffectParameters GetEffectFromFile(std::string filename);
+        EffectParameters* GetEffectFromFile(std::string filename);
     }
 }

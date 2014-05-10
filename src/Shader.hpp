@@ -26,11 +26,13 @@
 
 #include "Window.hpp"
 
+#include "RenderGL3.hpp"
+
 namespace Engine {
     class Shader {
     public:
         Shader();
-        Shader(std::string shaderFilename);
+        Shader(RenderGL3* render, std::string shaderFilename);
         
         ~Shader();
         
@@ -57,6 +59,8 @@ namespace Engine {
         bool compile(const char* vertSource, const char* fragSource);
         
         bool checkProgramPointer();
+        
+        RenderGL3* _render;
         
         bool _loaded;
         

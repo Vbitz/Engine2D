@@ -21,8 +21,6 @@
 
 #include "Shader.hpp"
 
-#include "RenderGL3.hpp"
-
 #include "Filesystem.hpp"
 
 #include "Util.hpp"
@@ -33,7 +31,7 @@ namespace Engine {
         
     }
     
-    Shader::Shader(std::string shaderFilename) : _loaded(false) {
+    Shader::Shader(RenderGL3* render, std::string shaderFilename) : _loaded(false), _render(render) {
         this->_vertFilename = "shaders/" + shaderFilename + ".vert";
         this->_fragFilename = "shaders/" + shaderFilename + ".frag";
         this->Init(this->_vertFilename, this->_fragFilename);
@@ -128,17 +126,17 @@ namespace Engine {
             Logger::begin("Shader", Logger::LogLevel_Error) << "Bad token name: " << token << Logger::end();
         }
         
-        GetRenderGL()->CheckGLError("Shader::BindVertexAttrib::PostGetAttribLocation");
+        this->_render->CheckGLError("Shader::BindVertexAttrib::PostGetAttribLocation");
         
         glVertexAttribPointer(attribPos, attribSize, GL_FLOAT, GL_FALSE,
                               totalSize * sizeof(float),
                               stride == 0 ? NULL : (void*)(stride * sizeof(float)));
         
-        GetRenderGL()->CheckGLError("Shader::BindVertexAttrib::PostVertexAttribPointer");
+        this->_render->CheckGLError("Shader::BindVertexAttrib::PostVertexAttribPointer");
         
         glEnableVertexAttribArray(attribPos);
         
-        GetRenderGL()->CheckGLError("Shader::BindVertexAttrib::PostEnable");
+        this->_render->CheckGLError("Shader::BindVertexAttrib::PostEnable");
     }
     
     void Shader::Init(std::string vertShaderFilename, std::string fragShaderFilename) {

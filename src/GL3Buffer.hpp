@@ -31,7 +31,7 @@ namespace Engine {
     
 	class GL3Buffer {
 	public:
-		GL3Buffer(RenderGL3* render, EffectParameters params);
+		GL3Buffer(RenderGL3* render, EffectParameters* params);
 		~GL3Buffer();
 
 		void Upload(float* buffer, int count);
@@ -57,7 +57,7 @@ namespace Engine {
         
         RenderGL3* _renderGL = NULL;
         Shader* _currentShader = NULL;
-        EffectParameters _currentEffect;
+        EffectParameters* _currentEffect;
         
         bool _shaderBound = false;
 	};

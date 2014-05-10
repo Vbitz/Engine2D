@@ -389,7 +389,7 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::RenderGL3* render, Engine:
     
     //return; // just until it's fixed
     
-    static Engine::GL3Buffer buf(render, *effect);
+    static Engine::GL3Buffer buf(render, effect);
     
     buf.Update();
     

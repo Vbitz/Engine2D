@@ -250,7 +250,7 @@ namespace Engine {
                 this->_currentFontName, this->_currentFontSize);
             
             drawingFont->drawTextGL3(x - this->_centerX, y - this->_centerY,
-                this, &this->_currentEffect,
+                this, this->_currentEffect,
                 this->_currentColor.r, this->_currentColor.g, this->_currentColor.b, string);
             
             CheckGLError("RenderGL3::Print::PostGL3Print");
@@ -340,7 +340,7 @@ namespace Engine {
         if (GetRendererType() == RendererType_OpenGL3) {
             std::string gl3Effect = Config::GetString("core.render.basicEffect");
             this->_currentEffect = EffectReader::GetEffectFromFile(gl3Effect);
-            this->_currentEffect.CreateShader();
+            this->_currentEffect->CreateShader();
             if (this->_defaultTexture == NULL || !this->_defaultTexture->IsValid()) {
                 Logger::begin("RenderGL3", Logger::LogLevel_Verbose) << "Creating Default Texture" << Logger::end();
                 this->_defaultTexture = GenerateDefaultTexture();

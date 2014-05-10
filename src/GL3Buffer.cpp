@@ -26,7 +26,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Engine {
-    GL3Buffer::GL3Buffer(RenderGL3* render, EffectParameters params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
+    GL3Buffer::GL3Buffer(RenderGL3* render, EffectParameters* params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
         this->_init();
     }
     
@@ -115,7 +115,7 @@ namespace Engine {
         
         glm::mat4 proj = glm::ortho(0.0f, (float) viewpoint[2], (float) viewpoint[3], 0.0f, 1.0f, -1.0f);
         
-        ShaderSettings settings = this->_currentEffect.GetShaderSettings();
+        ShaderSettings settings = this->_currentEffect->GetShaderSettings();
         
         this->_getShader()->UploadUniform(settings.modelMatrixParam, model);
         this->_getShader()->UploadUniform(settings.viewMatrixParam, view);
@@ -135,7 +135,7 @@ namespace Engine {
     
     Shader* GL3Buffer::_getShader() {
         if (this->_currentShader == NULL) {
-            this->_currentShader = this->_currentEffect.CreateShader();
+            this->_currentShader = this->_currentEffect->CreateShader();
         }
         return this->_currentShader;
     }
@@ -145,7 +145,7 @@ namespace Engine {
         
         this->_getRender()->CheckGLError("GL3Buffer::Upload::PostBeginShader");
         
-        ShaderSettings settings = this->_currentEffect.GetShaderSettings();
+        ShaderSettings settings = this->_currentEffect->GetShaderSettings();
         
         this->_getShader()->BindUniform(settings.modelMatrixParam);
         this->_getShader()->BindUniform(settings.viewMatrixParam);
