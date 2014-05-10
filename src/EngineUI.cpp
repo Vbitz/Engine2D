@@ -54,7 +54,7 @@ namespace Engine {
     }
     
     EngineUI::EngineUI(Application* app) : _app(app) {
-        this->_draw = new Draw2D(GetRenderGL());
+        this->_draw = new Draw2D(app->GetRender());
     }
     
     void EngineUI::Draw() {
@@ -62,7 +62,7 @@ namespace Engine {
             return;
         }
         
-        RenderGL3* renderGL = GetRenderGL();
+        RenderGL3* renderGL = this->_draw->GetRender();
         
         renderGL->ResetMatrix();
         
