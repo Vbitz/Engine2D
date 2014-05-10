@@ -551,7 +551,7 @@ namespace Engine {
         this->_window->SetAntiAlias(Config::GetInt("core.render.aa"));
         this->_window->SetDebug(Config::GetBoolean("core.debug.debugRenderer"));
         
-        this->_renderGL = GetRenderGL();
+        this->_renderGL = new RenderGL3();
         
         this->_window->Show();
         

@@ -479,13 +479,4 @@ namespace Engine {
             glRotatef(r, 0.0f, 0.0f, 1.0f);
         }
     }
-    
-    RenderGL3* _renderGl3Singilton = NULL;
-    
-    RenderGL3* GetRenderGL() {
-        if (_renderGl3Singilton == NULL) {
-            _renderGl3Singilton = new RenderGL3();
-        }
-        return _renderGl3Singilton;
-    }
 }

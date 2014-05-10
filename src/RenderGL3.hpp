@@ -155,6 +155,4 @@ namespace Engine {
         
         glm::mat4 _currentModelMatrix;;
     };
-    
-    RenderGL3* GetRenderGL();
 }
