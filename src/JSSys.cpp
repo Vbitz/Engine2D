@@ -42,7 +42,11 @@ namespace Engine {
             if (str == "highlight") return Logger::LogLevel_Highlight;
             return Logger::LogLevel_User;
         }
-
+        
+        Application* GetApp(v8::Local<v8::Object> thisValue) {
+            return (Application*) thisValue->GetHiddenValue(v8::String::NewSymbol("_app")).As<v8::External>()->Value();
+        }
+        
 		ENGINE_JS_METHOD(Println) {
 			ENGINE_JS_SCOPE_OPEN;
             
@@ -211,7 +215,7 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New();
             
-            OpenGLVersion version = GetRenderGL()->GetOpenGLVersion();
+            OpenGLVersion version = GetApp(args.This())->GetRender()->GetOpenGLVersion();
 
             ret->Set(v8::String::New("major"), v8::Number::New(version.major));
             ret->Set(v8::String::New("minor"), v8::Number::New(version.minor));
@@ -227,7 +231,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of a GL Extention to check for");
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetRenderGL()->HasExtention(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetApp(args.This())->GetRender()->HasExtention(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(GetExtentions) {
@@ -237,7 +241,7 @@ namespace Engine {
             
             v8::Handle<v8::Array> arr = v8::Array::New();
             
-            std::vector<std::string> extentionList = GetRenderGL()->GetExtentions();
+            std::vector<std::string> extentionList = GetApp(args.This())->GetRender()->GetExtentions();
             
             for (int i = 0; i < extentionList.size(); i++) {
                 arr->Set(i, v8::String::New(extentionList[i].c_str()));

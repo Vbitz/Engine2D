@@ -270,8 +270,6 @@ namespace Engine {
         
         JsMathHelper::InitMathHelper();
         
-        ctx->Global()->Get(v8::String::New("draw")).As<v8::Object>()->SetHiddenValue(v8::String::NewSymbol("_draw"), v8::External::New(new Draw2D(GetRenderGL())));
-        
 		if (!this->_runFile(Config::GetString("core.script.loader"), true)) {
             Logger::begin("Scripting", Logger::LogLevel_Error) << "Bootloader not found" << Logger::end();
             this->_engineUI->ToggleConsole(); // give them something to debug using
@@ -353,9 +351,11 @@ namespace Engine {
     }
     
     void Application::_disablePreload() {
-		v8::Local<v8::Object> sys_table = _getScriptTable("sys");
+        _getScriptTable("draw")->SetHiddenValue(v8::String::NewSymbol("_draw"), v8::External::New(new Draw2D(GetRender())));
         
-        sys_table->Set(v8::String::New("preload"), v8::Boolean::New(false));
+        _getScriptTable("sys")->SetHiddenValue(v8::String::NewSymbol("_app"), v8::External::New(this));
+        
+        _getScriptTable("sys")->Set(v8::String::New("preload"), v8::Boolean::New(false));
     }
     
     void Application::_loadBasicConfigs() {
