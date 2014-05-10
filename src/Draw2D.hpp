@@ -35,6 +35,8 @@ namespace Engine {
     public:
         Draw2D(RenderGL3* renderGL) : renderGL(renderGL) {}
         
+        RenderGL3* GetRender();
+        
         // Primatives
         void Rect(float x, float y, float w, float h);
         void Grid(float x, float y, float w, float h);

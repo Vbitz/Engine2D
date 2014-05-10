@@ -29,6 +29,10 @@
 #include "vendor/GLFT_Font.hpp"
 
 namespace Engine {
+    RenderGL3* Draw2D::GetRender() {
+        return renderGL;
+    }
+    
     void Draw2D::Rect(float x, float y, float w, float h) {
         renderGL->BeginRendering(GL_TRIANGLES);
             renderGL->AddVert(x, y, 0);
