@@ -216,6 +216,24 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
         }
     }
     
+    // points are in the format [x, y, x, y]
+    void Draw2D::Polygon(float xCenter, float yCenter, float* points, int pointCount) {
+        renderGL->BeginRendering(GL_TRIANGLE_FAN);
+        
+        renderGL->AddVert(xCenter, yCenter, 0.0f);
+        
+        for (int i = 0; i < pointCount; i++) {
+            renderGL->AddVert(xCenter + points[i * 2 + 0],
+                              yCenter + points[i * 2 + 1],
+                              0.0f);
+        }
+        
+        renderGL->EndRendering();
+        
+        if (renderGL->GetRendererType() == RendererType_OpenGL3) {
+            renderGL->FlushAll();
+        }
+    }
     
     // from http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
     glm::vec3 _calculateBezierPoint(float t, glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3) {

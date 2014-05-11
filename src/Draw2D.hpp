@@ -58,6 +58,8 @@ namespace Engine {
         void Circle(float xCenter, float yCenter, float radius, float innerRadius,
                     int segments, float start, float end, bool fill);
         
+        void Polygon(float xOff, float yCenter, float* points, int pointCount);
+        
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4);
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int segments);
         void BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments);

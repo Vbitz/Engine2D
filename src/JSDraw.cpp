@@ -251,6 +251,31 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(Polygon) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_GL;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X center of the polygon");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y center of the polygon");
+            ENGINE_CHECK_ARG_ARRAY(2, "Arg2 is the points to the circle in the format [x, y, x, y]");
+            
+            v8::Handle<v8::Array> arr = args[2].As<v8::Array>();
+            
+            float* circlePoints = new float[arr->Length()];
+            int circlePointCount = arr->Length() / 2;
+            
+            for (int i = 0; i < arr->Length(); i++) {
+                circlePoints[i] = arr->Get(i).As<v8::Number>()->Value();
+            }
+            
+            GetDraw2D(args.This())->Polygon(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), circlePoints, circlePointCount);
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         ENGINE_JS_METHOD(Curve) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -1101,6 +1126,7 @@ namespace Engine {
                 addItem(drawTable, "circle", Circle);
                 addItem(drawTable, "curve", Curve);
                 addItem(drawTable, "line", Line);
+                addItem(drawTable, "polygon", Polygon);
                 
                 addItem(drawTable, "colorPalette", ColorPalette);
                 addItem(drawTable, "setColorF", SetColorF);
