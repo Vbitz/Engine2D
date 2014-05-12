@@ -243,6 +243,11 @@ setTimeout(function () {
 	console.log("[setTimeout] This runs once after 10 seconds");
 }, 10000);
 
+
+var graphicsTests = {
+	
+};
+
 sys.on("draw", "test.draw", function () {
 	if (!draw.isTexture(img)) {
 		console.log("Loading Image 1");
@@ -344,6 +349,8 @@ sys.on("draw", "test.draw", function () {
 	draw.print(400, 500, "HSV Image");
 	draw.draw(img3, 410, 520, 360, 100);
 
+// profiler
+/*
 	draw.setFont("basic", 16);
 	draw.print(1040, 70, "Profiler");
 
@@ -360,6 +367,7 @@ sys.on("draw", "test.draw", function () {
 		draw.print(1190, y, sys.getProfilerTime(i).toFixed(4));
 		y += 20;
 	});
+*/
 
 	for (var curveX = 0; curveX < 2000; curveX += 100) {
 		draw.curve(curveX, 500, curveX, 600, 850, 600, input.mouseX, input.mouseY);
