@@ -27,27 +27,9 @@
 #include "vendor/GL/glew.h"
 #include <glm/glm.hpp>
 
+#include "RenderTypes.hpp"
+
 namespace Engine {
-    typedef struct _openGLVersion {
-        int major, minor, revision;
-    } OpenGLVersion;
-    
-    enum MouseButton {
-        MouseButton_Left,
-        MouseButton_Right,
-        MouseButton_Middle
-    };
-    
-    enum GraphicsVersion {
-        Graphics_OpenGL_Modern,
-        Graphics_OpenGL_Legacy
-    };
-    
-    enum KeyStatus {
-        Key_Press,
-        Key_Release,
-        Key_Repeat
-    };
     
     class Window {
     public:

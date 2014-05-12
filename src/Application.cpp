@@ -507,7 +507,7 @@ namespace Engine {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
 		app->UpdateScreen();
         glViewport(0, 0, w, h);
-        app->GetRender()->CheckGLError("Post Viewpoint");
+        app->GetRender()->CheckError("Post Viewpoint");
     }
     
     void Application::_initGLContext(GraphicsVersion v) {
@@ -524,7 +524,7 @@ namespace Engine {
             glDebugMessageCallback(DebugMessageCallback, NULL);
         }
         
-        this->GetRender()->CheckGLError("PostSetupContext");
+        this->GetRender()->CheckError("PostSetupContext");
         
         Logger::begin("Window", Logger::LogLevel_Log) << "Loaded OpenGL" << Logger::end();
         
@@ -557,7 +557,7 @@ namespace Engine {
         
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init OpenGL State" << Logger::end();
         
-        this->GetRender()->CheckGLError("PostSetCallback");
+        this->GetRender()->CheckError("PostSetCallback");
     }
     
     void Application::_closeWindow() {
@@ -818,7 +818,7 @@ namespace Engine {
             << "Loading Font: " << filename << " as " << prettyName
             << Logger::end();
         
-        this->GetRender()->CheckGLError("PreLoadFont");
+        this->GetRender()->CheckError("PreLoadFont");
         
 		if (Filesystem::FileExists(filename)) {
             ResourceManager::Load(filename);
@@ -828,7 +828,7 @@ namespace Engine {
             return false;
 		}
         
-        this->GetRender()->CheckGLError("PostLoadFont");
+        this->GetRender()->CheckError("PostLoadFont");
         
         Logger::begin("Font", Logger::LogLevel_Verbose) << "Loaded Font: " << filename << " as " << prettyName << Logger::end();
         
@@ -1150,7 +1150,7 @@ namespace Engine {
             
             Profiler::Begin("Draw");
             
-            this->GetRender()->CheckGLError("startOfRendering");
+            this->GetRender()->CheckError("startOfRendering");
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             
@@ -1184,7 +1184,7 @@ namespace Engine {
 				break;
 			}
             
-            this->GetRender()->CheckGLError("endOfRendering");
+            this->GetRender()->CheckError("endOfRendering");
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
                 Profiler::Begin("ScriptGC");
@@ -1272,7 +1272,7 @@ namespace Engine {
         
         // The window is now ready
         
-        GetRender()->CheckGLError("Post InitOpenGL");
+        GetRender()->CheckError("Post InitOpenGL");
         
         Engine::EnableGLContext();
         
@@ -1280,13 +1280,13 @@ namespace Engine {
         
         Events::Emit("postLoad");
         
-        GetRender()->CheckGLError("On JS Post Load");
+        GetRender()->CheckError("On JS Post Load");
         
         FreeImage_Initialise();
         
         this->UpdateScreen();
         
-        GetRender()->CheckGLError("Post Finish Loading");
+        GetRender()->CheckError("Post Finish Loading");
         
         Logger::begin("Application", Logger::LogLevel_Highlight) << "Loaded" << Logger::end();
         

@@ -311,7 +311,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is a name for the color");
                 ENGINE_CHECK_ARG_INT32(1, "Arg1 is the color to associate the name with");
                 
-                GetDraw2D(args.This())->GetRender()->SetDefinedColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1));
+                Color4f::SetDefinedColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1));
             } else if (args.Length() == 1) {
                 ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is an object containing a list of colors");
                 
@@ -323,7 +323,7 @@ namespace Engine {
                     v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
                     v8::Local<v8::Value> objItem = obj->Get(objKey);
                     
-                    GetDraw2D(args.This())->GetRender()->SetDefinedColor(std::string(*v8::String::Utf8Value(objKey)), (int) objItem->NumberValue());
+                    Color4f::SetDefinedColor(std::string(*v8::String::Utf8Value(objKey)), (int) objItem->NumberValue());
                 }
             } else {
                 ENGINE_THROW_ARGERROR("draw.colorPalette takes 1 or 2 args");
@@ -615,7 +615,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_GL;
                 
-                GetDraw2D(args.This())->GetRender()->CheckGLError("JSDraw::Draw::PreDraw");
+                GetDraw2D(args.This())->GetRender()->CheckError("JSDraw::Draw::PreDraw");
                 
                 Texture* tex;
                 GLfloat x, y, w, h;
@@ -650,7 +650,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_GL;
                 
-                GetDraw2D(args.This())->GetRender()->CheckGLError("Pre Image Draw");
+                GetDraw2D(args.This())->GetRender()->CheckError("Pre Image Draw");
                 
                 Texture* tex;
                 GLfloat x1, y1, w1, h1,
@@ -733,7 +733,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the image to load");
                 
-                GetDraw2D(args.This())->GetRender()->CheckGLError("Pre Image Load");
+                GetDraw2D(args.This())->GetRender()->CheckError("Pre Image Load");
                 
                 if (!Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))) {
                     ENGINE_THROW_ARGERROR("File does not Exist");
@@ -1095,12 +1095,6 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            ENGINE_JS_METHOD(GetVerts) {
-                ENGINE_JS_SCOPE_OPEN;
-                
-                ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(GetDraw2D(args.This())->GetRender()->GetVerts()));
-            }
-            
             ENGINE_JS_METHOD(SetCenter) {
                 ENGINE_JS_SCOPE_OPEN;
                 
@@ -1161,7 +1155,6 @@ namespace Engine {
                 addItem(drawTable, "loadFont", LoadFont);
                 addItem(drawTable, "isFontLoaded", IsFontLoaded);
                 
-                addItem(drawTable, "getVerts", GetVerts);
                 addItem(drawTable, "setCenter", SetCenter);
             }
             

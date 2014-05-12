@@ -60,7 +60,7 @@ namespace Engine {
         renderGL->BeginRendering(GL_TRIANGLES);
         
         if (renderGL->GetRendererType() == RendererType_OpenGL3) {
-            renderGL->CheckGLError("Draw2D::DrawImage::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
+            renderGL->CheckError("Draw2D::DrawImage::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
         }
         
         //                 x         y         z   s     t
@@ -73,11 +73,11 @@ namespace Engine {
         
         renderGL->EndRendering();
         
-        renderGL->CheckGLError("Draw2D::DrawImage::PostEnd");
+        renderGL->CheckError("Draw2D::DrawImage::PostEnd");
         
         renderGL->DisableTexture();
         
-        renderGL->CheckGLError("Draw2D::DrawImage::PostDraw");
+        renderGL->CheckError("Draw2D::DrawImage::PostDraw");
     }
     
     void Draw2D::DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {

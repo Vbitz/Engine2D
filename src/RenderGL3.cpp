@@ -73,12 +73,12 @@ namespace Engine {
         return EffectShaderTypes::GLSL_150;
     }
     
-    bool RenderGL3::CheckGLError(const char* source) {
+    bool RenderGL3::CheckError(const char* source) {
         GLenum err;
         bool oneError = false;
         while ((err = glGetError()) != GL_NO_ERROR) {
             Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : " << GLErrorString(err) << Logger::end();
-            throw new GLError(source, err, GLErrorString(err));
+            throw new RenderDriverError(source, err, GLErrorString(err));
         }
         return oneError;
     }
@@ -90,7 +90,7 @@ namespace Engine {
             glGetError(); // A bug in GLEW always throws a GL error
         }
         
-        CheckGLError("RenderGL3::HasExtention::PostGlewGetExtention");
+        CheckError("RenderGL3::HasExtention::PostGlewGetExtention");
         
         return has;
     }
@@ -122,7 +122,7 @@ namespace Engine {
             }
         }
         
-        CheckGLError("RenderGL3::GetExtentions");
+        CheckError("RenderGL3::GetExtentions");
         
         return ret;
     }
@@ -139,11 +139,7 @@ namespace Engine {
         }
     }
     
-    void RenderGL3::SetDefinedColor(std::string name, int col) {
-        Color4f::SetDefinedColor(name, col);
-    }
-    
-    void RenderGL3::BeginRendering(GLenum mode) {
+    void RenderGL3::BeginRendering(int mode) {
         if (GetRendererType() == RendererType_OpenGL3) {
             if (this->_currentMode != mode ||
                     this->_currentMode == GL_LINE_STRIP) {
@@ -153,7 +149,6 @@ namespace Engine {
             }
         } else {
             glBegin(mode);
-            GLSetColor();
         }
     }
     
@@ -165,46 +160,19 @@ namespace Engine {
             }
         } else {
             glEnd();
-            _drawCalls++;
         }
     }
     
-    void RenderGL3::AddVert(float x, float y, float z) {
-        if (GetRendererType() == RendererType_OpenGL3) {
-            AddVert(x, y, z, _currentColor, 0.0, 0.0);
-        } else {
-            glVertex3f(x - _centerX, y - _centerY, z);
-            _currentVerts++;
-        }
-    }
-    
-    void RenderGL3::AddVert(float x, float y, float z, Color4f col) {
-        if (GetRendererType() == RendererType_OpenGL3) {
-            AddVert(x, y, z, col, 0.0, 0.0);
-        } else {
-            glColor4f(col.r, col.g, col.b, col.a);
-            AddVert(x, y, z);
-        }
-    }
-    
-    void RenderGL3::AddVert(float x, float y, float z, float s, float t) {
-        if (GetRendererType() == RendererType_OpenGL3) {
-            AddVert(x, y, z, _currentColor, s, t);
-        } else {
-            glTexCoord2f(s, t);
-            AddVert(x, y, z);
-        }
-    }
-    
-    void RenderGL3::AddVert(float x, float y, float z, Color4f col, float s, float t) {
+    void RenderGL3::_addVert(float x, float y, float z, Color4f col, float s, float t) {
         if (GetRendererType() == RendererType_OpenGL3) {
             _buffer[_currentVerts].pos = glm::vec3(x - _centerX, y - _centerY, z);
             _buffer[_currentVerts].col = col;
             _buffer[_currentVerts].uv = glm::vec2(s, t);
             _currentVerts++;
         } else {
+            glColor4f(col.r, col.g, col.b, col.a);
             glTexCoord2f(s, t);
-            AddVert(x, y, z, col);
+            glVertex3f(x - _centerX, y - _centerY, z);
         }
     }
     
@@ -253,12 +221,12 @@ namespace Engine {
                 this, this->_currentEffect,
                 this->_currentColor.r, this->_currentColor.g, this->_currentColor.b, string);
             
-            CheckGLError("RenderGL3::Print::PostGL3Print");
+            CheckError("RenderGL3::Print::PostGL3Print");
             
         } else {
             glEnable(GL_TEXTURE_2D);
             
-            GLSetColor();
+            glColor4f(_currentColor.r, _currentColor.g, _currentColor.b, _currentColor.a);
             
             GLFT_Font* drawingFont = GetAppSingilton()->GetFont(_currentFontName, _currentFontSize);
             
@@ -266,29 +234,8 @@ namespace Engine {
             
             glDisable(GL_TEXTURE_2D);
             
-            CheckGLError("RenderGL3::Print::PostGL2Print");
-            
-            this->_polygons += strlen(string) * 4;
+            CheckError("RenderGL3::Print::PostGL2Print");
         }
-    }
-    
-    float RenderGL3::CalcStringWidth(std::string str) {
-        return GetAppSingilton()->GetFont(
-            this->_currentFontName, this->_currentFontSize)->calcStringWidth(str);
-    }
-    
-    void RenderGL3::SetFont(std::string name, int size) {
-        this->_currentFontName = name;
-        this->_currentFontSize = size;
-    }
-    
-    void RenderGL3::LoadFont(std::string prettyName, std::string filename) {
-        GetAppSingilton()->LoadFont(prettyName, filename);
-        this->_currentFontName = prettyName;
-    }
-    
-    bool RenderGL3::IsFontLoaded(std::string name) {
-        return GetAppSingilton()->IsFontLoaded(name);
     }
     
     Texture* GenerateDefaultTexture() {
@@ -361,7 +308,7 @@ namespace Engine {
         
         ResetMatrix();
         
-        CheckGLError("RenderGL3::Begin2d");
+        CheckError("RenderGL3::Begin2d");
     }
     
     void RenderGL3::End2d() {
@@ -371,78 +318,16 @@ namespace Engine {
             //glPopMatrix();
         }
         
-        this->_polygons = 0;
-        this->_drawCalls = 0;
-        
-        CheckGLError("RenderGL3::End2d");
+        CheckError("RenderGL3::End2d");
     }
     
     void RenderGL3::Reset() {
-        int oldVertCount = this->_polygons;
-        
         End2d();
         Begin2d();
-        
-        this->_polygons = oldVertCount;
     }
     
-    void RenderGL3::ClearColor(Color4f col) {
+    void RenderGL3::_clearColor(Color4f col) {
         glClearColor(col.r, col.g, col.b, col.a);
-    }
-    
-    void RenderGL3::ClearColor(int col) {
-        ClearColor(Color4f(col));
-    }
-    
-    void RenderGL3::ClearColor(std::string colorName) {
-        ClearColor(Color4f(colorName));
-    }
-    
-    void RenderGL3::ClearColor(float r, float g, float b) {
-        ClearColor(Color4f(r, g, b, 1.0f));
-    }
-    
-    Color4f RenderGL3::GetColor() {
-        return this->_currentColor;
-    }
-    
-    void RenderGL3::SetColor(Color4f col) {
-        this->_currentColor = col;
-    }
-    
-    void RenderGL3::SetColor(int col) {
-        SetColor(Color4f(col));
-    }
-    
-    void RenderGL3::SetColor(std::string colorName) {
-        if (colorName[0] == '#') {
-            unsigned int tempCol;
-            std::stringstream ss;
-            ss << std::hex << colorName.substr(1);
-            ss >> tempCol;
-            SetColor(tempCol);
-        } else {
-            SetColor(Color4f(colorName));
-        }
-    }
-    
-    void RenderGL3::SetColor(float r, float g, float b) {
-        SetColor(r, g, b, 1.0f);
-    }
-    
-    void RenderGL3::SetColor(float r, float g, float b, float a) {
-        this->_currentColor = Color4f(r, g, b, a);
-    }
-    
-    void RenderGL3::GLSetColor() {
-        glColor4f(this->_currentColor.r,
-                  this->_currentColor.g,
-                  this->_currentColor.b,
-                  this->_currentColor.a);
-    }
-    
-    int RenderGL3::GetVerts() {
-        return this->_polygons;
     }
     
     void RenderGL3::SetCenter(float x, float y) {

@@ -29,9 +29,12 @@
 #include "RenderGL3.hpp"
 
 namespace Engine {
+    class RenderGL3;
+    
     class Shader {
     public:
         Shader();
+        Shader(RenderGL3* render);
         Shader(RenderGL3* render, std::string shaderFilename);
         
         ~Shader();

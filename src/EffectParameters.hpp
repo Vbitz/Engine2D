@@ -25,8 +25,6 @@
 #include <string>
 
 #include "vendor/json/json.h"
-
-#include "EffectShaderTypes.hpp"
 #include "Shader.hpp"
 
 namespace Engine {
