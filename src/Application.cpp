@@ -53,6 +53,9 @@
 #include "JSUnsafe.hpp"
 #include "JSMathHelper.hpp"
 
+#include "RenderGL3.hpp"
+#include "RenderGL2.hpp"
+
 #include <pthread.h>
 
 #include <v8-debug.h>
@@ -551,7 +554,16 @@ namespace Engine {
         this->_window->SetAntiAlias(Config::GetInt("core.render.aa"));
         this->_window->SetDebug(Config::GetBoolean("core.debug.debugRenderer"));
         
-        this->_renderGL = CreateRenderGL3();
+        this->_renderGL = NULL;
+        
+        switch (v) {
+            case Graphics_OpenGL_Modern:
+                this->_renderGL = CreateRenderGL3();
+                break;
+            case Graphics_OpenGL_Legacy:
+                this->_renderGL = CreateRenderGL2();
+                break;
+        }
         
         this->_window->Show();
         

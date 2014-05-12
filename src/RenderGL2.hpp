@@ -20,3 +20,9 @@
  */
 
 #pragma once
+
+#include "RenderDriver.hpp"
+
+namespace Engine {
+    RenderDriver* CreateRenderGL2();
+}

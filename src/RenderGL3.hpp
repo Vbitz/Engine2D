@@ -24,5 +24,8 @@
 #include "RenderDriver.hpp"
 
 namespace Engine {
+    std::string GLErrorString(int error);
+    std::string GLModeToString(int mode);
+    
     RenderDriver* CreateRenderGL3();
 }
