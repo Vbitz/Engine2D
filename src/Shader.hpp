@@ -26,7 +26,7 @@
 
 #include "Window.hpp"
 
-#include "RenderGL3.hpp"
+#include "RenderDriver.hpp"
 
 namespace Engine {
     class RenderGL3;
@@ -48,9 +48,9 @@ namespace Engine {
         bool NeedsUpdate();
         
         void BindUniform(std::string token);
-        void UploadUniform(std::string token, GLfloat* data, int verts);
+        void UploadUniform(std::string token, float* data, int verts);
         void UploadUniform(std::string token, glm::mat4 matrix);
-        void UploadUniform(std::string token, GLfloat x, GLfloat y);
+        void UploadUniform(std::string token, float x, float y);
         
         void BindVertexAttrib(std::string token, int attribSize, int totalSize, int stride);
         
@@ -70,7 +70,7 @@ namespace Engine {
         std::map<std::string, GLuint> _uniforms;
         std::map<std::string, GLuint> _attribs;
         
-        GLuint _programPointer, _vertPointer, _fragPointer;
+        unsigned int _programPointer, _vertPointer, _fragPointer;
         std::string _vertFilename, _fragFilename;
         unsigned long _vertLastModify, _fragLastModify;
     };

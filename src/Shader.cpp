@@ -100,7 +100,7 @@ namespace Engine {
         }
     }
     
-    void Shader::UploadUniform(std::string token, GLfloat x, GLfloat y) {
+    void Shader::UploadUniform(std::string token, float x, float y) {
         if (this->checkProgramPointer()) {
             glUniform2f(this->_uniforms[token], x, y);
         }
@@ -112,7 +112,7 @@ namespace Engine {
         }
     }
     
-    void Shader::UploadUniform(std::string token, GLfloat* data, int verts) {
+    void Shader::UploadUniform(std::string token, float* data, int verts) {
         if (this->checkProgramPointer()) {
             glUniform2fv(this->_uniforms[token], verts, data);
         }

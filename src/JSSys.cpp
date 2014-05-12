@@ -26,7 +26,7 @@
 #include "Timer.hpp"
 #include "WorkerThreadPool.hpp"
 
-#include "RenderGL3.hpp"
+#include "RenderDriver.hpp"
 
 #include "Config.hpp"
 #include "Profiler.hpp"
