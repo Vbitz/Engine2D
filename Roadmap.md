@@ -11,7 +11,7 @@
 - **DONE** - Split Draw2D into RenderGL and Draw2D
 	- Move AddItem and buffer management into RenderGL
 	- Intergrate RenderGL and Draw2D
-- Split RenderGL into RenderGL2 and RenderGL3
+- **DONE** - Split RenderGL into RenderGL2 and RenderGL3
 	- Split OGL2 and OGL3 codepaths between the 2 versions
 - Remove dependancy on FreeType
 	- Rewrite GLFT_Font as a Sprite based Draw2D driven class
