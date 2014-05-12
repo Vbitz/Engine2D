@@ -31,10 +31,10 @@ namespace Engine {
         
     }
     
-    Shader::Shader(RenderGL3* render) : _render(render) {
+    Shader::Shader(RenderDriver* render) : _render(render) {
     }
     
-    Shader::Shader(RenderGL3* render, std::string shaderFilename) : _loaded(false), _render(render) {
+    Shader::Shader(RenderDriver* render, std::string shaderFilename) : _loaded(false), _render(render) {
         this->_vertFilename = "shaders/" + shaderFilename + ".vert";
         this->_fragFilename = "shaders/" + shaderFilename + ".frag";
         this->Init(this->_vertFilename, this->_fragFilename);

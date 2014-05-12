@@ -23,7 +23,7 @@
 
 #include "Shader.hpp"
 #include "EffectParameters.hpp"
-#include "RenderGL3.hpp"
+#include "RenderDriver.hpp"
 
 namespace Engine {
     class Shader;
@@ -31,7 +31,7 @@ namespace Engine {
     
 	class GL3Buffer {
 	public:
-		GL3Buffer(RenderGL3* render, EffectParameters* params);
+		GL3Buffer(RenderDriver* render, EffectParameters* params);
 		~GL3Buffer();
 
 		void Upload(float* buffer, int count);
@@ -51,11 +51,11 @@ namespace Engine {
         
 		void bindShader();
         
-        RenderGL3* _getRender();
+        RenderDriver* _getRender();
         
         GLuint _vertexArrayPointer, _vertexBufferPointer;
         
-        RenderGL3* _renderGL = NULL;
+        RenderDriver* _renderGL = NULL;
         Shader* _currentShader = NULL;
         EffectParameters* _currentEffect;
         

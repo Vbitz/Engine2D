@@ -62,7 +62,7 @@ namespace Engine {
             return;
         }
         
-        RenderGL3* renderGL = this->_draw->GetRender();
+        RenderDriver* renderGL = this->_draw->GetRender();
         
         renderGL->ResetMatrix();
         

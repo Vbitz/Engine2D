@@ -28,7 +28,7 @@ namespace Engine {
         
     }
     
-    Texture::Texture(RenderGL3* render, GLuint textureID) : _render(render) {
+    Texture::Texture(RenderDriver* render, GLuint textureID) : _render(render) {
         Logger::begin("Texture", Logger::LogLevel_Verbose) << "Creating Texture: " << textureID << Logger::end();
         this->_setTextureID(textureID);
     }
@@ -147,7 +147,7 @@ namespace Engine {
         }
         
         Texture* TextureFromBuffer(GLuint textureID, unsigned char *texture, int width, int height) {
-            RenderGL3* render = GetAppSingilton()->GetRender();
+            RenderDriver* render = GetAppSingilton()->GetRender();
             
             GLuint text = 0;
             
@@ -179,7 +179,7 @@ namespace Engine {
         }
         
         Texture* TextureFromBuffer(GLuint textureID, float* texture, int width, int height) {
-            RenderGL3* render = GetAppSingilton()->GetRender();
+            RenderDriver* render = GetAppSingilton()->GetRender();
             
             GLuint text = 0;
             

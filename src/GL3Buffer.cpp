@@ -21,12 +21,14 @@
 
 #include "GL3Buffer.hpp"
 
+#include "Logger.hpp"
+
 // TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Engine {
-    GL3Buffer::GL3Buffer(RenderGL3* render, EffectParameters* params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
+    GL3Buffer::GL3Buffer(RenderDriver* render, EffectParameters* params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
         this->_init();
     }
     
@@ -162,8 +164,7 @@ namespace Engine {
         this->_getShader()->End();
     }
     
-    RenderGL3* GL3Buffer::_getRender() {
-        
+    RenderDriver* GL3Buffer::_getRender() {
         return this->_renderGL;
     }
 }

@@ -34,8 +34,8 @@ namespace Engine {
     class Shader {
     public:
         Shader();
-        Shader(RenderGL3* render);
-        Shader(RenderGL3* render, std::string shaderFilename);
+        Shader(RenderDriver* render);
+        Shader(RenderDriver* render, std::string shaderFilename);
         
         ~Shader();
         
@@ -63,7 +63,7 @@ namespace Engine {
         
         bool checkProgramPointer();
         
-        RenderGL3* _render;
+        RenderDriver* _render;
         
         bool _loaded;
         

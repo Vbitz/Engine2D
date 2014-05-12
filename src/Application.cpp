@@ -551,7 +551,7 @@ namespace Engine {
         this->_window->SetAntiAlias(Config::GetInt("core.render.aa"));
         this->_window->SetDebug(Config::GetBoolean("core.debug.debugRenderer"));
         
-        this->_renderGL = new RenderGL3();
+        this->_renderGL = CreateRenderGL3();
         
         this->_window->Show();
         
@@ -1002,7 +1002,7 @@ namespace Engine {
         return this->_window->GetKeyStatus(key) == Key_Press;
     }
     
-    RenderGL3* Application::GetRender() {
+    RenderDriver* Application::GetRender() {
         ENGINE_ASSERT(this->_renderGL != NULL, "RenderGL3 is not initalized");
         return _renderGL;
     }

@@ -29,7 +29,7 @@
 #include "vendor/GLFT_Font.hpp"
 
 namespace Engine {
-    RenderGL3* Draw2D::GetRender() {
+    RenderDriver* Draw2D::GetRender() {
         return renderGL;
     }
     

@@ -377,7 +377,7 @@ void AddVert(float* _buffer, int _currentVerts, float x, float y, float r, float
     _buffer[_currentVerts * 9 + 8] = t;
 }
 
-void GLFT_Font::drawTextGL3(float x, float y, Engine::RenderGL3* render, Engine::EffectParameters* effect, float colR, float colG, float colB, const std::string& str) const {
+void GLFT_Font::drawTextGL3(float x, float y, Engine::RenderDriver* render, Engine::EffectParameters* effect, float colR, float colG, float colB, const std::string& str) const {
     
     if (!isValid()) {
         throw std::logic_error("Invalid GLFT_Font::drawTextGL3 call.");

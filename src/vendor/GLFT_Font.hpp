@@ -46,7 +46,7 @@ class GLFT_Font;
 
 namespace Engine {
     class EffectParameters;
-    class RenderGL3;
+    class RenderDriver;
 }
 
 #include "../EffectParameters.hpp"
@@ -112,7 +112,7 @@ public:
     void drawText(float x, float y, const char *str, ...) const;
     void drawText(float x, float y, const std::string& str) const;
     
-    void drawTextGL3(float x, float y, Engine::RenderGL3* render, Engine::EffectParameters* effect, float colR, float colG, float colB, const std::string& str) const;
+    void drawTextGL3(float x, float y, Engine::RenderDriver* render, Engine::EffectParameters* effect, float colR, float colG, float colB, const std::string& str) const;
     
     std::ostream& beginDraw(float x, float y);
     StreamFlusher endDraw();
