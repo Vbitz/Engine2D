@@ -825,12 +825,6 @@ global.draw.loadFont = function (prettyName, filename) {};
 global.draw.isFontLoaded = function (prettyName) {};
 
 /**
- * Returns the number of verts rendered this frame
- * @return {number}
- */
-global.draw.getVerts = function () {};
-
-/**
  * Set's the point to center drawing around
  * @param {number} x
  * @param {number} y
