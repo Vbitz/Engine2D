@@ -376,6 +376,7 @@ global.sys.shell = function (filename) {};
  */
 global.sys.dumpLog = function (filename) { };
 
+/** @namespace */
 function ThreadAPI () { }
 
 /**
@@ -585,6 +586,14 @@ global.draw.line = function (x0, y0, x1, y1) {};
  * @param  {number} y3
  */
 global.draw.curve = function (x0, y0, x1, y1, x2, y2, x3, y3) {};
+
+/**
+ * Renders a polygon using a triangle fan with arr points
+ * @param  {number} xCenter [description]
+ * @param  {number} yCenter [description]
+ * @param  {number[]} arr     In the format [x1, y1, x2, y2, ...]
+ */
+global.draw.polygon = function (xCenter, yCenter, arr) {};
 
 /**
  * Set's predefined colors for use in draw.setColor
