@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Namespace: mod</title>
+    <title>JSDoc: Namespace: ThreadAPI</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Namespace: mod</h1>
+    <h1 class="page-title">Namespace: ThreadAPI</h1>
     
     
 
@@ -27,9 +27,7 @@
     
 <header>
     <h2>
-        <span class="ancestors"><a href="global.html">global</a>.</span>
-    
-    mod
+    ThreadAPI
     </h2>
     
 </header>  
@@ -64,7 +62,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line884">line 884</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line380">line 380</a>
     </li></ul></dd>
     
     
@@ -98,7 +96,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="call"><span class="type-signature">&lt;static> </span>call<span class="signature">(id, method)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="emit"><span class="type-signature"></span>emit<span class="signature">(target, args)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -106,7 +104,8 @@
     
     
     <div class="description">
-        Call a paramterless method exported by the module defined by id
+        Sends a event to functions listening for target event.
+If the target is on another thread it will be defered to be dispatched by the event loop on the main thread
     </div>
     
 
@@ -140,13 +139,13 @@
 	
         <tr>
             
-                <td class="name"><code>id</code></td>
+                <td class="name"><code>target</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#ModuleID">ModuleID</a></span>
+<span class="param-type">String</span>
 
 
             
@@ -163,13 +162,13 @@
 	
         <tr>
             
-                <td class="name"><code>method</code></td>
+                <td class="name"><code>args</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">*</span>
 
 
             
@@ -210,7 +209,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line902">line 902</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line400">line 400</a>
     </li></ul></dd>
     
     
@@ -238,7 +237,7 @@
         
             
 <dt>
-    <h4 class="name" id="open"><span class="type-signature">&lt;static> </span>open<span class="signature">(filename)</span><span class="type-signature"> &rarr; {<a href="global.html#ModuleID">ModuleID</a>}</span></h4>
+    <h4 class="name" id="log"><span class="type-signature"></span>log<span class="signature">(obj)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -246,7 +245,136 @@
     
     
     <div class="description">
-        Open a module at filename
+        The same as console.log but identifys the line with the thread that created it
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>obj</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last">The value to print, internaly the values will be joined with spaces</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line386">line 386</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="sleep"><span class="type-signature"></span>sleep<span class="signature">(secs)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Suspends the thread for secs
     </div>
     
 
@@ -280,13 +408,13 @@
 	
         <tr>
             
-                <td class="name"><code>filename</code></td>
+                <td class="name"><code>secs</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Number</span>
 
 
             
@@ -296,7 +424,7 @@
             
             
             
-            <td class="description last">The real filename path to the module without a extention</td>
+            <td class="description last">mesured in seconds</td>
         </tr>
 	
 	
@@ -327,7 +455,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line895">line 895</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line392">line 392</a>
     </li></ul></dd>
     
     
@@ -348,24 +476,6 @@
     
     
     
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="global.html#ModuleID">ModuleID</a></span>
-
-
-	</dd>
-</dl>
-
-        
     
     
 </dd>
