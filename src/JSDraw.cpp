@@ -35,6 +35,7 @@
 #include "Scripting.hpp"
 #include "Util.hpp"
 #include "Config.hpp"
+#include "FontSheet.hpp"
 
 namespace Engine {
     
@@ -586,6 +587,32 @@ namespace Engine {
                 std::string str = ENGINE_GET_ARG_CPPSTRING_VALUE(2);
                 
                 GetDraw2D(args.This())->GetRender()->Print(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), (const char*) str.c_str());
+                
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            ENGINE_JS_METHOD(PrintNeo) {
+                static FontSheet* _sheet = NULL;
+                
+                ENGINE_JS_SCOPE_OPEN;
+                
+                ENGINE_CHECK_GL;
+                
+                ENGINE_CHECK_ARGS_LENGTH(4);
+                
+                ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X position of Arg2");
+                ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y position of Arg2");
+                ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the size of the text to draw");
+                ENGINE_CHECK_ARG_STRING(3, "Arg3 is the string to print");
+                
+                if (_sheet == NULL) {
+                    _sheet = FontSheetReader::LoadFont("fonts/source_sans_pro.json");
+                }
+                
+                _sheet->DrawText(GetDraw2D(args.This())->GetRender(), ENGINE_GET_ARG_NUMBER_VALUE(0),
+                    ENGINE_GET_ARG_NUMBER_VALUE(1),
+                    ENGINE_GET_ARG_NUMBER_VALUE(2),
+                    ENGINE_GET_ARG_CPPSTRING_VALUE(3));
                 
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
@@ -1156,6 +1183,8 @@ namespace Engine {
                 addItem(drawTable, "isFontLoaded", IsFontLoaded);
                 
                 addItem(drawTable, "setCenter", SetCenter);
+                
+                addItem(drawTable, "printNeo", PrintNeo);
             }
             
 #undef addItem

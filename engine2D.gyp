@@ -45,6 +45,7 @@
 				"src/StdLibTests.cpp",
 				"src/EffectParameters.cpp",
 				"src/SpriteSheet.cpp",
+				"src/FontSheet.cpp",
 				"src/TextureLoader.cpp",
 				"src/Timer.cpp",
 				"src/ScriptingManager.cpp",

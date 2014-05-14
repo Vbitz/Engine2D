@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Font Generator</title>
+	<style type="text/css">
+	canvas {
+		border: 1px solid black;
+		background-color: #000;
+	}
+	</style>
+</head>
+<body>
+	<canvas id="fontTarget" width="512" height="256"></canvas>
+	<textarea id="fontDataOutput" width="512" height="256"></textarea>
+	<a href="#" onclick="saveImage();">Save Image</a>
+	<script type="text/javascript">
+	var PADDING = 8;
+
+	var canvas = document.querySelector("#fontTarget");
+	var ctx = canvas.getContext("2d");
+	var outputPane = document.querySelector("#fontDataOutput");
+
+	function render(fontSize, fontName, chrBegin, chrEnd) {
+		var fontData = {
+			texture: fontName.toLowerCase().replace(/ /g, "_") + ".png",
+			baseSize: fontSize,
+			charactorCount: chrEnd - chrBegin,
+			charactors: []
+		};
+		//ctx.translate(0.5, 0.5);
+		ctx.clearRect(0, 0, ctx.width, ctx.height);
+		ctx.width = 512;
+		ctx.height = 256;
+
+		var x = PADDING;
+		var y = fontSize;
+
+		ctx.fillStyle = "#fff";
+		ctx.strokeStyle = "#ff0";
+		ctx.font = fontSize.toString(10) + "px \"" + fontName + "\"";
+
+		for (var i = chrBegin; i < chrEnd; i++) {
+			var chr = String.fromCharCode(i);
+			var chrSize = ctx.measureText(chr);
+			console.log(chrSize.width);
+			if ((x + chrSize.width + PADDING) > ctx.width) {
+				x = PADDING;
+				y += fontSize + PADDING;
+			}
+			ctx.fillText(chr, x, y);
+			chr = {
+				width: chrSize.width,
+				x1: x / ctx.width,
+				y1: (y - fontSize + PADDING) / ctx.height,
+				x2: (x + chrSize.width) / ctx.width,
+				y2: ((y - fontSize + PADDING) + fontSize) / ctx.height
+			};
+			//xctx.strokeRect(chr.x1 * ctx.width, chr.y1 * ctx.height, (chr.x2 * ctx.width) - (chr.x1 * ctx.width), (chr.y2 * ctx.height) - (chr.y1 * ctx.height));
+			fontData.charactors[i] = chr;
+			x += chrSize.width + PADDING;
+		}
+
+		outputPane.value = JSON.stringify(fontData, 0, '\t');
+	}
+
+	function saveImage() {
+		document.location = canvas.toDataURL();
+	}
+
+	render(32, "Source Sans Pro", 0, 128);
+	</script>
+</body>
+</html>
