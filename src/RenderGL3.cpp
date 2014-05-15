@@ -121,6 +121,9 @@ namespace Engine {
         
         void ResetMatrix() override {
             this->_currentModelMatrix = glm::mat4();
+            if (Config::GetBoolean("core.render.halfPix")) {
+                this->_currentModelMatrix = glm::translate(this->_currentModelMatrix, glm::vec3(0.5f, 0.5f, 0.0f));
+            }
         }
         
         void BeginRendering(int mode) override {

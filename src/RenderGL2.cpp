@@ -94,6 +94,9 @@ namespace Engine {
             glLoadIdentity();
             Application* app = GetAppSingilton();
             glOrtho(0, app->GetScreenWidth(), app->GetScreenHeight(), 0, 1, -1);
+            if (Config::GetBoolean("core.render.halfPix")) {
+                glTranslatef(0.5f, 0.5f, 0.0f);
+            }
         }
         
         void BeginRendering(int mode) override {

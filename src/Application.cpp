@@ -407,6 +407,7 @@ namespace Engine {
         Config::SetBoolean( "core.debug.v8Debug",                   this->_developerMode);
         Config::SetNumber(  "core.debug.v8Debug.port",              5858);
         Config::SetBoolean( "core.debug.slowload",                  false);
+        Config::SetBoolean( "core.render.halfPix",                  false);
     }
     
     EventMagic Application::_config_CoreRenderAA(Json::Value args) {
