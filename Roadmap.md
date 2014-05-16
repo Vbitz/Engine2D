@@ -13,6 +13,8 @@
 	- Intergrate RenderGL and Draw2D
 - **DONE** - Split RenderGL into RenderGL2 and RenderGL3
 	- Split OGL2 and OGL3 codepaths between the 2 versions
+- Update V8 Version
+	- There are some useful fixes to be had in the newer versions
 - Remove dependancy on FreeType
 	- Rewrite GLFT_Font as a Sprite based Draw2D driven class
 - Remove dependancy on FreeImage
