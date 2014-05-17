@@ -987,7 +987,7 @@ namespace Engine {
         
 		if (script.IsEmpty()) {
 			v8::Handle<v8::Value> exception = tryCatch.StackTrace();
-            Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception->ToString() << Logger::end();
+            Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *v8::String::Utf8Value(exception->ToString()) << Logger::end();
 		} else {
             v8::Local<v8::Value> result = script->Run();
             if (*result != NULL && !result->IsExternal()) { // well it works
@@ -1000,7 +1000,7 @@ namespace Engine {
             if (!tryCatch.StackTrace().IsEmpty()) {
                 // Use the old version, the new one is way too long
                 v8::Handle<v8::Value> exception = tryCatch.StackTrace();
-                Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception->ToString() << Logger::end();
+                Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *v8::String::Utf8Value(exception->ToString()) << Logger::end();
             }
 		}
     }
