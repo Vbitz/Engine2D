@@ -97,7 +97,7 @@ namespace Engine {
                 return this->_running;
             }
             
-#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+#define addItem(table, js_name, funct) table->Set(this->_isolate, js_name, v8::FunctionTemplate::New(this->_isolate, funct))
             
             void CreateScriptContext(std::string threadID) {
                 // ONLY called from Worker thread, this will kill scripting if called from the main thread
@@ -108,23 +108,23 @@ namespace Engine {
                 
                 v8::Handle<v8::ObjectTemplate> globals = v8::ObjectTemplate::New();
                 
-                v8::Handle<v8::FunctionTemplate> threadLog = v8::FunctionTemplate::New();
+                v8::Handle<v8::FunctionTemplate> threadLog = v8::FunctionTemplate::New(this->_isolate);
                 
                 std::stringstream threadIDSS;
                 
                 threadIDSS << "WorkerThread {" << threadID.substr(0, 13) << "}";
                 
-                threadLog->SetCallHandler(ThreadLog, v8::String::New(threadIDSS.str().c_str()));
+                threadLog->SetCallHandler(ThreadLog, v8::String::NewFromUtf8(this->_isolate, threadIDSS.str().c_str()));
                 
-                globals->Set("log", threadLog);
+                globals->Set(this->_isolate, "log", threadLog);
                 
                 addItem(globals, "sleep", ThreadSleep);
                 
-                v8::Handle<v8::FunctionTemplate> threadEventEmit = v8::FunctionTemplate::New();
+                v8::Handle<v8::FunctionTemplate> threadEventEmit = v8::FunctionTemplate::New(this->_isolate);
                 
-                threadEventEmit->SetCallHandler(ThreadEventEmit, v8::String::New(threadIDSS.str().c_str()));
+                threadEventEmit->SetCallHandler(ThreadEventEmit, v8::String::NewFromUtf8(this->_isolate, threadIDSS.str().c_str()));
                 
-                globals->Set("emit", threadEventEmit);
+                globals->Set(this->_isolate, "emit", threadEventEmit);
                 
                 this->_globalTemplate.Reset(this->_isolate, globals);
                 
@@ -144,10 +144,10 @@ namespace Engine {
                 
                 // Only called from Worker thread
                 v8::HandleScope scp(this->_isolate);
-                v8::Handle<v8::Context> ctx = v8::Handle<v8::Context>::New(this->_isolate, _context);
+                v8::Handle<v8::Context> ctx = v8::Local<v8::Context>::New(this->_isolate, _context);
                 v8::Context::Scope ctxScope(ctx);
                 
-                v8::Handle<v8::Script> script = v8::Script::Compile(v8::String::New(realSrc.str().c_str()), v8::String::New(fileName.c_str()));
+                v8::Handle<v8::Script> script = v8::Script::Compile(v8::String::NewFromUtf8(this->_isolate, realSrc.str().c_str()), v8::String::NewFromUtf8(this->_isolate, fileName.c_str()));
                 
                 if (script.IsEmpty()) {
                     return false;
@@ -157,7 +157,7 @@ namespace Engine {
                     
                     v8::Handle<v8::Value> args[1];
                     
-                    v8::Handle<v8::ObjectTemplate> globalObject = v8::Handle<v8::ObjectTemplate>::New(this->_isolate, this->_globalTemplate);
+                    v8::Handle<v8::ObjectTemplate> globalObject = v8::Local<v8::ObjectTemplate>::New(this->_isolate, this->_globalTemplate);
                     
                     args[0] = globalObject->NewInstance();
                     

@@ -44,7 +44,7 @@ namespace Engine {
         }
         
         Application* GetApp(v8::Local<v8::Object> thisValue) {
-            return (Application*) thisValue->GetHiddenValue(v8::String::NewSymbol("_app")).As<v8::External>()->Value();
+            return (Application*) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_app")).As<v8::External>()->Value();
         }
         
 		ENGINE_JS_METHOD(Println) {
@@ -78,12 +78,12 @@ namespace Engine {
             
             ENGINE_CHECK_ARGS_LENGTH(0);
             
-            v8::Local<v8::Array> argvArray = v8::Array::New();
+            v8::Local<v8::Array> argvArray = v8::Array::New(args.GetIsolate());
             
             std::vector<std::string> cArgs = GetAppSingilton()->GetCommandLineArgs();
             
             for (int i = 0; i < cArgs.size(); i++) {
-                argvArray->Set(i, v8::String::New(cArgs[i].c_str()));
+                argvArray->Set(i, v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), cArgs[i].c_str()));
             }
             
             ENGINE_JS_SCOPE_CLOSE(argvArray);
@@ -99,7 +99,7 @@ namespace Engine {
             
             std::string scriptFilename = *ENGINE_GET_ARG_CSTRING_VALUE(0) + std::string(".js");
 			
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetAppSingilton()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1))));
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetAppSingilton()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1))));
 		}
         
         ENGINE_JS_METHOD(EventsOn) {
@@ -183,7 +183,7 @@ namespace Engine {
                 ENGINE_THROW_ARGERROR("sys.createTimer takes 2 or 3 arguments");
             }
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(ret));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), ret));
         }
         
         ENGINE_JS_METHOD(DeleteTimer) {
@@ -213,13 +213,15 @@ namespace Engine {
         ENGINE_JS_METHOD(GetGLVersion) {
             ENGINE_JS_SCOPE_OPEN;
             
-            v8::Handle<v8::Object> ret = v8::Object::New();
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
             
             OpenGLVersion version = GetApp(args.This())->GetRender()->GetOpenGLVersion();
 
-            ret->Set(v8::String::New("major"), v8::Number::New(version.major));
-            ret->Set(v8::String::New("minor"), v8::Number::New(version.minor));
-            ret->Set(v8::String::New("rev"), v8::Number::New(version.revision));
+            ret->Set(v8::String::NewFromUtf8(isolate, "major"), v8::Number::New(isolate, version.major));
+            ret->Set(v8::String::NewFromUtf8(isolate, "minor"), v8::Number::New(isolate, version.minor));
+            ret->Set(v8::String::NewFromUtf8(isolate, "rev"), v8::Number::New(isolate, version.revision));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
@@ -231,20 +233,22 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of a GL Extention to check for");
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetApp(args.This())->GetRender()->HasExtention(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetApp(args.This())->GetRender()->HasExtention(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(GetExtentions) {
             ENGINE_JS_SCOPE_OPEN;
             
+            v8::Isolate* isolate = args.GetIsolate();
+            
             ENGINE_CHECK_GL;
             
-            v8::Handle<v8::Array> arr = v8::Array::New();
+            v8::Handle<v8::Array> arr = v8::Array::New(isolate);
             
             std::vector<std::string> extentionList = GetApp(args.This())->GetRender()->GetExtentions();
             
             for (int i = 0; i < extentionList.size(); i++) {
-                arr->Set(i, v8::String::New(extentionList[i].c_str()));
+                arr->Set(i, v8::String::NewFromUtf8(isolate, extentionList[i].c_str()));
             }
             
             ENGINE_JS_SCOPE_CLOSE(arr);
@@ -257,13 +261,13 @@ namespace Engine {
             
             glGetIntegerv(GL_MAX_TEXTURE_SIZE, &result);
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(result));
+            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(args.GetIsolate(), result));
         }
         
         ENGINE_JS_METHOD(Microtime) {
             ENGINE_JS_SCOPE_OPEN;
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Platform::GetTime()));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), Platform::GetTime()));
         }
         
         ENGINE_JS_METHOD(ResizeWindow) {
@@ -283,16 +287,18 @@ namespace Engine {
         ENGINE_JS_METHOD(HeapStats) {
             ENGINE_JS_SCOPE_OPEN;
             
-            v8::Handle<v8::Object> ret = v8::Object::New();
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
             
             v8::HeapStatistics stats;
             
             v8::Isolate::GetCurrent()->GetHeapStatistics(&stats);
             
-            ret->Set(v8::String::NewSymbol("heapLimit"), v8::Number::New(stats.heap_size_limit()));
-            ret->Set(v8::String::NewSymbol("heapTotalSize"), v8::Number::New(stats.total_heap_size()));
-            ret->Set(v8::String::NewSymbol("heapTotalExecSize"), v8::Number::New(stats.total_heap_size_executable()));
-            ret->Set(v8::String::NewSymbol("heapUsed"), v8::Number::New(stats.used_heap_size()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "heapLimit"), v8::Number::New(isolate, stats.heap_size_limit()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "heapTotalSize"), v8::Number::New(isolate, stats.total_heap_size()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "heapTotalExecSize"), v8::Number::New(isolate, stats.total_heap_size_executable()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "heapUsed"), v8::Number::New(isolate, stats.used_heap_size()));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
@@ -300,16 +306,18 @@ namespace Engine {
         ENGINE_JS_METHOD(MemoryStats) {
             ENGINE_JS_SCOPE_OPEN;
             
-            v8::Handle<v8::Object> ret = v8::Object::New();
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
             
             Platform::engine_memory_info mem_info = Platform::GetMemoryInfo();
             
-            ret->Set(v8::String::NewSymbol("totalVirutal"), v8::Number::New(mem_info.totalVirtual));
-            ret->Set(v8::String::NewSymbol("totalVirtualFree"), v8::Number::New(mem_info.totalVirtualFree));
-            ret->Set(v8::String::NewSymbol("myVirtualUsed"), v8::Number::New(mem_info.myVirtualUsed));
-            ret->Set(v8::String::NewSymbol("totalPhysical"), v8::Number::New(mem_info.totalPhysical));
-            ret->Set(v8::String::NewSymbol("totalPhysicalFree"), v8::Number::New(mem_info.totalPhysicalFree));
-            ret->Set(v8::String::NewSymbol("myPhysicalUsed"), v8::Number::New(mem_info.myPhysicalUsed));
+            ret->Set(v8::String::NewFromUtf8(isolate, "totalVirutal"), v8::Number::New(isolate, mem_info.totalVirtual));
+            ret->Set(v8::String::NewFromUtf8(isolate, "totalVirtualFree"), v8::Number::New(isolate, mem_info.totalVirtualFree));
+            ret->Set(v8::String::NewFromUtf8(isolate, "myVirtualUsed"), v8::Number::New(isolate, mem_info.myVirtualUsed));
+            ret->Set(v8::String::NewFromUtf8(isolate, "totalPhysical"), v8::Number::New(isolate, mem_info.totalPhysical));
+            ret->Set(v8::String::NewFromUtf8(isolate, "totalPhysicalFree"), v8::Number::New(isolate, mem_info.totalPhysicalFree));
+            ret->Set(v8::String::NewFromUtf8(isolate, "myPhysicalUsed"), v8::Number::New(isolate, mem_info.myPhysicalUsed));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
@@ -340,16 +348,16 @@ namespace Engine {
             
             Profiler::Begin(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
-            v8::Context::Scope ctx_scope(v8::Context::GetCurrent());
+            v8::Context::Scope ctx_scope(args.GetIsolate()->GetCurrentContext());
             
             v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
             
             v8::TryCatch tryCatch;
             
-            real_func->Call(v8::Context::GetCurrent()->Global(), 0, NULL);
+            real_func->Call(args.GetIsolate()->GetCurrentContext()->Global(), 0, NULL);
             
             if (!tryCatch.Exception().IsEmpty()) {
-                v8::ThrowException(tryCatch.Exception());
+                args.GetIsolate()->ThrowException(tryCatch.Exception());
             }
             
             Profiler::End(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
@@ -364,13 +372,15 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Profiler time to get");
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Profiler::GetTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), Profiler::GetTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(GetProfileZones) {
             ENGINE_JS_SCOPE_OPEN;
             
-            v8::Handle<v8::Array> arr = v8::Array::New();
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            v8::Handle<v8::Array> arr = v8::Array::New(isolate);
             
             std::vector<std::string> zones;
             
@@ -381,7 +391,7 @@ namespace Engine {
             }
             
             for (int i = 0; i < zones.size(); i++) {
-                arr->Set(i, v8::String::New(zones.at(i).c_str()));
+                arr->Set(i, v8::String::NewFromUtf8(isolate, zones.at(i).c_str()));
             }
             
             ENGINE_JS_SCOPE_CLOSE(arr);
@@ -397,16 +407,16 @@ namespace Engine {
             
             double startTime = Platform::GetTime();
             
-            v8::Context::Scope ctx_scope(v8::Context::GetCurrent());
+            v8::Context::Scope ctx_scope(args.GetIsolate()->GetCurrentContext());
             
             v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
             
             v8::TryCatch tryCatch;
             
-            real_func->Call(v8::Context::GetCurrent()->Global(), 0, NULL);
+            real_func->Call(args.GetIsolate()->GetCurrentContext()->Global(), 0, NULL);
             
             if (!tryCatch.Exception().IsEmpty()) {
-                v8::ThrowException(tryCatch.Exception());
+                args.GetIsolate()->ThrowException(tryCatch.Exception());
             }
             
             Logger::begin("JSSys", Logger::LogLevel_User) << "Timed: " << ENGINE_GET_ARG_CPPSTRING_VALUE(0) << " at "
@@ -417,6 +427,8 @@ namespace Engine {
         
         ENGINE_JS_METHOD(ConfigOptions) {
             ENGINE_JS_SCOPE_OPEN;
+            
+            v8::Isolate* isolate = args.GetIsolate();
             
             if (args.Length() == 0) {
                 // print all config options
@@ -429,15 +441,15 @@ namespace Engine {
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Config Key to Get");
                 switch (Config::GetType(ENGINE_GET_ARG_CPPSTRING_VALUE(0))) {
                     case Config::ConfigType_Bool:
-                        ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(Config::GetBoolean(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+                        ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(isolate, Config::GetBoolean(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
                     case Config::ConfigType_Number:
-                        ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Config::GetFloat(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+                        ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, Config::GetFloat(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
                     case Config::ConfigType_String:
-                        ENGINE_JS_SCOPE_CLOSE(v8::String::New(Config::GetString(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str()));
+                        ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(isolate, Config::GetString(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str()));
                     default:
                         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
                 }
-                ENGINE_JS_SCOPE_CLOSE(v8::String::New(Config::Get(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str()));
+                ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(isolate, Config::Get(ENGINE_GET_ARG_CPPSTRING_VALUE(0)).c_str()));
             } else if (args.Length() == 2) {
                 // set config option
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Config Key to Get");
@@ -545,9 +557,11 @@ namespace Engine {
         ENGINE_JS_METHOD(Version) {
             ENGINE_JS_SCOPE_OPEN;
             
+            v8::Isolate* isolate = args.GetIsolate();
+            
             ENGINE_CHECK_GL;
             
-            v8::Handle<v8::Object> ret = v8::Object::New();
+            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
             
             std::stringstream glfwVersion;
             
@@ -555,17 +569,17 @@ namespace Engine {
                 << "." << GLFW_VERSION_MINOR
                 << "." << GLFW_VERSION_REVISION;
             
-            ret->Set(v8::String::NewSymbol("openGL"),
-                     v8::String::NewSymbol((const char*) glGetString(GL_VERSION)));
-            ret->Set(v8::String::NewSymbol("glew"),
-                     v8::String::NewSymbol((const char*) glewGetString(GLEW_VERSION)));
-            ret->Set(v8::String::NewSymbol("v8"),
-                     v8::String::NewSymbol(v8::V8::GetVersion()));
-            ret->Set(v8::String::NewSymbol("engine"), v8::String::NewSymbol(Application::GetEngineVersion().c_str()));
-            ret->Set(v8::String::NewSymbol("glfw"),
-                     v8::String::NewSymbol(glfwVersion.str().c_str()));
-            ret->Set(v8::String::NewSymbol("glsl"),
-                     v8::String::NewSymbol((const char*) glGetString(GL_SHADING_LANGUAGE_VERSION)));
+            ret->Set(v8::String::NewFromUtf8(isolate, "openGL"),
+                     v8::String::NewFromUtf8(isolate, (const char*) glGetString(GL_VERSION)));
+            ret->Set(v8::String::NewFromUtf8(isolate, "glew"),
+                     v8::String::NewFromUtf8(isolate, (const char*) glewGetString(GLEW_VERSION)));
+            ret->Set(v8::String::NewFromUtf8(isolate, "v8"),
+                     v8::String::NewFromUtf8(isolate, v8::V8::GetVersion()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "engine"), v8::String::NewFromUtf8(isolate, Application::GetEngineVersion().c_str()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "glfw"),
+                     v8::String::NewFromUtf8(isolate, glfwVersion.str().c_str()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "glsl"),
+                     v8::String::NewFromUtf8(isolate, (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION)));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
@@ -593,7 +607,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the url to execute");
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(Platform::ShellExecute(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), Platform::ShellExecute(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
         }
         
         ENGINE_JS_METHOD(GetUuid) {
@@ -601,7 +615,7 @@ namespace Engine {
             
             unsigned char* uuid = Platform::GenerateUUID();
             
-            ENGINE_JS_SCOPE_CLOSE(v8::String::New(Platform::StringifyUUID(uuid).c_str()));
+            ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(args.GetIsolate(), Platform::StringifyUUID(uuid).c_str()));
         }
         
         ENGINE_JS_METHOD(DumpLog) {
@@ -644,7 +658,7 @@ namespace Engine {
         ENGINE_JS_METHOD(Assert) {
             ENGINE_JS_SCOPE_OPEN;
             if (GetAppSingilton()->IsDebugMode()) {
-                if (args[0]->ToBoolean() == v8::False()) {
+                if (args[0]->ToBoolean() == v8::False(args.GetIsolate())) {
                     if (args.Length() > 1 && args[1]->IsString()) {
                         ENGINE_ASSERT(false, ENGINE_GET_ARG_CPPSTRING_VALUE(1));
                     } else {
@@ -658,9 +672,11 @@ namespace Engine {
             }
         }
         
-#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
         
         void InitSys(v8::Handle<v8::ObjectTemplate> sysTable) {
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            
             addItem(sysTable, "argv", ArgV);
             
 			addItem(sysTable, "runFile", RunFile);

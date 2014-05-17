@@ -48,12 +48,13 @@ namespace Engine {
             
             int key = (int) str[0];
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(GetAppSingilton()->GetKeyPressed(key)));
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetAppSingilton()->GetKeyPressed(key)));
         }
         
-#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
         
         void InitInput(v8::Handle<v8::ObjectTemplate> inputTable) {
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
             addItem(inputTable, "keyDown", KeyDown);
         }
         

@@ -65,11 +65,13 @@ namespace Engine {
         ENGINE_JS_METHOD(ExecPrepare) {
             ENGINE_JS_SCOPE_OPEN;
             
+            v8::Isolate* isolate = args.GetIsolate();
+            
             ENGINE_CHECK_ARGS_LENGTH(1);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the query to be run on the database");
             
-            v8::Local<v8::Array> arr = v8::Array::New();
+            v8::Local<v8::Array> arr = v8::Array::New(isolate);
             
             std::vector< std::map<std::string, std::string> > ret = currentDatabase->ExecutePrepare(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
@@ -79,9 +81,9 @@ namespace Engine {
             int rows = 0;
             
             for (it_type1 iterator1 = ret.begin(); iterator1 != ret.end(); iterator1++) {
-                v8::Local<v8::Object> row = v8::Object::New();
+                v8::Local<v8::Object> row = v8::Object::New(isolate);
                 for (it_type2 iterator2 = iterator1->begin(); iterator2 != iterator1->end(); iterator2++) {
-                    row->Set(v8::String::New(iterator2->first.c_str()), v8::String::New(iterator2->second.c_str()));
+                    row->Set(v8::String::NewFromUtf8(isolate, iterator2->first.c_str()), v8::String::NewFromUtf8(isolate, iterator2->second.c_str()));
                 }
                 arr->Set(rows++, row);
             }
@@ -89,9 +91,11 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE(arr);
         }
         
-#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
         
         void InitDatabase(v8::Handle<v8::ObjectTemplate> dbTable) {
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            
             addItem(dbTable, "open", SetDatabaseFilename);
             addItem(dbTable, "exec", Exec);
             addItem(dbTable, "execPrepare", ExecPrepare);

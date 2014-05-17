@@ -57,7 +57,7 @@ namespace Engine {
             int modID = _lastOpenModule;
             _openModules[_lastOpenModule++] = lib;
 
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(modID));
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), modID));
         }
         
         ENGINE_JS_METHOD(CallMethod) {
@@ -73,9 +73,11 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
         
         void InitMod(v8::Handle<v8::ObjectTemplate> modTable) {
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            
             addItem(modTable, "open", OpenModule);
             addItem(modTable, "call", CallMethod);
         }

@@ -118,7 +118,7 @@ namespace Engine {
         if (nameStr == "EM_CANCEL") {
             info.GetReturnValue().Set(_EM_CANCEL);
         } else {
-            v8::Handle<v8::FunctionTemplate> t = v8::FunctionTemplate::New();
+            v8::Handle<v8::FunctionTemplate> t = v8::FunctionTemplate::New(info.GetIsolate());
         
             t->SetCallHandler(EventCallCallback, name);
         
@@ -159,8 +159,9 @@ namespace Engine {
     }
     
     void Application::_createEventMagic() {
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
         if (_EM_CANCEL.IsEmpty()) {
-            _EM_CANCEL.Reset(v8::Isolate::GetCurrent(), v8::External::New(new EventMagic(EM_CANCEL)));
+            _EM_CANCEL.Reset(isolate, v8::External::New(isolate, new EventMagic(EM_CANCEL)));
         }
     }
     
@@ -170,7 +171,7 @@ namespace Engine {
         }
     }
 	
-#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
     
     v8::Handle<v8::Context> Application::_initScripting() {
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
@@ -183,11 +184,11 @@ namespace Engine {
         
         v8::V8::SetJitCodeEventHandler(v8::JitCodeEventOptions::kJitCodeEventDefault, JitEventCallback);
         
-		v8::HandleScope handle_scope(isolate);
+		v8::EscapableHandleScope handle_scope(isolate);
         
 		v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
         
-        global->SetAccessor(v8::String::NewSymbol("global"), globalAccessor);
+        global->SetAccessor(v8::String::NewFromUtf8(isolate, "global"), globalAccessor);
         
         addItem(global, "assert", JsSys::Assert);
         
@@ -198,64 +199,64 @@ namespace Engine {
         addItem(consoleTable, "clear", JsSys::ClearConsole);
         addItem(consoleTable, "toggle", JsSys::ToggleConsole);
         
-        global->Set("console", consoleTable);
+        global->Set(isolate, "console", consoleTable);
         
 		// sysTable
 		v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
         
         JsSys::InitSys(sysTable);
         
-        sysTable->Set("platform", v8::String::New(_PLATFORM));
-        sysTable->Set("devMode", v8::Boolean::New(this->_developerMode));
-        sysTable->Set("preload", v8::Boolean::New(true));
-        sysTable->Set("numProcessers", v8::Number::New(Platform::GetProcesserCount()));
+        sysTable->Set(isolate, "platform", v8::String::NewFromUtf8(isolate, _PLATFORM));
+        sysTable->Set(isolate, "devMode", v8::Boolean::New(isolate, this->_developerMode));
+        sysTable->Set(isolate, "preload", v8::Boolean::New(isolate, true));
+        sysTable->Set(isolate, "numProcessers", v8::Number::New(isolate, Platform::GetProcesserCount()));
         
         // depending on the runtime being used in the future this will be set to something unique per system
         // for example on steam it can be the friends name or SteamID
-        sysTable->Set("username", v8::String::New(Platform::GetUsername().c_str()));
+        sysTable->Set(isolate, "username", v8::String::NewFromUtf8(isolate, Platform::GetUsername().c_str()));
         
-		global->Set("sys", sysTable);
+		global->Set(isolate, "sys", sysTable);
         
         v8::Handle<v8::ObjectTemplate> eventTable = v8::ObjectTemplate::New();
         
         eventTable->SetNamedPropertyHandler(EventGetterCallback, EventSetterCallback);
         
-        global->Set("event", eventTable);
+        global->Set(isolate, "event", eventTable);
         
         // drawTable
         v8::Handle<v8::ObjectTemplate> drawTable = v8::ObjectTemplate::New();
         
         JsDraw::InitDraw(drawTable);
         
-		global->Set("draw", drawTable);
+		global->Set(isolate, "draw", drawTable);
         
         // fsTable
         v8::Handle<v8::ObjectTemplate> fsTable = v8::ObjectTemplate::New();
         
         JsFS::InitFS(fsTable);
         
-        global->Set("fs", fsTable);
+        global->Set(isolate, "fs", fsTable);
         
         // dbTable
         v8::Handle<v8::ObjectTemplate> dbTable = v8::ObjectTemplate::New();
         
         JSDatabase::InitDatabase(dbTable);
         
-        global->Set("db", dbTable);
+        global->Set(isolate, "db", dbTable);
         
         // inputTable
         v8::Handle<v8::ObjectTemplate> inputTable = v8::ObjectTemplate::New();
         
         JsInput::InitInput(inputTable);
         
-		global->Set("input", inputTable);
+		global->Set(isolate, "input", inputTable);
         
         // moduleTable
         v8::Handle<v8::ObjectTemplate> moduleTable = v8::ObjectTemplate::New();
         
         JSMod::InitMod(moduleTable);
         
-        global->Set("mod", moduleTable);
+        global->Set(isolate, "mod", moduleTable);
         
         // unsafeTable
         
@@ -264,10 +265,10 @@ namespace Engine {
         
             JsUnsafe::InitUnsafe(unsafeTable);
         
-            global->Set("unsafe", unsafeTable);
+            global->Set(isolate, "unsafe", unsafeTable);
         }
         
-        v8::Handle<v8::Context> ctx = v8::Context::New(isolate, NULL, global);
+        v8::Local<v8::Context> ctx = v8::Context::New(isolate, NULL, global);
         
         ctx->Enter();
         
@@ -280,7 +281,7 @@ namespace Engine {
         
         Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
         
-        return handle_scope.Close(ctx);
+        return handle_scope.Escape(ctx);
 	}
 	
 #undef addItem
@@ -315,19 +316,21 @@ namespace Engine {
         v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
         
 		v8::Local<v8::Object> obj = ctx->Global();
-		return v8::Local<v8::Object>::Cast(obj->Get(v8::String::New(name.c_str())));
+		return v8::Local<v8::Object>::Cast(obj->Get(v8::String::NewFromUtf8(isolate, name.c_str())));
     }
 	
 	void Application::_updateMousePos() {
         glm::vec2 mouse = _window->GetCursorPos();
         
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
+        
         v8::Local<v8::Object> input_table = _getScriptTable("input");
         
-		input_table->Set(v8::String::New("mouseX"), v8::Number::New(mouse.x));
-		input_table->Set(v8::String::New("mouseY"), v8::Number::New(mouse.y));
-		input_table->Set(v8::String::New("leftMouseButton"), v8::Boolean::New(this->_window->GetMouseButtonPressed(MouseButton_Left)));
-		input_table->Set(v8::String::New("middleMouseButton"), v8::Boolean::New(this->_window->GetMouseButtonPressed(MouseButton_Middle)));
-		input_table->Set(v8::String::New("rightMouseButton"), v8::Boolean::New(this->_window->GetMouseButtonPressed(MouseButton_Right)));
+		input_table->Set(v8::String::NewFromUtf8(isolate, "mouseX"), v8::Number::New(isolate, mouse.x));
+		input_table->Set(v8::String::NewFromUtf8(isolate, "mouseY"), v8::Number::New(isolate, mouse.y));
+		input_table->Set(v8::String::NewFromUtf8(isolate, "leftMouseButton"), v8::Boolean::New(isolate, this->_window->GetMouseButtonPressed(MouseButton_Left)));
+		input_table->Set(v8::String::NewFromUtf8(isolate, "middleMouseButton"), v8::Boolean::New(isolate, this->_window->GetMouseButtonPressed(MouseButton_Middle)));
+		input_table->Set(v8::String::NewFromUtf8(isolate, "rightMouseButton"), v8::Boolean::New(isolate, this->_window->GetMouseButtonPressed(MouseButton_Right)));
 	}
 	
 	void Application::UpdateScreen() {
@@ -335,12 +338,13 @@ namespace Engine {
             return false;
         }
         
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
         v8::Local<v8::Object> sys_table = _getScriptTable("sys");
         
         glm::vec2 size = this->_window->GetWindowSize();
         
-		sys_table->Set(v8::String::New("screenWidth"), v8::Number::New(size.x));
-		sys_table->Set(v8::String::New("screenHeight"), v8::Number::New(size.y));
+		sys_table->Set(v8::String::NewFromUtf8(isolate, "screenWidth"), v8::Number::New(isolate, size.x));
+		sys_table->Set(v8::String::NewFromUtf8(isolate, "screenHeight"), v8::Number::New(isolate, size.y));
 	}
     
     EngineUI* Application::GetEngineUI() {
@@ -348,17 +352,20 @@ namespace Engine {
     }
     
     void Application::_updateFrameTime() {
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
 		v8::Local<v8::Object> sys_table = _getScriptTable("sys");
         
-        sys_table->Set(v8::String::NewSymbol("deltaTime"), v8::Number::New(FramePerfMonitor::GetFrameTime()));
+        sys_table->Set(v8::String::NewFromUtf8(isolate, "deltaTime"), v8::Number::New(isolate, FramePerfMonitor::GetFrameTime()));
     }
     
     void Application::_disablePreload() {
-        _getScriptTable("draw")->SetHiddenValue(v8::String::NewSymbol("_draw"), v8::External::New(new Draw2D(GetRender())));
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
         
-        _getScriptTable("sys")->SetHiddenValue(v8::String::NewSymbol("_app"), v8::External::New(this));
+        _getScriptTable("draw")->SetHiddenValue(v8::String::NewFromUtf8(isolate, "_draw"), v8::External::New(isolate, new Draw2D(GetRender())));
         
-        _getScriptTable("sys")->Set(v8::String::New("preload"), v8::Boolean::New(false));
+        _getScriptTable("sys")->SetHiddenValue(v8::String::NewFromUtf8(isolate, "_app"), v8::External::New(isolate, this));
+        
+        _getScriptTable("sys")->Set(v8::String::NewFromUtf8(isolate, "preload"), v8::Boolean::New(isolate, false));
     }
     
     void Application::_loadBasicConfigs() {
@@ -858,8 +865,8 @@ namespace Engine {
     
 	bool Application::_runFile(std::string path, bool persist) {
 		Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Loading File: " << path << Logger::end();
-        
-		v8::HandleScope scp(v8::Isolate::GetCurrent());
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
+		v8::HandleScope scp(isolate);
         v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
         v8::Context::Scope ctx_scope(ctx);
         
@@ -867,8 +874,7 @@ namespace Engine {
         
 		v8::TryCatch tryCatch;
         
-		v8::Handle<v8::Script> script = v8::Script::Compile(
-                                                            v8::String::New(inputScript), v8::String::New(path.c_str()));
+		v8::Handle<v8::Script> script = v8::Script::Compile(v8::String::NewFromUtf8(isolate, inputScript), v8::String::NewFromUtf8(isolate, path.c_str()));
         
 		if (script.IsEmpty()) {
 			Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not Load file: " << path << Logger::end();
@@ -968,20 +974,20 @@ namespace Engine {
     }
     
     void Application::RunCommand(std::string str) {
-		v8::HandleScope scp(v8::Isolate::GetCurrent());
-        v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
+		v8::HandleScope scp(isolate);
+        v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
         v8::Context::Scope ctx_scope(ctx);
         
 		Logger::begin("Console", Logger::LogLevel_ConsoleInput) << "> " << str << Logger::end();
         
 		v8::TryCatch tryCatch;
         
-		v8::Handle<v8::Script> script = v8::Script::Compile(v8::String::New(str.c_str()), v8::String::NewSymbol("Console"));
+		v8::Handle<v8::Script> script = v8::Script::Compile(v8::String::NewFromUtf8(isolate, str.c_str()), v8::String::NewFromUtf8(isolate, "Console"));
         
 		if (script.IsEmpty()) {
 			v8::Handle<v8::Value> exception = tryCatch.StackTrace();
-			v8::String::AsciiValue exception_str(exception);
-            Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
+            Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception->ToString() << Logger::end();
 		} else {
             v8::Local<v8::Value> result = script->Run();
             if (*result != NULL && !result->IsExternal()) { // well it works
@@ -994,8 +1000,7 @@ namespace Engine {
             if (!tryCatch.StackTrace().IsEmpty()) {
                 // Use the old version, the new one is way too long
                 v8::Handle<v8::Value> exception = tryCatch.StackTrace();
-                v8::String::AsciiValue exception_str(exception);
-                Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception_str << Logger::end();
+                Logger::begin("Console", Logger::LogLevel_Error) << "Exception: " << *exception->ToString() << Logger::end();
             }
 		}
     }
@@ -1201,7 +1206,7 @@ namespace Engine {
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
                 Profiler::Begin("ScriptGC");
-                v8::V8::IdleNotification();
+                // v8::V8::IdleNotification(); Causes EXC_BAD_INSTRUCTION
                 Profiler::End("ScriptGC");
             }
             
@@ -1263,7 +1268,8 @@ namespace Engine {
             return 0;
         }
         
-        v8::HandleScope handle_scope(v8::Isolate::GetCurrent());
+        v8::Isolate* isolate = v8::Isolate::GetCurrent();
+        v8::HandleScope handle_scope(isolate);
         
         Profiler::Begin("InitScripting");
         v8::Handle<v8::Context> ctx = this->_initScripting();

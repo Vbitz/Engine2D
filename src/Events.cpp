@@ -85,9 +85,9 @@ namespace Engine {
                 
                 if ((e.isObject() || e.isArray()) &&
                     e.getMemberNames().size() == 0) {
-                    args[0] = v8::Object::New();
+                    args[0] = v8::Object::New(currentIsolate);
                 } else if (e.isNull()) {
-                    args[0] = v8::Null();
+                    args[0] = v8::Null(currentIsolate);
                 } else {
                     args[0] = ScriptingManager::GetObjectFromJson(e);
                 }

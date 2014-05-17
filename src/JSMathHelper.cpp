@@ -51,13 +51,13 @@ namespace Engine {
                 rand = new BasicRandom();
             }
             
-            v8::Handle<v8::External> randGen = v8::External::New(rand);
+            v8::Handle<v8::External> randGen = v8::External::New(args.GetIsolate(), rand);
             
             v8::Persistent<v8::External> randGenPersist;
             randGenPersist.Reset(v8::Isolate::GetCurrent(), randGen);
             randGenPersist.SetWeak<BasicRandom*>(&rand, DisposeRandomCallback);
             
-            args.This()->SetHiddenValue(v8::String::NewSymbol("__rand"), randGen);
+            args.This()->SetHiddenValue(v8::String::NewFromUtf8(args.GetIsolate(), "__rand"), randGen);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -65,57 +65,64 @@ namespace Engine {
         ENGINE_JS_METHOD(Random_Next) {
             ENGINE_JS_SCOPE_OPEN;
             
-            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewSymbol("__rand")).As<v8::External>()->Value();
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
             
             if (args.Length() == 0) {
-                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(rand->Next()));
+                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, rand->Next()));
             } else if (args.Length() == 1) {
-                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(rand->Next(ENGINE_GET_ARG_INT32_VALUE(0))));
+                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, rand->Next(ENGINE_GET_ARG_INT32_VALUE(0))));
             } else if (args.Length() == 2) {
-                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(rand->Next(ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1))));
+                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, rand->Next(ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1))));
             }
         }
         
         ENGINE_JS_METHOD(Random_NextDouble) {
             ENGINE_JS_SCOPE_OPEN;
             
-            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewSymbol("__rand")).As<v8::External>()->Value();
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(rand->NextDouble()));
+            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, rand->NextDouble()));
         }
         
         ENGINE_JS_METHOD(Random_NextNormal) {
             ENGINE_JS_SCOPE_OPEN;
             
-            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewSymbol("__rand")).As<v8::External>()->Value();
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(rand->NextNormal(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1))));
+            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, rand->NextNormal(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1))));
         }
         
         void InitMathHelper() {
-            v8::HandleScope scp(v8::Isolate::GetCurrent());
-            v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            v8::HandleScope scp(isolate);
+            v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
             v8::Context::Scope ctx_scope(ctx);
             
-            v8::Local<v8::Object> obj = v8::Context::GetCurrent()->Global();
+            v8::Local<v8::Object> obj = ctx->Global();
             
-            v8::Local<v8::Object> math_table = v8::Object::Cast(*obj->Get(v8::String::New("Math")));
+            v8::Local<v8::Object> math_table = v8::Object::Cast(*obj->Get(v8::String::NewFromUtf8(isolate, "Math")));
             
-            math_table->Set(v8::String::NewSymbol("PI"), v8::Number::New(M_PI));
-            math_table->Set(v8::String::NewSymbol("PI_2"), v8::Number::New(M_PI_2));
-            math_table->Set(v8::String::NewSymbol("PI_4"), v8::Number::New(M_PI_4));
+            math_table->Set(v8::String::NewFromUtf8(isolate, "PI"), v8::Number::New(isolate, M_PI));
+            math_table->Set(v8::String::NewFromUtf8(isolate, "PI_2"), v8::Number::New(isolate, M_PI_2));
+            math_table->Set(v8::String::NewFromUtf8(isolate, "PI_4"), v8::Number::New(isolate, M_PI_4));
             
-            v8::Handle<v8::FunctionTemplate> random_template = v8::FunctionTemplate::New();
+            v8::Handle<v8::FunctionTemplate> random_template = v8::FunctionTemplate::New(isolate);
             
             random_template->SetCallHandler(Random_New);
             
             v8::Handle<v8::ObjectTemplate> random_proto = random_template->PrototypeTemplate();
             
-            random_proto->Set("next", v8::FunctionTemplate::New(Random_Next));
-            random_proto->Set("nextDouble", v8::FunctionTemplate::New(Random_NextDouble));
-            random_proto->Set("nextNormal", v8::FunctionTemplate::New(Random_NextNormal));
+            random_proto->Set(isolate, "next", v8::FunctionTemplate::New(isolate, Random_Next));
+            random_proto->Set(isolate, "nextDouble", v8::FunctionTemplate::New(isolate, Random_NextDouble));
+            random_proto->Set(isolate, "nextNormal", v8::FunctionTemplate::New(isolate, Random_NextNormal));
             
-            math_table->Set(v8::String::NewSymbol("Random"), random_template->GetFunction());
+            math_table->Set(v8::String::NewFromUtf8(isolate, "Random"), random_template->GetFunction());
         }
     }
 }

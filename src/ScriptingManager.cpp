@@ -128,12 +128,12 @@ namespace Engine {
             // TODO: Assert this->_isolate != null
             v8::HandleScope scp(this->_isolate);
             
-            v8::Handle<v8::String> codeHandle = v8::String::New(code.c_str());
-            v8::Handle<v8::String> fileHandle = v8::String::New(sourceFile.c_str());
+            v8::Handle<v8::String> codeHandle = v8::String::NewFromUtf8(this->_isolate, code.c_str());
+            v8::Handle<v8::String> fileHandle = v8::String::NewFromUtf8(this->_isolate, sourceFile.c_str());
             
             v8::TryCatch tryCatch;
             
-            v8::Handle<v8::Script> script = v8::Script::New(codeHandle, fileHandle);
+            v8::Handle<v8::Script> script = v8::Script::Compile(codeHandle, fileHandle);
             
             if (script.IsEmpty()) {
                 Logger::begin("Scripting", Logger::LogLevel_Error) << "Error Loading Script: " << sourceFile << Logger::end();
@@ -164,8 +164,8 @@ namespace Engine {
         
         ScriptingObject* V8ScriptingContext::CreateFunction(ScriptingFunctionCallback cb) {
             // TODO: assert to see if we have a valid scope
-            v8::Handle<v8::FunctionTemplate> func = v8::FunctionTemplate::New();
-            func->SetCallHandler(ScriptingFunctionDispatch, v8::External::New((void*) cb));
+            v8::Handle<v8::FunctionTemplate> func = v8::FunctionTemplate::New(this->_isolate);
+            func->SetCallHandler(ScriptingFunctionDispatch, v8::External::New(this->_isolate, (void*) cb));
         }
         
         void V8ScriptingContext::Enter() {
@@ -185,7 +185,7 @@ namespace Engine {
         }
         
         ScriptingObject* V8ScriptingContext::_getGlobal(std::string name) {
-            return new V8ScriptingObject(v8::Undefined());
+            return new V8ScriptingObject(v8::Undefined(this->_isolate));
         }
         
         // V8ScriptingObject
@@ -215,7 +215,7 @@ namespace Engine {
         }
         
         ScriptingObject* V8ScriptingObject::_getChild(std::string name) {
-            return new V8ScriptingObject(v8::Undefined());
+            return new V8ScriptingObject(v8::Undefined(v8::Isolate::GetCurrent()));
         }
         
         void V8ScriptingObject::_setChild(std::string name, ScriptingObject* obj) {
@@ -266,16 +266,17 @@ namespace Engine {
         }
         
         v8::Local<v8::Value> _getValueFromJson(Json::Value val) {
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
             switch (val.type()) {
-                case Json::nullValue: return v8::Null();
-                case Json::intValue: return v8::Number::New(val.asInt());
-                case Json::uintValue: return v8::Number::New(val.asUInt());
-                case Json::realValue: return v8::Number::New(val.asDouble());
-                case Json::stringValue: return v8::String::New(val.asCString());
-                case Json::booleanValue: return v8::Boolean::New(val.asBool());
+                case Json::nullValue: return v8::Null(isolate);
+                case Json::intValue: return v8::Number::New(isolate, val.asInt());
+                case Json::uintValue: return v8::Number::New(isolate, val.asUInt());
+                case Json::realValue: return v8::Number::New(isolate, val.asDouble());
+                case Json::stringValue: return v8::String::NewFromUtf8(isolate, val.asCString());
+                case Json::booleanValue: return v8::Boolean::New(isolate, val.asBool());
                 case Json::arrayValue:
                 case Json::objectValue:
-                    v8::Local<v8::Array> ret = v8::Array::New();
+                    v8::Local<v8::Array> ret = v8::Array::New(isolate);
                     for (auto iter = val.begin(); iter != val.end(); iter++) {
                         ret->Set(_getValueFromJson(iter.key()), _getValueFromJson(val[iter.key().asString()]));
                     }

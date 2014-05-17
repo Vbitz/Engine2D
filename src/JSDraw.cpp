@@ -41,18 +41,15 @@ namespace Engine {
     
 	namespace JsDraw {
         
-        static void ReadBufferWeakCallback(v8::Isolate* isolate, v8::Persistent<v8::Object>* arr, float* cppArray) {
-            v8::Handle<v8::Object> realArr =
-                v8::Handle<v8::Object>::New(isolate, *arr);
+        static void ReadBufferWeakCallback(const v8::WeakCallbackData<v8::Object, float>& args) {
             
             size_t byte_length =
-                realArr->Get(v8::String::NewSymbol("byteLength"))->Int32Value();
+                args.GetValue()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "byteLength"))->Int32Value();
             
-            isolate->AdjustAmountOfExternalAllocatedMemory(
+            args.GetIsolate()->AdjustAmountOfExternalAllocatedMemory(
                                         -static_cast<intptr_t>(byte_length));
             
-            delete[] cppArray;
-            arr->Dispose();
+            delete[] args.GetParameter();
         }
         
         ENGINE_JS_METHOD(CreateColor) {
@@ -74,24 +71,25 @@ namespace Engine {
         }
         
         void InitColorObject(v8::Handle<v8::ObjectTemplate> drawTable) {
-            v8::HandleScope scope(v8::Isolate::GetCurrent());
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            v8::HandleScope scope(isolate);
             
-            v8::Handle<v8::FunctionTemplate> newColor = v8::FunctionTemplate::New();
+            v8::Handle<v8::FunctionTemplate> newColor = v8::FunctionTemplate::New(isolate);
             
-            newColor->SetClassName(v8::String::NewSymbol("Color"));
+            newColor->SetClassName(v8::String::NewFromUtf8(isolate, "Color"));
             
             v8::Handle<v8::ObjectTemplate> colorPrototypeTemplate = newColor->PrototypeTemplate();
             v8::Handle<v8::ObjectTemplate> colorInstanceTemplate = newColor->InstanceTemplate();
             
-            v8::Handle<v8::FunctionTemplate> createColor = v8::FunctionTemplate::New();
+            v8::Handle<v8::FunctionTemplate> createColor = v8::FunctionTemplate::New(isolate);
             
             createColor->SetCallHandler(CreateColor);
             
-            drawTable->Set("Color", createColor);
+            drawTable->Set(isolate, "Color", createColor);
         }
         
         Draw2D* GetDraw2D(v8::Local<v8::Object> thisValue) {
-            return (Draw2D*) thisValue->GetHiddenValue(v8::String::NewSymbol("_draw")).As<v8::External>()->Value();
+            return (Draw2D*) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_draw")).As<v8::External>()->Value();
         }
         
 		ENGINE_JS_METHOD(Rect) {
@@ -368,9 +366,9 @@ namespace Engine {
                 GetDraw2D(args.This())->GetRender()->SetColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             } else if (args[0]->IsObject()) {
                 v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
-                double r = obj->Get(v8::String::NewSymbol("r"))->NumberValue();
-                double g = obj->Get(v8::String::NewSymbol("g"))->NumberValue();
-                double b = obj->Get(v8::String::NewSymbol("b"))->NumberValue();
+                double r = obj->Get(v8::String::NewFromUtf8(args.GetIsolate(), "r"))->NumberValue();
+                double g = obj->Get(v8::String::NewFromUtf8(args.GetIsolate(), "g"))->NumberValue();
+                double b = obj->Get(v8::String::NewFromUtf8(args.GetIsolate(), "b"))->NumberValue();
                 GetDraw2D(args.This())->GetRender()->SetColor(r, g, b);
             } else {
                 ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb) or a object with r,g,b propertys");
@@ -398,14 +396,15 @@ namespace Engine {
         ENGINE_JS_METHOD(GetColor) {
             ENGINE_JS_SCOPE_OPEN;
             
-            v8::Handle<v8::Object> ret = v8::Object::New();
+            v8::Isolate* isolate = args.GetIsolate();
+            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
             
             Color4f col = GetDraw2D(args.This())->GetRender()->GetColor();
             
-            ret->Set(v8::String::NewSymbol("r"), v8::Number::New(col.r));
-            ret->Set(v8::String::NewSymbol("g"), v8::Number::New(col.g));
-            ret->Set(v8::String::NewSymbol("b"), v8::Number::New(col.b));
-            ret->Set(v8::String::NewSymbol("a"), v8::Number::New(col.b));
+            ret->Set(v8::String::NewFromUtf8(isolate, "r"), v8::Number::New(isolate, col.r));
+            ret->Set(v8::String::NewFromUtf8(isolate, "g"), v8::Number::New(isolate, col.g));
+            ret->Set(v8::String::NewFromUtf8(isolate, "b"), v8::Number::New(isolate, col.b));
+            ret->Set(v8::String::NewFromUtf8(isolate, "a"), v8::Number::New(isolate, col.b));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
@@ -413,13 +412,19 @@ namespace Engine {
         ENGINE_JS_METHOD(GetRGBFromHSV) {
             ENGINE_JS_SCOPE_OPEN;
             
+            v8::Isolate* isolate = args.GetIsolate();
+            
             ENGINE_CHECK_ARGS_LENGTH(3);
             
             ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Hue Component between 0 and 360");
             ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Saturation Component between 0.0f and 1.0f");
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Value Component between 0.0f and 1.0f");
             
-            v8::Handle<v8::Object> ret = v8::Object::New();
+            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
+            
+            v8::Handle<v8::String> rStr = v8::String::NewFromUtf8(isolate, "r");
+            v8::Handle<v8::String> gStr = v8::String::NewFromUtf8(isolate, "g");
+            v8::Handle<v8::String> bStr = v8::String::NewFromUtf8(isolate, "b");
             
             float hue = ENGINE_GET_ARG_NUMBER_VALUE(0),
             saturation = ENGINE_GET_ARG_NUMBER_VALUE(1),
@@ -434,15 +439,15 @@ namespace Engine {
 #else
                     if (hue != hue) {
 #endif
-                        ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
-                        ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
-                        ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
+                        ret->Set(rStr, v8::Number::New(isolate, value));
+                        ret->Set(gStr, v8::Number::New(isolate, value));
+                        ret->Set(bStr, v8::Number::New(isolate, value));
                         ENGINE_JS_SCOPE_CLOSE(ret);
                     }
                     // error - should never happen
-                    ret->Set(v8::String::NewSymbol("r"), v8::Number::New(0.0f));
-                    ret->Set(v8::String::NewSymbol("g"), v8::Number::New(0.0f));
-                    ret->Set(v8::String::NewSymbol("b"), v8::Number::New(0.0f));
+                    ret->Set(rStr, v8::Number::New(isolate, 0.0f));
+                    ret->Set(gStr, v8::Number::New(isolate, 0.0f));
+                    ret->Set(bStr, v8::Number::New(isolate, 0.0f));
                     ENGINE_JS_SCOPE_CLOSE(ret);
                 }
                 hh = hue;
@@ -456,35 +461,35 @@ namespace Engine {
                 
                 switch(i) {
                     case 0:
-                        ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
-                        ret->Set(v8::String::NewSymbol("g"), v8::Number::New(t));
-                        ret->Set(v8::String::NewSymbol("b"), v8::Number::New(p));
+                        ret->Set(rStr, v8::Number::New(isolate, value));
+                        ret->Set(gStr, v8::Number::New(isolate, t));
+                        ret->Set(bStr, v8::Number::New(isolate, p));
                         break;
                     case 1:
-                        ret->Set(v8::String::NewSymbol("r"), v8::Number::New(q));
-                        ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
-                        ret->Set(v8::String::NewSymbol("b"), v8::Number::New(p));
+                        ret->Set(rStr, v8::Number::New(isolate, q));
+                        ret->Set(gStr, v8::Number::New(isolate, value));
+                        ret->Set(bStr, v8::Number::New(isolate, p));
                         break;
                     case 2:
-                        ret->Set(v8::String::NewSymbol("r"), v8::Number::New(p));
-                        ret->Set(v8::String::NewSymbol("g"), v8::Number::New(value));
-                        ret->Set(v8::String::NewSymbol("b"), v8::Number::New(t));
+                        ret->Set(rStr, v8::Number::New(isolate, p));
+                        ret->Set(gStr, v8::Number::New(isolate, value));
+                        ret->Set(bStr, v8::Number::New(isolate, t));
                         break;
                     case 3:
-                        ret->Set(v8::String::NewSymbol("r"), v8::Number::New(p));
-                        ret->Set(v8::String::NewSymbol("g"), v8::Number::New(q));
-                        ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
+                        ret->Set(rStr, v8::Number::New(isolate, p));
+                        ret->Set(gStr, v8::Number::New(isolate, q));
+                        ret->Set(bStr, v8::Number::New(isolate, value));
                         break;
                     case 4:
-                        ret->Set(v8::String::NewSymbol("r"), v8::Number::New(t));
-                        ret->Set(v8::String::NewSymbol("g"), v8::Number::New(p));
-                        ret->Set(v8::String::NewSymbol("b"), v8::Number::New(value));
+                        ret->Set(rStr, v8::Number::New(isolate, t));
+                        ret->Set(gStr, v8::Number::New(isolate, p));
+                        ret->Set(bStr, v8::Number::New(isolate, value));
                         break;
                     case 5:
                     default:
-                        ret->Set(v8::String::NewSymbol("r"), v8::Number::New(value));
-                        ret->Set(v8::String::NewSymbol("g"), v8::Number::New(p));
-                        ret->Set(v8::String::NewSymbol("b"), v8::Number::New(q));
+                        ret->Set(rStr, v8::Number::New(isolate, value));
+                        ret->Set(gStr, v8::Number::New(isolate, p));
+                        ret->Set(bStr, v8::Number::New(isolate, q));
                         break;
                 }
                 ENGINE_JS_SCOPE_CLOSE(ret);
@@ -492,6 +497,8 @@ namespace Engine {
             
             ENGINE_JS_METHOD(ClearColor) {
                 ENGINE_JS_SCOPE_OPEN;
+                
+                v8::Isolate* isolate = args.GetIsolate();
                 
                 ENGINE_CHECK_GL;
                 
@@ -511,9 +518,9 @@ namespace Engine {
                     GetDraw2D(args.This())->GetRender()->ClearColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
                 } else if (args[0]->IsObject()) {
                     v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
-                    double r = obj->Get(v8::String::NewSymbol("r"))->NumberValue();
-                    double g = obj->Get(v8::String::NewSymbol("g"))->NumberValue();
-                    double b = obj->Get(v8::String::NewSymbol("b"))->NumberValue();
+                    double r = obj->Get(v8::String::NewFromUtf8(isolate, "r"))->NumberValue();
+                    double g = obj->Get(v8::String::NewFromUtf8(isolate, "g"))->NumberValue();
+                    double b = obj->Get(v8::String::NewFromUtf8(isolate, "b"))->NumberValue();
                     GetDraw2D(args.This())->GetRender()->ClearColor(r, g, b);
                 } else {
                     ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb)");
@@ -570,7 +577,7 @@ namespace Engine {
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to check");
                 
                 ENGINE_JS_SCOPE_CLOSE(
-                    v8::Boolean::New(GetDraw2D(args.This())->GetRender()->IsFontLoaded(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+                    v8::Boolean::New(args.GetIsolate(), GetDraw2D(args.This())->GetRender()->IsFontLoaded(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
             }
             
             ENGINE_JS_METHOD(Print) {
@@ -626,7 +633,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the string to get the width of");
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(GetDraw2D(args.This())->GetRender()->CalcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+                ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), GetDraw2D(args.This())->GetRender()->CalcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
             }
             
             // Texture Handling
@@ -777,7 +784,7 @@ namespace Engine {
                 
                 img->Load();
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::External::New(img->GetTexture()));
+                ENGINE_JS_SCOPE_CLOSE(v8::External::New(args.GetIsolate(), img->GetTexture()));
             }
             
             ENGINE_JS_METHOD(OpenSpriteSheet) {
@@ -795,7 +802,7 @@ namespace Engine {
                     ResourceManager::Load(filename);
                 }
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::External::New(SpriteSheetReader::LoadSpriteSheetFromFile(filename)));
+                ENGINE_JS_SCOPE_CLOSE(v8::External::New(args.GetIsolate(), SpriteSheetReader::LoadSpriteSheetFromFile(filename)));
             }
             
             ENGINE_JS_METHOD(GetImageArray) {
@@ -807,7 +814,7 @@ namespace Engine {
                 
                 ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to load");
                 
-                v8::Handle<v8::Object> array = v8::Object::New();
+                v8::Handle<v8::Object> array = v8::Object::New(args.GetIsolate());
                 
                 v8::Isolate* isolate = v8::Isolate::GetCurrent();
                 
@@ -848,17 +855,17 @@ namespace Engine {
                 arr.Reset(isolate, array);
                 
                 arr.MarkIndependent();
-                arr.MakeWeak<float>(rawArray, ReadBufferWeakCallback);
+                arr.SetWeak(rawArray, ReadBufferWeakCallback);
                 
                 isolate->AdjustAmountOfExternalAllocatedMemory(imageSize * sizeof(float));
                 
                 array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, imageSize * sizeof(float));
                 
-                array->Set(v8::String::New("length"), v8::Number::New(imageSize));
-                array->Set(v8::String::New("width"), v8::Number::New(imageWidth));
-                array->Set(v8::String::New("height"), v8::Number::New(imageHeight));
-                array->Set(v8::String::NewSymbol("byteLength"),
-                           v8::Int32::New(static_cast<int32_t>(imageSize), isolate), v8::ReadOnly);
+                array->Set(v8::String::NewFromUtf8(isolate, "length"), v8::Number::New(isolate, imageSize));
+                array->Set(v8::String::NewFromUtf8(isolate, "width"), v8::Number::New(isolate, imageWidth));
+                array->Set(v8::String::NewFromUtf8(isolate, "height"), v8::Number::New(isolate, imageHeight));
+                array->Set(v8::String::NewFromUtf8(isolate, "byteLength"),
+                           v8::Int32::New(isolate, static_cast<int32_t>(imageSize)), v8::ReadOnly);
                 
                 unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
                 
@@ -867,10 +874,10 @@ namespace Engine {
                 
                 for (int x = 0; x < imageWidth; x++) {
                     for (int y = 0; y < imageHeight; y++) {
-                        array->Set(i + 0, v8::Number::New((float) pixel[pos + 2] / 256.f));
-                        array->Set(i + 1, v8::Number::New((float) pixel[pos + 1] / 256.f));
-                        array->Set(i + 2, v8::Number::New((float) pixel[pos + 0] / 256.f));
-                        array->Set(i + 3, v8::Number::New(1.0f));
+                        array->Set(i + 0, v8::Number::New(isolate, (float) pixel[pos + 2] / 256.f));
+                        array->Set(i + 1, v8::Number::New(isolate, (float) pixel[pos + 1] / 256.f));
+                        array->Set(i + 2, v8::Number::New(isolate, (float) pixel[pos + 0] / 256.f));
+                        array->Set(i + 3, v8::Number::New(isolate, 1.0f));
                         pos += 4;
                         i += 4;
                     }
@@ -894,9 +901,9 @@ namespace Engine {
                 
                 int arraySize = imageWidth * imageHeight * 4;
                 
-                v8::Handle<v8::Object> array = v8::Object::New();
-                
                 v8::Isolate* isolate = v8::Isolate::GetCurrent();
+                
+                v8::Handle<v8::Object> array = v8::Object::New(isolate);
                 
                 float* rawArray = new float[arraySize]; // sadly this is a memory leak right now
                 
@@ -912,17 +919,17 @@ namespace Engine {
                 arr.Reset(isolate, array);
                 
                 arr.MarkIndependent();
-                arr.MakeWeak<float>(rawArray, ReadBufferWeakCallback);
+                arr.SetWeak(rawArray, ReadBufferWeakCallback);
                 
                 isolate->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
                 
                 array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));
                 
-                array->Set(v8::String::New("length"), v8::Number::New(arraySize));
-                array->Set(v8::String::New("width"), v8::Number::New(imageWidth));
-                array->Set(v8::String::New("height"), v8::Number::New(imageHeight));
-                array->Set(v8::String::NewSymbol("byteLength"),
-                           v8::Int32::New(static_cast<int32_t>(arraySize), isolate), v8::ReadOnly);
+                array->Set(v8::String::NewFromUtf8(isolate, "length"), v8::Number::New(isolate, arraySize));
+                array->Set(v8::String::NewFromUtf8(isolate, "width"), v8::Number::New(isolate, imageWidth));
+                array->Set(v8::String::NewFromUtf8(isolate, "height"), v8::Number::New(isolate, imageHeight));
+                array->Set(v8::String::NewFromUtf8(isolate, "byteLength"),
+                           v8::Int32::New(isolate, static_cast<int32_t>(arraySize)), v8::ReadOnly);
                 
                 ENGINE_JS_SCOPE_CLOSE(array);
             }
@@ -992,7 +999,7 @@ namespace Engine {
                     free(pixels);
                 }
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::External::New(t));
+                ENGINE_JS_SCOPE_CLOSE(v8::External::New(args.GetIsolate(), t));
             }
             
             ENGINE_JS_METHOD(SaveImage) {
@@ -1044,12 +1051,12 @@ namespace Engine {
                 ENGINE_CHECK_ARGS_LENGTH(1);
                 
                 if (!args[0]->IsExternal()) {
-                    ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(false));
+                    ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), false));
                 }
                 
                 Texture* tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(tex->IsValid()));
+                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), tex->IsValid()));
             }
             
             ENGINE_JS_METHOD(IsSpriteSheet) {
@@ -1060,12 +1067,12 @@ namespace Engine {
                 ENGINE_CHECK_ARGS_LENGTH(1);
                 
                 if (!args[0]->IsExternal()) {
-                    ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(false));
+                    ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), false));
                 }
                 
                 SpriteSheet* sprite = (SpriteSheet*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
                 
-                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(sprite->IsValid()));
+                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), sprite->IsValid()));
             }
             
             // basicly restarts 2d drawing
@@ -1136,10 +1143,12 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-#define addItem(table, js_name, funct) table->Set(js_name, v8::FunctionTemplate::New(funct))
+#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
             
             void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
                 InitColorObject(drawTable);
+                
+                v8::Isolate* isolate = v8::Isolate::GetCurrent();
                 
                 addItem(drawTable, "rect", Rect);
                 addItem(drawTable, "grid", Grid);

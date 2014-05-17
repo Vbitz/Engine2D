@@ -38,8 +38,8 @@ namespace Engine {
     void DisableGLContext();
 }
 
-#define ENGINE_THROW_ARGCOUNT(count) v8::ThrowException(v8::Exception::TypeError(v8::String::New("Wrong number of arguments, expected " + count)));
-#define ENGINE_THROW_ARGERROR(str) v8::ThrowException(v8::Exception::TypeError(v8::String::New(str)));
+#define ENGINE_THROW_ARGCOUNT(count) v8::Isolate::GetCurrent()->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Wrong number of arguments, expected " + count)));
+#define ENGINE_THROW_ARGERROR(str) v8::Isolate::GetCurrent()->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), str)));
 
 #define ENGINE_JS_METHOD(name) void name(const v8::FunctionCallbackInfo<v8::Value>& args)
 
