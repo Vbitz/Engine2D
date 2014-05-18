@@ -106,14 +106,9 @@ namespace Engine {
             ENGINE_JS_SCOPE_OPEN;
             
             if (args.Length() == 4) {
-                Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
-                                 ENGINE_GET_ARG_CPPSTRING_VALUE(1),
-                                 ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(ENGINE_GET_ARG_OBJECT(2))),
-                                 args[3].As<v8::Function>());
+                Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->AddListener(ENGINE_GET_ARG_CPPSTRING_VALUE(1), Events::MakeTarget(ScriptingManager::ObjectToJson(ENGINE_GET_ARG_OBJECT(2)), args[3].As<v8::Function>()));
             } else if (args.Length() == 3) {
-                Events::On(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
-                                 ENGINE_GET_ARG_CPPSTRING_VALUE(1),
-                                 args[2].As<v8::Function>());
+                Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->AddListener(ENGINE_GET_ARG_CPPSTRING_VALUE(1), Events::MakeTarget(args[2].As<v8::Function>()));
             } else {
                 
             }
@@ -127,10 +122,10 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
             
             if (args.Length() == 2) {
-                Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
+                Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->Emit(
                              ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(args[1].As<v8::Object>())));
             } else if (args.Length() == 1) {
-                Events::Emit(ENGINE_GET_ARG_CPPSTRING_VALUE(0), Json::nullValue);
+                Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->Emit();
             } else {
                 ENGINE_THROW_ARGERROR("sys.emit takes 1 or 2 args");
             }

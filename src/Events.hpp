@@ -115,22 +115,13 @@ namespace Engine {
         EventClassPtrRef GetEvent(std::string eventName);
         
         void Init();
-        void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args);
-        void Emit(std::string evnt, Json::Value args);
-        void Emit(std::string evnt);
         
         EventTarget* MakeTarget(Json::Value e, EventTargetFunc target);
         EventTarget* MakeTarget(Json::Value e, v8::Handle<v8::Function> target);
         EventTarget* MakeTarget(EventTargetFunc target);
         EventTarget* MakeTarget(v8::Handle<v8::Function> target);
         
-        void On(std::string evnt, std::string label, Json::Value e, EventTargetFunc target);
-        void On(std::string evnt, std::string label, Json::Value e, v8::Handle<v8::Function> target);
-        void On(std::string evnt, std::string label, EventTargetFunc target);
-        void On(std::string evnt, std::string label, v8::Handle<v8::Function> target);
         void Clear(std::string eventID);
-        
-        void SetDefered(std::string eventName, bool defered);
     
         void PollDeferedMessages();
         void PollDeferedMessages(std::string eventName);

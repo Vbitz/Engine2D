@@ -282,7 +282,7 @@ namespace Engine {
             if (this->_window == NULL) return;
             glfwDestroyWindow(this->_window);
             this->_window = NULL;
-            Events::Emit("destroyWindow");
+            Events::GetEvent("destroyWindow")->Emit();
         }
         
         void _resizeCallback(int width, int height) {
@@ -293,7 +293,7 @@ namespace Engine {
             val["width"] = width;
             val["height"] = height;
             
-            Events::Emit("rawResize", val);
+            Events::GetEvent("rawResize")->Emit(val);
         }
         
         void _keypressCallback(int rawKey, int scanCode, int state, int mods) {
@@ -311,7 +311,7 @@ namespace Engine {
             val["state"] = glfwGetKeyStateName(state);
             val["shift"] = (mods & GLFW_MOD_SHIFT);
             
-            Events::Emit("rawInput", val);
+            Events::GetEvent("rawInput")->Emit(val);
         }
         
         static void WindowResize(GLFWwindow* window, int width, int height) {
@@ -371,7 +371,7 @@ namespace Engine {
             glfwSetWindowSizeCallback(this->_window, WindowResize);
             glfwSetKeyCallback(this->_window, WindowKeyPress);
             
-            Events::Emit("postCreateContext");
+            Events::GetEvent("postCreateContext")->Emit();
         }
         
         GLFWwindow* _window = NULL;

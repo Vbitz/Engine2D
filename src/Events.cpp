@@ -233,7 +233,7 @@ namespace Engine {
         
         void Init() {
             _eventMutex = Platform::CreateMutex();
-            Events::On("eventDebug", "Events::_debug", _debug);
+            GetEvent("eventDebug")->AddListener("Events::_debug", MakeTarget(_debug));
         }
         
         EventClassPtrRef GetEvent(std::string eventName) {
@@ -244,24 +244,6 @@ namespace Engine {
                 cls->TargetName = evnt_copy;
             }
             return cls;
-        }
-        
-        void Emit(std::string evnt, std::function<bool(Json::Value)> filter, Json::Value args) {
-            
-            EventClassPtrRef cls = _events[evnt];
-            if (cls == NULL) {
-                return;
-            }
-            
-            cls->Emit(filter, args);
-        }
-        
-        void Emit(std::string evnt, Json::Value args) {
-            Emit(evnt, emptyFilter, args);
-        }
-        
-        void Emit(std::string evnt) {
-            Emit(evnt, emptyFilter, Json::nullValue);
         }
         
         EventTarget* MakeTarget(Json::Value e, EventTargetFunc target) {
@@ -280,44 +262,11 @@ namespace Engine {
             return MakeTarget(Json::nullValue, target);
         }
         
-        void _On(std::string evnt, std::string name, EventTarget* target) {
-            GetEvent(evnt)->AddListener(name, target);
-        }
-        
-        void On(std::string evnt, std::string name, Json::Value e, EventTargetFunc target) {
-            std::string evnt_copy = std::string(evnt.c_str());
-            std::string name_copy = std::string(name.c_str());
-            _On(evnt_copy, name_copy, MakeTarget(e, target));
-        }
-        
-        void On(std::string evnt, std::string name, Json::Value e, v8::Handle<v8::
-            Function> target) {
-            std::string evnt_copy = std::string(evnt.c_str());
-            std::string name_copy = std::string(name.c_str());
-            _On(evnt_copy, name_copy, MakeTarget(e, target));
-        }
-        
-        void On(std::string evnt, std::string name, EventTargetFunc target) {
-            On(evnt, name, Json::nullValue, target);
-        }
-        
-        void On(std::string evnt, std::string name, v8::Handle<v8::Function> target) {
-            On(evnt, name, Json::nullValue, target);
-        }
-        
         void Clear(std::string eventID) {
             for (auto iter = _events.begin(); iter != _events.end(); iter++) {
                 if (iter->second == NULL) return;
                 iter->second->Clear(eventID);
             }
-        }
-        
-        void SetDefered(std::string eventName, bool defered) {
-            GetEvent(eventName)->SetDefered(defered);
-        }
-        
-        void SetNoScript(std::string eventName, bool noScript) {
-            GetEvent(eventName)->Security.NoScript = noScript;
         }
         
         // Only called from the main thread

@@ -46,7 +46,7 @@ namespace Engine {
             double currentTime = Platform::GetTime() - _pauseTime;
             for (auto iter = _timers.begin(); iter != _timers.end(); iter++) {
                 if (currentTime > iter->second.targetTime) {
-                    Events::Emit(iter->second.eventTarget);
+                    Events::GetEvent(iter->second.eventTarget)->Emit();
                     if (iter->second.repeat) {
                         iter->second.targetTime += iter->second.interval;
                     } else {

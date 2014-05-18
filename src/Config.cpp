@@ -37,22 +37,22 @@ namespace Engine {
         
         void SetNumber(std::string key, int value) {
             _numberCvars[key] = value;
-            if (_configEventEnabled) Events::Emit("config:" + key);
+            if (_configEventEnabled) Events::GetEvent("config:" + key)->Emit();
         }
         
         void SetNumber(std::string key, float value) {
             _numberCvars[key] = value;
-            if (_configEventEnabled) Events::Emit("config:" + key);
+            if (_configEventEnabled) Events::GetEvent("config:" + key)->Emit();
         }
         
         void SetBoolean(std::string key, bool value) {
             _boolCvars[key] = value;
-            if (_configEventEnabled) Events::Emit("config:" + key);
+            if (_configEventEnabled) Events::GetEvent("config:" + key)->Emit();
         }
         
         void SetString(std::string key, std::string value) {
             _stringCvars[key] = value;
-            if (_configEventEnabled) Events::Emit("config:" + key);
+            if (_configEventEnabled) Events::GetEvent("config:" + key)->Emit();
         }
         
         bool Set(std::string key, std::string value) {
@@ -76,7 +76,7 @@ namespace Engine {
                     SetString(key, value);
                     break;
             }
-            if (_configEventEnabled) Events::Emit("config:" + key);
+            if (_configEventEnabled) Events::GetEvent("config:" + key)->Emit();
             return true;
         }
         

@@ -210,7 +210,7 @@ namespace Engine {
         if (key == KEY_CONSOLE && press == GLFW_PRESS) { // `
             this->ToggleConsole();
         } else if (key == GLFW_KEY_F10 && press == GLFW_PRESS) { // f10
-            Events::Emit("dumpProfile");
+            Events::GetEvent("dumpProfile")->Emit();
         }
 
         if (!_showConsole) {
