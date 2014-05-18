@@ -23,11 +23,11 @@
 
 #include <string>
 
-#define GLEW_STATIC
-#include "vendor/GL/glew.h"
 #include <glm/glm.hpp>
 
 #include "RenderTypes.hpp"
+
+#include "RenderDriver.hpp"
 
 namespace Engine {
     
@@ -74,6 +74,8 @@ namespace Engine {
         
         // This is just a tempoary stopgap until the API is more graphics agnostic
         virtual OpenGLVersion GetGlVersion() = 0;
+        
+        virtual RenderDriver* GetRender() = 0;
         
         GraphicsVersion GetGraphicsVersion() {
             return this->_version;

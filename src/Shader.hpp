@@ -67,8 +67,8 @@ namespace Engine {
         
         bool _loaded;
         
-        std::map<std::string, GLuint> _uniforms;
-        std::map<std::string, GLuint> _attribs;
+        std::map<std::string, uint> _uniforms;
+        std::map<std::string, uint> _attribs;
         
         unsigned int _programPointer, _vertPointer, _fragPointer;
         std::string _vertFilename, _fragFilename;

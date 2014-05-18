@@ -19,6 +19,9 @@
    limitations under the License.
 */
 
+#define GLEW_STATIC
+#include "vendor/GL/glew.h"
+
 #include "Application.hpp"
 
 #include <cstring>
@@ -52,9 +55,6 @@
 #include "JSMod.hpp"
 #include "JSUnsafe.hpp"
 #include "JSMathHelper.hpp"
-
-#include "RenderGL3.hpp"
-#include "RenderGL2.hpp"
 
 #include <pthread.h>
 
@@ -522,6 +522,8 @@ namespace Engine {
     }
     
     void Application::_initGLContext(GraphicsVersion v) {
+        this->_renderGL = this->_window->GetRender();
+        
         glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
         
@@ -561,17 +563,6 @@ namespace Engine {
         this->_window->SetFullscreen(fullscreen);
         this->_window->SetAntiAlias(Config::GetInt("core.render.aa"));
         this->_window->SetDebug(Config::GetBoolean("core.debug.debugRenderer"));
-        
-        this->_renderGL = NULL;
-        
-        switch (v) {
-            case Graphics_OpenGL_Modern:
-                this->_renderGL = CreateRenderGL3();
-                break;
-            case Graphics_OpenGL_Legacy:
-                this->_renderGL = CreateRenderGL2();
-                break;
-        }
         
         this->_window->Show();
         

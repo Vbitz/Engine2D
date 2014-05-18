@@ -35,7 +35,7 @@ namespace Engine {
 		~GL3Buffer();
 
 		void Upload(float* buffer, int count);
-		void Draw(GLenum mode, glm::mat4 model, glm::mat4 view, int vertexCount);
+		void Draw(int mode, glm::mat4 model, glm::mat4 view, int vertexCount);
         
         bool NeedsUpdate();
         bool Update();
@@ -53,7 +53,7 @@ namespace Engine {
         
         RenderDriver* _getRender();
         
-        GLuint _vertexArrayPointer, _vertexBufferPointer;
+        uint _vertexArrayPointer, _vertexBufferPointer;
         
         RenderDriver* _renderGL = NULL;
         Shader* _currentShader = NULL;

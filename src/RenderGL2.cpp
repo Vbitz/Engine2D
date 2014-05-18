@@ -19,6 +19,9 @@
  limitations under the License.
  */
 
+#define GLEW_STATIC
+#include "vendor/GL/glew.h"
+
 #include "RenderGL2.hpp"
 #include "RenderGL3.hpp"
 

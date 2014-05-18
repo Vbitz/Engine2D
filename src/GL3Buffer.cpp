@@ -19,6 +19,9 @@
    limitations under the License.
 */
 
+#define GLEW_STATIC
+#include "vendor/GL/glew.h"
+
 #include "GL3Buffer.hpp"
 
 #include "Logger.hpp"
@@ -103,7 +106,7 @@ namespace Engine {
         glBindVertexArray(0);
     }
     
-    void GL3Buffer::Draw(GLenum mode, glm::mat4 model, glm::mat4 view, int vertexCount) {
+    void GL3Buffer::Draw(int mode, glm::mat4 model, glm::mat4 view, int vertexCount) {
         glBindVertexArray(this->_vertexArrayPointer);
         glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
         

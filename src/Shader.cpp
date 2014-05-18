@@ -19,6 +19,9 @@
    limitations under the License.
 */
 
+#define GLEW_STATIC
+#include "vendor/GL/glew.h"
+
 #include "Shader.hpp"
 
 #include "Filesystem.hpp"

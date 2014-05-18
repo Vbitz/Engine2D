@@ -21,7 +21,13 @@
 
 #include "Window.hpp"
 
+#define GLEW_STATIC
+#include "vendor/GL/glew.h"
+
 #include <GLFW/glfw3.h>
+
+#include "RenderGL3.hpp"
+#include "RenderGL2.hpp"
 
 #include "Events.hpp"
 #include "Logger.hpp"
@@ -273,6 +279,10 @@ namespace Engine {
             return ret;
         }
         
+        RenderDriver* GetRender() override {
+            return this->_render;
+        }
+        
     private:
         void _init() override {
             
@@ -371,9 +381,19 @@ namespace Engine {
             glfwSetWindowSizeCallback(this->_window, WindowResize);
             glfwSetKeyCallback(this->_window, WindowKeyPress);
             
+            switch (this->_version) {
+                case Graphics_OpenGL_Modern:
+                    this->_render = CreateRenderGL3();
+                    break;
+                case Graphics_OpenGL_Legacy:
+                    this->_render = CreateRenderGL2();
+                    break;
+            }
+            
             Events::GetEvent("postCreateContext")->Emit();
         }
         
+        RenderDriver* _render = NULL;
         GLFWwindow* _window = NULL;
         
         glm::vec2 _size = glm::vec2(800, 600);
