@@ -63,6 +63,8 @@ namespace Engine {
         }
         
         RenderDriver* renderGL = this->_draw->GetRender();
+        Window* window = this->_app->GetWindow();
+        glm::vec2 windowSize = window->GetWindowSize();
         
         renderGL->ResetMatrix();
         
@@ -72,7 +74,7 @@ namespace Engine {
             renderGL->SetColor(40 / 255.0f, 40 / 255.0f, 40 / 255.0f, 0.95f);
         }
         
-        this->_draw->Rect(0.0f, 0.0f, this->_app->GetScreenWidth(), _showConsole ? this->_app->GetScreenHeight() : 14);
+        this->_draw->Rect(0.0f, 0.0f, windowSize.x, _showConsole ? windowSize.y : 14);
         
         renderGL->SetFont("basic", 10);
         if (!this->_showConsole) {
@@ -93,11 +95,11 @@ namespace Engine {
             this->_ss.precision(4);
             this->_ss << "FPS: " << FramePerfMonitor::GetFPS();
             this->_ss << " | DrawTime: " << drawTime;
-            renderGL->Print(this->_app->GetScreenWidth() - 220, 4, this->_ss.str().c_str());
+            renderGL->Print(windowSize.x - 220, 4, this->_ss.str().c_str());
             
             renderGL->DisableSmooth();
             
-            this->_draw->LineGraph(this->_app->GetScreenWidth() - 430, 14, 2, 200, this->_lastDrawTimes, 100);
+            this->_draw->LineGraph(windowSize.x - 430, 14, 2, 200, this->_lastDrawTimes, 100);
             
             renderGL->EnableSmooth();
         }
@@ -112,7 +114,7 @@ namespace Engine {
         
         bool showVerbose = Config::GetBoolean("core.debug.engineUI.showVerboseLog"); // pretty cheap
         
-        int i = this->_app->GetScreenHeight() - 40;
+        int i = windowSize.y - 40;
         
         for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
             if (iterator->Hidden) {
@@ -123,15 +125,15 @@ namespace Engine {
                 if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
                     i -= 6; // add some padding to show that a message is there, just hidden
                     renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
-                    this->_draw->Rect(0, i + 2, this->_app->GetScreenWidth(), 2);
+                    this->_draw->Rect(0, i + 2, windowSize.x, 2);
                 } else {
                     i -= 22;
                     if (iterator->Level == Logger::LogLevel_Highlight) {
                         renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
-                        this->_draw->Rect(0, i + 1, this->_app->GetScreenWidth(), 20);
+                        this->_draw->Rect(0, i + 1, windowSize.x, 20);
                     } else {
                         renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
-                        this->_draw->Rect(60, i + 1, this->_app->GetScreenWidth() - 60, 20);
+                        this->_draw->Rect(60, i + 1, windowSize.x - 60, 20);
                     }
                 }
             }
@@ -187,11 +189,11 @@ namespace Engine {
         }
         
         renderGL->SetColor(0.0f, 0.0f, 0.0f, 0.85f);
-        this->_draw->Rect(5, this->_app->GetScreenHeight() - 30, this->_app->GetScreenWidth() - 10, 25);
+        this->_draw->Rect(5, windowSize.y - 30, windowSize.x - 10, 25);
         
         renderGL->SetColor(1.0f, 1.0f, 1.0f);
         renderGL->SetFont("basic", 12);
-        renderGL->Print(10, this->_app->GetScreenHeight() - 22, (this->_currentConsoleInput.str() + "_").c_str());
+        renderGL->Print(10, windowSize.y - 22, (this->_currentConsoleInput.str() + "_").c_str());
     }
     
 #ifndef _PLATFORM_WIN32

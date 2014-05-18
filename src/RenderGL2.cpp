@@ -93,7 +93,8 @@ namespace Engine {
             glDisable(GL_DEPTH_TEST);
             glLoadIdentity();
             Application* app = GetAppSingilton();
-            glOrtho(0, app->GetScreenWidth(), app->GetScreenHeight(), 0, 1, -1);
+            glm::vec2 windowSize = app->GetWindow()->GetWindowSize();
+            glOrtho(0, windowSize.x, windowSize.y, 0, 1, -1);
             if (Config::GetBoolean("core.render.halfPix")) {
                 glTranslatef(0.5f, 0.5f, 0.0f);
             }

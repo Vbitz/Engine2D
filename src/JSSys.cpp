@@ -278,8 +278,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the new X size of the window");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the new Y size of the window");
             
-            GetAppSingilton()->SetScreenSize(   ENGINE_GET_ARG_INT32_VALUE(0),
-                                                ENGINE_GET_ARG_INT32_VALUE(1));
+            GetAppSingilton()->GetWindow()->SetWindowSize(glm::vec2(   ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1)));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

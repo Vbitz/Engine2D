@@ -56,9 +56,6 @@ namespace Engine {
         bool IsDelayedConfig(std::string configKey);
         
         // Public window functions
-        int GetScreenWidth();
-        int GetScreenHeight();
-        void SetScreenSize(int width, int height);
         Window* GetWindow();
         bool GetKeyPressed(int key);
         void UpdateScreen();

@@ -811,18 +811,6 @@ namespace Engine {
     bool Application::IsDelayedConfig(std::string configKey) {
         return this->_delayedConfigs.count(configKey) != 0;
     }
-	
-	int Application::GetScreenWidth() {
-		return this->_window->GetWindowSize().x;
-	}
-	
-	int Application::GetScreenHeight() {
-		return this->_window->GetWindowSize().y;
-	}
-
-    void Application::SetScreenSize(int width, int height) {
-        this->_window->SetWindowSize(glm::vec2(width, height));
-    }
     
     Window* Application::GetWindow() {
         return this->_window;
