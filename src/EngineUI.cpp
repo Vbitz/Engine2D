@@ -55,6 +55,10 @@ namespace Engine {
     
     EngineUI::EngineUI(Application* app) : _app(app) {
         this->_draw = new Draw2D(app->GetRender());
+        
+        for (int i = 0; i < 100; i++) {
+            this->_lastDrawTimes[i] = 0.0f;
+        }
     }
     
     void EngineUI::Draw() {
