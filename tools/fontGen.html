@@ -11,9 +11,10 @@
 	</style>
 </head>
 <body>
-	<canvas id="fontTarget" width="512" height="256"></canvas>
+	<canvas id="fontTarget" width="512" height="512"></canvas>
 	<textarea id="fontDataOutput" width="512" height="256"></textarea>
 	<a href="#" onclick="saveImage();">Save Image</a>
+	<div id="fontSizeOptions"></div>
 	<script type="text/javascript">
 	var PADDING = 8;
 
@@ -21,44 +22,60 @@
 	var ctx = canvas.getContext("2d");
 	var outputPane = document.querySelector("#fontDataOutput");
 
-	function render(fontSize, fontName, chrBegin, chrEnd) {
+	var fontSizes = [32, 24, 10, 8];
+
+	function render(fontName, chrBegin, chrEnd) {
 		var fontData = {
 			texture: fontName.toLowerCase().replace(/ /g, "_") + ".png",
-			baseSize: fontSize,
 			charactorCount: chrEnd - chrBegin,
-			charactors: []
+			sizes: {}
 		};
-		//ctx.translate(0.5, 0.5);
-		ctx.clearRect(0, 0, ctx.width, ctx.height);
-		ctx.width = 512;
-		ctx.height = 256;
+		ctx.translate(0.5, 0.5);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.width = canvas.width;
+		ctx.height = canvas.height;
 
-		var x = PADDING;
-		var y = fontSize;
+		var x = 0;
+		var y = 0;
 
-		ctx.fillStyle = "#fff";
-		ctx.strokeStyle = "#ff0";
-		ctx.font = fontSize.toString(10) + "px \"" + fontName + "\"";
-
-		for (var i = chrBegin; i < chrEnd; i++) {
-			var chr = String.fromCharCode(i);
-			var chrSize = ctx.measureText(chr);
-			console.log(chrSize.width);
-			if ((x + chrSize.width + PADDING) > ctx.width) {
-				x = PADDING;
-				y += fontSize + PADDING;
+		for (var z = 0; z < fontSizes.length; z++) {
+			if (!document.querySelector("#size-" + fontSizes[z].toString(10)).checked){
+				console.log(document.querySelector("#size-" + fontSizes[z].toString(10)));
+				continue;
 			}
-			ctx.fillText(chr, x, y);
-			chr = {
-				width: chrSize.width,
-				x1: x / ctx.width,
-				y1: (y - fontSize + PADDING) / ctx.height,
-				x2: (x + chrSize.width) / ctx.width,
-				y2: ((y - fontSize + PADDING) + fontSize) / ctx.height
-			};
-			//xctx.strokeRect(chr.x1 * ctx.width, chr.y1 * ctx.height, (chr.x2 * ctx.width) - (chr.x1 * ctx.width), (chr.y2 * ctx.height) - (chr.y1 * ctx.height));
-			fontData.charactors[i] = chr;
-			x += chrSize.width + PADDING;
+
+			var fontSize = fontSizes[z];
+
+			console.log("Rendering: " + fontSize);
+
+			x = PADDING;
+			y += fontSize + PADDING;
+
+			fontData.sizes[fontSize] = [];
+
+			ctx.fillStyle = "#fff";
+			ctx.strokeStyle = "#ff0";
+			ctx.font = fontSize.toString(10) + "px \"" + fontName + "\"";
+
+			for (var i = chrBegin; i < chrEnd; i++) {
+				var chr = String.fromCharCode(i);
+				var chrSize = ctx.measureText(chr);
+				if ((x + chrSize.width + PADDING) > ctx.width) {
+					x = PADDING;
+					y += fontSize + PADDING;
+				}
+				ctx.fillText(chr, x, y + (z * 2));
+				chr = {
+					width: chrSize.width,
+					x1: x / ctx.width,
+					y1: (y - fontSize + PADDING) / ctx.height,
+					x2: (x + chrSize.width) / ctx.width,
+					y2: ((y - fontSize + PADDING) + fontSize) / ctx.height
+				};
+				//ctx.strokeRect(chr.x1 * ctx.width, chr.y1 * ctx.height, (chr.x2 * ctx.width) - (chr.x1 * ctx.width), (chr.y2 * ctx.height) - (chr.y1 * ctx.height));
+				fontData.sizes[fontSize][i] = chr;
+				x += chrSize.width + PADDING;
+			}
 		}
 
 		outputPane.value = JSON.stringify(fontData, 0, '\t');
@@ -68,7 +85,23 @@
 		document.location = canvas.toDataURL();
 	}
 
-	render(32, "Source Sans Pro", 0, 128);
+	function bodyLoaded() {
+		var fontSizeContainer = document.querySelector("#fontSizeOptions");
+		fontSizes.forEach(function (s) {
+			var eleLabel = document.createElement("label");
+			eleLabel.setAttribute("for", "size-" + s.toString(10));
+			eleLabel.textContent = s.toString(10) + "px";
+			fontSizeContainer.appendChild(eleLabel);
+			var ele = document.createElement("input");
+			ele.type = "checkbox";
+			ele.id = "size-" + s.toString(10);
+			ele.checked = true;
+			fontSizeContainer.appendChild(ele);
+		});
+	}
+
+	bodyLoaded();
+	render("Source Sans Pro", 0, 128);
 	</script>
 </body>
 </html>

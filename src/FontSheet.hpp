@@ -17,6 +17,13 @@ namespace Engine {
         }
     };
     
+    struct FontSize {
+        int size;
+        std::vector<FontRectangle> chars;
+    };
+    
+    typedef FontSize& FontSizeRef;
+    
     class FontSheet {
     public:
         FontSheet(Json::Value root, std::string basePath);
@@ -28,8 +35,11 @@ namespace Engine {
         Texture* _texture;
         float _baseSize;
         int _charCount;
-        std::vector<FontRectangle> _chars;
+        std::map<int, FontSize> _sizes;
         
+        FontSizeRef _getBestSize(int charSize);
+        
+        void _loadSize(int size, int charCount, Json::Value sizeRoot);
         void _load(Json::Value root, std::string basePath);
     };
     
