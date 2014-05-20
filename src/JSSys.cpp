@@ -469,7 +469,8 @@ namespace Engine {
         ENGINE_JS_METHOD(GC) {
             ENGINE_JS_SCOPE_OPEN;
             
-            v8::V8::IdleNotification(200); // recomend a full GC (the internals which I've gone through
+            // This function crashes the current version of V8
+            //v8::V8::IdleNotification(200); // recomend a full GC (the internals which I've gone through
                 // say that at the moment this will recomend a full GC but the value is just a hint.)
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
