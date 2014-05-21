@@ -210,7 +210,7 @@ def build_env():
 
 @command(requires=["build_env"], usage="Runs the engine in Development Mode")
 def run():
-	shell_command(["-devmode", "-debug"]);
+	run_engine(["-devmode", "-debug"]);
 
 @command(requires=["build_env"], usage="Runs the engine in Test Mode")
 def test():
