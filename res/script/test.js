@@ -207,7 +207,10 @@ for (var i = 0; i < mImgA.length; i += 4) {
 
 var mImg = mImg ? mImg : draw.createImage(mImgA, 128, 128);
 
-var spriteSheet = spriteSheet ? spriteSheet : draw.openSpriteSheet("texture/spriteTest.json");
+var spriteSheet = spriteSheet ? spriteSheet : (function () {
+	console.log("Loading Sprite Sheet");
+	return draw.openSpriteSheet("texture/spriteTest.json");
+})();
 
 var t = 0;
 

@@ -415,6 +415,7 @@ namespace Engine {
         Config::SetNumber(  "core.debug.v8Debug.port",              5858);
         Config::SetBoolean( "core.debug.slowload",                  false);
         Config::SetBoolean( "core.render.halfPix",                  false);
+        Config::SetNumber(  "core.test.testFrames",                 0);
     }
     
     EventMagic Application::_config_CoreRenderAA(Json::Value args) {
@@ -1122,8 +1123,8 @@ namespace Engine {
                 }
             }
             
-            Profiler::StartProfileFrame();
             FramePerfMonitor::BeginFrame();
+            Profiler::StartProfileFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
             Events::PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
             this->_processScripts();
@@ -1203,6 +1204,10 @@ namespace Engine {
                     Logger::begin("Profiler", Logger::LogLevel_Log)
                     << "Saved Profiler Report as: " << Filesystem::GetRealPath(_detailFilename) << Logger::end();
                 }
+            }
+            
+            if (this->_testMode && this->_frames++ > Config::GetInt("core.test.testFrames")) {
+                this->Exit();
             }
             
             FramePerfMonitor::EndFrame();
@@ -1293,6 +1298,9 @@ namespace Engine {
         if (this->_testMode) {
             this->_loadTests();
             TestSuite::Run();
+            if (Config::GetInt("core.test.testFrames") > 0) {
+                this->_mainLoop();
+            }
         } else {
             // Let's get this going
             this->_mainLoop();

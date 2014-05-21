@@ -72,6 +72,9 @@ def shell_command(cmd, throw=True):
 	else:
 		subprocess.call(cmd);
 
+def run_engine(args):
+	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name())] + args);
+
 def get_git_hash():
 	# check for .git folder
 	return subprocess.check_output(["git", "rev-parse", "HEAD"])[:7];
@@ -207,23 +210,14 @@ def build_env():
 
 @command(requires=["build_env"], usage="Runs the engine in Development Mode")
 def run():
-	shell_command([
-			resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
-			"-devmode",
-			"-debug"
-		]);
+	shell_command(["-devmode", "-debug"]);
 
 @command(requires=["build_env"], usage="Runs the engine in Test Mode")
 def test():
-	shell_command([
-			resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
-			"-test"
-		]);
-	shell_command([
-			resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
-			"-test",
-			"-Ccore.render.openGL=2.0"
-		]);
+	run_engine(["-test"]);
+	run_engine(["-test", "-Ccore.render.openGL=2.0"]);
+	run_engine(["-test", "-Ccore.test.testFrames=100"]);
+	#run_engine(["-test", "-Ccore.render.openGL=2.0", "-Ccore.test.testFrames=100"]); # broken due to bug in SprieSheets
 
 @command(usage="Build documentation using jsdoc")
 def doc():

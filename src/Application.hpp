@@ -184,6 +184,8 @@ namespace Engine {
         
         std::queue<RawScriptInfo> _pendingScripts;
         std::unordered_map<std::string, ScriptInfo> _scripts;
+        
+        long _frames = 0;
     };
     
     Application* GetAppSingilton();
