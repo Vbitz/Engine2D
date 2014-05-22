@@ -204,14 +204,6 @@ namespace Engine {
         int _centerY = 0;
         
         int _currentVerts = 0;
-        
-        GLenum _currentMode = 0;
-        
-        EffectParameters* _currentEffect;
-        
-        Texture* _defaultTexture;
-        
-        Texture* _currentTexture = NULL;
     };
     
     RenderDriver* CreateRenderGL2() {
