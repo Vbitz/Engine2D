@@ -168,13 +168,15 @@ namespace Engine {
         }
         
         void FlushAll() override {
-            static GL3Buffer buf(this, this->_currentEffect); // temporory
+            if (this->_gl3Buffer == NULL) {
+                this->_gl3Buffer = new GL3Buffer(this, this->_currentEffect);
+            }
             
             if (_currentVerts == 0) {
                 return; // nothing to draw
             }
             
-            if (buf.Update()) {
+            if (this->_gl3Buffer->Update()) {
                 Logger::begin("RenderGL3", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
             }
             
@@ -185,9 +187,9 @@ namespace Engine {
                 _currentTexture = _defaultTexture;
                 _currentTexture->Begin();
             }
-            buf.Upload((float*) _buffer, _currentVerts * sizeof(BufferFormat));
+            this->_gl3Buffer->Upload((float*) _buffer, _indexBuffer, _currentVerts, sizeof(BufferFormat));
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
-            buf.Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
+            this->_gl3Buffer->Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
             
             _currentTexture->End();
             
@@ -267,6 +269,7 @@ namespace Engine {
             _buffer[_currentVerts].pos = glm::vec3(x - _centerX, y - _centerY, z);
             _buffer[_currentVerts].col = col;
             _buffer[_currentVerts].uv = glm::vec2(s, t);
+            _indexBuffer[_currentVerts] = _currentVerts;
             _currentVerts++;
         }
         
@@ -303,14 +306,17 @@ namespace Engine {
         };
         
         BufferFormat _buffer[BUFFER_SIZE];
+        ushort _indexBuffer[BUFFER_SIZE];
         
         GLenum _currentMode = 0;
         
         EffectParameters* _currentEffect;
         
-        Texture* _defaultTexture;
+        Texture* _defaultTexture = NULL;
         
         Texture* _currentTexture = NULL;
+        
+        GL3Buffer* _gl3Buffer = NULL;
         
         glm::mat4 _currentModelMatrix;;
     };

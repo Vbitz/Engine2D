@@ -363,7 +363,7 @@ void GLFT_Font::drawText(float x, float y, const std::string& str) const
     glPopMatrix();
 }
 
-void AddVert(float* _buffer, int _currentVerts, float x, float y, float r, float g, float b, float s, float t) {
+void AddVert(float* _buffer, ushort* _indexBuffer, int _currentVerts, float x, float y, float r, float g, float b, float s, float t) {
     _buffer[_currentVerts * 9 + 0] = x;
     _buffer[_currentVerts * 9 + 1] = y;
     _buffer[_currentVerts * 9 + 2] = 0.0f;
@@ -375,6 +375,7 @@ void AddVert(float* _buffer, int _currentVerts, float x, float y, float r, float
         
     _buffer[_currentVerts * 9 + 7] = s;
     _buffer[_currentVerts * 9 + 8] = t;
+    _indexBuffer[_currentVerts] = _currentVerts;
 }
 
 void GLFT_Font::drawTextGL3(float x, float y, Engine::RenderDriver* render, Engine::EffectParameters* effect, float colR, float colG, float colB, const std::string& str) const {
@@ -396,6 +397,7 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::RenderDriver* render, Engi
     glBindTexture(GL_TEXTURE_2D, texID_);
     
     float* dbuf = new float[str.length() * 6 * 9];
+    ushort* ibuf = new ushort[str.length() * 6];
     
     int verts = 0;
     
@@ -410,16 +412,16 @@ void GLFT_Font::drawTextGL3(float x, float y, Engine::RenderDriver* render, Engi
             c = _chars.at(ch);
         }
         
-        AddVert(dbuf, verts++, xPos,            y,            colR, colG, colB, c.Tex1, c.Tex3);
-        AddVert(dbuf, verts++, xPos + c.Width,  y,            colR, colG, colB, c.Tex2, c.Tex3);
-        AddVert(dbuf, verts++, xPos + c.Width,  y + c.Height, colR, colG, colB, c.Tex2, c.Tex4);
-        AddVert(dbuf, verts++, xPos,            y,            colR, colG, colB, c.Tex1, c.Tex3);
-        AddVert(dbuf, verts++, xPos,            y + c.Height, colR, colG, colB, c.Tex1, c.Tex4);
-        AddVert(dbuf, verts++, xPos + c.Width,  y + c.Height, colR, colG, colB, c.Tex2, c.Tex4);
+        AddVert(dbuf, ibuf, verts++, xPos,            y,            colR, colG, colB, c.Tex1, c.Tex3);
+        AddVert(dbuf, ibuf, verts++, xPos + c.Width,  y,            colR, colG, colB, c.Tex2, c.Tex3);
+        AddVert(dbuf, ibuf, verts++, xPos + c.Width,  y + c.Height, colR, colG, colB, c.Tex2, c.Tex4);
+        AddVert(dbuf, ibuf, verts++, xPos,            y,            colR, colG, colB, c.Tex1, c.Tex3);
+        AddVert(dbuf, ibuf, verts++, xPos,            y + c.Height, colR, colG, colB, c.Tex1, c.Tex4);
+        AddVert(dbuf, ibuf, verts++, xPos + c.Width,  y + c.Height, colR, colG, colB, c.Tex2, c.Tex4);
         xPos += c.Width;
     }
     
-    buf.Upload(dbuf, verts * 9 * sizeof(float));
+    buf.Upload(dbuf, ibuf, verts, 9);
     buf.Draw(GL_TRIANGLES, glm::mat4(), glm::mat4(), verts);
     
     glBindTexture(GL_TEXTURE_2D, 0);
