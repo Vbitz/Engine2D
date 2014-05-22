@@ -96,9 +96,10 @@ namespace Engine {
             void Emit(std::function<bool(Json::Value)> filter, Json::Value args);
             void Emit(Json::Value args);
             void Emit();
-            void AddListener(std::string name, EventTarget* target);
+            EventClass* AddListener(std::string name, EventTarget* target);
             void Clear(std::string eventID);
-            void SetDefered(bool defered);
+            EventClass* SetDefered(bool defered);
+            EventClass* SetNoScript(bool noScript);
             void PollDeferedMessages();
             void AddDeferedMessage(Json::Value e);
             

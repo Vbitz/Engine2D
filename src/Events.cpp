@@ -163,7 +163,7 @@ namespace Engine {
             this->Emit(emptyFilter, Json::nullValue);
         }
         
-        void EventClass::AddListener(std::string name, EventTarget* target) {
+        EventClass* EventClass::AddListener(std::string name, EventTarget* target) {
             for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
                 if (iter->Label == name) {
                     delete iter->Target;
@@ -172,6 +172,7 @@ namespace Engine {
                 }
             }
             this->_events.push_back(Event(name, target));
+            return this;
         }
         
         void EventClass::Clear(std::string eventID) {
@@ -182,8 +183,14 @@ namespace Engine {
             }
         }
         
-        void EventClass::SetDefered(bool defered) {
+        EventClass* EventClass::SetDefered(bool defered) {
             this->_alwaysDefered = defered;
+            return this;
+        }
+        
+        EventClass* EventClass::SetNoScript(bool noScript) {
+            this->Security.NoScript = noScript;
+            return this;
         }
         
         void EventClass::PollDeferedMessages() {

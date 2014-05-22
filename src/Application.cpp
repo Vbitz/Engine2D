@@ -501,16 +501,11 @@ namespace Engine {
         Events::GetEvent("exit")->AddListener("Application::_appEvent_Exit", Events::MakeTarget(_appEvent_Exit));
         Events::GetEvent("dumpScripts")->AddListener("Applicaton::_appEvent_DumpScripts", Events::MakeTarget(_appEvent_DumpScripts));
         
-        Events::GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", Events::MakeTarget(_toggleFullscreen));
-        Events::GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", Events::MakeTarget(_restartRenderer));
-        Events::GetEvent("screenshot")->AddListener("Application::_saveScreenshot", Events::MakeTarget(_saveScreenshot));
-        Events::GetEvent("dumpProfile")->AddListener("Application::_dumpProfile", Events::MakeTarget(_dumpProfile));
+        Events::GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", Events::MakeTarget(_toggleFullscreen))->SetDefered(true);
+        Events::GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", Events::MakeTarget(_restartRenderer))->SetDefered(true);
+        Events::GetEvent("screenshot")->AddListener("Application::_saveScreenshot", Events::MakeTarget(_saveScreenshot))->SetDefered(true);
+        Events::GetEvent("dumpProfile")->AddListener("Application::_dumpProfile", Events::MakeTarget(_dumpProfile))->SetDefered(true);
         Events::GetEvent("dumpLog")->AddListener("Application::_dumpLog", Events::MakeTarget(_dumpLog));
-        
-        Events::GetEvent("toggleFullscreen")->SetDefered(true);
-        Events::GetEvent("restartRenderer")->SetDefered(true);
-        Events::GetEvent("screenshot")->SetDefered(true);
-        Events::GetEvent("dumpProfile")->SetDefered(true);
     }
 	
     void _resizeWindow(Json::Value val) {
