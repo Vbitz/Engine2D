@@ -22,6 +22,7 @@
 #include "RenderDriver.hpp"
 
 #include "Application.hpp"
+#include "FontSheet.hpp"
 
 namespace Engine {
     void RenderDriver::AddVert(float x, float y, float z) {
@@ -38,6 +39,14 @@ namespace Engine {
     
     void RenderDriver::AddVert(float x, float y, float z, Color4f col, float s, float t) {
         this->_addVert(x, y, z, col, s, t);
+    }
+    
+    void RenderDriver::Print(float x, float y, const char* string) {
+        if (this->_usingNeoFont()) {
+            this->_printNeo(x, y, string);
+        } else {
+            this->_printFT(x, y, string);
+        }
     }
     
     float RenderDriver::CalcStringWidth(std::string str) {
@@ -104,5 +113,15 @@ namespace Engine {
     
     void RenderDriver::SetColor(float r, float g, float b, float a) {
         this->_currentColor = Color4f(r, g, b, a);
+    }
+    
+    void RenderDriver::_printNeo(float x, float y, const char* string) {
+        static FontSheet* _sheet = NULL;
+        
+        if (_sheet == NULL) {
+            _sheet = FontSheetReader::LoadFont("fonts/source_sans_pro.json");
+        }
+        
+        _sheet->DrawText(this, x, y, this->_currentFontSize, string);
     }
 }

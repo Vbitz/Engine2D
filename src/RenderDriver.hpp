@@ -24,6 +24,7 @@
 #include "stdlib.hpp"
 
 #include "RenderTypes.hpp"
+#include "Config.hpp"
 
 namespace Engine {
     class Texture;
@@ -64,7 +65,7 @@ namespace Engine {
         virtual void EnableSmooth() = 0;
         virtual void DisableSmooth() = 0;
         
-        virtual void Print(float x, float y, const char* string) = 0;
+        void Print(float x, float y, const char* string);
         
         float CalcStringWidth(std::string str);
         void SetFont(std::string name, int fontSize);
@@ -99,9 +100,16 @@ namespace Engine {
         virtual void CameraRotate(float r) = 0;
     
     protected:
+        virtual void _printFT(float x, float y, const char* string) = 0;
+        void _printNeo(float x, float y, const char* string);
+        
         virtual void _clearColor(Color4f col) = 0;
         virtual void _addVert(float x, float y, float z, Color4f col, float s, float t) = 0;
 		Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+        
+        inline bool _usingNeoFont() {
+            return Config::GetBoolean("core.render.neoFont");
+        }
         
         std::string _currentFontName = "basic";
         int _currentFontSize = 16;

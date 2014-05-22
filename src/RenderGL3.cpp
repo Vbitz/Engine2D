@@ -167,18 +167,6 @@ namespace Engine {
             glDisable(GL_POLYGON_SMOOTH);
         }
         
-        void Print(float x, float y, const char* string) override {
-            FlushAll();
-                
-            GLFT_Font* drawingFont = GetAppSingilton()->GetFont(this->_currentFontName, this->_currentFontSize);
-            
-            drawingFont->drawTextGL3(x - this->_centerX, y - this->_centerY,
-                                         this, this->_currentEffect,
-                                         this->_currentColor.r, this->_currentColor.g, this->_currentColor.b, string);
-            
-            CheckError("RenderGL3::Print::PostGL3Print");
-        }
-        
         void FlushAll() override {
             static GL3Buffer buf(this, this->_currentEffect); // temporory
             
@@ -281,6 +269,19 @@ namespace Engine {
             _buffer[_currentVerts].uv = glm::vec2(s, t);
             _currentVerts++;
         }
+        
+        void _printFT(float x, float y, const char* string) override {
+            FlushAll();
+            
+            GLFT_Font* drawingFont = GetAppSingilton()->GetFont(this->_currentFontName, this->_currentFontSize);
+            
+            drawingFont->drawTextGL3(x - this->_centerX, y - this->_centerY,
+                                     this, this->_currentEffect,
+                                     this->_currentColor.r, this->_currentColor.g, this->_currentColor.b, string);
+            
+            CheckError("RenderGL3::Print::PostGL3Print");
+        }
+        
     private:
         int _centerX = 0;
         int _centerY = 0;

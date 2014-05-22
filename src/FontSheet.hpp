@@ -5,6 +5,8 @@
 #include "TextureLoader.hpp"
 
 namespace Engine {
+    class Texture;
+    
     struct FontRectangle {
         float width, x1, y1, x2, y2;
         

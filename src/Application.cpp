@@ -416,6 +416,7 @@ namespace Engine {
         Config::SetBoolean( "core.debug.slowload",                  false);
         Config::SetBoolean( "core.render.halfPix",                  false);
         Config::SetNumber(  "core.test.testFrames",                 0);
+        Config::SetBoolean( "core.render.neoFont",                  false);
     }
     
     EventMagic Application::_config_CoreRenderAA(Json::Value args) {

@@ -32,7 +32,7 @@ namespace Engine {
     class Texture {
     public:
         Texture();
-        Texture(RenderDriver* render, GLuint textureID);
+        Texture(RenderDriver* render, uint textureID);
         ~Texture();
         
         void Invalidate();
@@ -48,11 +48,11 @@ namespace Engine {
         int GetHeight();
         
     private:
-        void _setTextureID(GLuint textureID);
-        void _setTextureID(GLuint textureID, bool deleteOld);
+        void _setTextureID(uint textureID);
+        void _setTextureID(uint textureID, bool deleteOld);
         
         RenderDriver* _render;
-        GLuint _textureID = UINT_MAX;
+        uint _textureID = UINT_MAX;
         int _width, _height;
     };
     
@@ -60,10 +60,10 @@ namespace Engine {
         Texture* TextureFromFileBuffer(unsigned char* texture, long bufferLength);
         
         Texture* TextureFromBuffer(unsigned char* texture, int width, int height);
-        Texture* TextureFromBuffer(GLuint textureID, unsigned char* texture, int width, int height);
+        Texture* TextureFromBuffer(uint textureID, unsigned char* texture, int width, int height);
 
         Texture* TextureFromBuffer(float* texture, int width, int height);
-        Texture* TextureFromBuffer(GLuint textureID, float* texture, int width, int height);
+        Texture* TextureFromBuffer(uint textureID, float* texture, int width, int height);
         
         ResourceManager::ImageResource* TextureFromFile(std::string filename);
     }
