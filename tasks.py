@@ -218,6 +218,7 @@ def test():
 	run_engine(["-test", "-Ccore.render.openGL=2.0"]);
 	run_engine(["-test", "-Ccore.test.testFrames=100"]);
 	#run_engine(["-test", "-Ccore.render.openGL=2.0", "-Ccore.test.testFrames=100"]); # broken due to bug in SprieSheets
+	run_engine(["-test", "-Ccore.render.neoFont=true", "-Ccore.test.testFrames=100"]);
 
 @command(usage="Build documentation using jsdoc")
 def doc():
