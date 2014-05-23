@@ -346,33 +346,39 @@ namespace Engine {
             
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
+        
+        bool _setColor(v8::Isolate* isolate, Draw2D* draw2D, v8::Local<v8::Value> value) {
+            if (value->IsNumber()) {
+                int col = value.As<v8::Number>()->NumberValue();
+                
+                if (col > (256 * 256 * 256))
+                {
+                    return false;
+                }
+                
+                draw2D->GetRender()->SetColor(col); // yay now draw2d handles it
+                return true;
+            } else if (value->IsString()) {
+                draw2D->GetRender()->SetColor(std::string(*v8::String::Utf8Value(value)));
+                return true;
+            } else if (value->IsObject()) {
+                v8::Local<v8::Object> obj = value.As<v8::Object>();
+                double r = obj->Get(v8::String::NewFromUtf8(isolate, "r"))->NumberValue();
+                double g = obj->Get(v8::String::NewFromUtf8(isolate, "g"))->NumberValue();
+                double b = obj->Get(v8::String::NewFromUtf8(isolate, "b"))->NumberValue();
+                draw2D->GetRender()->SetColor(r, g, b);
+                return true;
+            } else {
+                return false;
+            }
+        }
 		
 		ENGINE_JS_METHOD(SetColor) {
             ENGINE_JS_SCOPE_OPEN;
             
             ENGINE_CHECK_ARGS_LENGTH(1);
             
-            if (args[0]->IsNumber()) {
-                int col = ENGINE_GET_ARG_INT32_VALUE(0);
-                
-                if (col > (256 * 256 * 256))
-                {
-                    ENGINE_THROW_ARGERROR("Arg0 is beyond 0xffffff");
-                    ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-                }
-                
-                GetDraw2D(args.This())->GetRender()->SetColor(col); // yay now draw2d handles it
-            } else if (args[0]->IsString()) {
-                GetDraw2D(args.This())->GetRender()->SetColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            } else if (args[0]->IsObject()) {
-                v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
-                double r = obj->Get(v8::String::NewFromUtf8(args.GetIsolate(), "r"))->NumberValue();
-                double g = obj->Get(v8::String::NewFromUtf8(args.GetIsolate(), "g"))->NumberValue();
-                double b = obj->Get(v8::String::NewFromUtf8(args.GetIsolate(), "b"))->NumberValue();
-                GetDraw2D(args.This())->GetRender()->SetColor(r, g, b);
-            } else {
-                ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb) or a object with r,g,b propertys");
-            }
+            _setColor(args.GetIsolate(), GetDraw2D(args.This()), args[0]);
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
@@ -393,20 +399,23 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
         
-        ENGINE_JS_METHOD(GetColor) {
-            ENGINE_JS_SCOPE_OPEN;
+        v8::Local<v8::Value> _getColor(v8::Isolate* isolate, Draw2D* draw) {
+            v8::Local<v8::Object> ret = v8::Object::New(isolate);
             
-            v8::Isolate* isolate = args.GetIsolate();
-            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
-            
-            Color4f col = GetDraw2D(args.This())->GetRender()->GetColor();
+            Color4f col = draw->GetRender()->GetColor();
             
             ret->Set(v8::String::NewFromUtf8(isolate, "r"), v8::Number::New(isolate, col.r));
             ret->Set(v8::String::NewFromUtf8(isolate, "g"), v8::Number::New(isolate, col.g));
             ret->Set(v8::String::NewFromUtf8(isolate, "b"), v8::Number::New(isolate, col.b));
             ret->Set(v8::String::NewFromUtf8(isolate, "a"), v8::Number::New(isolate, col.b));
             
-            ENGINE_JS_SCOPE_CLOSE(ret);
+            return ret;
+        }
+        
+        ENGINE_JS_METHOD(GetColor) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_JS_SCOPE_CLOSE(_getColor(args.GetIsolate(), GetDraw2D(args.This())));
         }
         
         ENGINE_JS_METHOD(GetRGBFromHSV) {
@@ -1117,6 +1126,14 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
+            void DrawColorGetter(v8::Local<v8::String> prop, const v8::PropertyCallbackInfo<v8::Value>& info) {
+                info.GetReturnValue().Set(_getColor(info.GetIsolate(), GetDraw2D(info.Holder())));
+            }
+            
+            void DrawColorSetter(v8::Local<v8::String> prop, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info) {
+                _setColor(info.GetIsolate(), GetDraw2D(info.Holder()), value);
+            }
+            
 #define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
             
             void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
@@ -1166,6 +1183,8 @@ namespace Engine {
                 addItem(drawTable, "isFontLoaded", IsFontLoaded);
                 
                 addItem(drawTable, "setCenter", SetCenter);
+                
+                drawTable->SetAccessor(v8::String::NewFromUtf8(isolate, "drawColor"), DrawColorGetter, DrawColorSetter);
             }
             
 #undef addItem

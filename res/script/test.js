@@ -288,11 +288,11 @@ sys.on("draw", "test.draw", function () {
 	}
 
 	draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
-	draw.setColor("black");
+	draw.drawColor = "black";
 	draw.setFont("basic", 16);
 	draw.print(10, 35, "Engine2D Test Suite");
 
-	draw.setColor("white");
+	draw.drawColor = "white";
 	draw.print(10, 70, "Automated Tests");
 	draw.print(400, 70, "Rendering Tests");
 
@@ -300,17 +300,17 @@ sys.on("draw", "test.draw", function () {
 	var x = 2;
 	for (var i in testResults) {
 		if (testResults[i]) {
-			draw.setColor("green");
+			draw.drawColor = "green";
 		} else {
-			draw.setColor("red");
+			draw.drawColor = "red";
 		}
 		draw.rect(15, x * 30 + 35, 220, 20);
-		draw.setColor("black");
+		draw.drawColor = "black";
 		draw.print(20, x * 30 + 40, i);
 		x++;
 	}
 
-	draw.setColor(0xffffff);
+	draw.drawColor = 0xffffff;
 	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + supportsFramebuffer);
 	draw.print(10, x++ * 30 + 40, "Number of Processers: " + sys.numProcessers);
 
@@ -329,17 +329,17 @@ sys.on("draw", "test.draw", function () {
 	draw.grad(770, 120, 100, 100, 0xffffff, 0x000000, false);
 
 	draw.print(400, 240, "PNG Image");
-	draw.setColor("white");
+	draw.drawColor = "white";
 	draw.draw(img, 410, 270, 100, 100);
 
 	draw.print(520, 240, "Gen Image");
 	draw.drawSub(img2, 530, 270, 100, 100, t, t += 0.1, 16, 16);
 
 	draw.print(640, 240, "Tinted Image");
-	draw.setColor(Math.floor(Math.random() * 255 * 255 * 255));
+	draw.drawColor = Math.floor(Math.random() * 255 * 255 * 255);
 	draw.draw(img, 650, 270, 100, 100);
 
-	draw.setColor("white");
+	draw.drawColor = "white";
 	draw.print(760, 240, "Circle");
 	draw.circle(770 + 50, 270 + 50, 50, 40, 200, 0.1, 1.0, true);
 
