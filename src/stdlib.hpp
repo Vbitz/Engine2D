@@ -42,6 +42,7 @@ namespace Engine {
         Color4f(float r, float g, float b, float a);
         
         static void SetDefinedColor(std::string name, int col);
+        static Color4f FromHSV(float h, float s, float v);
         
         float r, g, b, a;
         

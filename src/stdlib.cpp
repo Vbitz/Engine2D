@@ -62,6 +62,43 @@ namespace Engine {
         _predefinedColors[name] = col;
     }
     
+    Color4f Color4f::FromHSV(float hue, float saturation, float value) {
+        double hh, p, q, t, ff;
+        long i;
+        
+        if(saturation <= 0.0) {    // < is bogus, just shuts up warnings
+            if(std::isnan(hue)) {  // in.h == NAN
+                return Color4f(value, value, value, 1.0f);
+            }
+            // error - should never happen
+            return Color4f(0.0f, 0.0f, 0.0f, 1.0f);
+        }
+        hh = hue;
+        if(hh >= 360.0) hh = 0.0;
+        hh /= 60.0;
+        i = (long)hh;
+        ff = hh - i;
+        p = value * (1.0 - saturation);
+        q = value * (1.0 - (saturation * ff));
+        t = value * (1.0 - (saturation * (1.0 - ff)));
+        
+        switch(i) {
+            case 0:
+                return Color4f(value, t, p, 1.0f);
+            case 1:
+                return Color4f(q, value, p, 1.0f);
+            case 2:
+                return Color4f(p, value, t, 1.0f);
+            case 3:
+                return Color4f(p, q, value, 1.0f);
+            case 4:
+                return Color4f(t, p, value, 1.0f);
+            case 5:
+            default:
+                return Color4f(value, p, q, 1.0f);
+        }
+    }
+    
     void Color4f::_initPredefinedColors() {
         static bool predefFilled = false;
         if (!predefFilled) {
