@@ -29,6 +29,11 @@ namespace Engine {
     
     class EngineUI {
     public:
+        enum CurrentView {
+            CurrentView_Console,
+            CurrentView_Settings
+        };
+        
         EngineUI(Application* app);
         
         void Draw();
@@ -44,6 +49,8 @@ namespace Engine {
     private:
         Application* _app;
         Draw2D* _draw;
+        
+        CurrentView _currentView = CurrentView_Console;
         
         std::stringstream _ss;
         

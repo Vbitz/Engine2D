@@ -34,6 +34,12 @@ namespace Engine {
             ConfigType_Unknown
         };
         
+        struct ConfigValue {
+            ConfigType type;
+            std::string key;
+            std::string value;
+        };
+        
         void EnableConfigEvents();
         
         void SetNumber(std::string key, int value);
@@ -51,5 +57,6 @@ namespace Engine {
         std::string GetString(std::string key);
         
         std::vector<std::string> GetAll();
+        std::vector<ConfigValue> GetAllUI();
     }
 }
