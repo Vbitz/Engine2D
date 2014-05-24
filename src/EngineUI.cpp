@@ -204,24 +204,39 @@ namespace Engine {
             Config::UIConfigCollection configItems = Config::GetAllUI();
             
             for (auto iter = configItems.begin(); iter != configItems.end(); iter++) {
+                
+                auto renderConfigItem = [&](int x) {
+                    // render key value
+                    renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                    renderGL->Print(x + 37, i + 2, iter->first.c_str());
+                    
+                    float textOffset = (x > 0 ? windowSize.x : (windowSize.x / 2)) - 55;
+                    
+                    if (iter->second.type == Config::ConfigType_Bool) {
+                        // render boolean checkbox
+                        if (iter->second.value == "true") {
+                            renderGL->SetColor(20 / 255.0f, 160 / 255.0f, 20 / 255.0f);
+                        } else {
+                            renderGL->SetColor(160 / 255.0f, 20 / 255.0f, 20 / 255.0f);
+                        }
+                        this->_draw->Rect(textOffset - 20, i + 2, 15, 15);
+                    } else {
+                        float valueLength = renderGL->CalcStringWidth(iter->second.value);
+                        renderGL->SetColor(160 / 255.0f, 160 / 255.0f, 160 / 255.0f);
+                        renderGL->Print(textOffset - valueLength, i + 2, iter->second.value.c_str());
+                    }
+                };
+                
                 renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
                 this->_draw->Rect(30, i, (windowSize.x / 2) - 70, 20);
                 this->_draw->Rect((windowSize.x / 2) + 30, i, (windowSize.x / 2) - 70, 20);
                 
-                // draw first config item
-                renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
-                renderGL->Print(37, i + 2, iter->first.c_str());
-                float valueLength = renderGL->CalcStringWidth(iter->second.value);
-                renderGL->Print((windowSize.x / 2) - 55 - valueLength, i + 2, iter->second.value.c_str());
+                renderConfigItem(0);
                 
                 iter++;
                 if (iter == configItems.end()) break;
                 
-                // draw second config item
-                renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
-                renderGL->Print((windowSize.x / 2) + 37, i + 2, iter->first.c_str());
-                valueLength = renderGL->CalcStringWidth(iter->second.value);
-                renderGL->Print(windowSize.x - 55 - valueLength, i + 2, iter->second.value.c_str());
+                renderConfigItem((windowSize.x / 2));
                 
                 i+= 22;
                 if (i > (windowSize.y - 20)) {

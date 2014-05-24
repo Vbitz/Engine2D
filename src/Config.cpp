@@ -168,7 +168,7 @@ namespace Engine {
                 ret[iter->first] = {ConfigType_Bool, (iter->second ? "true" : "false")};
             }
             for (auto iter = _stringCvars.begin(); iter != _stringCvars.end(); iter++) {
-                ret[iter->first] = {ConfigType_String, iter->second};
+                ret[iter->first] = {ConfigType_String, "\"" + iter->second + "\""};
             }
             return ret;
         }
