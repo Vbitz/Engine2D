@@ -159,16 +159,16 @@ namespace Engine {
             return true;
         }
         
-        std::vector<ConfigValue> GetAllUI() {
-            std::vector<ConfigValue> ret;
+        UIConfigCollection GetAllUI() {
+            UIConfigCollection ret;
             for (auto iter = _numberCvars.begin(); iter != _numberCvars.end(); iter++) {
-                ret.push_back({ConfigType_Number, iter->first, std::to_string(iter->second)});
+                ret[iter->first] = {ConfigType_Number, std::to_string(iter->second)};
             }
             for (auto iter = _boolCvars.begin(); iter != _boolCvars.end(); iter++) {
-                ret.push_back({ConfigType_Bool, iter->first, (iter->second ? "true" : "false")});
+                ret[iter->first] = {ConfigType_Bool, (iter->second ? "true" : "false")};
             }
             for (auto iter = _stringCvars.begin(); iter != _stringCvars.end(); iter++) {
-                ret.push_back({ConfigType_String, iter->first, iter->second});
+                ret[iter->first] = {ConfigType_String, iter->second};
             }
             return ret;
         }

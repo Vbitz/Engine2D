@@ -24,6 +24,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <map>
 
 namespace Engine {
     namespace Config {
@@ -36,9 +37,10 @@ namespace Engine {
         
         struct ConfigValue {
             ConfigType type;
-            std::string key;
             std::string value;
         };
+        
+        typedef std::map<std::string, ConfigValue> UIConfigCollection;
         
         void EnableConfigEvents();
         
@@ -57,6 +59,6 @@ namespace Engine {
         std::string GetString(std::string key);
         
         std::vector<std::string> GetAll();
-        std::vector<ConfigValue> GetAllUI();
+        UIConfigCollection GetAllUI();
     }
 }
