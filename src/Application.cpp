@@ -417,6 +417,7 @@ namespace Engine {
         Config::SetBoolean( "core.render.halfPix",                  false);
         Config::SetNumber(  "core.test.testFrames",                 0);
         Config::SetBoolean( "core.render.neoFont",                  false);
+        Config::SetString( "core.render.neoFontPath",               "fonts/open_sans.json");
     }
     
     EventMagic Application::_config_CoreRenderAA(Json::Value args) {

@@ -119,7 +119,8 @@ namespace Engine {
         static FontSheet* _sheet = NULL;
         
         if (_sheet == NULL) {
-            _sheet = FontSheetReader::LoadFont("fonts/source_sans_pro.json");
+            Logger::begin("RenderDriver", Logger::LogLevel_Verbose) << "Loading NeoFont: " << Config::GetString("core.render.neoFontPath") << Logger::end();
+            _sheet = FontSheetReader::LoadFont(Config::GetString("core.render.neoFontPath"));
         }
         
         _sheet->DrawText(this, x, y, this->_currentFontSize, string);

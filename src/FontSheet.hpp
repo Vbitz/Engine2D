@@ -36,6 +36,7 @@ namespace Engine {
     private:
         Texture* _texture;
         float _baseSize;
+        float _charSpacing = 0.0f;
         int _charCount;
         std::map<int, FontSize> _sizes;
         

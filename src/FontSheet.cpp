@@ -31,7 +31,7 @@ namespace Engine {
             render->AddVert(currentX, y, 0.0f, rect.x1, rect.y1);
             render->AddVert(currentX, y + chrHeight, 0.0f, rect.x1, rect.y2);
             render->AddVert(currentX + (chrWidth * rect.width), y + chrHeight, 0.0f, rect.x2, rect.y2);
-            currentX += (chrWidth * rect.width);
+            currentX += (chrWidth * rect.width) + this->_charSpacing;
         }
         render->EndRendering();
         render->DisableTexture();
@@ -87,6 +87,7 @@ namespace Engine {
         this->_texture = ImageReader::TextureFromFile(fontResolvePath(basePath, root["texture"].asString()))->GetTexture();
         this->_baseSize = root["baseSize"].asFloat();
         this->_charCount = root["charactorCount"].asInt();
+        this->_charSpacing = root.get("charactorSpacing", 0.0f).asFloat();
         
         Json::Value sizes = root["sizes"];
         
