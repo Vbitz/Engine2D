@@ -395,3 +395,7 @@ sys.on("input", "test.input", function (e) {
 		event.toggleFullscreen();
 	}
 });
+
+sys.on("mouseButton", "test.mouseButton", function (e) {
+	console.log("[MOUSE] : " + e.button + " : " + e.action);
+});

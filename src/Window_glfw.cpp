@@ -137,6 +137,20 @@ namespace Engine {
         }
     }
     
+    std::string glfwGetMouseButtonName(int e) {
+        switch (e) {
+            case GLFW_MOUSE_BUTTON_1:   return "mouseLeft";
+            case GLFW_MOUSE_BUTTON_2:   return "mouseRight";
+            case GLFW_MOUSE_BUTTON_3:   return "mouseMiddle";
+            case GLFW_MOUSE_BUTTON_4:   return "mouse4";
+            case GLFW_MOUSE_BUTTON_5:   return "mouse5";
+            case GLFW_MOUSE_BUTTON_6:   return "mouse6";
+            case GLFW_MOUSE_BUTTON_7:   return "mouse7";
+            case GLFW_MOUSE_BUTTON_8:   return "mouse8";
+            default:                    return "unknown";
+        }
+    }
+    
     KeyStatus glfwKeyToKeyStatus(int s) {
         switch (s) {
             case GLFW_PRESS:            return Key_Press;
@@ -324,6 +338,18 @@ namespace Engine {
             Events::GetEvent("rawInput")->Emit(val);
         }
         
+        void _mouseButtonCallback(int button, int action, int mods) {
+            Json::Value val(Json::objectValue);
+            
+            std::string buttonName = glfwGetMouseButtonName(button);
+            
+            val["button"] = buttonName;
+            val["action"] = action == GLFW_PRESS ? "press" : "release";
+            val["rawMods"] = mods;
+            
+            Events::GetEvent("mouseButton")->Emit(val);
+        }
+        
         static void WindowResize(GLFWwindow* window, int width, int height) {
             Window_glfw* win = (Window_glfw*) glfwGetWindowUserPointer(window);
             win->_resizeCallback(width, height);
@@ -332,6 +358,11 @@ namespace Engine {
         static void WindowKeyPress(GLFWwindow* window, int rawKey, int scanCode, int state, int mods) {
             Window_glfw* win = (Window_glfw*) glfwGetWindowUserPointer(window);
             win->_keypressCallback(rawKey, scanCode, state, mods);
+        }
+        
+        static void WindowMouseButton(GLFWwindow* window, int button, int action, int mods) {
+            Window_glfw* win = (Window_glfw*) glfwGetWindowUserPointer(window);
+            win->_mouseButtonCallback(button, action, mods);
         }
         
         void _create() {
@@ -380,6 +411,7 @@ namespace Engine {
             
             glfwSetWindowSizeCallback(this->_window, WindowResize);
             glfwSetKeyCallback(this->_window, WindowKeyPress);
+            glfwSetMouseButtonCallback(this->_window, WindowMouseButton);
             
             switch (this->_version) {
                 case Graphics_OpenGL_Modern:
