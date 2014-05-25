@@ -313,7 +313,7 @@ namespace Engine {
             } else if (args.Length() == 1) {
                 ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is an object containing a list of colors");
                 
-                v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
+                v8::Local<v8::Object> obj = ENGINE_GET_ARG_OBJECT(0);
                 
                 v8::Local<v8::Array> objNames = obj->GetPropertyNames();
                 
@@ -463,7 +463,7 @@ namespace Engine {
             } else if (args[0]->IsString()) {
                 GetDraw2D(args.This())->GetRender()->ClearColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             } else if (args[0]->IsObject()) {
-                v8::Object* obj = ENGINE_GET_ARG_OBJECT(0);
+                v8::Local<v8::Object> obj = ENGINE_GET_ARG_OBJECT(0);
                 double r = obj->Get(v8::String::NewFromUtf8(isolate, "r"))->NumberValue();
                 double g = obj->Get(v8::String::NewFromUtf8(isolate, "g"))->NumberValue();
                 double b = obj->Get(v8::String::NewFromUtf8(isolate, "b"))->NumberValue();

@@ -106,7 +106,7 @@ namespace Engine {
             
             v8::Local<v8::Object> obj = ctx->Global();
             
-            v8::Local<v8::Object> math_table = v8::Object::Cast(*obj->Get(v8::String::NewFromUtf8(isolate, "Math")));
+            v8::Local<v8::Object> math_table = obj->Get(v8::String::NewFromUtf8(isolate, "Math")).As<v8::Object>();
             
             math_table->Set(v8::String::NewFromUtf8(isolate, "PI"), v8::Number::New(isolate, M_PI));
             math_table->Set(v8::String::NewFromUtf8(isolate, "PI_2"), v8::Number::New(isolate, M_PI_2));

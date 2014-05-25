@@ -60,10 +60,10 @@ namespace Engine {
 #define ENGINE_GET_ARG_BOOLEAN_VALUE(num) args[num]->ToBoolean()->Value()
 
 #define ENGINE_CHECK_ARG_ARRAY(num, errStr) if (!args[num]->IsArray()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
-#define ENGINE_GET_ARG_ARRAY(num) v8::Array::Cast(*args[num])
+#define ENGINE_GET_ARG_ARRAY(num) args[num].As<v8::Array>()
 
 #define ENGINE_CHECK_ARG_OBJECT(num, errStr) if (!args[num]->IsObject()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
-#define ENGINE_GET_ARG_OBJECT(num) v8::Object::Cast(*args[num])
+#define ENGINE_GET_ARG_OBJECT(num) args[num].As<v8::Object>()
 
 #define ENGINE_CHECK_ARG_EXTERNAL(num, errStr) if (!args[num]->IsExternal()) {ENGINE_THROW_ARGERROR(errStr);ENGINE_JS_SCOPE_CLOSE_UNDEFINED;}
 #define ENGINE_GET_ARG_EXTERNAL_VALUE(num) v8::Handle<v8::External>::Cast(args[num])->Value()
