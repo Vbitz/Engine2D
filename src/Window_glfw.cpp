@@ -347,6 +347,11 @@ namespace Engine {
             val["action"] = action == GLFW_PRESS ? "press" : "release";
             val["rawMods"] = mods;
             
+            glm::vec2 cursorPos = this->GetCursorPos();
+            
+            val["x"] = std::floor(cursorPos.x);
+            val["y"] = std::floor(cursorPos.x);
+            
             Events::GetEvent("mouseButton")->Emit(val);
         }
         
