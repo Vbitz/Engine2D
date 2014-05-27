@@ -361,10 +361,11 @@ namespace Engine {
     }
     
     BasicRandom::BasicRandom() {
-        
+        static std::random_device rd;
+        this->_gen.seed(rd());
     }
     
-    BasicRandom::BasicRandom(long seed) : BasicRandom() {
+    BasicRandom::BasicRandom(long seed) {
         this->_gen.seed(seed);
     }
     
