@@ -27,6 +27,8 @@ PROJECT_ROOT = 0;
 PROJECT_SOURCE = 1;
 PROJECT_BUILD_PATH = 2;
 
+CTAGS_PATH = "/usr/local/bin/ctags";
+
 commands = {};
 
 def noop():
@@ -234,6 +236,14 @@ def help():
 @command(usage="Prints the current building enviroment")
 def env():
 	print("sys.platform = %s" % (sys.platform));
+
+@command(usage="Runs CTags on the source directory")
+def tags():
+	srcPath = resolve_path(PROJECT_ROOT, "src")
+	srcFiles = [ f for f in os.listdir(srcPath) if os.path.isfile(os.path.join(srcPath,f)) ]
+	srcFiles = [ "src/" + f for f in srcFiles if f != ".DS_Store"]
+	shell_command([
+			CTAGS_PATH, "--c++-kinds=+p", "--fields=+iaS", "--extra=+q"] + srcFiles)
 
 def run_command(cmdName):
 	if not commands[cmdName].check():
