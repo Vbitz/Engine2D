@@ -35,7 +35,7 @@
 - Audio Support
 	- Add OpenAL Depend (maybe another libary, something to really look into)
 	- Write C++ Clases
-	- Write JS API
+	- Write JS API (Maybe raw sound or maybe somthing more like web audio
 - Port to Linux
 	- Stub Out Platform_linux.cpp
 	- Use GYP to generate a Makefile
@@ -45,7 +45,7 @@
 - Support C based addons
 	- Engine2D.h common API header file with wrapper code
 - Entity System
-	- Abstract out
+	- Abstract out messaging to work with entitys
 - UI System
 - 3D Support
 - ???
