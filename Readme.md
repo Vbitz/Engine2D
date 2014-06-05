@@ -1,5 +1,8 @@
 # "Engine2D" 2D Game Engine
 
+## Auto-Generated Screenshot
+![Screenshot](screenshot.png)
+
 ## Building
 Right now the engine **only** builds out of the box on Mac OSX. To build it for other platforms you need...
 
