@@ -290,7 +290,7 @@ sys.on("draw", "test.draw", function () {
 	draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
 	draw.drawColor = "black";
 	draw.setFont("basic", 16);
-	draw.print(10, 35, "Engine2D Test Suite");
+	draw.print(10, 35, sys.version().engine + " Test Suite");
 
 	draw.drawColor = "white";
 	draw.print(10, 70, "Automated Tests");
