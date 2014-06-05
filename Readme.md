@@ -7,14 +7,15 @@
 Right now the engine **only** builds out of the box on Mac OSX. To build it for other platforms you need...
 
 - A modern C++ compiler supporting C++11. It's built using [clang](http://clang.llvm.org/) right now
-- [Python](http://www.python.org/) v2.7 (For GYP and tasks.py)
+- [Python](http://www.python.org/) v2.7.x (For GYP and tasks.py)
 - [Subversion](https://subversion.apache.org/) (For GYP)
 - [GYP](https://code.google.com/p/gyp/)
 - [FreeType](http://www.freetype.org/) v2.5.x
 - [FreeImage](http://freeimage.sourceforge.net/) v3.15.x
 - [GLFW](http://www.glfw.org/) v3.0.x
 - [PhysFS](https://icculus.org/physfs/) v2.0.x
-- [V8](https://code.google.com/p/v8/) v3.21.x
+- [V8](https://code.google.com/p/v8/) v3.25.30
+- [GLM](http://glm.g-truc.net/0.9.5/index.html) v0.9.x
 
 On a source level you will need to fill in or stub out `Platform_{x}.cpp`.
 
