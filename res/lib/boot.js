@@ -75,6 +75,19 @@
 			testNum++;
 		});
 
+		global.sys.on("testScreenshot", "boot.testScreenshot", function () {
+			if (!fs.hasSetConfigDir) {
+				console.warn("configDir has not been set for TestScreenshot defaulting to testScreenshot");
+				fs.configDir("testScreenshot");
+			}
+			global.sys.on("onSaveScreenshot", "boot.onSaveScreenshot", function (e) {
+				console.log("TestScreenshot - #### Screenshot saved to [" + e.filename + "]");
+			});
+			console.log("TestScreenshot - Taking screenshot");
+			event.screenshot({filename: "testScreenshot.png"});
+			sys.exit();
+		});
+
 		function onPostLoad() {
 			console.log("Booting JavaScript Phase 2");
 			var argv = sys.argv();
@@ -89,6 +102,9 @@
 			if (!sys.runFile(sys.config("core.script.entryPoint"), true)) {
 				console.error("Could not load core.script.entryPoint=" + sys.config("core.script.entryPoint"));
 				console.toggle();
+			}
+			if (sys.config("core.test.screenshotTime") > 0) {
+				sys.createTimer(sys.config("core.test.screenshotTime"), "testScreenshot");
 			}
 		}
 
