@@ -56,6 +56,7 @@ namespace Engine {
         }
         
         void SetupUserDir(std::string path) {
+            if (HasSetUserDir()) return; // Don't call PHYSFS_setSaneConfig twice
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
                 return;

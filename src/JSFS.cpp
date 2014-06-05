@@ -117,6 +117,10 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        void HasSetConfigDir(v8::Local<v8::String> name, const v8::PropertyCallbackInfo<v8::Value>& args) {
+            args.GetReturnValue().Set(Filesystem::HasSetUserDir());
+        }
+        
         ENGINE_JS_METHOD(Mkdir) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -162,6 +166,8 @@ namespace Engine {
             addItem(fsTable, "configDir", ConfigDir);
             addItem(fsTable, "mkdir", Mkdir);
             addItem(fsTable, "lsdir", Lsdir);
+            
+            fsTable->SetAccessor(v8::String::NewFromUtf8(isolate, "hasSetConfigDir"), HasSetConfigDir);
         }
         
 #undef addItem
