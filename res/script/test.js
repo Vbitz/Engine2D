@@ -371,9 +371,14 @@ sys.on("draw", "test.draw", function () {
 		y += 20;
 	});
 */
-
-	for (var curveX = 0; curveX < 2000; curveX += 100) {
-		draw.curve(curveX, 500, curveX, 600, 850, 600, input.mouseX, input.mouseY);
+	if (sys.config("core.test.screenshotTime") > 0) {
+		for (var curveX = 0; curveX < 2000; curveX += 100) {
+			draw.curve(curveX, 500, curveX, 600, 850, 600, curveX, 500);
+		}
+	} else {
+		for (var curveX = 0; curveX < 2000; curveX += 100) {
+			draw.curve(curveX, 500, curveX, 600, 850, 600, input.mouseX, input.mouseY);
+		}	
 	}
 });
 

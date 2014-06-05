@@ -23,6 +23,7 @@ import sys;
 import os;
 import subprocess;
 import re;
+import shutil;
 
 PROJECT_ROOT = 0;
 PROJECT_SOURCE = 1;
@@ -240,24 +241,21 @@ def env():
 
 @command(usage="Runs CTags on the source directory")
 def tags():
-	srcPath = resolve_path(PROJECT_ROOT, "src")
-	srcFiles = [ f for f in os.listdir(srcPath) if os.path.isfile(os.path.join(srcPath,f)) ]
-	srcFiles = [ "src/" + f for f in srcFiles if f != ".DS_Store"]
+	srcPath = resolve_path(PROJECT_ROOT, "src");
+	srcFiles = [ f for f in os.listdir(srcPath) if os.path.isfile(os.path.join(srcPath,f)) ];
+	srcFiles = [ "src/" + f for f in srcFiles if f != ".DS_Store"];
 	shell_command([
-			CTAGS_PATH, "--c++-kinds=+p", "--fields=+iaS", "--extra=+q"] + srcFiles)
+			CTAGS_PATH, "--c++-kinds=+p", "--fields=+iaS", "--extra=+q"] + srcFiles);
 
 @command(usage="Run the engine and take a screenshot after 1 second automaticly")
 def screenshot():
 	output = subprocess.check_output([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
 		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"]);
-	output = output.split("\n");
-	for s in output:
-		if "TestScreenshot - ####" in s:
-			reg = re.search("to \[(.*)\]", s)
-			filename = reg.group(0);
-			filename = filename[4:-1]
-			print("Screenshot saved at: " + filename)
-			return
+	output = [f for f in output.split("\n") if "TestScreenshot - ####" in f];
+	reg = re.search("to \[(.*)\]", output[0]);
+	filename = reg.group(0);
+	filename = filename[4:-1];
+	shutil.copyfile(filename, resolve_path(PROJECT_ROOT, "screenshot.png"));
 
 def run_command(cmdName):
 	if not commands[cmdName].check():
