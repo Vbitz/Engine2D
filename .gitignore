@@ -32,3 +32,5 @@ build/
 src/Build.hpp
 
 tags
+
+*.pyc

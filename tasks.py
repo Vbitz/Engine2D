@@ -81,7 +81,7 @@ def run_engine(args):
 
 def get_git_hash():
 	# check for .git folder
-	return subprocess.check_output(["git", "rev-parse", "HEAD"])[:7];
+	return subprocess.check_output(["git", "rev-parse", "HEAD"])[:10];
 
 @command(usage="Downloads a local copy of SVN if we can't find one")
 def fetch_svn():
@@ -247,7 +247,7 @@ def tags():
 	shell_command([
 			CTAGS_PATH, "--c++-kinds=+p", "--fields=+iaS", "--extra=+q"] + srcFiles);
 
-@command(usage="Run the engine and take a screenshot after 1 second automaticly")
+@command(requires=["build_env"], usage="Run the engine and take a screenshot after 1 second automaticly")
 def screenshot():
 	output = subprocess.check_output([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
 		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"]);
