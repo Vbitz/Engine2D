@@ -31,6 +31,8 @@
 
 #include "Events.hpp"
 
+#include "Drawables/CubeDrawableTest.hpp"
+
 #include <queue>
 
 #define ENGINE_ASSERT(value, msg) GetAppSingilton()->Assert(value, msg, __FILE__, __LINE__)
@@ -184,6 +186,8 @@ namespace Engine {
         
         std::queue<RawScriptInfo> _pendingScripts;
         std::unordered_map<std::string, ScriptInfo> _scripts;
+        
+        //Drawables::CubeDrawableTest* _cubeTest;
         
         long _frames = 0;
     };

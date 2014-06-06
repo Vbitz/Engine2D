@@ -50,7 +50,9 @@
 				"src/Timer.cpp",
 				"src/ScriptingManager.cpp",
 				"src/Window_glfw.cpp",
-				"src/WorkerThreadPool.cpp"
+				"src/WorkerThreadPool.cpp",
+
+				"src/Drawables/CubeDrawableTest.cpp"
 			],
 			"conditions": [
 				['OS != "win"', {

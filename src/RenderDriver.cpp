@@ -25,6 +25,11 @@
 #include "FontSheet.hpp"
 
 namespace Engine {
+    Drawable::~Drawable() {
+        this->_cleanup();
+        this->_render->_cleanupDrawable(this);
+    }
+    
     void RenderDriver::AddVert(float x, float y, float z) {
         this->AddVert(x, y, z, _currentColor, 0.0, 0.0);
     }
@@ -113,6 +118,10 @@ namespace Engine {
     
     void RenderDriver::SetColor(float r, float g, float b, float a) {
         this->_currentColor = Color4f(r, g, b, a);
+    }
+    
+    void RenderDriver::_cleanupDrawable(DrawablePtr drawable) {
+        
     }
     
     void RenderDriver::_printNeo(float x, float y, const char* string) {

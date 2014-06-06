@@ -29,6 +29,25 @@
 namespace Engine {
     class Texture;
     
+    class RenderDriver;
+    
+    class Drawable {
+    public:
+        virtual ~Drawable();
+        
+        virtual void Draw() = 0;
+    protected:
+        Drawable(RenderDriver* render) : _render(render) {}
+        
+        RenderDriver* _render;
+        
+        virtual void _init() {};
+        virtual void _cleanup() {};
+        
+        friend class RenderDriver;
+    };
+    typedef Drawable* DrawablePtr;
+    
     class RenderDriver {
     public:
         class RenderDriverError {
@@ -98,13 +117,24 @@ namespace Engine {
         virtual void CameraPan(float x, float y) = 0;
         virtual void CameraZoom(float f) = 0;
         virtual void CameraRotate(float r) = 0;
+        
+        template<class T> inline auto CreateDrawable() -> T* {
+            Drawable* drawable = new T(this);
+            this->_managedDrawables.push_back(drawable);
+            drawable->_init();
+            return static_cast<T*>(drawable);
+        }
     
     protected:
+        
+        void _cleanupDrawable(DrawablePtr drawable);
+        
         virtual void _printFT(float x, float y, const char* string) = 0;
         void _printNeo(float x, float y, const char* string);
         
         virtual void _clearColor(Color4f col) = 0;
         virtual void _addVert(float x, float y, float z, Color4f col, float s, float t) = 0;
+        
 		Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
         
         inline bool _usingNeoFont() {
@@ -113,5 +143,9 @@ namespace Engine {
         
         std::string _currentFontName = "basic";
         int _currentFontSize = 16;
+        
+        std::vector<DrawablePtr> _managedDrawables;
+        
+        friend class Drawable;
     };
 }

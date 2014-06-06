@@ -1160,6 +1160,8 @@ namespace Engine {
             
             this->GetRender()->Begin2d();
             
+            //this->_cubeTest->Draw();
+            
             Profiler::Begin("EngineUI", Config::GetFloat("core.render.targetFrameTime") / 3);
             this->_engineUI->Draw();
             Profiler::End("EngineUI");
@@ -1284,6 +1286,8 @@ namespace Engine {
         GetRender()->CheckError("On JS Post Load");
         
         FreeImage_Initialise();
+        
+        //this->_cubeTest = this->_renderGL->CreateDrawable<Drawables::CubeDrawableTest>();
         
         this->UpdateScreen();
         
