@@ -72,6 +72,8 @@ namespace Engine {
         }
         
         std::vector<std::string> GetExtentions() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             std::vector<std::string> ret;
             
             std::string extentionList = std::string((const char*) glGetString(GL_EXTENSIONS));
@@ -92,6 +94,8 @@ namespace Engine {
         }
         
         void ResetMatrix() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             //glPushMatrix();
             glDisable(GL_DEPTH_TEST);
             glLoadIdentity();
@@ -112,18 +116,24 @@ namespace Engine {
         }
         
         void EnableTexture(Texture* texId) override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glEnable(GL_TEXTURE_2D);
                 
             texId->Begin();
         }
         
         void DisableTexture() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glBindTexture(GL_TEXTURE_2D, 0);
                 
             glDisable(GL_TEXTURE_2D);
         }
         
         void EnableSmooth() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glEnable(GL_LINE_SMOOTH);
             glEnable(GL_POLYGON_SMOOTH);
             glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -131,6 +141,8 @@ namespace Engine {
         }
         
         void DisableSmooth() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glDisable(GL_LINE_SMOOTH);
             glDisable(GL_POLYGON_SMOOTH);
         }
@@ -140,6 +152,8 @@ namespace Engine {
         void Init2d() override { }
         
 		void Begin2d() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             EnableSmooth();
             
             glDisable(GL_TEXTURE_2D);
@@ -186,6 +200,8 @@ namespace Engine {
         }
         
         void _printFT(float x, float y, const char* string) override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glEnable(GL_TEXTURE_2D);
             
             glColor4f(_currentColor.r, _currentColor.g, _currentColor.b, _currentColor.a);

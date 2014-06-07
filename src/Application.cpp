@@ -508,6 +508,7 @@ namespace Engine {
         Events::GetEvent("screenshot")->AddListener("Application::_saveScreenshot", Events::MakeTarget(_saveScreenshot))->SetDefered(true);
         Events::GetEvent("dumpProfile")->AddListener("Application::_dumpProfile", Events::MakeTarget(_dumpProfile))->SetDefered(true);
         Events::GetEvent("dumpLog")->AddListener("Application::_dumpLog", Events::MakeTarget(_dumpLog));
+        Events::GetEvent("doDrawProfile")->AddListener("Application::_doDrawProfile", Events::MakeTarget(_doDrawProfile))->SetDefered(true);
     }
 	
     void _resizeWindow(Json::Value val) {
@@ -951,6 +952,11 @@ namespace Engine {
         Events::GetEvent("onSaveLog")->Emit(saveArgs);
     }
     
+    EventMagic Application::_doDrawProfile(Json::Value args) {
+        GetAppSingilton()->GetRender()->BeginProfiling();
+        return EM_OK;
+    }
+    
     void Application::RunCommand(std::string str) {
         v8::Isolate* isolate = v8::Isolate::GetCurrent();
 		v8::HandleScope scp(isolate);
@@ -1140,6 +1146,8 @@ namespace Engine {
             
             Profiler::Begin("Frame", Config::GetFloat("core.render.targetFrameTime"));
             
+            Events::PollDeferedMessages("doDrawProfile");
+            
             this->_updateFrameTime();
             
             this->_updateMousePos();
@@ -1211,6 +1219,7 @@ namespace Engine {
             }
             
             FramePerfMonitor::EndFrame();
+            this->_renderGL->EndProfilingFrame();
 		}
     }
     

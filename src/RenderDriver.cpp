@@ -120,6 +120,31 @@ namespace Engine {
         this->_currentColor = Color4f(r, g, b, a);
     }
     
+    void RenderDriver::BeginProfiling() {
+        this->_profiling = true;
+        this->_profileResults.clear();
+    }
+    
+    void RenderDriver::EndProfilingFrame() {
+        if (!this->_profiling) return;
+        this->_profiling = false;
+        Json::Value resultsObj(Json::objectValue);
+        Json::Value results(Json::objectValue);
+        
+        for (auto iter = this->_profileResults.begin(); iter != this->_profileResults.end(); iter++) {
+            Json::Value resultPoint(Json::objectValue);
+            resultPoint["count"] = iter->second.callCount;
+            resultPoint["avg"] = iter->second.avg;
+            resultPoint["min"] = iter->second.min;
+            resultPoint["max"] = iter->second.max;
+            results[iter->first] = resultPoint;
+        }
+        
+        resultsObj["results"] = results;
+        
+        Events::GetEvent("onDrawProfileEnd")->Emit(resultsObj);
+    }
+    
     void RenderDriver::_cleanupDrawable(DrawablePtr drawable) {
         
     }
@@ -127,11 +152,30 @@ namespace Engine {
     void RenderDriver::_printNeo(float x, float y, const char* string) {
         static FontSheet* _sheet = NULL;
         
+        RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+        
         if (_sheet == NULL) {
             Logger::begin("RenderDriver", Logger::LogLevel_Verbose) << "Loading NeoFont: " << Config::GetString("core.render.neoFontPath") << Logger::end();
             _sheet = FontSheetReader::LoadFont(Config::GetString("core.render.neoFontPath"));
         }
         
         _sheet->DrawText(this, x, y, this->_currentFontSize, string);
+    }
+    
+    void RenderDriver::_submitProfile(const char zone[], double time) {
+        if (!this->_profiling) return;
+        ProfileDataPoint& pnt = this->_profileResults[zone];
+        pnt.callCount++;
+        if (pnt.avg == -1) {
+            pnt.avg = time;
+        } else {
+            pnt.avg += (time - pnt.avg) / pnt.callCount;
+        }
+        if (time > pnt.max) {
+            pnt.max = time;
+        }
+        if (time < pnt.min) {
+            pnt.min = time;
+        }
     }
 }

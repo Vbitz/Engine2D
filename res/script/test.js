@@ -396,6 +396,8 @@ sys.on("input", "test.input", function (e) {
 				draw.saveImage(i, "img" + i + ".png");
 			} catch (ex) { }
 		}
+	} else if (key === "D" && press) {
+		event.doDrawProfile();
 	} else if (key === "F" && press) {
 		event.toggleFullscreen();
 	}
@@ -403,4 +405,8 @@ sys.on("input", "test.input", function (e) {
 
 sys.on("mouseButton", "test.mouseButton", function (e) {
 	console.log("[MOUSE] : " + e.button + " : " + e.action + " : (" + e.x + ", " + e.y + ")");
+});
+
+sys.on("onDrawProfileEnd", "test.onDrawProfileEnd", function (e) {
+	console.log("DrawProfile " + JSON.stringify(e, 0, '\t'));
 });

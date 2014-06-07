@@ -106,6 +106,7 @@ namespace Engine {
         static EventMagic _dumpLog(Json::Value args);
         static EventMagic _appEvent_Exit(Json::Value v);
         static EventMagic _appEvent_DumpScripts(Json::Value v);
+        static EventMagic _doDrawProfile(Json::Value v);
         
         // Window Events
         static EventMagic _rawInputHandler(Json::Value v);

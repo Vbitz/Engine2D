@@ -274,13 +274,22 @@ namespace Engine {
                 case Json::realValue: return v8::Number::New(isolate, val.asDouble());
                 case Json::stringValue: return v8::String::NewFromUtf8(isolate, val.asCString());
                 case Json::booleanValue: return v8::Boolean::New(isolate, val.asBool());
-                case Json::arrayValue:
-                case Json::objectValue:
+                case Json::arrayValue: {
                     v8::Local<v8::Array> ret = v8::Array::New(isolate);
                     for (auto iter = val.begin(); iter != val.end(); iter++) {
                         ret->Set(_getValueFromJson(iter.key()), _getValueFromJson(val[iter.key().asString()]));
                     }
                     return ret;
+                }
+                case Json::objectValue: {
+                    v8::Local<v8::Object> ret = v8::Object::New(isolate);
+                    for (auto iter = val.begin(); iter != val.end(); iter++) {
+                        ret->Set(_getValueFromJson(iter.key()), _getValueFromJson(val[iter.key().asString()]));
+                    }
+                    return ret;
+                }
+                default:
+                    throw "_getValueFromJson type unimplamented";
             }
         }
         

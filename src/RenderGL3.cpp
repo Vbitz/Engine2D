@@ -95,6 +95,8 @@ namespace Engine {
         }
         
         bool HasExtention(std::string extentionName) override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             bool has = glewGetExtension(extentionName.c_str());
             
             glGetError(); // A bug in GLEW always throws a GL error
@@ -105,6 +107,8 @@ namespace Engine {
         }
         
         std::vector<std::string> GetExtentions() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             std::vector<std::string> ret;
             
             int extentionCount;
@@ -123,6 +127,8 @@ namespace Engine {
         }
         
         void ResetMatrix() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             this->_currentModelMatrix = glm::mat4();
             if (Config::GetBoolean("core.render.halfPix")) {
                 this->_currentModelMatrix = glm::translate(this->_currentModelMatrix, glm::vec3(0.5f, 0.5f, 0.0f));
@@ -130,6 +136,8 @@ namespace Engine {
         }
         
         void BeginRendering(int mode) override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             if (this->_currentMode != mode ||
                 this->_currentMode == GL_LINE_STRIP) {
                 // it's a hack, I really need to fix this
@@ -139,6 +147,8 @@ namespace Engine {
         }
         
         void EndRendering() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             if (this->_currentVerts > BUFFER_SIZE - 256) {
                 FlushAll();
                 BeginRendering(_currentMode);
@@ -146,16 +156,22 @@ namespace Engine {
         }
         
         void EnableTexture(Texture* texId) override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             FlushAll();
             this->_currentTexture = texId;
         }
         
         void DisableTexture() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             FlushAll();
             _currentTexture = _defaultTexture;
         }
         
         void EnableSmooth() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glEnable(GL_LINE_SMOOTH);
             glEnable(GL_POLYGON_SMOOTH);
             glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -163,6 +179,8 @@ namespace Engine {
         }
         
         void DisableSmooth() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glDisable(GL_LINE_SMOOTH);
             glDisable(GL_POLYGON_SMOOTH);
         }
@@ -175,6 +193,8 @@ namespace Engine {
             if (_currentVerts == 0) {
                 return; // nothing to draw
             }
+            
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
             
             if (this->_gl3Buffer->Update()) {
                 Logger::begin("RenderGL3", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
@@ -207,6 +227,8 @@ namespace Engine {
         }
 		
         void Init2d() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             std::string gl3Effect = Config::GetString("core.render.basicEffect");
             this->_currentEffect = EffectReader::GetEffectFromFile(gl3Effect);
             this->_currentEffect->CreateShader();
@@ -218,6 +240,8 @@ namespace Engine {
         }
         
 		void Begin2d() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             EnableSmooth();
             
             this->_currentTexture = this->_defaultTexture;
@@ -229,12 +253,16 @@ namespace Engine {
         }
         
 		void End2d() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             FlushAll();
             
             CheckError("RenderGL3::End2d");
         }
         
         void Reset() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             End2d();
             Begin2d();
         }
@@ -274,6 +302,8 @@ namespace Engine {
         }
         
         void _printFT(float x, float y, const char* string) override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             FlushAll();
             
             GLFT_Font* drawingFont = GetAppSingilton()->GetFont(this->_currentFontName, this->_currentFontSize);

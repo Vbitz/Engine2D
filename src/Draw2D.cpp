@@ -34,6 +34,7 @@ namespace Engine {
     }
     
     void Draw2D::Rect(float x, float y, float w, float h) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->BeginRendering(GL_TRIANGLES);
             renderGL->AddVert(x, y, 0);
             renderGL->AddVert(x + w, y, 0);
@@ -45,6 +46,7 @@ namespace Engine {
     }
     
     void Draw2D::Grid(float x, float y, float w, float h) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->BeginRendering(GL_LINE_LOOP);
             renderGL->AddVert(x, y, 0);
             renderGL->AddVert(x + w, y, 0);
@@ -55,6 +57,7 @@ namespace Engine {
     }
     
     void Draw2D::DrawImage(Texture* tex, float x, float y, float w, float h) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->EnableTexture(tex);
         
         renderGL->BeginRendering(GL_TRIANGLES);
@@ -81,6 +84,7 @@ namespace Engine {
     }
     
     void Draw2D::DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->EnableTexture(tex);
         
         int imageWidth = tex->GetWidth();
@@ -101,11 +105,13 @@ namespace Engine {
     }
     
     void Draw2D::DrawSprite(SpriteSheet* sheet, std::string sprite, float x, float y, float w, float h) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         Sprite s = sheet->GetSprite(sprite);
         this->DrawImage(s.tex, x, y, w, h, s.loc.x, s.loc.y, s.loc.w, s.loc.h);
     }
     
     void Draw2D::Grad(float x, float y, float w, float h, int col1, int col2, bool vert) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         if (col1 > 256 * 256 * 256 || col2 > 256 * 256 * 256) {
             return;
         }
@@ -134,6 +140,7 @@ namespace Engine {
     }
     
     void Draw2D::Line(float x0, float y0, float x1, float y1) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->BeginRendering(GL_LINES);
             renderGL->AddVert(x0, y0, 0.0f);
             renderGL->AddVert(x1, y1, 0.0f);
@@ -141,6 +148,7 @@ namespace Engine {
     }
     
     void Draw2D::Lines(float* points, unsigned int count) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->BeginRendering(GL_LINE_STRIP);
         for (int i = 0; i < count * 2; i += 2) {
             renderGL->AddVert(points[i], points[i + 1], 0);
@@ -149,6 +157,7 @@ namespace Engine {
     }
     
     void Draw2D::LineGraph(float xOff, float yOff, float xScale, float yScale, float* points, unsigned int count) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         float* newPoints = (float*) std::malloc(count * 2 * sizeof(float)); // twice the size of points
         for (int x = 0; x < count; x++) {
             newPoints[x * 2] = xOff + (x * xScale);
@@ -175,7 +184,8 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     }
     
     void Draw2D::Circle(float xCenter, float yCenter, float radius, float innerRadius,
-                int segments, float start, float end, bool fill) {
+                        int segments, float start, float end, bool fill) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         bool usingGl3 = renderGL->GetRendererType() == RendererType_OpenGL3;
         static double pi2 = 2 * 3.14159265358979323846;
         float rStart = pi2 * start;
@@ -271,6 +281,7 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     }
     
     void Draw2D::BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments) {
+        RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         glm::vec3 q0 = _calculateBezierPoint(0, vec1, vec2, vec3, vec4);
         
         renderGL->BeginRendering(GL_LINE_STRIP);
