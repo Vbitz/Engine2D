@@ -8,11 +8,16 @@
 		border: 1px solid black;
 		background-color: #000;
 	}
+
+	#fontDataOutput {
+		width: 512px;
+		height: 1024px;
+	}
 	</style>
 </head>
 <body>
 	<canvas id="fontTarget" width="512" height="1024"></canvas>
-	<textarea id="fontDataOutput" width="512" height="256"></textarea>
+	<textarea id="fontDataOutput" width="512" height="1024"></textarea>
 	<a href="#" onclick="saveImage();">Save Image</a>
 	<div id="fontSizeOptions"></div>
 	<script type="text/javascript">
@@ -60,21 +65,23 @@
 			for (var i = chrBegin; i < chrEnd; i++) {
 				var chr = String.fromCharCode(i);
 				var chrSize = ctx.measureText(chr);
-				if ((x + chrSize.width + PADDING) > ctx.width) {
+				var chrWidth = chrSize.width + 2;
+				var chrHeight = fontSize < 10 ? fontSize + 2 : fontSize;
+				if ((x + chrWidth + PADDING) > ctx.width) {
 					x = PADDING;
-					y += fontSize + PADDING;
+					y += chrHeight + PADDING;
 				}
-				ctx.fillText(chr, x, y + (z * 2));
+				ctx.fillText(chr, x + 1, y + (z * 2) - (fontSize < 10 ? 3 : 0));
 				chr = {
-					width: chrSize.width,
-					x1: x / ctx.width,
-					y1: (y - fontSize + PADDING) / ctx.height,
-					x2: (x + chrSize.width) / ctx.width,
-					y2: ((y - fontSize + PADDING) + fontSize) / ctx.height
+					width: chrWidth,
+					x1: (x / ctx.width),
+					y1: ((y - chrHeight + PADDING) - z) / ctx.height,
+					x2: (x + chrWidth) / ctx.width,
+					y2: (((y - chrHeight + PADDING) + chrHeight) - z) / ctx.height
 				};
 				//ctx.strokeRect(chr.x1 * ctx.width, chr.y1 * ctx.height, (chr.x2 * ctx.width) - (chr.x1 * ctx.width), (chr.y2 * ctx.height) - (chr.y1 * ctx.height));
 				fontData.sizes[fontSize][i] = chr;
-				x += chrSize.width + PADDING;
+				x += chrWidth + PADDING;
 			}
 		}
 
