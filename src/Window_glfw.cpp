@@ -350,7 +350,7 @@ namespace Engine {
             glm::vec2 cursorPos = this->GetCursorPos();
             
             val["x"] = std::floor(cursorPos.x);
-            val["y"] = std::floor(cursorPos.x);
+            val["y"] = std::floor(cursorPos.y);
             
             Events::GetEvent("mouseButton")->Emit(val);
         }
