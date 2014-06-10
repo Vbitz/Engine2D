@@ -29,7 +29,7 @@ namespace Engine {
     namespace JSDatabase {
         Database* currentDatabase = NULL;
         
-        ENGINE_JS_METHOD(SetDatabaseFilename) {
+        ENGINE_JS_METHOD(OpenDatabase) {
             ENGINE_JS_SCOPE_OPEN;
             
             ENGINE_CHECK_ARGS_LENGTH(1);
@@ -45,9 +45,27 @@ namespace Engine {
             
             Filesystem::TouchFile(path);
             
+            if (currentDatabase != NULL) {
+                delete currentDatabase;
+                currentDatabase = NULL;
+            }
+            
             currentDatabase = Database::CreateDatabase(Filesystem::GetRealPath(path));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(CloseDatabase) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            if (currentDatabase == NULL) {
+                ENGINE_THROW_ARGERROR("A database needs to be loaded with fs.open before it can be closed");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            } else {
+                delete currentDatabase;
+                currentDatabase = NULL;
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
         }
         
         ENGINE_JS_METHOD(Exec) {
@@ -56,6 +74,11 @@ namespace Engine {
             ENGINE_CHECK_ARGS_LENGTH(1);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the query to be run on the database");
+            
+            if (currentDatabase == NULL) {
+                ENGINE_THROW_ARGERROR("A database needs to be loaded with fs.open before queries can be executed");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
             
             currentDatabase->Execute(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
@@ -70,6 +93,11 @@ namespace Engine {
             ENGINE_CHECK_ARGS_LENGTH(1);
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the query to be run on the database");
+            
+            if (currentDatabase == NULL) {
+                ENGINE_THROW_ARGERROR("A database needs to be loaded with fs.open before queries can be executed");
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
             
             v8::Local<v8::Array> arr = v8::Array::New(isolate);
             
@@ -96,7 +124,8 @@ namespace Engine {
         void InitDatabase(v8::Handle<v8::ObjectTemplate> dbTable) {
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
             
-            addItem(dbTable, "open", SetDatabaseFilename);
+            addItem(dbTable, "open", OpenDatabase);
+            addItem(dbTable, "close", CloseDatabase);
             addItem(dbTable, "exec", Exec);
             addItem(dbTable, "execPrepare", ExecPrepare);
         }
