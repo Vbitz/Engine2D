@@ -19,9 +19,6 @@
    limitations under the License.
 */
 
-#define GLEW_STATIC
-#include "vendor/GL/glew.h"
-
 #include "JSSys.hpp"
 
 #include "Application.hpp"
@@ -255,11 +252,7 @@ namespace Engine {
         ENGINE_JS_METHOD(GetMaxTextureSize) {
             ENGINE_JS_SCOPE_OPEN;
             
-            GLint result = 0;
-            
-            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &result);
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(args.GetIsolate(), result));
+            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(args.GetIsolate(), GetApp(args.This())->GetWindow()->GetMaxTextureSize()));
         }
         
         ENGINE_JS_METHOD(Microtime) {
@@ -561,23 +554,21 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New(isolate);
             
-            std::stringstream glfwVersion;
+            Application* app = GetAppSingilton();
             
-            glfwVersion << GLFW_VERSION_MAJOR
-                << "." << GLFW_VERSION_MINOR
-                << "." << GLFW_VERSION_REVISION;
+            OpenGLVersion glVersion = app->GetWindow()->GetGlVersion();
             
             ret->Set(v8::String::NewFromUtf8(isolate, "openGL"),
-                     v8::String::NewFromUtf8(isolate, (const char*) glGetString(GL_VERSION)));
+                     v8::String::NewFromUtf8(isolate, glVersion.toString().c_str()));
             ret->Set(v8::String::NewFromUtf8(isolate, "glew"),
-                     v8::String::NewFromUtf8(isolate, (const char*) glewGetString(GLEW_VERSION)));
+                     v8::String::NewFromUtf8(isolate, glVersion.glewVersion.c_str()));
             ret->Set(v8::String::NewFromUtf8(isolate, "v8"),
                      v8::String::NewFromUtf8(isolate, v8::V8::GetVersion()));
             ret->Set(v8::String::NewFromUtf8(isolate, "engine"), v8::String::NewFromUtf8(isolate, Application::GetEngineVersion().c_str()));
             ret->Set(v8::String::NewFromUtf8(isolate, "glfw"),
-                     v8::String::NewFromUtf8(isolate, glfwVersion.str().c_str()));
+                     v8::String::NewFromUtf8(isolate, app->GetWindow()->GetWindowVersion().c_str()));
             ret->Set(v8::String::NewFromUtf8(isolate, "glsl"),
-                     v8::String::NewFromUtf8(isolate, (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION)));
+                     v8::String::NewFromUtf8(isolate, glVersion.glslVersion.c_str()));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }

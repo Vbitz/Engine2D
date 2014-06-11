@@ -28,9 +28,11 @@
 #include "RenderTypes.hpp"
 #include "Platform.hpp"
 #include "Config.hpp"
+#include "FontSheet.hpp"
 
 namespace Engine {
     class Texture;
+    class FontSheet;
     
     class RenderDriver;
     
@@ -176,6 +178,8 @@ namespace Engine {
             return Config::GetBoolean("core.render.neoFont");
         }
         
+        FontSheet* _getSheet();
+        
         std::string _currentFontName = "basic";
         int _currentFontSize = 16;
         
@@ -188,6 +192,8 @@ namespace Engine {
             double max = std::numeric_limits<double>::min();
             int callCount = 0;
         };
+        
+        FontSheet* _sheet = NULL;
         
         bool _profiling = false;
         std::unordered_map<const char*, ProfileDataPoint> _profileResults;

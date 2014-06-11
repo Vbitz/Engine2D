@@ -28,6 +28,8 @@
 
 #include "vendor/GLFT_Font.hpp"
 
+#include <GLFW/glfw3.h>
+
 namespace Engine {
     RenderDriver* Draw2D::GetRender() {
         return renderGL;

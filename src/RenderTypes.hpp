@@ -21,6 +21,9 @@
 
 #pragma once
 
+#include <string>
+#include <sstream>
+
 namespace Engine {
     enum RendererType {
         RendererType_OpenGL3,
@@ -29,6 +32,13 @@ namespace Engine {
     
     struct OpenGLVersion {
         int major, minor, revision;
+        std::string glslVersion, glewVersion;
+        
+        std::string toString() {
+            std::stringstream glVersion;
+            glVersion << this->major << "." << this->minor << "." << this->revision;
+            return glVersion.str();
+        }
     };
     
     enum MouseButton {

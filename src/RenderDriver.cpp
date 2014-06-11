@@ -22,7 +22,6 @@
 #include "RenderDriver.hpp"
 
 #include "Application.hpp"
-#include "FontSheet.hpp"
 
 namespace Engine {
     Drawable::~Drawable() {
@@ -55,7 +54,11 @@ namespace Engine {
     }
     
     float RenderDriver::CalcStringWidth(std::string str) {
-        return GetAppSingilton()->GetFont(this->_currentFontName, this->_currentFontSize)->calcStringWidth(str);
+        if (this->_usingNeoFont()) {
+            return _getSheet()->MeasureText(this->_currentFontSize, str);
+        } else {
+            return GetAppSingilton()->GetFont(this->_currentFontName, this->_currentFontSize)->calcStringWidth(str);
+        }
     }
     
     void RenderDriver::SetFont(std::string name, int size) {
@@ -145,21 +148,22 @@ namespace Engine {
         Events::GetEvent("onDrawProfileEnd")->Emit(resultsObj);
     }
     
+    FontSheet* RenderDriver::_getSheet() {
+        if (this->_sheet == NULL) {
+            Logger::begin("RenderDriver", Logger::LogLevel_Verbose) << "Loading NeoFont: " << Config::GetString("core.render.neoFontPath") << Logger::end();
+            this->_sheet = FontSheetReader::LoadFont(Config::GetString("core.render.neoFontPath"));
+        }
+        return this->_sheet;
+    }
+    
     void RenderDriver::_cleanupDrawable(DrawablePtr drawable) {
         
     }
     
     void RenderDriver::_printNeo(float x, float y, const char* string) {
-        static FontSheet* _sheet = NULL;
-        
         RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
         
-        if (_sheet == NULL) {
-            Logger::begin("RenderDriver", Logger::LogLevel_Verbose) << "Loading NeoFont: " << Config::GetString("core.render.neoFontPath") << Logger::end();
-            _sheet = FontSheetReader::LoadFont(Config::GetString("core.render.neoFontPath"));
-        }
-        
-        _sheet->DrawText(this, x, y, this->_currentFontSize, string);
+        _getSheet()->DrawText(this, x, y, this->_currentFontSize, string);
     }
     
     void RenderDriver::_submitProfile(const char zone[], double time) {

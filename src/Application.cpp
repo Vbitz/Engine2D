@@ -77,10 +77,6 @@ namespace Engine {
     
     static v8::Persistent<v8::External> _EM_CANCEL;
     
-    void OnGLFWError(int error, const char* msg) {
-        Logger::begin("Window", Logger::LogLevel_Error) << "GLFW Error : " << error << " : " << msg << Logger::end();
-    }
-    
     void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, void* userParam) {
         Logger::begin("OpenGL", Logger::LogLevel_Error) << source << " : " << type << " : " <<
         id << " : " << severity << " : " << message << Logger::end();
@@ -619,9 +615,7 @@ namespace Engine {
         Events::GetEvent("postCreateContext")->AddListener("Application::_postCreateContext", Events::MakeTarget(_postCreateContext));
         Events::GetEvent("rawResize")->AddListener("Application::RawResizeHandler", Events::MakeTarget(_rawResizeHandler));
         
-        glfwSetErrorCallback(OnGLFWError);
-        
-		glfwInit();
+        Window::StaticInit();
         
         this->_openWindow(Config::GetInt("core.window.width"), Config::GetInt("core.window.height"),
                    Config::GetBoolean("core.window.fullscreen"), Config::GetString("core.render.openGL"));
@@ -629,7 +623,7 @@ namespace Engine {
 	
 	void Application::_shutdownOpenGL() {
         this->_closeWindow();
-		glfwTerminate();
+        Window::StaticDestroy();
 	}
 	
 	// font rendering

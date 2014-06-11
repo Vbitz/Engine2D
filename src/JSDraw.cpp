@@ -96,7 +96,7 @@ namespace Engine {
             
             ENGINE_CHECK_GL;
             
-			GLfloat x, y, w, h;
+			float x, y, w, h;
             
             ENGINE_CHECK_ARGS_LENGTH(4);
             
@@ -105,10 +105,10 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Width of a rect");
             ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Height of a rect");
             
-			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
-			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
-			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
-			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
+			x = (float)ENGINE_GET_ARG_NUMBER_VALUE(0);
+			y = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
+			w = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
+			h = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
             GetDraw2D(args.This())->Rect(x, y, w, h);
             
@@ -120,7 +120,7 @@ namespace Engine {
             
             ENGINE_CHECK_GL;
             
-			GLfloat x, y, w, h;
+			float x, y, w, h;
             
             ENGINE_CHECK_ARGS_LENGTH(4);
             
@@ -129,10 +129,10 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Width of a rect");
             ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Height of a rect");
             
-			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
-			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
-			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
-			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
+			x = (float)ENGINE_GET_ARG_NUMBER_VALUE(0);
+			y = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
+			w = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
+			h = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
             GetDraw2D(args.This())->Grid(x, y, w, h);
             
@@ -144,7 +144,7 @@ namespace Engine {
             
             ENGINE_CHECK_GL;
             
-			GLfloat x, y, w, h;
+			float x, y, w, h;
             
             unsigned int col1, col2;
             
@@ -160,10 +160,10 @@ namespace Engine {
             ENGINE_CHECK_ARG_INT32(5, "Arg5 is Color2 of the gradient");
             ENGINE_CHECK_ARG_BOOLEAN(6, "Arg6 set's orientation of the gradient");
             
-			x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(0);
-			y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
-			w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
-			h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
+			x = (float)ENGINE_GET_ARG_NUMBER_VALUE(0);
+			y = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
+			w = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
+			h = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
             
 			col1 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(4);
 			col2 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(5);
@@ -569,7 +569,7 @@ namespace Engine {
             GetDraw2D(args.This())->GetRender()->CheckError("JSDraw::Draw::PreDraw");
             
             Texture* tex;
-            GLfloat x, y, w, h;
+            float x, y, w, h;
             
             ENGINE_CHECK_ARGS_LENGTH(5);
             
@@ -586,10 +586,10 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
-            y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
-            w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
+            x = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
+            y = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
+            w = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
+            h = (float)ENGINE_GET_ARG_NUMBER_VALUE(4);
             
             GetDraw2D(args.This())->DrawImage(tex, x, y, w, h);
             
@@ -604,7 +604,7 @@ namespace Engine {
             GetDraw2D(args.This())->GetRender()->CheckError("Pre Image Draw");
             
             Texture* tex;
-            GLfloat x1, y1, w1, h1,
+            float x1, y1, w1, h1,
             x2, y2, w2, h2;
             int imageWidth, imageHeight;
             
@@ -627,14 +627,14 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            x1 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(1);
-            y1 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
-            w1 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            h1 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
-            x2 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(5);
-            y2 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(6);
-            w2 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(7);
-            h2 = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(8);
+            x1 = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
+            y1 = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
+            w1 = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
+            h1 = (float)ENGINE_GET_ARG_NUMBER_VALUE(4);
+            x2 = (float)ENGINE_GET_ARG_NUMBER_VALUE(5);
+            y2 = (float)ENGINE_GET_ARG_NUMBER_VALUE(6);
+            w2 = (float)ENGINE_GET_ARG_NUMBER_VALUE(7);
+            h2 = (float)ENGINE_GET_ARG_NUMBER_VALUE(8);
             
             GetDraw2D(args.This())->DrawImage(tex, x1, y1, w1, h1, x2, y2, w2, h2);
             
@@ -646,7 +646,7 @@ namespace Engine {
             
             SpriteSheet* sheet;
             std::string sprite;
-            GLfloat x, y, w, h;
+            float x, y, w, h;
             
             ENGINE_CHECK_ARGS_LENGTH(6);
             
@@ -665,10 +665,10 @@ namespace Engine {
             }
             
             sprite = ENGINE_GET_ARG_CPPSTRING_VALUE(1);
-            x = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(2);
-            y = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            w = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(4);
-            h = (GLfloat)ENGINE_GET_ARG_NUMBER_VALUE(5);
+            x = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
+            y = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
+            w = (float)ENGINE_GET_ARG_NUMBER_VALUE(4);
+            h = (float)ENGINE_GET_ARG_NUMBER_VALUE(5);
             
             GetDraw2D(args.This())->DrawSprite(sheet, sprite, x, y, w, h);
             
@@ -864,7 +864,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the width of the new image");
             ENGINE_CHECK_ARG_INT32(2, "Arg2 is the height of the new image");
             
-            GLuint texID = 0;
+            unsigned int texID = 0;
             
             if (args.Length() == 4) {
                 ENGINE_CHECK_ARG_INT32(3, "Arg3 is the texture ID to reuse");

@@ -3,6 +3,9 @@
 #include "Filesystem.hpp"
 #include "RenderDriver.hpp"
 
+#define GLEW_STATIC
+#include "vendor/GL/glew.h"
+
 namespace Engine {
     std::string fontResolvePath(std::string basePath, std::string path) {
         if (path.find_first_of('/') == 0)
@@ -35,6 +38,16 @@ namespace Engine {
         }
         render->EndRendering();
         render->DisableTexture();
+    }
+
+    float FontSheet::MeasureText(float charSize, std::string text) {
+        FontSizeRef size = this->_getBestSize(charSize);
+        float textWidth = 0.0f;
+        float chrWidth = charSize / size.size;
+        for (int i = 0; i < text.length(); i++) {
+            textWidth += (chrWidth * size.chars[text[i]].width) + this->_charSpacing;
+        }
+        return textWidth;
     }
     
     FontSizeRef FontSheet::_getBestSize(int charSize) {

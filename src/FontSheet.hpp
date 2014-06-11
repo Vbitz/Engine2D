@@ -32,7 +32,8 @@ namespace Engine {
         
         bool IsValid();
         
-        void DrawText(RenderDriver* render, float x, float y, float charHeight, std::string text);
+        void DrawText(RenderDriver* render, float x, float y, float charSize, std::string text);
+        float MeasureText(float charSize, std::string text);
     private:
         Texture* _texture;
         float _baseSize;

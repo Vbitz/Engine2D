@@ -21,6 +21,8 @@
 
 #include "EngineUI.hpp"
 
+#include <GLFW/glfw3.h>
+
 #include "FramePerfMonitor.hpp"
 #include "Config.hpp"
 #include "Profiler.hpp"

@@ -74,12 +74,18 @@ namespace Engine {
         
         // This is just a tempoary stopgap until the API is more graphics agnostic
         virtual OpenGLVersion GetGlVersion() = 0;
+        virtual std::string GetWindowVersion() = 0;
+        
+        virtual int GetMaxTextureSize() = 0;
         
         virtual RenderDriver* GetRender() = 0;
         
         GraphicsVersion GetGraphicsVersion() {
             return this->_version;
         }
+        
+        static void StaticInit();
+        static void StaticDestroy();
         
     protected:
         virtual void _init() {};

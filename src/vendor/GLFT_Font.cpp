@@ -45,6 +45,13 @@
 #include "../Shader.hpp"
 #include "../GL3Buffer.hpp"
 
+// opengl includes
+#ifdef _WIN32
+#include <GLFW\glfw3.h>
+#else
+#include <GLFW/glfw3.h>
+#endif
+
 // static members
 FT_Library FTLibraryContainer::library_;
 FTLibraryContainer GLFT_Font::library_;

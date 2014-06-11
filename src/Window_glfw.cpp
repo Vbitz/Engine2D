@@ -289,8 +289,29 @@ namespace Engine {
             ret.major = glfwGetWindowAttrib(this->_window, GLFW_CONTEXT_VERSION_MAJOR);
             ret.minor = glfwGetWindowAttrib(this->_window, GLFW_CONTEXT_VERSION_MINOR);
             ret.revision = glfwGetWindowAttrib(this->_window, GLFW_CONTEXT_REVISION);
+            ret.glslVersion = (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
+            ret.glewVersion = (const char*) glewGetString(GLEW_VERSION);
             
             return ret;
+        }
+        
+        std::string GetWindowVersion() override {
+            std::stringstream glfwVersion;
+            
+            glfwVersion << "GLFW v"
+            << GLFW_VERSION_MAJOR
+            << "." << GLFW_VERSION_MINOR
+            << "." << GLFW_VERSION_REVISION;
+        
+            return glfwVersion.str();
+        }
+        
+        int GetMaxTextureSize() override {
+            GLint result = 0;
+            
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &result);
+            
+            return result;
         }
         
         RenderDriver* GetRender() override {
@@ -441,6 +462,19 @@ namespace Engine {
         bool _debug = false;
         bool _vSync = true;
     };
+    
+    void OnGLFWError(int error, const char* msg) {
+        Logger::begin("Window", Logger::LogLevel_Error) << "GLFW Error : " << error << " : " << msg << Logger::end();
+    }
+    
+    void Window::StaticInit() {
+        glfwSetErrorCallback(OnGLFWError);
+        glfwInit();
+    }
+    
+    void Window::StaticDestroy() {
+        glfwTerminate();
+    }
     
     Window* CreateWindow(GraphicsVersion v) {
         return new Window_glfw(v);
