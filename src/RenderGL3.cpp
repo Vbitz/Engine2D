@@ -144,6 +144,10 @@ namespace Engine {
                 FlushAll();
                 this->_currentMode = mode;
             }
+            
+            if (this->_activeTexture != this->_currentTexture) {
+                this->_setActiveTexture();
+            }
         }
         
         void EndRendering() override {
@@ -156,16 +160,10 @@ namespace Engine {
         }
         
         void EnableTexture(Texture* texId) override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
-            
-            FlushAll();
             this->_currentTexture = texId;
         }
         
         void DisableTexture() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
-            
-            FlushAll();
             _currentTexture = _defaultTexture;
         }
         
@@ -201,17 +199,17 @@ namespace Engine {
             }
             
             try {
-                _currentTexture->Begin();
+                this->_activeTexture->Begin();
             } catch (...) {
-                _currentTexture->End();
-                _currentTexture = _defaultTexture;
-                _currentTexture->Begin();
+                this->_activeTexture->End();
+                this->_activeTexture = _defaultTexture;
+                this->_activeTexture->Begin();
             }
             this->_gl3Buffer->Upload((float*) _buffer, _indexBuffer, _currentVerts, sizeof(BufferFormat));
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
             this->_gl3Buffer->Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
             
-            _currentTexture->End();
+            this->_activeTexture->End();
             
             /* I think this line here needs a story. What happens when you forget it?
              Well as it turns out it will eat though the buffer growing ever bigger until
@@ -316,6 +314,12 @@ namespace Engine {
         }
         
     private:
+        void _setActiveTexture() {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            FlushAll();
+            this->_activeTexture = this->_currentTexture;
+        }
+        
         int _centerX = 0;
         int _centerY = 0;
         
@@ -343,6 +347,7 @@ namespace Engine {
         EffectParameters* _currentEffect;
         
         Texture* _defaultTexture = NULL;
+        Texture* _activeTexture = NULL;
         
         Texture* _currentTexture = NULL;
         
