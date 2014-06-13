@@ -71,6 +71,7 @@ namespace Engine {
         if (!this->NeedsUpdate()) {
             return false;
         }
+        RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
         
         if (glIsBuffer(this->_vertexBufferPointer)) {
             glDeleteBuffers(1, &this->_vertexBufferPointer);
@@ -90,6 +91,8 @@ namespace Engine {
     }
     
     void GL3Buffer::Upload(float *vertBuffer, ushort* indexBuffer, int count, size_t formatSize) {
+        RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
+        
         this->Update();
         
         glBindVertexArray(this->_vertexArrayPointer);
@@ -159,6 +162,8 @@ namespace Engine {
     }
     
     void GL3Buffer::bindShader() {
+        RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
+        
         this->_getShader()->Begin();
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PostBeginShader");

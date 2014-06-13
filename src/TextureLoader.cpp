@@ -66,6 +66,8 @@ namespace Engine {
             throw "Invalid Texture";
         }
         
+        RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        
         this->_render->CheckError("Texture::Begin::PreBind");
         glBindTexture(GL_TEXTURE_2D, this->_textureID);
         
@@ -73,6 +75,9 @@ namespace Engine {
     }
     
     void Texture::End() {
+        
+        RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        
         glBindTexture(GL_TEXTURE_2D, 0);
     }
     

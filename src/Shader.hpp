@@ -68,6 +68,7 @@ namespace Engine {
         bool _loaded;
         
         std::map<std::string, uint> _uniforms;
+        std::unordered_map<std::string, glm::mat4> _matrix_uniform_cache;
         std::map<std::string, uint> _attribs;
         
         unsigned int _programPointer, _vertPointer, _fragPointer;
