@@ -203,7 +203,7 @@ namespace Engine {
             while (args->worker->IsRunning()) {
                 // TODO: Recieve events using Events::PollThreadWorker(threadID)
                 // TODO: Dispatch events
-                Platform::Sleep(0);
+                Platform::Sleep(1000);
             }
         }
         
