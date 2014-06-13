@@ -68,6 +68,7 @@ namespace Engine {
         
         this->_render->CheckError("Texture::Begin::PreBind");
         glBindTexture(GL_TEXTURE_2D, this->_textureID);
+        
         this->_render->CheckError("Texture::Begin::PostBind");
     }
     

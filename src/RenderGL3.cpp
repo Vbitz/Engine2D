@@ -145,8 +145,8 @@ namespace Engine {
                 this->_currentMode = mode;
             }
             
-            if (this->_activeTexture != this->_currentTexture) {
-                this->_setActiveTexture();
+            if (this->_currentTexture != this->_activeTexture) {
+                FlushAll();
             }
         }
         
@@ -198,18 +198,9 @@ namespace Engine {
                 Logger::begin("RenderGL3", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
             }
             
-            try {
-                this->_activeTexture->Begin();
-            } catch (...) {
-                this->_activeTexture->End();
-                this->_activeTexture = _defaultTexture;
-                this->_activeTexture->Begin();
-            }
             this->_gl3Buffer->Upload((float*) _buffer, _indexBuffer, _currentVerts, sizeof(BufferFormat));
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
             this->_gl3Buffer->Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
-            
-            this->_activeTexture->End();
             
             /* I think this line here needs a story. What happens when you forget it?
              Well as it turns out it will eat though the buffer growing ever bigger until
@@ -222,6 +213,10 @@ namespace Engine {
             _currentVerts = 0;
             
             // maybe zero the buffer
+            
+            if (this->_activeTexture != this->_currentTexture) {
+                this->_switchTextures();
+            }
         }
 		
         void Init2d() override {
@@ -314,10 +309,22 @@ namespace Engine {
         }
         
     private:
-        void _setActiveTexture() {
+        void _switchTextures() {
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
-            FlushAll();
+            
+            //if (this->_activeTexture != NULL) {
+            //    this->_activeTexture->End();
+            //}
+            
             this->_activeTexture = this->_currentTexture;
+            
+            try {
+                this->_activeTexture->Begin();
+            } catch (...) {
+                //this->_activeTexture->End();
+                this->_activeTexture = this->_defaultTexture;
+                this->_activeTexture->Begin();
+            }
         }
         
         int _centerX = 0;
