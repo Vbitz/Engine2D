@@ -72,8 +72,8 @@ public:
 
 namespace Engine {
     
-    static pthread_mutex_t debugMesssageReadyMutex;
-    static bool debugMessageReady = false;
+    //static pthread_mutex_t debugMesssageReadyMutex;
+    //static bool debugMessageReady = false;
     
     static v8::Persistent<v8::External> _EM_CANCEL;
     
@@ -283,23 +283,25 @@ namespace Engine {
 #undef addItem
     
     // WARNING: This is executed on another thread, basicly everything right now is not threadsafe
-    static void DispatchDebugMessages() {
+    /*static void DispatchDebugMessages() {
         pthread_mutex_lock(&debugMesssageReadyMutex);
         debugMessageReady = true;
         pthread_mutex_unlock(&debugMesssageReadyMutex);
-    }
+    }*/
     
     void Application::_handleDebugMessage() {
         v8::Debug::ProcessDebugMessages();
     }
     
     void Application::_enableV8Debugger() {
-        int debugPort = Config::GetInt("core.debug.v8Debug.port");
-        v8::Debug::SetDebugMessageDispatchHandler(DispatchDebugMessages);
-        v8::Debug::EnableAgent("Engine2D", debugPort, false);
-        Config::SetBoolean("core.runOnIdle", true);
-        pthread_mutex_init(&debugMesssageReadyMutex, NULL);
-        Logger::begin("Application", Logger::LogLevel_Log) << "Started V8 Debugger on 127.0.0.1:" << debugPort << Logger::end();
+        // Well looks like the built in v8 debugger is now removed.
+        
+        //int debugPort = Config::GetInt("core.debug.v8Debug.port");
+        //v8::Debug::SetDebugMessageDispatchHandler(DispatchDebugMessages);
+        //v8::Debug::EnableAgent("Engine2D", debugPort, false);
+        //Config::SetBoolean("core.runOnIdle", true);
+        //pthread_mutex_init(&debugMesssageReadyMutex, NULL);
+        //Logger::begin("Application", Logger::LogLevel_Log) << "Started V8 Debugger on 127.0.0.1:" << debugPort << Logger::end();
     }
 	
 	void Application::_shutdownScripting() {
@@ -1127,14 +1129,14 @@ namespace Engine {
             Events::PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
             this->_processScripts();
             
-            if (this->_debugMode) {
+            /*if (this->_debugMode) {
                 pthread_mutex_lock(&debugMesssageReadyMutex);
                 if (debugMessageReady) {
                     this->_handleDebugMessage();
                     debugMessageReady = false;
                 }
                 pthread_mutex_unlock(&debugMesssageReadyMutex);
-            }
+            }*/
             
             this->_checkUpdate();
             
@@ -1255,7 +1257,8 @@ namespace Engine {
             return 0;
         }
         
-        v8::Isolate* isolate = v8::Isolate::GetCurrent();
+        v8::Isolate* isolate = v8::Isolate::New();
+        isolate->Enter();
         v8::HandleScope handle_scope(isolate);
         
         Profiler::Begin("InitScripting");
