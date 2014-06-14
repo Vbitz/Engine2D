@@ -178,7 +178,7 @@ namespace Engine {
             return Config::GetBoolean("core.render.neoFont");
         }
         
-        FontSheet* _getSheet();
+        FontSheet* _getSheet(std::string fontName);
         
         std::string _currentFontName = "basic";
         int _currentFontSize = 16;
@@ -193,6 +193,7 @@ namespace Engine {
             int callCount = 0;
         };
         
+        std::unordered_map<std::string, FontSheet*> _sheets;
         FontSheet* _sheet = NULL;
         
         bool _profiling = false;

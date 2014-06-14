@@ -55,7 +55,7 @@ namespace Engine {
     
     float RenderDriver::CalcStringWidth(std::string str) {
         if (this->_usingNeoFont()) {
-            return _getSheet()->MeasureText(this->_currentFontSize, str);
+            return this->_getSheet(this->_currentFontName)->MeasureText(this->_currentFontSize, str);
         } else {
             return GetAppSingilton()->GetFont(this->_currentFontName, this->_currentFontSize)->calcStringWidth(str);
         }
@@ -67,12 +67,20 @@ namespace Engine {
     }
     
     void RenderDriver::LoadFont(std::string prettyName, std::string filename) {
-        GetAppSingilton()->LoadFont(prettyName, filename);
-        this->_currentFontName = prettyName;
+        if (this->_usingNeoFont()) {
+            this->_sheets[prettyName] = FontSheetReader::LoadFont(filename);
+        } else {
+            GetAppSingilton()->LoadFont(prettyName, filename);
+            this->_currentFontName = prettyName;
+        }
     }
     
     bool RenderDriver::IsFontLoaded(std::string name) {
-        return GetAppSingilton()->IsFontLoaded(name);
+        if (this->_usingNeoFont()) {
+            return this->_sheets.count(name) > 0;
+        } else {
+            return GetAppSingilton()->IsFontLoaded(name);
+        }
     }
     
     void RenderDriver::ClearColor(Color4f col) {
@@ -148,12 +156,12 @@ namespace Engine {
         Events::GetEvent("onDrawProfileEnd")->Emit(resultsObj);
     }
     
-    FontSheet* RenderDriver::_getSheet() {
-        if (this->_sheet == NULL) {
+    FontSheet* RenderDriver::_getSheet(std::string fontName) {
+        if (!this->IsFontLoaded("basic")) {
             Logger::begin("RenderDriver", Logger::LogLevel_Verbose) << "Loading NeoFont: " << Config::GetString("core.render.neoFontPath") << Logger::end();
-            this->_sheet = FontSheetReader::LoadFont(Config::GetString("core.render.neoFontPath"));
+            this->_sheets["basic"] = FontSheetReader::LoadFont(Config::GetString("core.render.neoFontPath"));
         }
-        return this->_sheet;
+        return this->_sheets[fontName];
     }
     
     void RenderDriver::_cleanupDrawable(DrawablePtr drawable) {
@@ -163,7 +171,7 @@ namespace Engine {
     void RenderDriver::_printNeo(float x, float y, const char* string) {
         RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
         
-        _getSheet()->DrawText(this, x, y, this->_currentFontSize, string);
+        this->_getSheet(this->_currentFontName)->DrawText(this, x, y, this->_currentFontSize, string);
     }
     
     void RenderDriver::_submitProfile(const char zone[], double time) {

@@ -279,7 +279,11 @@ sys.on("draw", "test.draw", function () {
 
 	if (!draw.isFontLoaded("light")) {
 		//console.log("Loading Font");
-		draw.loadFont("light", "fonts/OpenSans-Light.ttf");
+		if (sys.config("core.render.neoFont")) {
+			draw.loadFont("light", "fonts/open_sans.json");
+		} else {
+			draw.loadFont("light", "fonts/OpenSans-Light.ttf");
+		}
 	}
 
 	if (firstDraw) {
