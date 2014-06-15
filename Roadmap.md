@@ -15,7 +15,7 @@
 	- Split OGL2 and OGL3 codepaths between the 2 versions
 - **DONE** - Update V8 Version
 	- There are some useful fixes to be had in the newer versions
-- Remove dependancy on FreeType
+- **DONE** - Remove dependancy on FreeType
 	- **DONE** Rewrite GLFT_Font as a Sprite based Draw2D driven class
 	- Fix font rendering bugs in FontSheet
 - Remove dependancy on FreeImage
