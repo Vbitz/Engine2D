@@ -23,8 +23,6 @@
 
 #include "Filesystem.hpp"
 
-#include "vendor/GLFT_Font.hpp"
-
 #include "TextureLoader.hpp"
 
 #include <FreeImage.h>
@@ -199,23 +197,6 @@ namespace Engine {
             bool _manualTexture;
             
             Texture* _texture;
-        };
-        
-        class FontResource : public Resource {
-        public:
-            FontResource() : Resource() {}
-            FontResource(std::string sourceID) : Resource(sourceID) {}
-            
-            bool IsCritical() override;
-            
-            GLFT_Font* GetFont(unsigned int fontSize);
-            
-        protected:
-            void _load() override;
-            void _unload() override;
-            
-        private:
-            std::map<unsigned int, GLFT_Font*> _fonts;
         };
         
         void Load(std::string path);

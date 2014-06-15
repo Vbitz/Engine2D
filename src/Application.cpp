@@ -26,8 +26,6 @@
 
 #include <cstring>
 
-#include "vendor/OpenSans-Regular.ttf.hpp"
-
 #include "vendor/json/json.h"
 
 #include "Config.hpp"
@@ -380,7 +378,7 @@ namespace Engine {
         Config::SetBoolean( "core.window.vsync",                    false); // lack of vsync causes FPS issues
         Config::SetBoolean( "core.window.fullscreen",               false);
         Config::SetString(  "core.render.openGL",                   "3.2");
-        Config::SetString(  "core.content.fontPath",                "fonts/OpenSans-Regular.ttf");
+        Config::SetString(  "core.content.fontPath",                "fonts/open_sans.json");
         Config::SetBoolean( "core.debug.engineUI.showVerboseLog",   false);
         Config::SetBoolean( "core.debug.engineUI",                  this->_developerMode);
         Config::SetBoolean( "core.debug.profiler",                  this->_developerMode || this->_debugMode);
@@ -414,8 +412,6 @@ namespace Engine {
         Config::SetBoolean( "core.debug.slowload",                  false);
         Config::SetBoolean( "core.render.halfPix",                  false);
         Config::SetNumber(  "core.test.testFrames",                 0);
-        Config::SetBoolean( "core.render.neoFont",                  true);
-        Config::SetString(  "core.render.neoFontPath",               "fonts/open_sans.json");
         Config::SetNumber(  "core.test.screenshotTime",             0);
     }
     
@@ -538,8 +534,7 @@ namespace Engine {
         this->GetRender()->CheckError("PostSetupContext");
         
         Logger::begin("Window", Logger::LogLevel_Log) << "Loaded OpenGL" << Logger::end();
-        
-        this->_initFonts();
+
         this->GetRender()->Init2d();
     }
     
@@ -593,7 +588,6 @@ namespace Engine {
     
     EventMagic Application::_rendererKillHandler(Json::Value val) {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Window Destroyed" << Logger::end();
-        GetAppSingilton()->_shutdownFonts();
         ResourceManager::UnloadAll();
         return EM_OK;
     }
@@ -626,22 +620,6 @@ namespace Engine {
 	void Application::_shutdownOpenGL() {
         this->_closeWindow();
         Window::StaticDestroy();
-	}
-	
-	// font rendering
-    
-	void Application::_initFonts() {
-        Profiler::Begin("LoadFonts");
-        if (!this->LoadFont("basic", Config::GetString("core.content.fontPath"))) {
-            Logger::begin("Font", Logger::LogLevel_Warning) << "Font not found: " << Config::GetString("core.content.fontPath") << " falling back to inbuilt font" << Logger::end();
-            ResourceManager::Load("basicFont", new ResourceManager::RawSource(OpenSans_Regular, sizeof(OpenSans_Regular)));
-            _fonts["basic"] = new ResourceManager::FontResource("basicFont");
-        }
-        Profiler::End("LoadFonts");
-	}
-	
-	void Application::_shutdownFonts() {
-        _fonts.clear();
 	}
     
     // command line handlers
@@ -801,37 +779,6 @@ namespace Engine {
     
     Window* Application::GetWindow() {
         return this->_window;
-    }
-	
-	GLFT_Font* Application::GetFont(std::string fontName, int size) {
-        return _fonts[fontName]->GetFont(size);
-	}
-    
-    
-    bool Application::LoadFont(std::string prettyName, std::string filename) {
-        Logger::begin("Font", Logger::LogLevel_Verbose)
-            << "Loading Font: " << filename << " as " << prettyName
-            << Logger::end();
-        
-        this->GetRender()->CheckError("PreLoadFont");
-        
-		if (Filesystem::FileExists(filename)) {
-            ResourceManager::Load(filename);
-            _fonts[prettyName] = new ResourceManager::FontResource(filename);
-		} else {
-			Logger::begin("Font", Logger::LogLevel_Error) << "Could not load font" << Logger::end();
-            return false;
-		}
-        
-        this->GetRender()->CheckError("PostLoadFont");
-        
-        Logger::begin("Font", Logger::LogLevel_Verbose) << "Loaded Font: " << filename << " as " << prettyName << Logger::end();
-        
-        return true;
-    }
-    
-    bool Application::IsFontLoaded(std::string fontName) {
-        return _fonts.count(fontName) != 0;
     }
     
     std::vector<std::string> Application::GetCommandLineArgs() {

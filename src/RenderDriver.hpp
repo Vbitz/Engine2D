@@ -166,17 +166,10 @@ namespace Engine {
     protected:
         void _cleanupDrawable(DrawablePtr drawable);
         
-        virtual void _printFT(float x, float y, const char* string) = 0;
-        void _printNeo(float x, float y, const char* string);
-        
         virtual void _clearColor(Color4f col) = 0;
         virtual void _addVert(float x, float y, float z, Color4f col, float s, float t) = 0;
         
 		Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        
-        inline bool _usingNeoFont() {
-            return Config::GetBoolean("core.render.neoFont");
-        }
         
         FontSheet* _getSheet(std::string fontName);
         

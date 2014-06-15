@@ -26,8 +26,6 @@
 #include "GL3Buffer.hpp"
 #include "EffectParameters.hpp"
 
-#include "vendor/GLFT_Font.hpp"
-
 #include <GLFW/glfw3.h>
 
 namespace Engine {

@@ -2,10 +2,13 @@
 
 #include "stdlib.hpp"
 
+#include "RenderDriver.hpp"
 #include "TextureLoader.hpp"
+#include "vendor/json/json.h"
 
 namespace Engine {
     class Texture;
+    class RenderDriver;
     
     struct FontRectangle {
         float width, x1, y1, x2, y2;

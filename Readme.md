@@ -10,7 +10,6 @@ Right now the engine **only** builds out of the box on Mac OSX. To build it for 
 - [Python](http://www.python.org/) v2.7.x (For GYP and tasks.py)
 - [Subversion](https://subversion.apache.org/) (For GYP)
 - [GYP](https://code.google.com/p/gyp/)
-- [FreeType](http://www.freetype.org/) v2.5.x
 - [FreeImage](http://freeimage.sourceforge.net/) v3.15.x
 - [GLFW](http://www.glfw.org/) v3.0.x
 - [PhysFS](https://icculus.org/physfs/) v2.0.x

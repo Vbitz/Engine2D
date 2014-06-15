@@ -21,13 +21,13 @@
 
 #pragma once
 
+#include "Window.hpp"
+
 #include "EngineUI.hpp"
 
 #include "ScriptingManager.hpp"
 
 #include "ResourceManager.hpp"
-
-#include "vendor/GLFT_Font.hpp"
 
 #include "Events.hpp"
 
@@ -47,11 +47,6 @@ namespace Engine {
         // Startup/Shutdown
         int Start(int argc, char const *argv[]);
         void Exit();
-        
-        // Public font functions
-        GLFT_Font* GetFont(std::string fontName, int fontSize);
-        bool LoadFont(std::string prettyName, std::string filename);
-        bool IsFontLoaded(std::string fontName);
         
         // Public application functions
         std::vector<std::string> GetCommandLineArgs();
@@ -146,10 +141,6 @@ namespace Engine {
         void _printConfigVars();
         void _loadConfigFile();
         
-        // Fonts
-        void _shutdownFonts();
-        void _initFonts();
-        
         // OpenGL
         void _shutdownOpenGL();
         void _initOpenGL();
@@ -173,8 +164,6 @@ namespace Engine {
         Window* _window = NULL;
         EngineUI* _engineUI = NULL;
         RenderDriver* _renderGL = NULL;
-        
-        std::map<std::string, ResourceManager::FontResource*> _fonts;
         
         std::map<std::string, std::string> _delayedConfigs;
         

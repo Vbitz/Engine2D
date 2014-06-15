@@ -199,22 +199,6 @@ namespace Engine {
             glVertex3f(x - _centerX, y - _centerY, z);
         }
         
-        void _printFT(float x, float y, const char* string) override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
-            
-            glEnable(GL_TEXTURE_2D);
-            
-            glColor4f(_currentColor.r, _currentColor.g, _currentColor.b, _currentColor.a);
-            
-            GLFT_Font* drawingFont = GetAppSingilton()->GetFont(_currentFontName, _currentFontSize);
-            
-            drawingFont->drawText(x - _centerX, y - _centerY, string);
-            
-            glDisable(GL_TEXTURE_2D);
-            
-            CheckError("RenderGL2::Print::PostGL2Print");
-        }
-        
     private:
         int _centerX = 0;
         int _centerY = 0;

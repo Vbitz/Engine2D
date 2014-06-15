@@ -294,20 +294,6 @@ namespace Engine {
             _currentVerts++;
         }
         
-        void _printFT(float x, float y, const char* string) override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
-            
-            FlushAll();
-            
-            GLFT_Font* drawingFont = GetAppSingilton()->GetFont(this->_currentFontName, this->_currentFontSize);
-            
-            drawingFont->drawTextGL3(x - this->_centerX, y - this->_centerY,
-                                     this, this->_currentEffect,
-                                     this->_currentColor.r, this->_currentColor.g, this->_currentColor.b, string);
-            
-            CheckError("RenderGL3::Print::PostGL3Print");
-        }
-        
     private:
         void _switchTextures() {
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);

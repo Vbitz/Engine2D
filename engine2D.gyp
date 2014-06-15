@@ -17,7 +17,6 @@
 				"src/JSMathHelper.cpp",
 				"src/Database.cpp",
 				"src/Filesystem.cpp",
-				"src/vendor/GLFT_Font.cpp",
 				"src/vendor/jsoncpp.cpp",
 				"src/vendor/sqlite3.c",
 				"src/vendor/glew.c",
@@ -76,7 +75,6 @@
 							"-pthread"
 						],
 						"OTHER_LDFLAGS": [
-							"-lfreetype "
 							"-lglfw3",
 							"-lphysfs",
 							"-lv8",

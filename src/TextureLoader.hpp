@@ -22,8 +22,11 @@
 #pragma once
 
 #include "ResourceManager.hpp"
+#include "RenderDriver.hpp"
 
 namespace Engine {
+    
+    class RenderDriver;
     
     namespace ResourceManager {
         class ImageResource;

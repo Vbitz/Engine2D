@@ -266,38 +266,6 @@ namespace Engine {
             }
         }
         
-        
-        // FontResource
-        
-        bool FontResource::IsCritical() {
-            return false;
-        }
-            
-        GLFT_Font* FontResource::GetFont(unsigned int fontSize) {
-            if (!this->IsLoaded()) {
-                this->_forceLoad();
-            }
-            if (this->_fonts.count(fontSize) == 0) {
-                GLFT_Font* newFont = new GLFT_Font();
-                long fileLen = 0;
-                unsigned char* fileData = this->_source->GetData(fileLen);
-                newFont->open((char*) fileData, fileLen, fontSize);
-                
-                this->_fonts[fontSize] = newFont;
-                Logger::begin("ResourceManager", Logger::LogLevel_Verbose) << "Loaded Font: " << this->_source->GetName() << " with size " << fontSize << Logger::end();
-            }
-            return this->_fonts[fontSize];
-        }
-        
-        void FontResource::_load() { } // fonts are loaded on demand
-        
-        void FontResource::_unload() {
-            for (auto iter = this->_fonts.begin(); iter != this->_fonts.end(); iter++) {
-                iter->second->release();
-            }
-            this->_fonts.clear();
-        }
-        
         std::vector<Resource*> _resources;
         std::map<std::string, Source*> _sources;
         

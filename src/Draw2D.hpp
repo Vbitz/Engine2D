@@ -23,6 +23,9 @@
 
 #include "RenderDriver.hpp"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "SpriteSheet.hpp"
 
 #define BUFFER_SIZE 4096
