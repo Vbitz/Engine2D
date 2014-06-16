@@ -26,7 +26,7 @@
 #include "GL3Buffer.hpp"
 #include "EffectParameters.hpp"
 
-#include <GLFW/glfw3.h>
+#include <OpenGL/gl3.h>
 
 namespace Engine {
     RenderDriver* Draw2D::GetRender() {

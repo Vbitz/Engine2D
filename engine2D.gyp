@@ -48,7 +48,10 @@
 				"src/TextureLoader.cpp",
 				"src/Timer.cpp",
 				"src/ScriptingManager.cpp",
-				"src/Window_glfw.cpp",
+				
+				"src/Window_glfw.cpp", ## GLFW Specifc
+				# "src/Window_sdl.cpp", ## SDL2 Specfic
+
 				"src/WorkerThreadPool.cpp",
 
 				"src/Drawables/CubeDrawableTest.cpp"
@@ -70,12 +73,16 @@
 					"xcode_settings": {
 						"OTHER_CPLUSPLUSFLAGS": [
 							"-D_FORTIFY_SOURCE=2",
+							# "-D_THREAD_SAFE", ## SDL2 Specfic
 							"-std=gnu++11",
 							"-stdlib=libc++",
 							"-pthread"
 						],
 						"OTHER_LDFLAGS": [
-							"-lglfw3",
+							"-lglfw3", ## GLFW Specfic
+
+							# "-lSDL2", ## SDL2 Specifc
+
 							"-lphysfs",
 							"-lv8",
 							"-lfreeimage"
@@ -83,7 +90,7 @@
 					},
 					"include_dirs": [
 						"/usr/local/include",
-						"/usr/local/include/freetype2"
+						# "/usr/local/include/SDL2" ## SDL2 Specfic
 					],
 					"library_dirs": [
 						"/usr/local/lib/"

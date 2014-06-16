@@ -21,7 +21,7 @@
 
 #include "EngineUI.hpp"
 
-#include <GLFW/glfw3.h>
+#include <OpenGL/gl3.h>
 
 #include "FramePerfMonitor.hpp"
 #include "Config.hpp"
@@ -264,21 +264,15 @@ namespace Engine {
             renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
         renderGL->Print(130, 24, "Settings (F2)");
     }
-    
-#ifndef _PLATFORM_WIN32
-#define KEY_CONSOLE 161
-#else
-#define KEY_CONSOLE 96
-#endif
 
     void EngineUI::OnKeyPress(int key, int press, bool shift) {
         if (!Config::GetBoolean("core.debug.engineUI")) {
             return;
         }
         
-        if (key == KEY_CONSOLE && press == GLFW_PRESS) { // `
+        if (key == Key_Console && press == Key_Press) { // `
             this->ToggleConsole();
-        } else if (key == GLFW_KEY_F10 && press == GLFW_PRESS) { // f10
+        } else if (key == Key_F10 && press == Key_Press) { // f10
             Events::GetEvent("dumpProfile")->Emit();
         }
 
@@ -286,18 +280,18 @@ namespace Engine {
             return;
         }
         
-        if (key == GLFW_KEY_F1 && press == GLFW_PRESS) {
+        if (key == Key_F1 && press == Key_Press) {
             this->_currentView = CurrentView_Console;
-        } else if (key == GLFW_KEY_F2 && press == GLFW_PRESS) {
+        } else if (key == Key_F2 && press == Key_Press) {
             this->_currentView = CurrentView_Settings;
         } else if (this->_currentView == CurrentView_Console) {
-            if (key < 256 && (press == GLFW_PRESS || press == GLFW_REPEAT) && key != KEY_CONSOLE && key != GLFW_KEY_ENTER) {
+            if (key < 256 && (press == Key_Press || press == Key_Repeat) && key != Key_Console && key != Key_Enter) {
 #ifndef _PLATFORM_WIN32
                 this->_currentConsoleInput << (char) (shift ? getSpecialChars(key) : (char) std::tolower(key));
 #else
                 currentConsoleInput << (char) (shift ? getSpecialChars(key) : tolower(key));
 #endif
-            } else if (key == GLFW_KEY_BACKSPACE && (press == GLFW_PRESS || press == GLFW_REPEAT)) {
+            } else if (key == Key_Backspace && (press == Key_Press || press == Key_Repeat)) {
                 std::string str = this->_currentConsoleInput.str();
                 if (str.length() > 0) {
                     str.resize(str.length() - 1);
@@ -306,7 +300,7 @@ namespace Engine {
                         this->_currentConsoleInput.seekp(str.length());
                     }
                 }
-            } else if (key == GLFW_KEY_UP && press == GLFW_PRESS) {
+            } else if (key == Key_Up && press == Key_Press) {
                 if (this->_currentHistoryLine > 0) {
                     this->_currentHistoryLine--;
                     this->_currentConsoleInput.str(this->_commandHistory[this->_currentHistoryLine]);
@@ -314,7 +308,7 @@ namespace Engine {
                         this->_currentConsoleInput.seekp(this->_currentConsoleInput.str().length());
                     }
                 }
-            } else if (key == GLFW_KEY_DOWN && press == GLFW_PRESS) {
+            } else if (key == Key_Down && press == Key_Press) {
                 if (this->_commandHistory.size() > 0 && this->_currentHistoryLine < this->_commandHistory.size() - 1) {
                     this->_currentHistoryLine++;
                     this->_currentConsoleInput.str(this->_commandHistory[this->_currentHistoryLine]);
@@ -322,7 +316,7 @@ namespace Engine {
                         this->_currentConsoleInput.seekp(this->_currentConsoleInput.str().length());
                     }
                 }
-            } else if (key == GLFW_KEY_ENTER && press == GLFW_PRESS) {
+            } else if (key == Key_Enter && press == Key_Press) {
                 std::string command = this->_currentConsoleInput.str();
                 this->_app->RunCommand(command);
                 if (this->_commandHistory.size() == 0 || this->_commandHistory[this->_commandHistory.size() - 1] != command) {

@@ -53,9 +53,47 @@ namespace Engine {
     };
     
     enum KeyStatus {
-        Key_Press,
-        Key_Release,
-        Key_Repeat
+        Key_Release = 0,
+        Key_Press = 1,
+        Key_Repeat = 2
+    };
+    
+    enum Keys {
+        Key_Backspace = 259,
+        Key_Enter = 257,
+        Key_Up = 265,
+        Key_Down = 264,
+#ifndef _PLATFORM_WIN32
+        Key_Console = 161,
+#else
+        Key_Console = 96,
+#endif
+        Key_F1 = 290,
+        Key_F2 = 291,
+        Key_F3 = 292,
+        Key_F4 = 293,
+        Key_F5 = 294,
+        Key_F6 = 295,
+        Key_F7 = 296,
+        Key_F8 = 297,
+        Key_F9 = 298,
+        Key_F10 = 299,
+        Key_F11 = 300,
+        Key_F12 = 301,
+        Key_F13 = 302,
+        Key_F14 = 303,
+        Key_F15 = 304,
+        Key_F16 = 305,
+        Key_F17 = 306,
+        Key_F18 = 307,
+        Key_F19 = 308,
+        Key_F20 = 309,
+        Key_F21 = 310,
+        Key_F22 = 311,
+        Key_F23 = 312,
+        Key_F24 = 313,
+        Key_F25 = 314,
+        Key_Null
     };
     
     namespace EffectShaderTypes {
