@@ -565,7 +565,7 @@ namespace Engine {
             ret->Set(v8::String::NewFromUtf8(isolate, "v8"),
                      v8::String::NewFromUtf8(isolate, v8::V8::GetVersion()));
             ret->Set(v8::String::NewFromUtf8(isolate, "engine"), v8::String::NewFromUtf8(isolate, Application::GetEngineVersion().c_str()));
-            ret->Set(v8::String::NewFromUtf8(isolate, "glfw"),
+            ret->Set(v8::String::NewFromUtf8(isolate, "window"),
                      v8::String::NewFromUtf8(isolate, app->GetWindow()->GetWindowVersion().c_str()));
             ret->Set(v8::String::NewFromUtf8(isolate, "glsl"),
                      v8::String::NewFromUtf8(isolate, glVersion.glslVersion.c_str()));

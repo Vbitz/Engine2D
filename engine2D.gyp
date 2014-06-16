@@ -1,4 +1,7 @@
 {
+	"variables": {
+		"WINDOW%": "glfw"
+	},
 	"targets": [
 		{
 			"target_name": "engine2D",
@@ -48,9 +51,6 @@
 				"src/TextureLoader.cpp",
 				"src/Timer.cpp",
 				"src/ScriptingManager.cpp",
-				
-				"src/Window_glfw.cpp", ## GLFW Specifc
-				# "src/Window_sdl.cpp", ## SDL2 Specfic
 
 				"src/WorkerThreadPool.cpp",
 
@@ -73,16 +73,11 @@
 					"xcode_settings": {
 						"OTHER_CPLUSPLUSFLAGS": [
 							"-D_FORTIFY_SOURCE=2",
-							# "-D_THREAD_SAFE", ## SDL2 Specfic
 							"-std=gnu++11",
 							"-stdlib=libc++",
 							"-pthread"
 						],
 						"OTHER_LDFLAGS": [
-							"-lglfw3", ## GLFW Specfic
-
-							# "-lSDL2", ## SDL2 Specifc
-
 							"-lphysfs",
 							"-lv8",
 							"-lfreeimage"
@@ -90,7 +85,6 @@
 					},
 					"include_dirs": [
 						"/usr/local/include",
-						# "/usr/local/include/SDL2" ## SDL2 Specfic
 					],
 					"library_dirs": [
 						"/usr/local/lib/"
@@ -102,7 +96,33 @@
 							"$(SDKROOT)/System/Library/Frameworks/IOKit.framework"
 						]
 					}
-				}]
+				}],
+				['("<(WINDOW)" == "glfw") & (OS == "mac")', {
+					'sources': [
+						"src/Window_glfw.cpp"
+					],
+					"xcode_settings": {
+						"OTHER_LDFLAGS": [
+							"-lglfw3"
+						]
+					}
+				}],
+				['("<(WINDOW)" == "sdl") & (OS == "mac")', {
+					'sources': [
+						"src/Window_sdl.cpp"
+					],
+					"xcode_settings": {
+						"OTHER_CPLUSPLUSFLAGS": [
+							"-D_THREAD_SAFE"
+						],
+						"OTHER_LDFLAGS": [
+							"-lSDL2"
+						]
+					},
+					"include_dirs": [
+						"/usr/local/include/SDL2"
+					]
+				}],
 			]
 		}
 	]

@@ -42,8 +42,8 @@ namespace Engine {
     };
     
     enum MouseButton {
-        MouseButton_Left,
-        MouseButton_Right,
+        MouseButton_Left = 0,
+        MouseButton_Right = 1,
         MouseButton_Middle
     };
     

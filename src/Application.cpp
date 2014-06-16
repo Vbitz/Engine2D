@@ -604,7 +604,7 @@ namespace Engine {
     }
 	
 	void Application::_initOpenGL() {
-        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init GLFW" << Logger::end();
+        Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init Window" << Logger::end();
         
         Events::GetEvent("destroyWindow")->AddListener("Application::RendererKillHandler", Events::MakeTarget(_rendererKillHandler));
         Events::GetEvent("rawInput")->AddListener("Application::RawInputHandler", Events::MakeTarget(_rawInputHandler));
