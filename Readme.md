@@ -10,16 +10,15 @@ Right now the engine **only** builds out of the box on Mac OSX. To build it for 
 - [Python](http://www.python.org/) v2.7.x (For GYP and tasks.py)
 - [Subversion](https://subversion.apache.org/) (For GYP)
 - [GYP](https://code.google.com/p/gyp/)
-- [GLFW](http://www.glfw.org/) v3.0.x
+- [GLFW](http://www.glfw.org/) v3.0.x or [SDL](http://www.libsdl.org/) v2.0.3
 - [PhysFS](https://icculus.org/physfs/) v2.0.x
 - [V8](https://code.google.com/p/v8/) v3.25.30
-- [GLM](http://glm.g-truc.net/0.9.5/index.html) v0.9.x
 
 On a source level you will need to fill in or stub out `Platform_{x}.cpp`.
 
 Once you have the dependancys installed you can run `./tasks.py gyp` and then build the project using XCode on OSX, Visual Studio on Windows or make on linux.
 
-If your having trouble locating or building the dependancys then there are incomplete instructions in tasks.py. You can also fetch almost all of the dependancys using Homebrew with `brew install physfs v8 glm`.
+If your having trouble locating or building the dependancys then there are incomplete instructions in tasks.py. You can also fetch almost all of the dependancys using Homebrew with `brew install physfs v8`.
 
 ##Sample Code
 

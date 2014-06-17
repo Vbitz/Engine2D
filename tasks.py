@@ -120,13 +120,6 @@ def gyp():
 def check_depends():
 	return True;
 
-@command(usage="Fetch and install GLM")
-def fetch_glm():
-	# both platforms need http://sourceforge.net/projects/ogl-math/files/glm-0.9.5.1/glm-0.9.5.1.zip/download (4071873 bytes)
-	# extracts to glm
-	# copy entire glm/include folder to thrid_party/include
-	pass;
-
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def fetch_glfw3():
 	# both platforms need https://github.com/glfw/glfw/archive/3.0.3.zip (400,137 bytes)
@@ -164,7 +157,7 @@ def fetch_v8():
 		# make native i18nsupport=off (takes bloody ages)
 		pass
 
-@command(requires=["fetch_glm", "fetch_glfw3", "fetch_physfs", "fetch_v8"], usage="Fetches Build Dependancys", check=check_depends)
+@command(requires=["fetch_glfw3", "fetch_physfs", "fetch_v8"], usage="Fetches Build Dependancys", check=check_depends)
 def fetch_build_deps():
 	pass;
 
