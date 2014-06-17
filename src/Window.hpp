@@ -23,7 +23,7 @@
 
 #include <string>
 
-#include <glm/glm.hpp>
+#include "vendor/glm/glm.hpp"
 
 #include "RenderTypes.hpp"
 

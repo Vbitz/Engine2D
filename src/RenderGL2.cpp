@@ -33,8 +33,8 @@
 #include "Application.hpp"
 
 // TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "vendor/glm/glm.hpp"
+#include "vendor/glm/gtc/matrix_transform.hpp"
 
 #define BUFFER_SIZE 4096
 
