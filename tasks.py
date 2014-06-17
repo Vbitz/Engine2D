@@ -236,7 +236,7 @@ def screenshot():
 	reg = re.search("to \[(.*)\]", output[0]);
 	filename = reg.group(0);
 	filename = filename[4:-1];
-	shutil.copyfile(filename, resolve_path(PROJECT_ROOT, "screenshot.png"));
+	shutil.copyfile(filename, resolve_path(PROJECT_ROOT, "screenshot.bmp"));
 
 def run_command(cmdName):
 	if not commands[cmdName].check():

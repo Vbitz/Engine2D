@@ -18,7 +18,7 @@
 - **DONE** - Remove dependancy on FreeType
 	- **DONE** Rewrite GLFT_Font as a Sprite based Draw2D driven class
 	- Fix font rendering bugs in FontSheet
-- Remove dependancy on FreeImage
+- **DONE** - Remove dependancy on FreeImage
 	- Improve image rendering using the Event system
 - Report to Windows
 	- Stub Out Platform_win.cpp

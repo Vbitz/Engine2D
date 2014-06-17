@@ -84,7 +84,7 @@
 				console.log("TestScreenshot - #### Screenshot saved to [" + e.filename + "]");
 			});
 			console.log("TestScreenshot - Taking screenshot");
-			event.screenshot({filename: "testScreenshot.png"});
+			event.screenshot({filename: "testScreenshot.bmp"});
 			sys.exit();
 		});
 
