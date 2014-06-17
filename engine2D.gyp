@@ -20,9 +20,6 @@
 				"src/JSMathHelper.cpp",
 				"src/Database.cpp",
 				"src/Filesystem.cpp",
-				"src/vendor/jsoncpp.cpp",
-				"src/vendor/sqlite3.c",
-				"src/vendor/glew.c",
 				"src/GL3Buffer.cpp",
 				"src/Shader.cpp",
 				"src/EngineUI.cpp",
@@ -51,10 +48,19 @@
 				"src/TextureLoader.cpp",
 				"src/Timer.cpp",
 				"src/ScriptingManager.cpp",
-
 				"src/WorkerThreadPool.cpp",
 
-				"src/Drawables/CubeDrawableTest.cpp"
+				"src/Drawables/CubeDrawableTest.cpp",
+
+				"src/vendor/jsoncpp.cpp",
+				"src/vendor/sqlite3.c",
+				"src/vendor/glew.c",
+
+				# SOIL
+				"src/vendor/soil/image_DXT.c",
+				"src/vendor/soil/image_helper.c",
+				"src/vendor/soil/SOIL.c",
+				"src/vendor/soil/stb_image_aug.c",
 			],
 			"conditions": [
 				['OS != "win"', {
@@ -79,8 +85,7 @@
 						],
 						"OTHER_LDFLAGS": [
 							"-lphysfs",
-							"-lv8",
-							"-lfreeimage"
+							"-lv8"
 						]
 					},
 					"include_dirs": [

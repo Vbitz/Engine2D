@@ -127,14 +127,6 @@ def fetch_glm():
 	# copy entire glm/include folder to thrid_party/include
 	pass;
 
-@command(usage="Fetch a freetype binary distribution or compile one")
-def fetch_freetype():
-	# osx comes with freetype already installed
-	if sys.platform == "win32": # windows
-		# windows needs http://sourceforge.net/projects/gnuwin32/files/freetype/2.3.5-1/freetype-2.3.5-1-lib.zip/download
-		# and also http://sourceforge.net/projects/gnuwin32/files/freetype/2.3.5-1/freetype-2.3.5-1-bin.zip/download
-		pass;
-
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def fetch_glfw3():
 	# both platforms need https://github.com/glfw/glfw/archive/3.0.3.zip (400,137 bytes)
@@ -172,21 +164,7 @@ def fetch_v8():
 		# make native i18nsupport=off (takes bloody ages)
 		pass
 
-@command(usage="Fetch a freeimage binary distribution")
-def fetch_freeimage():
-	if sys.platform == "win32":
-		# windows needs http://downloads.sourceforge.net/freeimage/FreeImage3154Win32.zip
-		pass;
-	elif sys.platform == "darwin": #osx
-		# osx needs http://downloads.sourceforge.net/freeimage/FreeImage3154.zip (5,513,923 bytes)
-		# extracts to FreeImage using unzip -aa to make sure patching works
-		# Patch FreeImage/Makefile.gnu with third_party/patches/FreeImage_osx.patch
-		# Patch FreeImage/Source/OpenEXR/IlmImf/ImfAutoArray.h with third_party/patches/FreeImage_OpenEXR_osx.patch
-		# run make -p Makefile.gnu inside of FreeImage
-		# Copy the files from dist to third_party/lib and third_party/include
-		pass;
-
-@command(requires=["fetch_glm", "fetch_freetype", "fetch_glfw3", "fetch_physfs", "fetch_v8", "fetch_freeimage"], usage="Fetches Build Dependancys", check=check_depends)
+@command(requires=["fetch_glm", "fetch_glfw3", "fetch_physfs", "fetch_v8"], usage="Fetches Build Dependancys", check=check_depends)
 def fetch_build_deps():
 	pass;
 

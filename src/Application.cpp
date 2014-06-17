@@ -27,6 +27,7 @@
 #include <cstring>
 
 #include "vendor/json/json.h"
+#include "vendor/soil/SOIL.h"
 
 #include "Config.hpp"
 #include "Profiler.hpp"
@@ -860,10 +861,9 @@ namespace Engine {
         width = app->_window->GetWindowSize().x;
         height = app->_window->GetWindowSize().y;
         
-        BYTE* pixels = new BYTE[4 * width * height];
-        glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+        Filesystem::TouchFile(targetFilename);
         
-        ImageWriter::SaveBufferToFile(targetFilename, pixels, width, height);
+        SOIL_save_screenshot(Filesystem::GetRealPath(targetFilename).c_str(), SOIL_SAVE_TYPE_BMP, 0, 0, width, height);
         
         Logger::begin("Screenshot", Logger::LogLevel_Log) << "Saved Screenshot as: " << Filesystem::GetRealPath(targetFilename) << Logger::end();
         
@@ -872,8 +872,6 @@ namespace Engine {
         saveArgs["filename"] = Filesystem::GetRealPath(targetFilename);
         
         Events::GetEvent("onSaveScreenshot")->Emit(saveArgs);
-        
-        delete [] pixels;
     }
     
     EventMagic Application::_dumpProfile(Json::Value args) {
@@ -1237,8 +1235,6 @@ namespace Engine {
         Events::GetEvent("postLoad")->Emit();
         
         GetRender()->CheckError("On JS Post Load");
-        
-        FreeImage_Initialise();
         
         //this->_cubeTest = this->_renderGL->CreateDrawable<Drawables::CubeDrawableTest>();
         

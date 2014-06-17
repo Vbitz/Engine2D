@@ -26,6 +26,8 @@
 
 #include "Application.hpp"
 
+#include "vendor/soil/SOIL.h"
+
 namespace Engine {
     Texture::Texture() {
         
@@ -49,7 +51,7 @@ namespace Engine {
     void Texture::Save(std::string filename) {
         this->Begin();
         
-        BYTE* pixels = new BYTE[4 * this->_width * this->_height];
+        unsigned char* pixels = new unsigned char[4 * this->_width * this->_height];
         glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
         
         this->End();
@@ -109,44 +111,12 @@ namespace Engine {
     namespace ImageReader {
         
         Texture* TextureFromFileBuffer(unsigned char *buffer, long bufferLength) {
-            FIMEMORY* mem = FreeImage_OpenMemory((BYTE*) buffer, (unsigned int)bufferLength);
+            int width, height, chaneals;
+            unsigned char* pixel = SOIL_load_image_from_memory(buffer, bufferLength, &width, &height, &chaneals, SOIL_LOAD_RGBA);
             
-            FIBITMAP *lImg = FreeImage_LoadFromMemory(FreeImage_GetFileTypeFromMemory(mem), mem);
+            Texture* tex = TextureFromBuffer(pixel, width, height);
             
-            FIBITMAP *img = 0;
-            
-            if (FreeImage_GetBPP(lImg) == 24) {
-                Logger::begin("JSDraw", Logger::LogLevel_Warning) << "Converting image to 32bit" << Logger::end();
-                img = FreeImage_ConvertTo32Bits(lImg);
-            } else {
-                img = lImg;
-            }
-            
-            int width = FreeImage_GetWidth(img);
-            int height = FreeImage_GetHeight(img);
-            
-            FreeImage_FlipVertical(img); // a fix for freeimage
-            
-            unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
-            unsigned char* texture = new unsigned char[4 * width * height];
-            
-            int pos = 0;
-            
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    texture[pos + 0] = pixel[pos + 2];
-                    texture[pos + 1] = pixel[pos + 1];
-                    texture[pos + 2] = pixel[pos + 0];
-                    texture[pos + 3] = pixel[pos + 3];
-                    pos += 4;
-                }
-            }
-            
-            FreeImage_CloseMemory(mem);
-            
-            Texture* tex = TextureFromBuffer(texture, width, height);
-            
-            delete [] texture; // that should fix some anoying memory leaks
+            SOIL_free_image_data(pixel);
             
             return tex;
         }
@@ -229,29 +199,12 @@ namespace Engine {
         }
         
         bool SaveBufferToFile(std::string filename, unsigned char* pixels, int width, int height, bool topDown) {
-            FIMEMORY* mem = FreeImage_OpenMemory();
             
-            FIBITMAP* image = FreeImage_ConvertFromRawBits(pixels, width, height, ((((32 * width) + 31) / 32) * 4), 32, 0xFF000000, 0x00FF0000, 0x0000FF00, topDown);
+            Filesystem::TouchFile(filename);
             
-            FREE_IMAGE_FORMAT format = FreeImage_GetFIFFromFilename(filename.c_str());
+            const char* filepath = Filesystem::GetRealPath(filename).c_str();
             
-            if (format == FIF_UNKNOWN) {
-                format = FIF_BMP;
-            }
-            
-            FreeImage_SaveToMemory(format, image, mem);
-            
-            long fileSize = FreeImage_TellMemory(mem);
-            
-            FreeImage_SeekMemory(mem, 0, SEEK_SET);
-            
-            char* buffer = (char*)malloc(sizeof(char) * fileSize);
-            
-            FreeImage_ReadMemory(buffer, sizeof(char), (unsigned int) fileSize, mem);
-            
-            Filesystem::WriteFile(filename, buffer, fileSize);
-            
-            FreeImage_CloseMemory(mem);
+            SOIL_save_image(filepath, SOIL_SAVE_TYPE_BMP, width, height, 4, pixels);
         }
 
     }

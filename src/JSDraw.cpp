@@ -21,9 +21,7 @@
 
 #include "JSDraw.hpp"
 
-#include "main.hpp"
-
-#include <FreeImage.h>
+#include "vendor/soil/SOIL.h"
 
 #include "Filesystem.hpp"
 #include "Draw2D.hpp"
@@ -737,26 +735,13 @@ namespace Engine {
             
             long fileSize = 0;
             
-            char* file = Filesystem::GetFileContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0), fileSize);
+            unsigned char* file = (unsigned char*) Filesystem::GetFileContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0), fileSize);
             
-            FIMEMORY* mem = FreeImage_OpenMemory((BYTE*) file, (unsigned int)fileSize);
+            int imageWidth, imageHeight, chaneals;
             
-            FIBITMAP *lImg = FreeImage_LoadFromMemory(FreeImage_GetFileTypeFromMemory(mem), mem);
+            unsigned char* pixel = SOIL_load_image_from_memory(file, fileSize, &imageWidth, &imageHeight, &chaneals, SOIL_LOAD_RGBA);
             
-            FIBITMAP *img = 0;
-            
-            if (FreeImage_GetBPP(lImg) != 32) {
-                Logger::begin("JSDraw", Logger::LogLevel_Warning) << "Converting image to 32bit" << Logger::end();
-                img = FreeImage_ConvertTo32Bits(lImg);
-            } else {
-                img = lImg;
-            }
-            
-            int imageWidth = FreeImage_GetWidth(img);
-            int imageHeight = FreeImage_GetHeight(img);
             int imageSize = imageWidth * imageHeight * 4;
-            
-            FreeImage_FlipVertical(img); // a fix for freeimage
             
             float* rawArray = new float[imageSize];
             
@@ -784,8 +769,6 @@ namespace Engine {
             array->Set(v8::String::NewFromUtf8(isolate, "byteLength"),
                        v8::Int32::New(isolate, static_cast<int32_t>(imageSize)), v8::ReadOnly);
             
-            unsigned char* pixel = (unsigned char*)FreeImage_GetBits(img);
-            
             int pos = 0;
             int i = 0;
             
@@ -800,7 +783,7 @@ namespace Engine {
                 }
             }
             
-            FreeImage_CloseMemory(mem);
+            SOIL_free_image_data(pixel);
             
             ENGINE_JS_SCOPE_CLOSE(array);
         }
