@@ -30,6 +30,10 @@
 - Add new Scripting Features
 	- Implament new fucntions in javascriptAPI.txt
 - Support C++ based addons
+	- Effective addon loading system
+		- Resolve dependancys
+		- Fix circlur depends
+		- Cache Loading
 	- Basic .dll/.so/.dylib loading support
 	- Engine2D.hpp common API header file
 - Audio Support
