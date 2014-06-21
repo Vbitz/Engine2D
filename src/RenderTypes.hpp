@@ -32,7 +32,7 @@ namespace Engine {
     
     struct OpenGLVersion {
         int major, minor, revision;
-        std::string glslVersion, glewVersion;
+        std::string glslVersion, glewVersion, glVendor, glRenderer, fullGLVersion;
         
         std::string toString() {
             std::stringstream glVersion;

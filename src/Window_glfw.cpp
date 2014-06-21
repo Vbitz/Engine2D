@@ -291,6 +291,9 @@ namespace Engine {
             ret.revision = glfwGetWindowAttrib(this->_window, GLFW_CONTEXT_REVISION);
             ret.glslVersion = (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
             ret.glewVersion = (const char*) glewGetString(GLEW_VERSION);
+            ret.fullGLVersion = (const char*) glGetString(GL_VERSION);
+            ret.glVendor = (const char*) glGetString(GL_VENDOR);
+            ret.glRenderer = (const char*) glGetString(GL_RENDERER);
             
             return ret;
         }

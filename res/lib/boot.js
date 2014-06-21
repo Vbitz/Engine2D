@@ -94,8 +94,9 @@
 			if (argv.length > 0) {
 				sys.config("core.script.entryPoint", argv[0]);
 			}
-			var glInfo = sys.getGLVersion();
-			console.log("Using OpenGL: " + glInfo.major + "." + glInfo.minor + "." + glInfo.rev);
+			var versionInfo = sys.version();
+			console.log("Using OpenGL: " + versionInfo.openGL);
+			console.log("Using OpenGL Renderer: " + versionInfo.glRenderer);
 			sys.screenWidth = parseInt(sys.config("core.window.width"), 10);
 			sys.screenHeight = parseInt(sys.config("core.window.height"), 10);
 			sys.clearEvent("bootloaderLoad");

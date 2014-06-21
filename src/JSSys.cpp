@@ -559,7 +559,7 @@ namespace Engine {
             OpenGLVersion glVersion = app->GetWindow()->GetGlVersion();
             
             ret->Set(v8::String::NewFromUtf8(isolate, "openGL"),
-                     v8::String::NewFromUtf8(isolate, glVersion.toString().c_str()));
+                     v8::String::NewFromUtf8(isolate, glVersion.fullGLVersion.c_str()));
             ret->Set(v8::String::NewFromUtf8(isolate, "glew"),
                      v8::String::NewFromUtf8(isolate, glVersion.glewVersion.c_str()));
             ret->Set(v8::String::NewFromUtf8(isolate, "v8"),
@@ -569,6 +569,10 @@ namespace Engine {
                      v8::String::NewFromUtf8(isolate, app->GetWindow()->GetWindowVersion().c_str()));
             ret->Set(v8::String::NewFromUtf8(isolate, "glsl"),
                      v8::String::NewFromUtf8(isolate, glVersion.glslVersion.c_str()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "glVendor"),
+                     v8::String::NewFromUtf8(isolate, glVersion.glVendor.c_str()));
+            ret->Set(v8::String::NewFromUtf8(isolate, "glRenderer"),
+                     v8::String::NewFromUtf8(isolate, glVersion.glRenderer.c_str()));
             
             ENGINE_JS_SCOPE_CLOSE(ret);
         }
