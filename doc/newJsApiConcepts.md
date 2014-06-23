@@ -19,12 +19,13 @@ void Texture.prototype.setPixel(number x, number y, Color4f col);
 Color4f Texture.prototype.getPixel(number x, number y);
 void Texture.prototype.setRepeat(bool val);
 Texture Texture.prototype.convert(TextureType target);
+
 number Texture.prototype.width;
 number Texture.prototype.height;
 TextureType Texture.prototype.type;
 ```
 
-## VertexBuffer
+## VertexBuffer2D
 Basicly the same as the RenderDriver API is right now in C++
 
 ```javascript
@@ -32,9 +33,13 @@ enum PolygonMode {
     RenderBuffer.Triangles
 };
 
-new RenderBuffer(PolygonMode mode); // automaticly expanding
+new VertexBuffer2D(PolygonMode mode); // automaticly expanding
 
-void RenderBuffer.prototype.addVert(Vertex2f vertPositon, Color4f col = Color4f.White, Vertex2f uv = null);
-void RenderBuffer.prototype.setAutoUV(bool val);
-number RenderBuffer.prototype.verts;
+void VertexBuffer2D.prototype.addVert(Vector2f vertPositon, Color4f col = Color4f.White, Vector2f uv = null);
+void VertexBuffer2D.prototype.setAutoUV(bool val);
+
+void VertexBuffer2D.prototype.rect(Vector2f p1, Vector p2);
+// Potentioly other Draw2D Methods
+
+number VertexBuffer2D.prototype.verts;
 ```
