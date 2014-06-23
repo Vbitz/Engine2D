@@ -52,19 +52,102 @@ namespace Engine {
         ENGINE_JS_METHOD(CreateColor) {
             ENGINE_JS_SCOPE_OPEN;
             
-            if (args.Length() == 1) { // new Color(number(0xrrggbb) || string('predefined'))
-                
-            } else if (args.Length() == 2) { // new Color(number(0xrrggbb), number(alpha))
-                
-            } else if (args.Length() == 3) { // new Color(number(r), number(g), number(b))
-                
-            } else if (args.Length() == 4) { // new Color(number(r), number(g), number(b), number(a))
-                
-            } else { // undefined
-                
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            if (!args.IsConstructCall()) {
+                const int argc = args.Length();
+                std::vector<v8::Handle<v8::Value>> av(static_cast<size_t>(argc),v8::Undefined(isolate));
+                for(int i = 0; i < argc; ++i) av[i] = args[i];
+                ENGINE_JS_SCOPE_CLOSE(args.Callee()->NewInstance(argc, &av[0]));
             }
             
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            Color4f col;
+            
+            if (args.Length() == 0) { // new Color()
+                col = Color4f();
+            } else if (args.Length() == 1) { // new Color(number(0xrrggbb) || string('predefined'))
+                if (args[0]->IsNumber()) {
+                    col = Color4f(ENGINE_GET_ARG_INT32_VALUE(0));
+                } else if (args[0]->IsString()) {
+                    col = Color4f(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                } else {
+                    col = Color4f();
+                }
+            } else if (args.Length() == 2) { // new Color(number(0xrrggbb), number(alpha))
+                col = Color4f(ENGINE_GET_ARG_INT32_VALUE(0));
+                col.a = ENGINE_GET_ARG_NUMBER_VALUE(1);
+            } else if (args.Length() == 3) { // new Color(number(r), number(g), number(b))
+                col = Color4f(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                              ENGINE_GET_ARG_NUMBER_VALUE(1),
+                              ENGINE_GET_ARG_NUMBER_VALUE(2),
+                              1.0f);
+            } else if (args.Length() == 4) { // new Color(number(r), number(g), number(b), number(a))
+                col = Color4f(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                              ENGINE_GET_ARG_NUMBER_VALUE(1),
+                              ENGINE_GET_ARG_NUMBER_VALUE(2),
+                              1.0f);
+            } else { // undefined
+                col = Color4f();
+            }
+            
+            args.This()->Set(v8::String::NewFromUtf8(isolate, "r"),
+                             v8::Number::New(isolate, col.r));
+            args.This()->Set(v8::String::NewFromUtf8(isolate, "g"),
+                             v8::Number::New(isolate, col.g));
+            args.This()->Set(v8::String::NewFromUtf8(isolate, "b"),
+                             v8::Number::New(isolate, col.b));
+            args.This()->Set(v8::String::NewFromUtf8(isolate, "a"),
+                             v8::Number::New(isolate, col.a));
+            
+            return; // Override the normal behavior of ENGINE_JS_SCOPE_CLOSE;
+        }
+        
+        ENGINE_JS_METHOD(Color_FromHSV) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            std::cout << args.Length() << std::endl;
+            
+            ENGINE_CHECK_ARGS_LENGTH(3);
+            
+            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Hue Component between 0 and 360");
+            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Saturation Component between 0.0f and 1.0f");
+            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Value Component between 0.0f and 1.0f");
+            
+            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
+            
+            float hue = ENGINE_GET_ARG_NUMBER_VALUE(0),
+            saturation = ENGINE_GET_ARG_NUMBER_VALUE(1),
+            value = ENGINE_GET_ARG_NUMBER_VALUE(2);
+            
+            Color4f col = Color4f::FromHSV(hue, saturation, value);
+            
+            std::vector<v8::Handle<v8::Value>> av(4 ,v8::Undefined(args.GetIsolate()));
+            
+            av[0] = v8::Number::New(isolate, col.r);
+            av[1] = v8::Number::New(isolate, col.g);
+            av[2] = v8::Number::New(isolate, col.b);
+            av[3] = v8::Number::New(isolate, col.a);
+            
+            ENGINE_JS_SCOPE_CLOSE(args.This().As<v8::Function>()->NewInstance(4, &av[0]));
+        }
+        
+        ENGINE_JS_METHOD(Color_ToString) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            std::stringstream sb;
+            
+            sb << "[color rgba(";
+            
+            sb << std::floor(args.This()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "r"))->NumberValue() * 255) << ", ";
+            sb << std::floor(args.This()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "g"))->NumberValue() * 255) << ", ";
+            sb << std::floor(args.This()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "b"))->NumberValue() * 255) << ", ";
+            sb << std::floor(args.This()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "a"))->NumberValue() * 255);
+            
+            sb << ") ]";
+            
+            ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(args.GetIsolate(), sb.str().c_str()));
         }
         
         void InitColorObject(v8::Handle<v8::ObjectTemplate> drawTable) {
@@ -78,11 +161,13 @@ namespace Engine {
             v8::Handle<v8::ObjectTemplate> colorPrototypeTemplate = newColor->PrototypeTemplate();
             v8::Handle<v8::ObjectTemplate> colorInstanceTemplate = newColor->InstanceTemplate();
             
-            v8::Handle<v8::FunctionTemplate> createColor = v8::FunctionTemplate::New(isolate);
+            newColor->Set(isolate, "fromHSV", v8::FunctionTemplate::New(isolate, Color_FromHSV));
             
-            createColor->SetCallHandler(CreateColor);
+            colorPrototypeTemplate->Set(isolate, "toString", v8::FunctionTemplate::New(isolate, Color_ToString));
             
-            drawTable->Set(isolate, "Color", createColor);
+            newColor->SetCallHandler(CreateColor);
+            
+            drawTable->Set(isolate, "Color", newColor);
         }
         
         Draw2D* GetDraw2D(v8::Local<v8::Object> thisValue) {
@@ -361,7 +446,8 @@ namespace Engine {
                 double r = obj->Get(v8::String::NewFromUtf8(isolate, "r"))->NumberValue();
                 double g = obj->Get(v8::String::NewFromUtf8(isolate, "g"))->NumberValue();
                 double b = obj->Get(v8::String::NewFromUtf8(isolate, "b"))->NumberValue();
-                draw2D->GetRender()->SetColor(r, g, b);
+                double a = obj->Get(v8::String::NewFromUtf8(isolate, "a"))->NumberValue();
+                draw2D->GetRender()->SetColor(r, g, b, a);
                 return true;
             } else {
                 return false;
