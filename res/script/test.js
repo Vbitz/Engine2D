@@ -1,4 +1,15 @@
 /* jshint esnext: true */
+/***
+	{
+		"fontCacheList": [
+			"fonts/open_sans.json"
+		],
+		"textureCacheList": [
+			"texture/spriteTest.json",
+			"texture/testing.png"
+		]
+	}
+*/
 
 fs.configDir("testSuite");
 
