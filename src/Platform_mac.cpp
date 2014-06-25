@@ -349,5 +349,19 @@ namespace Engine {
         void NanoSleep(int timeNS) {
             usleep(timeNS);
         }
+        
+        long CryptBytes(unsigned char* buffer, long count) {
+            FILE *fp = std::fopen("/dev/urandom", "r");
+            
+            if (!fp) {
+                return -1;
+            }
+            
+            long ret = fread(buffer, sizeof(unsigned char), count, fp);
+            
+            fclose(fp);
+            
+            return ret;
+        }
     }
 }

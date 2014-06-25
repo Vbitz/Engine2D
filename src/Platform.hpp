@@ -129,5 +129,7 @@ namespace Engine {
         
         void Sleep(int timeS);
         void NanoSleep(int timeNS);
+        
+        long CryptBytes(unsigned char* buf, long len);
     }
 }
