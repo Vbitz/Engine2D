@@ -347,7 +347,7 @@ sys.on("draw", "test.draw", function () {
 	draw.drawSub(img2, 530, 270, 100, 100, t, t += 0.1, 16, 16);
 
 	draw.print(640, 240, "Tinted Image");
-	draw.drawColor = Math.floor(Math.random() * 255 * 255 * 255);
+	draw.drawColor = draw.Color.fromRandom();
 	draw.draw(img, 650, 270, 100, 100);
 
 	draw.drawColor = "white";

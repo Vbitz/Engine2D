@@ -107,8 +107,6 @@ namespace Engine {
             
             v8::Isolate* isolate = args.GetIsolate();
             
-            std::cout << args.Length() << std::endl;
-            
             ENGINE_CHECK_ARGS_LENGTH(3);
             
             ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Hue Component between 0 and 360");
@@ -123,12 +121,29 @@ namespace Engine {
             
             Color4f col = Color4f::FromHSV(hue, saturation, value);
             
-            std::vector<v8::Handle<v8::Value>> av(4 ,v8::Undefined(args.GetIsolate()));
+            std::vector<v8::Handle<v8::Value>> av(4, v8::Undefined(isolate));
             
             av[0] = v8::Number::New(isolate, col.r);
             av[1] = v8::Number::New(isolate, col.g);
             av[2] = v8::Number::New(isolate, col.b);
             av[3] = v8::Number::New(isolate, col.a);
+            
+            ENGINE_JS_SCOPE_CLOSE(args.This().As<v8::Function>()->NewInstance(4, &av[0]));
+        }
+        
+        ENGINE_JS_METHOD(Color_FromRandom) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            static BasicRandom rand = BasicRandom();
+            
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            std::vector<v8::Handle<v8::Value>> av(4, v8::Undefined(isolate));
+            
+            av[0] = v8::Number::New(isolate, rand.NextDouble());
+            av[1] = v8::Number::New(isolate, rand.NextDouble());
+            av[2] = v8::Number::New(isolate, rand.NextDouble());
+            av[3] = v8::Number::New(isolate, 1.0f);
             
             ENGINE_JS_SCOPE_CLOSE(args.This().As<v8::Function>()->NewInstance(4, &av[0]));
         }
@@ -162,6 +177,8 @@ namespace Engine {
             v8::Handle<v8::ObjectTemplate> colorInstanceTemplate = newColor->InstanceTemplate();
             
             newColor->Set(isolate, "fromHSV", v8::FunctionTemplate::New(isolate, Color_FromHSV));
+            newColor->Set(isolate, "fromRandom", v8::FunctionTemplate::New(isolate,
+                Color_FromRandom));
             
             colorPrototypeTemplate->Set(isolate, "toString", v8::FunctionTemplate::New(isolate, Color_ToString));
             
