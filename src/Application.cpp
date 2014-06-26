@@ -534,7 +534,7 @@ namespace Engine {
         
         this->GetRender()->CheckError("PostSetupContext");
         
-        Logger::begin("Window", Logger::LogLevel_Log) << "Loaded OpenGL" << Logger::end();
+        Logger::begin("Window", Logger::LogLevel_Highlight) << "Loaded OpenGL" << Logger::end();
 
         this->GetRender()->Init2d();
     }
@@ -1063,7 +1063,7 @@ namespace Engine {
                     Timer::NotifyPause(Platform::GetTime() - startPauseTime);
                     continue;
                 } else {
-                    if (Config::GetBoolean("core.throttleOnIdle")) {
+                    if (Config::GetBoolean("core.throttleOnIdle") && !this->_window->GetFullscreen()) {
                         Platform::NanoSleep(150000);
                     }
                 }

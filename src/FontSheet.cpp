@@ -39,7 +39,15 @@ namespace Engine {
         this->_load(root, basePath);
     }
     
+    bool FontSheet::IsValid() {
+        return this->_texture->IsValid();
+    }
+    
     void FontSheet::DrawText(RenderDriver* render, float x, float y, float charSize, std::string text) {
+        if (!this->IsValid()) {
+            Logger::begin("FontSheet", Logger::LogLevel_Verbose) << "FontSheet Texture reloaded" << Logger::end();
+            this->_texture = ImageReader::TextureFromFile(this->_texturePath)->GetTexture();
+        }
         render->EnableTexture(this->_texture);
         render->BeginRendering(GL_TRIANGLES); // I would rather render quads but
                                 // OGL 3.x does'nt support them
@@ -118,7 +126,8 @@ namespace Engine {
     }
     
     void FontSheet::_load(Json::Value root, std::string basePath) {
-        this->_texture = ImageReader::TextureFromFile(fontResolvePath(basePath, root["texture"].asString()))->GetTexture();
+        this->_texturePath = fontResolvePath(basePath, root["texture"].asString());
+        this->_texture = ImageReader::TextureFromFile(this->_texturePath)->GetTexture();
         this->_baseSize = root["baseSize"].asFloat();
         this->_charCount = root["charactorCount"].asInt();
         this->_charSpacing = root.get("charactorSpacing", 0.0f).asFloat();

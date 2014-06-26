@@ -40,6 +40,7 @@ namespace Engine {
     }
     
     void GL3Buffer::_init() {
+        this->_renderGL->CheckError("GL3Buffer::_init::Pre");
         glGenVertexArrays(1, &this->_vertexArrayPointer);
         glGenBuffers(1, &this->_elementBufferPointer);
         glGenBuffers(1, &this->_vertexBufferPointer);
@@ -47,6 +48,7 @@ namespace Engine {
     }
     
     void GL3Buffer::_shutdown() {
+        this->_renderGL->CheckError("GL3Buffer::_shutdown::Pre");
         glDeleteBuffers(1, &this->_vertexBufferPointer);
         glDeleteBuffers(1, &this->_elementBufferPointer);
         glDeleteVertexArrays(1, &this->_vertexArrayPointer);
@@ -73,6 +75,8 @@ namespace Engine {
         }
         RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
         
+        this->_renderGL->CheckError("GL3Buffer::Update::Pre");
+        
         if (glIsBuffer(this->_vertexBufferPointer)) {
             glDeleteBuffers(1, &this->_vertexBufferPointer);
         }
@@ -85,13 +89,19 @@ namespace Engine {
         
         this->_init();
         
+        this->_renderGL->CheckError("GL3Buffer::Update::PostInit");
+        
         this->_getShader()->Update();
+        
+        this->_renderGL->CheckError("GL3Buffer::Update::PostUpdateShader");
         
         return true;
     }
     
     void GL3Buffer::Upload(float *vertBuffer, ushort* indexBuffer, int count, size_t formatSize) {
         RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
+        
+        this->_getRender()->CheckError("GL3Buffer::Upload::Pre");
         
         this->Update();
         
@@ -118,6 +128,8 @@ namespace Engine {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+        
+        this->_getRender()->CheckError("GL3Buffer::Upload::Post");
     }
     
     void GL3Buffer::Draw(int mode, glm::mat4 model, glm::mat4 view, int vertexCount) {

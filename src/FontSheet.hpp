@@ -59,6 +59,7 @@ namespace Engine {
         void DrawText(RenderDriver* render, float x, float y, float charSize, std::string text);
         float MeasureText(float charSize, std::string text);
     private:
+        std::string _texturePath;
         Texture* _texture;
         float _baseSize;
         float _charSpacing = 0.0f;

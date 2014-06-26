@@ -89,6 +89,7 @@ namespace Engine {
             bool oneError = false;
             while ((err = glGetError()) != GL_NO_ERROR) {
                 Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : " << GLErrorString(err) << Logger::end();
+                Platform::DumpStackTrace();
                 throw new RenderDriverError(source, err, GLErrorString(err));
             }
             return oneError;
@@ -194,13 +195,22 @@ namespace Engine {
             
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
             
+            this->CheckError("RenderGL3::FlushAll::Pre");
+            
             if (this->_gl3Buffer->Update()) {
                 Logger::begin("RenderGL3", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
             }
             
+            this->CheckError("RenderGL3::FlushAll::PostUpdate");
+            
             this->_gl3Buffer->Upload((float*) _buffer, _indexBuffer, _currentVerts, sizeof(BufferFormat));
+            
+            this->CheckError("RenderGL3::FlushAll::PostUpload");
+            
             //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
             this->_gl3Buffer->Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
+            
+            this->CheckError("RenderGL3::FlushAll::PostDraw");
             
             /* I think this line here needs a story. What happens when you forget it?
              Well as it turns out it will eat though the buffer growing ever bigger until

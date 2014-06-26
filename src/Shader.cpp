@@ -68,11 +68,27 @@ namespace Engine {
         if (this->NeedsUpdate()) {
             RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
             
-            glDeleteShader(this->_vertPointer);
-            glDeleteShader(this->_fragPointer);
-            glDeleteProgram(this->_programPointer);
+            this->_render->CheckError("Shader::Update::Pre");
+            
+            if (glIsShader(this->_vertPointer)) {
+                glDeleteShader(this->_vertPointer);
+            }
+            
+            if (glIsShader(this->_fragPointer)) {
+                glDeleteShader(this->_fragPointer);
+            }
+            
+            if (glIsProgram(this->_programPointer)) {
+                glDeleteProgram(this->_programPointer);
+            }
+            
+            this->_render->CheckError("Shader::Update::PostDelete");
+            
             this->_loaded = false;
             this->Init(this->_vertFilename, this->_fragFilename);
+            
+            this->_render->CheckError("Shader::Update::PostInit");
+            
             return true;
         } else {
             return false;

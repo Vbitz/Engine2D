@@ -58,6 +58,7 @@ namespace Engine {
             bool oneError = false;
             while ((err = glGetError()) != GL_NO_ERROR) {
                 Logger::begin("OpenGL", Logger::LogLevel_Error) << "GLError in " << source << " : " << GLErrorString(err) << Logger::end();
+                Platform::DumpStackTrace();
                 throw new RenderDriverError(source, err, GLErrorString(err));
             }
             return oneError;
