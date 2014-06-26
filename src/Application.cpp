@@ -691,7 +691,8 @@ namespace Engine {
                 size_t keyLength = strcspn(argv[i], "=") - 2;
                 size_t valueLength = strlen(argv[i]) - keyLength - 3; // 2 chars for -C and 1 for =
                 
-                char* key = (char*) malloc(keyLength);
+                char* key = (char*) malloc(keyLength + 1);
+                key[valueLength] = '\0';
                 strncpy(key, &argv[i][2], keyLength);
                 
                 char* value = (char*) malloc(valueLength + 1);
