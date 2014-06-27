@@ -31,6 +31,22 @@
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
 namespace Engine {
+    inline GLenum _polygonModeToGLMode(PolygonMode mode) {
+        switch (mode) {
+            case PolygonMode_Invalid: return NULL;
+                
+            case PolygonMode_Triangles: return GL_TRIANGLES;
+            case PolygonMode_TriangleFan: return GL_TRIANGLE_FAN;
+            case PolygonMode_TriangleStrip: return GL_TRIANGLE_STRIP;
+                
+            case PolygonMode_Lines: return GL_LINES;
+            case PolygonMode_LineLoop: return GL_LINE_LOOP;
+            case PolygonMode_LineStrip: return GL_LINE_STRIP;
+                
+            default: return NULL;
+        }
+    }
+    
     GL3Buffer::GL3Buffer(RenderDriver* render, EffectParameters* params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
         this->_init();
     }
@@ -127,7 +143,7 @@ namespace Engine {
         this->_getRender()->CheckError("GL3Buffer::Upload::Post");
     }
     
-    void GL3Buffer::Draw(int mode, glm::mat4 model, glm::mat4 view, int vertexCount) {
+    void GL3Buffer::Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view, int vertexCount) {
         RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
         
         this->_begin();
@@ -150,7 +166,7 @@ namespace Engine {
         
         this->_getRender()->CheckError("GL3Buffer::Draw::PostUploadUniform");
         
-        glDrawElements(mode, vertexCount, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(_polygonModeToGLMode(mode), vertexCount, GL_UNSIGNED_SHORT, 0);
         
         this->_getRender()->CheckError("GL3Buffer::Draw::PostDraw");
         

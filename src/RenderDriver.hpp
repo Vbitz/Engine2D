@@ -100,7 +100,7 @@ namespace Engine {
         
         virtual void ResetMatrix() = 0;
         
-        virtual void BeginRendering(int mode) = 0;
+        virtual void BeginRendering(PolygonMode mode) = 0;
         
         virtual void EndRendering() = 0;
         

@@ -49,7 +49,7 @@ namespace Engine {
 		~GL3Buffer();
 
 		void Upload(BufferFormat *vertBuffer, ushort* indexBuffer, int count);
-		void Draw(int mode, glm::mat4 model, glm::mat4 view, int vertexCount);
+		void Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view, int vertexCount);
         
         bool NeedsUpdate();
         bool Update();

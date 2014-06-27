@@ -96,6 +96,16 @@ namespace Engine {
         Key_Null
     };
     
+    enum PolygonMode {
+        PolygonMode_Invalid,
+        PolygonMode_LineStrip,
+        PolygonMode_Triangles,
+        PolygonMode_LineLoop,
+        PolygonMode_Lines,
+        PolygonMode_TriangleStrip,
+        PolygonMode_TriangleFan
+    };
+    
     namespace EffectShaderTypes {
         enum Type {
             GLSL_150,

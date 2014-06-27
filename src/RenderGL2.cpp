@@ -39,6 +39,22 @@
 #define BUFFER_SIZE 4096
 
 namespace Engine {
+    inline GLenum _polygonModeToGLMode(PolygonMode mode) {
+        switch (mode) {
+            case PolygonMode_Invalid: return NULL;
+                
+            case PolygonMode_Triangles: return GL_TRIANGLES;
+            case PolygonMode_TriangleFan: return GL_TRIANGLE_FAN;
+            case PolygonMode_TriangleStrip: return GL_TRIANGLE_STRIP;
+                
+            case PolygonMode_Lines: return GL_LINES;
+            case PolygonMode_LineLoop: return GL_LINE_LOOP;
+            case PolygonMode_LineStrip: return GL_LINE_STRIP;
+                
+            default: return NULL;
+        }
+    }
+    
     class RenderGL2 : public RenderDriver {
     public:
         RendererType GetRendererType() override {
@@ -108,8 +124,8 @@ namespace Engine {
             }
         }
         
-        void BeginRendering(int mode) override {
-            glBegin(mode);
+        void BeginRendering(PolygonMode mode) override {
+            glBegin(_polygonModeToGLMode(mode));
         }
         
         void EndRendering() override {

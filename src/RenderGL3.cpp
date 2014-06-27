@@ -136,11 +136,11 @@ namespace Engine {
             }
         }
         
-        void BeginRendering(int mode) override {
+        void BeginRendering(PolygonMode mode) override {
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
             
             if (this->_currentMode != mode ||
-                this->_currentMode == GL_LINE_STRIP) {
+                this->_currentMode == PolygonMode_LineStrip) {
                 // it's a hack, I really need to fix this
                 FlushAll();
                 this->_currentMode = mode;
@@ -331,7 +331,7 @@ namespace Engine {
         BufferFormat _buffer[BUFFER_SIZE];
         ushort _indexBuffer[BUFFER_SIZE];
         
-        GLenum _currentMode = 0;
+        PolygonMode _currentMode = PolygonMode_Invalid;
         
         EffectParameters* _currentEffect;
         
