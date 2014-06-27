@@ -1,4 +1,3 @@
-#version 150
 in vec3 vertex;
 in vec4 color;
 in vec2 texCoard;

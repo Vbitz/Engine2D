@@ -31,6 +31,12 @@
 namespace Engine {
     class RenderGL3;
     
+    enum class ShaderType {
+        All,
+        VertexShader,
+        FragmentShader
+    };
+    
     class Shader {
     public:
         Shader();
@@ -39,7 +45,9 @@ namespace Engine {
         
         ~Shader();
         
-        void Init(std::string vertShaderFilename, std::string fragShaderFilename);
+        void SetMacro(std::string name, ShaderType exposure);
+        
+        void Init(EffectShaderType, std::string vertShaderFilename, std::string fragShaderFilename);
         
         void Begin();
         void End();
@@ -63,10 +71,13 @@ namespace Engine {
         
         bool checkProgramPointer();
         
+        EffectShaderType _type;
+        
         RenderDriver* _render;
         
         bool _loaded;
         
+        std::vector<std::string> _vertexMacros, _fragMacros;
         std::map<std::string, uint> _uniforms;
         std::unordered_map<std::string, glm::mat4> _matrix_uniform_cache;
         std::map<std::string, uint> _attribs;

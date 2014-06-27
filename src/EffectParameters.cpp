@@ -69,7 +69,7 @@ namespace Engine {
         ShaderSpec spec = this->_getBestShaderSpec();
         Shader* shader = new Shader(GetAppSingilton()->GetRender());
         Logger::begin("EffectParameters", Logger::LogLevel_Verbose) << "Using Shader: " << spec.vertexShaderPath << " : " << spec.fragmentShaderPath << Logger::end();
-        shader->Init(spec.vertexShaderPath, spec.fragmentShaderPath);
+        shader->Init(spec.type, spec.vertexShaderPath, spec.fragmentShaderPath);
         return shader;
     }
     

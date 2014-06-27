@@ -30,17 +30,21 @@
 #include "Platform.hpp"
 
 namespace Engine {
+    std::string _getVersionString(EffectShaderType type) {
+        switch (type) {
+            case EffectShaderType::GLSL_120: return "#version 120\n";
+            case EffectShaderType::GLSL_140: return "#version 140\n";
+            case EffectShaderType::GLSL_150: return "#version 150\n";
+            default:
+                return "";
+        }
+    }
+    
     Shader::Shader() : _loaded(false) {
         
     }
     
     Shader::Shader(RenderDriver* render) : _render(render) {
-    }
-    
-    Shader::Shader(RenderDriver* render, std::string shaderFilename) : _loaded(false), _render(render) {
-        this->_vertFilename = "shaders/" + shaderFilename + ".vert";
-        this->_fragFilename = "shaders/" + shaderFilename + ".frag";
-        this->Init(this->_vertFilename, this->_fragFilename);
     }
     
     Shader::~Shader() {
@@ -85,7 +89,7 @@ namespace Engine {
             this->_render->CheckError("Shader::Update::PostDelete");
             
             this->_loaded = false;
-            this->Init(this->_vertFilename, this->_fragFilename);
+            this->Init(this->_type, this->_vertFilename, this->_fragFilename);
             
             this->_render->CheckError("Shader::Update::PostInit");
             
@@ -173,13 +177,24 @@ namespace Engine {
         this->_render->CheckError("Shader::BindVertexAttrib::PostEnable");
     }
     
-    void Shader::Init(std::string vertShaderFilename, std::string fragShaderFilename) {
+    void Shader::SetMacro(std::string name, ShaderType exposure) {
+        if (exposure == ShaderType::All || exposure == ShaderType::VertexShader) {
+            this->_vertexMacros.push_back(name);
+        }
+        if (exposure == ShaderType::All || exposure == ShaderType::FragmentShader) {
+            this->_fragMacros.push_back(name);
+        }
+    }
+    
+    void Shader::Init(EffectShaderType type, std::string vertShaderFilename, std::string fragShaderFilename) {
         RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        
+        this->_type = type;
         
         this->_vertFilename = vertShaderFilename;
         this->_fragFilename = fragShaderFilename;
-        const char* vertShader = Filesystem::GetFileContent(vertShaderFilename);
-        const char* fragShader = Filesystem::GetFileContent(fragShaderFilename);
+        char* vertShader = Filesystem::GetFileContent(vertShaderFilename);
+        char* fragShader = Filesystem::GetFileContent(fragShaderFilename);
         
         this->_vertLastModify = Filesystem::GetFileModifyTime(vertShaderFilename);
         this->_fragLastModify = Filesystem::GetFileModifyTime(fragShaderFilename);
@@ -194,6 +209,10 @@ namespace Engine {
             vertShader = Filesystem::GetFileContent(vertShaderFilename);
             fragShader = Filesystem::GetFileContent(fragShaderFilename);
         }
+        
+        std::free(vertShader);
+        std::free(fragShader);
+        
         this->_loaded = true;
     }
     
@@ -203,7 +222,25 @@ namespace Engine {
         this->_vertPointer = glCreateShader(GL_VERTEX_SHADER);
         this->_fragPointer = glCreateShader(GL_FRAGMENT_SHADER);
         
-        glShaderSource(this->_vertPointer, 1, &vertSource, NULL);
+        std::string versionString = _getVersionString(this->_type);
+        
+        std::stringstream vertBuilder, fragBuilder;
+        
+        for (auto iter = this->_vertexMacros.begin(); iter != this->_vertexMacros.end(); iter++) {
+            vertBuilder << "#define " << &iter << '\n';
+        }
+        
+        for (auto iter = this->_fragMacros.begin(); iter != this->_fragMacros.end(); iter++) {
+            vertBuilder << "#define " << &iter << '\n';
+        }
+        
+        const char *vertSources[3] = {
+            versionString.c_str(),
+            vertBuilder.str().c_str(),
+            vertSource
+        };
+        
+        glShaderSource(this->_vertPointer, 3, vertSources, NULL);
       
         glCompileShader(this->_vertPointer);
         
@@ -218,7 +255,13 @@ namespace Engine {
             return false;
         }
         
-        glShaderSource(this->_fragPointer, 1, &fragSource, NULL);
+        const char *fragSources[3] = {
+            versionString.c_str(),
+            fragBuilder.str().c_str(),
+            fragSource
+        };
+        
+        glShaderSource(this->_fragPointer, 3, fragSources, NULL);
         
         glCompileShader(this->_fragPointer);
         

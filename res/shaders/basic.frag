@@ -1,4 +1,3 @@
-#version 150
 in vec4 postColor;
 in vec2 postTexCoard;
 in vec4 postVertex;
