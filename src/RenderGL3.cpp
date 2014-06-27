@@ -203,7 +203,7 @@ namespace Engine {
             
             this->CheckError("RenderGL3::FlushAll::PostUpdate");
             
-            this->_gl3Buffer->Upload((float*) _buffer, _indexBuffer, _currentVerts, sizeof(BufferFormat));
+            this->_gl3Buffer->Upload(this->_buffer, this->_indexBuffer, this->_currentVerts);
             
             this->CheckError("RenderGL3::FlushAll::PostUpload");
             
@@ -327,20 +327,6 @@ namespace Engine {
         int _centerY = 0;
         
         int _currentVerts = 0;
-        
-        /*
-         Buffer format
-         (x, y, z)      Position
-         (r, g, b, a)   Color
-         (u, v)         TexCourd
-         */
-        
-#pragma pack(0)
-        struct BufferFormat {
-            glm::vec3 pos;
-            Color4f col;
-            glm::vec2 uv;
-        };
         
         BufferFormat _buffer[BUFFER_SIZE];
         ushort _indexBuffer[BUFFER_SIZE];

@@ -29,12 +29,26 @@ namespace Engine {
     class Shader;
     class RenderGL3;
     
+    /*
+     Buffer format
+     (x, y, z)      Position
+     (r, g, b, a)   Color
+     (u, v)         TexCourd
+     */
+    
+#pragma pack(0)
+    struct BufferFormat {
+        glm::vec3 pos;
+        Color4f col;
+        glm::vec2 uv;
+    };
+    
 	class GL3Buffer {
 	public:
 		GL3Buffer(RenderDriver* render, EffectParameters* params);
 		~GL3Buffer();
 
-		void Upload(float *vertBuffer, ushort* indexBuffer, int count, size_t formatSize);
+		void Upload(BufferFormat *vertBuffer, ushort* indexBuffer, int count);
 		void Draw(int mode, glm::mat4 model, glm::mat4 view, int vertexCount);
         
         bool NeedsUpdate();
@@ -48,6 +62,9 @@ namespace Engine {
         void _init();
         void _shutdown();
         Shader* _getShader();
+        
+        void _begin();
+        void _end();
         
 		void bindShader();
         

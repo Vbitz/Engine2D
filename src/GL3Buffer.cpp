@@ -98,23 +98,20 @@ namespace Engine {
         return true;
     }
     
-    void GL3Buffer::Upload(float *vertBuffer, ushort* indexBuffer, int count, size_t formatSize) {
+    void GL3Buffer::Upload(BufferFormat *vertBuffer, ushort* indexBuffer, int count) {
         RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
         
         this->_getRender()->CheckError("GL3Buffer::Upload::Pre");
         
         this->Update();
         
-        glBindVertexArray(this->_vertexArrayPointer);
-        glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
+        this->_begin();
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PreUploadBufferData");
         
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * formatSize * count, vertBuffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(BufferFormat) * count, vertBuffer, GL_STATIC_DRAW);
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadBufferData");
-        
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->_elementBufferPointer);
         
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort) * count, indexBuffer, GL_STATIC_DRAW);
         
@@ -125,17 +122,15 @@ namespace Engine {
             this->_shaderBound = true;
         }
         
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        this->_end();
         
         this->_getRender()->CheckError("GL3Buffer::Upload::Post");
     }
     
     void GL3Buffer::Draw(int mode, glm::mat4 model, glm::mat4 view, int vertexCount) {
-        glBindVertexArray(this->_vertexArrayPointer);
-        glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->_elementBufferPointer);
+        RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
+        
+        this->_begin();
         
         this->_getShader()->Begin();
         
@@ -161,6 +156,16 @@ namespace Engine {
         
         this->_getShader()->End();
         
+        this->_end();
+    }
+    
+    void GL3Buffer::_begin() {
+        glBindVertexArray(this->_vertexArrayPointer);
+        glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->_elementBufferPointer);
+    }
+    
+    void GL3Buffer::_end() {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
