@@ -33,16 +33,9 @@
 
 #include "ScriptingManager.hpp"
 
+#include "RenderTypes.hpp"
+
 namespace Engine {
-    enum EventMagic {
-        EM_OK,
-        EM_CANCEL,
-        
-        // internal values
-        EM_BADFILTER,
-        EM_BADTARGET
-    };
-    
     namespace Events {
         typedef EventMagic (*EventTargetFunc)(Json::Value e);
         

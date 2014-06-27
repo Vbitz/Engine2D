@@ -27,6 +27,8 @@
 #include "Config.hpp"
 #include "Profiler.hpp"
 
+#define SEC_TO_NSEC 1000000000
+
 namespace Engine {
     char getSpecialChars(int key) {
         switch (key) {
@@ -61,6 +63,8 @@ namespace Engine {
         for (int i = 0; i < 100; i++) {
             this->_lastDrawTimes[i] = 0.0f;
         }
+        
+        Events::GetEvent("onDrawProfileEnd")->AddListener("EngineUI::_profilerHook", Events::MakeTarget(_profilerHook));
     }
     
     void EngineUI::Draw() {
@@ -116,7 +120,7 @@ namespace Engine {
             return;
         }
         
-        if (this->_currentView == CurrentView_Console) {
+        if (this->_currentView == CurrentView::Console) {
             std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
             
             bool showVerbose = Config::GetBoolean("core.debug.engineUI.showVerboseLog"); // pretty cheap
@@ -201,7 +205,7 @@ namespace Engine {
             renderGL->SetColor(1.0f, 1.0f, 1.0f);
             renderGL->SetFont("basic", 12);
             renderGL->Print(10, windowSize.y - 22, (this->_currentConsoleInput.str() + "_").c_str());
-        } else if (this->_currentView == CurrentView_Settings) {
+        } else if (this->_currentView == CurrentView::Settings) {
             int i = 50;
             Config::UIConfigCollection configItems = Config::GetAllUI();
             
@@ -213,7 +217,6 @@ namespace Engine {
                     renderGL->Print(x + 37, i + 2, iter->first.c_str());
                     
                     float textOffset = (x > 0 ? windowSize.x : (windowSize.x / 2)) - 55;
-                    
                     if (iter->second.type == Config::ConfigType_Bool) {
                         // render boolean checkbox
                         if (iter->second.value == "true") {
@@ -245,6 +248,71 @@ namespace Engine {
                     break;
                 }
             }
+        } else if (this->_currentView == CurrentView::Profiler) {
+            int y = 100;
+            int x = 0;
+            
+            std::stringstream ss;
+            
+            renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f, 0.8f);
+            this->_draw->Rect(0, 50, windowSize.x, 25);
+            
+            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+            renderGL->SetFont("basic", 16);
+            renderGL->Print(windowSize.x - 160, 55, "Press R to Refresh");
+            
+            renderGL->SetFont("basic", 10);
+            
+            this->_draw->Rect(0, 80, windowSize.x, 18);
+            
+            renderGL->SetColor(0.1f, 0.1f, 0.1f);
+            
+            renderGL->Print(20,  85, "Name");
+            renderGL->Print(680, 85, "Count");
+            renderGL->Print(750, 85, "Avg (ns)");
+            renderGL->Print(850, 85, "Min (ns)");
+            renderGL->Print(950, 85, "Max (ns)");
+            
+            for (auto iter = this->_cachedProfilerDetails.begin();
+                 iter != this->_cachedProfilerDetails.end();
+                 iter++) {
+                std::string key = iter.key().asString();
+                
+                if (x++ % 2) {
+                    renderGL->SetColor(60 / 255.0f, 60 / 255.0f, 60 / 255.0f, 0.9f);
+                } else {
+                    renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+                }
+                this->_draw->Rect(0, y, windowSize.x, 18);
+                
+                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+                renderGL->Print(20, y + 4, key.c_str());
+                
+                ss.str("");
+                ss << (*iter)["count"].asDouble();
+                
+                renderGL->Print(680, y + 4, ss.str().c_str());
+                
+                ss.str("");
+                ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
+                
+                renderGL->Print(750, y + 4, ss.str().c_str());
+                
+                ss.str("");
+                ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
+                
+                renderGL->Print(850, y + 4, ss.str().c_str());
+                
+                ss.str("");
+                ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
+                
+                renderGL->Print(950, y + 4, ss.str().c_str());
+                
+                y += 18;
+                if (y > windowSize.y) {
+                    break;
+                }
+            }
         }
         
         renderGL->SetFont("basic", 10);
@@ -252,17 +320,23 @@ namespace Engine {
         renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.95f);
         this->_draw->Rect(0, 20, windowSize.x, 20);
         
-        if (this->_currentView == CurrentView_Console)
+        if (this->_currentView == CurrentView::Console)
             renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
         else
             renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
         renderGL->Print(10, 24, "Console (F1)");
         
-        if (this->_currentView == CurrentView_Settings)
+        if (this->_currentView == CurrentView::Settings)
             renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
         else
             renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
         renderGL->Print(130, 24, "Settings (F2)");
+        
+        if (this->_currentView == CurrentView::Profiler)
+            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+        else
+            renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
+        renderGL->Print(250, 24, "Profiler (F3)");
     }
 
     void EngineUI::OnKeyPress(int key, int press, bool shift) {
@@ -281,10 +355,12 @@ namespace Engine {
         }
         
         if (key == Key_F1 && press == Key_Press) {
-            this->_currentView = CurrentView_Console;
+            this->_currentView = CurrentView::Console;
         } else if (key == Key_F2 && press == Key_Press) {
-            this->_currentView = CurrentView_Settings;
-        } else if (this->_currentView == CurrentView_Console) {
+            this->_currentView = CurrentView::Settings;
+        } else if (key == Key_F3 && press == Key_Press) {
+            this->_currentView = CurrentView::Profiler;
+        } else if (this->_currentView == CurrentView::Console) {
             if (key < 256 && (press == Key_Press || press == Key_Repeat) && key != Key_Console && key != Key_Enter) {
 #ifndef _PLATFORM_WIN32
                 this->_currentConsoleInput << (char) (shift ? getSpecialChars(key) : (char) std::tolower(key));
@@ -325,6 +401,10 @@ namespace Engine {
                 this->_currentHistoryLine = this->_commandHistory.size();
                 this->_currentConsoleInput.str("");
             }
+        } else if (this->_currentView == CurrentView::Profiler) {
+            if (key == 'R' && press == Key_Press) {
+                Events::GetEvent("doDrawProfile")->Emit();
+            }
         }
     }
     
@@ -342,5 +422,11 @@ namespace Engine {
     
     bool EngineUI::ConsoleActive() {
         return this->_showConsole;
+    }
+    
+    EventMagic EngineUI::_profilerHook(Json::Value args) {
+        EngineUI* eui = GetAppSingilton()->GetEngineUI();
+        
+        eui->_cachedProfilerDetails = args["results"];
     }
 }

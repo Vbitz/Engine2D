@@ -35,7 +35,7 @@
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 8192
 
 namespace Engine {
     std::string GLErrorString(int error) {
@@ -154,7 +154,7 @@ namespace Engine {
         void EndRendering() override {
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
             
-            if (this->_currentVerts > BUFFER_SIZE - 256) {
+            if (this->_currentVerts > (BUFFER_SIZE - (BUFFER_SIZE / 4))) {
                 FlushAll();
                 BeginRendering(_currentMode);
             }

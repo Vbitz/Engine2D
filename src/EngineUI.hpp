@@ -29,9 +29,10 @@ namespace Engine {
     
     class EngineUI {
     public:
-        enum CurrentView {
-            CurrentView_Console,
-            CurrentView_Settings
+        enum class CurrentView {
+            Console,
+            Settings,
+            Profiler
         };
         
         EngineUI(Application* app);
@@ -50,7 +51,7 @@ namespace Engine {
         Application* _app;
         Draw2D* _draw;
         
-        CurrentView _currentView = CurrentView_Console;
+        CurrentView _currentView = CurrentView::Console;
         
         std::stringstream _ss;
         
@@ -65,5 +66,8 @@ namespace Engine {
         
         std::vector<std::string> _commandHistory;
         size_t _currentHistoryLine = 0;
+        
+        Json::Value _cachedProfilerDetails;
+        static EventMagic _profilerHook(Json::Value args);
     };
 }

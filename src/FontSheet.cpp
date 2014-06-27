@@ -49,8 +49,7 @@ namespace Engine {
             this->_texture = ImageReader::TextureFromFile(this->_texturePath)->GetTexture();
         }
         render->EnableTexture(this->_texture);
-        render->BeginRendering(PolygonMode::Triangles); // I would rather render quads but
-                                // OGL 3.x does'nt support them
+        render->BeginRendering(PolygonMode::Triangles); // I would rather render quads but OGL 3.x does'nt support them
         FontSizeRef size = this->_getBestSize(charSize);
         float currentX = x;
         float chrWidth = charSize / size.size;

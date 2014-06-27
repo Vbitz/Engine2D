@@ -120,5 +120,14 @@ namespace Engine {
         GLSL_440, // OpenGL 4.4
         Unknown
     };
+    
+    enum EventMagic {
+        EM_OK,
+        EM_CANCEL,
+        
+        // internal values
+        EM_BADFILTER,
+        EM_BADTARGET
+    };
 }
 
