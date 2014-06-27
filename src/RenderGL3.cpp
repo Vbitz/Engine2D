@@ -35,8 +35,6 @@
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
-#define BUFFER_SIZE 8192
-
 namespace Engine {
     std::string GLErrorString(int error) {
         switch (error) {
@@ -151,14 +149,7 @@ namespace Engine {
             }
         }
         
-        void EndRendering() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
-            
-            if (this->_currentVerts > (BUFFER_SIZE - (BUFFER_SIZE / 4))) {
-                FlushAll();
-                BeginRendering(_currentMode);
-            }
-        }
+        void EndRendering() override { }
         
         void EnableTexture(Texture* texId) override {
             this->_currentTexture = texId;
@@ -203,7 +194,7 @@ namespace Engine {
             
             this->CheckError("RenderGL3::FlushAll::PostUpdate");
             
-            this->_gl3Buffer->Upload(this->_buffer, this->_indexBuffer, this->_currentVerts);
+            this->_gl3Buffer->Upload(&this->_buffer[0], &this->_indexBuffer[0], this->_currentVerts);
             
             this->CheckError("RenderGL3::FlushAll::PostUpload");
             
@@ -220,7 +211,9 @@ namespace Engine {
              exceptions it's self to death over the span of 3 frames. This was my best line
              that day.
              */
-            _currentVerts = 0;
+            this->_currentVerts = 0;
+            this->_buffer.clear();
+            this->_indexBuffer.clear();
             
             // maybe zero the buffer
             
@@ -297,27 +290,24 @@ namespace Engine {
         }
         
         void _addVert(float x, float y, float z, Color4f col, float s, float t) override {
-            _buffer[_currentVerts].pos = glm::vec3(x - _centerX, y - _centerY, z);
-            _buffer[_currentVerts].col = col;
-            _buffer[_currentVerts].uv = glm::vec2(s, t);
-            _indexBuffer[_currentVerts] = _currentVerts;
-            _currentVerts++;
+            this->_buffer.push_back(BufferFormat({
+                .pos = glm::vec3(x - _centerX, y - _centerY, z),
+                .col = col,
+                .uv = glm::vec2(s, t)
+            }));
+            this->_indexBuffer.push_back(_currentVerts);
+            this->_currentVerts++;
         }
         
     private:
         void _switchTextures() {
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
             
-            //if (this->_activeTexture != NULL) {
-            //    this->_activeTexture->End();
-            //}
-            
             this->_activeTexture = this->_currentTexture;
             
             try {
                 this->_activeTexture->Begin();
             } catch (...) {
-                //this->_activeTexture->End();
                 this->_activeTexture = this->_defaultTexture;
                 this->_activeTexture->Begin();
             }
@@ -328,8 +318,8 @@ namespace Engine {
         
         int _currentVerts = 0;
         
-        BufferFormat _buffer[BUFFER_SIZE];
-        ushort _indexBuffer[BUFFER_SIZE];
+        std::vector<BufferFormat> _buffer;
+        std::vector<ushort> _indexBuffer;
         
         PolygonMode _currentMode = PolygonMode::Invalid;
         

@@ -36,8 +36,6 @@
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
-#define BUFFER_SIZE 4096
-
 namespace Engine {
     inline GLenum _polygonModeToGLMode(PolygonMode mode) {
         switch (mode) {
