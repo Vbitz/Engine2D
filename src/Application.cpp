@@ -522,7 +522,7 @@ namespace Engine {
         glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
         
-        if (v == Graphics_OpenGL_Legacy) {
+        if (v == GraphicsVersion::OpenGL_Legacy) {
             glDisable(GL_LIGHTING);
         }
         
@@ -545,9 +545,9 @@ namespace Engine {
         GraphicsVersion v;
         
         if (openGL3Context == "3.2") {
-            v = Graphics_OpenGL_Modern;
+            v = GraphicsVersion::OpenGL_Modern;
         } else {
-            v = Graphics_OpenGL_Legacy;
+            v = GraphicsVersion::OpenGL_Legacy;
         }
         
         this->_window = CreateWindow(v);

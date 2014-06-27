@@ -41,15 +41,15 @@
 namespace Engine {
     inline GLenum _polygonModeToGLMode(PolygonMode mode) {
         switch (mode) {
-            case PolygonMode_Invalid: return NULL;
+            case PolygonMode::Invalid: return NULL;
                 
-            case PolygonMode_Triangles: return GL_TRIANGLES;
-            case PolygonMode_TriangleFan: return GL_TRIANGLE_FAN;
-            case PolygonMode_TriangleStrip: return GL_TRIANGLE_STRIP;
+            case PolygonMode::Triangles: return GL_TRIANGLES;
+            case PolygonMode::TriangleFan: return GL_TRIANGLE_FAN;
+            case PolygonMode::TriangleStrip: return GL_TRIANGLE_STRIP;
                 
-            case PolygonMode_Lines: return GL_LINES;
-            case PolygonMode_LineLoop: return GL_LINE_LOOP;
-            case PolygonMode_LineStrip: return GL_LINE_STRIP;
+            case PolygonMode::Lines: return GL_LINES;
+            case PolygonMode::LineLoop: return GL_LINE_LOOP;
+            case PolygonMode::LineStrip: return GL_LINE_STRIP;
                 
             default: return NULL;
         }
@@ -58,15 +58,15 @@ namespace Engine {
     class RenderGL2 : public RenderDriver {
     public:
         RendererType GetRendererType() override {
-            return RendererType_OpenGL2;
+            return RendererType::OpenGL2;
         }
         
         OpenGLVersion GetOpenGLVersion() override {
             return GetAppSingilton()->GetWindow()->GetGlVersion();
         }
         
-        EffectShaderTypes::Type GetBestEffectShaderType() override {
-            return EffectShaderTypes::GLSL_150;
+        EffectShaderType GetBestEffectShaderType() override {
+            return EffectShaderType::GLSL_150;
         }
         
         bool CheckError(const char* source) override {

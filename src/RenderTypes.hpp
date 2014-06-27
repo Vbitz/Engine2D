@@ -25,9 +25,9 @@
 #include <sstream>
 
 namespace Engine {
-    enum RendererType {
-        RendererType_OpenGL3,
-        RendererType_OpenGL2
+    enum class RendererType {
+        OpenGL3,
+        OpenGL2
     };
     
     struct OpenGLVersion {
@@ -47,9 +47,9 @@ namespace Engine {
         MouseButton_Middle
     };
     
-    enum GraphicsVersion {
-        Graphics_OpenGL_Modern,
-        Graphics_OpenGL_Legacy
+    enum class GraphicsVersion {
+        OpenGL_Modern,
+        OpenGL_Legacy
     };
     
     enum KeyStatus {
@@ -96,21 +96,29 @@ namespace Engine {
         Key_Null
     };
     
-    enum PolygonMode {
-        PolygonMode_Invalid,
-        PolygonMode_LineStrip,
-        PolygonMode_Triangles,
-        PolygonMode_LineLoop,
-        PolygonMode_Lines,
-        PolygonMode_TriangleStrip,
-        PolygonMode_TriangleFan
+    enum class PolygonMode {
+        Invalid,
+        LineStrip,
+        Triangles,
+        LineLoop,
+        Lines,
+        TriangleStrip,
+        TriangleFan
     };
     
-    namespace EffectShaderTypes {
-        enum Type {
-            GLSL_150,
-            Unknown
-        };
-    }
+    enum class EffectShaderType {
+        GLSL_110, // OpenGL 2.0
+        GLSL_120, // OpenGL 2.1
+        GLSL_130, // OpenGL 3.0
+        GLSL_140, // OpenGL 3.1
+        GLSL_150, // OpenGL 3.2
+        GLSL_330, // OpenGL 3.3
+        GLSL_400, // OpenGL 4.0
+        GLSL_410, // OpenGL 4.1
+        GLSL_420, // OpenGL 4.2
+        GLSL_430, // OpenGL 4.3
+        GLSL_440, // OpenGL 4.4
+        Unknown
+    };
 }
 

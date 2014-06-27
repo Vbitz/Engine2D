@@ -73,15 +73,15 @@ namespace Engine {
     class RenderGL3 : public RenderDriver {
     public:
         RendererType GetRendererType() override {
-            return RendererType_OpenGL3;
+            return RendererType::OpenGL3;
         }
         
         OpenGLVersion GetOpenGLVersion() override {
             return GetAppSingilton()->GetWindow()->GetGlVersion();
         }
         
-        EffectShaderTypes::Type GetBestEffectShaderType() override {
-            return EffectShaderTypes::GLSL_150;
+        EffectShaderType GetBestEffectShaderType() override {
+            return EffectShaderType::GLSL_150;
         }
         
         bool CheckError(const char* source) override {
@@ -140,7 +140,7 @@ namespace Engine {
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
             
             if (this->_currentMode != mode ||
-                this->_currentMode == PolygonMode_LineStrip) {
+                this->_currentMode == PolygonMode::LineStrip) {
                 // it's a hack, I really need to fix this
                 FlushAll();
                 this->_currentMode = mode;
@@ -331,7 +331,7 @@ namespace Engine {
         BufferFormat _buffer[BUFFER_SIZE];
         ushort _indexBuffer[BUFFER_SIZE];
         
-        PolygonMode _currentMode = PolygonMode_Invalid;
+        PolygonMode _currentMode = PolygonMode::Invalid;
         
         EffectParameters* _currentEffect;
         

@@ -33,15 +33,15 @@
 namespace Engine {
     inline GLenum _polygonModeToGLMode(PolygonMode mode) {
         switch (mode) {
-            case PolygonMode_Invalid: return NULL;
+            case PolygonMode::Invalid: return NULL;
                 
-            case PolygonMode_Triangles: return GL_TRIANGLES;
-            case PolygonMode_TriangleFan: return GL_TRIANGLE_FAN;
-            case PolygonMode_TriangleStrip: return GL_TRIANGLE_STRIP;
+            case PolygonMode::Triangles: return GL_TRIANGLES;
+            case PolygonMode::TriangleFan: return GL_TRIANGLE_FAN;
+            case PolygonMode::TriangleStrip: return GL_TRIANGLE_STRIP;
                 
-            case PolygonMode_Lines: return GL_LINES;
-            case PolygonMode_LineLoop: return GL_LINE_LOOP;
-            case PolygonMode_LineStrip: return GL_LINE_STRIP;
+            case PolygonMode::Lines: return GL_LINES;
+            case PolygonMode::LineLoop: return GL_LINE_LOOP;
+            case PolygonMode::LineStrip: return GL_LINE_STRIP;
                 
             default: return NULL;
         }

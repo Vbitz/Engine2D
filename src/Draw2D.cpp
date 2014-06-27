@@ -35,7 +35,7 @@ namespace Engine {
     
     void Draw2D::Rect(float x, float y, float w, float h) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
-        renderGL->BeginRendering(PolygonMode_Triangles);
+        renderGL->BeginRendering(PolygonMode::Triangles);
             renderGL->AddVert(x, y, 0);
             renderGL->AddVert(x + w, y, 0);
             renderGL->AddVert(x + w, y + h, 0);
@@ -47,7 +47,7 @@ namespace Engine {
     
     void Draw2D::Grid(float x, float y, float w, float h) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
-        renderGL->BeginRendering(PolygonMode_LineLoop);
+        renderGL->BeginRendering(PolygonMode::LineLoop);
             renderGL->AddVert(x, y, 0);
             renderGL->AddVert(x + w, y, 0);
             renderGL->AddVert(x + w, y + h, 0);
@@ -60,9 +60,9 @@ namespace Engine {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->EnableTexture(tex);
         
-        renderGL->BeginRendering(PolygonMode_Triangles);
+        renderGL->BeginRendering(PolygonMode::Triangles);
         
-        if (renderGL->GetRendererType() == RendererType_OpenGL3) {
+        if (renderGL->GetRendererType() == RendererType::OpenGL3) {
             renderGL->CheckError("Draw2D::DrawImage::PostStart"); // throws GL_INVALID_OPERATION when Begin turns into glBegin
         }
         
@@ -90,7 +90,7 @@ namespace Engine {
         int imageWidth = tex->GetWidth();
         int imageHeight = tex->GetHeight();
         
-        renderGL->BeginRendering(PolygonMode_Triangles);
+        renderGL->BeginRendering(PolygonMode::Triangles);
         //                x           y           z       s                       t
         renderGL->AddVert(x1,         y1,         0,      x2 / imageWidth,        y2 / imageHeight);
         renderGL->AddVert(x1 + w1,    y1,         0,      (x2 + w2) / imageWidth, y2 / imageHeight);
@@ -120,7 +120,7 @@ namespace Engine {
         
         Color4f color2(col2);
         
-        renderGL->BeginRendering(PolygonMode_Triangles);
+        renderGL->BeginRendering(PolygonMode::Triangles);
         if (vert) {
             renderGL->AddVert(x, y, 0, color1);
             renderGL->AddVert(x + w, y, 0, color1);
@@ -141,7 +141,7 @@ namespace Engine {
     
     void Draw2D::Line(float x0, float y0, float x1, float y1) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
-        renderGL->BeginRendering(PolygonMode_Lines);
+        renderGL->BeginRendering(PolygonMode::Lines);
             renderGL->AddVert(x0, y0, 0.0f);
             renderGL->AddVert(x1, y1, 0.0f);
         renderGL->EndRendering();
@@ -149,7 +149,7 @@ namespace Engine {
     
     void Draw2D::Lines(float* points, unsigned int count) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
-        renderGL->BeginRendering(PolygonMode_LineStrip);
+        renderGL->BeginRendering(PolygonMode::LineStrip);
         for (int i = 0; i < count * 2; i += 2) {
             renderGL->AddVert(points[i], points[i + 1], 0);
         }
@@ -186,7 +186,7 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     void Draw2D::Circle(float xCenter, float yCenter, float radius, float innerRadius,
                         int segments, float start, float end, bool fill) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
-        bool usingGl3 = renderGL->GetRendererType() == RendererType_OpenGL3;
+        bool usingGl3 = renderGL->GetRendererType() == RendererType::OpenGL3;
         static double pi2 = 2 * 3.14159265358979323846;
         float rStart = pi2 * start;
         float rEnd = pi2 * end;
@@ -194,10 +194,10 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
         if (usingGl3) {
             renderGL->FlushAll();
         }
-        renderGL->BeginRendering(fill ? (innerRadius != radius ? PolygonMode_TriangleStrip // doughnut
-                               : PolygonMode_TriangleFan) // filled circle
-                       : (end == 1.0f ? PolygonMode_LineLoop // circle outline
-                          : PolygonMode_LineStrip // circle outline segment
+        renderGL->BeginRendering(fill ? (innerRadius != radius ? PolygonMode::TriangleStrip // doughnut
+                               : PolygonMode::TriangleFan) // filled circle
+                       : (end == 1.0f ? PolygonMode::LineLoop // circle outline
+                          : PolygonMode::LineStrip // circle outline segment
                           ));
         if (fill) {
             if (innerRadius == radius) {
@@ -228,7 +228,7 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
     
     // points are in the format [x, y, x, y]
     void Draw2D::Polygon(float xCenter, float yCenter, float* points, int pointCount) {
-        renderGL->BeginRendering(PolygonMode_TriangleFan);
+        renderGL->BeginRendering(PolygonMode::TriangleFan);
         
         renderGL->AddVert(xCenter, yCenter, 0.0f);
         
@@ -240,7 +240,7 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
         
         renderGL->EndRendering();
         
-        if (renderGL->GetRendererType() == RendererType_OpenGL3) {
+        if (renderGL->GetRendererType() == RendererType::OpenGL3) {
             renderGL->FlushAll();
         }
     }
@@ -284,7 +284,7 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         glm::vec3 q0 = _calculateBezierPoint(0, vec1, vec2, vec3, vec4);
         
-        renderGL->BeginRendering(PolygonMode_LineStrip);
+        renderGL->BeginRendering(PolygonMode::LineStrip);
         
         renderGL->AddVert(q0.x, q0.y, q0.z);
         

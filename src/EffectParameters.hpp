@@ -32,7 +32,7 @@ namespace Engine {
     class Shader;
     
     typedef struct {
-        EffectShaderTypes::Type type;
+        EffectShaderType type;
         std::string vertexShaderPath;
         std::string fragmentShaderPath;
     } ShaderSpec;

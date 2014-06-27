@@ -399,12 +399,12 @@ namespace Engine {
             
             glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
             
-            if (this->_version == Graphics_OpenGL_Modern) {
+            if (this->_version == GraphicsVersion::OpenGL_Modern) {
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
                 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
                 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-            } else if (this->_version == Graphics_OpenGL_Legacy) {
+            } else if (this->_version == GraphicsVersion::OpenGL_Legacy) {
                 
             }
             
@@ -443,10 +443,10 @@ namespace Engine {
             glfwSetMouseButtonCallback(this->_window, WindowMouseButton);
             
             switch (this->_version) {
-                case Graphics_OpenGL_Modern:
+                case GraphicsVersion::OpenGL_Modern:
                     this->_render = CreateRenderGL3();
                     break;
-                case Graphics_OpenGL_Legacy:
+                case GraphicsVersion::OpenGL_Legacy:
                     this->_render = CreateRenderGL2();
                     break;
             }

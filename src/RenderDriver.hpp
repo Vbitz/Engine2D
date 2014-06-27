@@ -91,7 +91,7 @@ namespace Engine {
         
         virtual RendererType GetRendererType() = 0;
         virtual OpenGLVersion GetOpenGLVersion() = 0;
-        virtual EffectShaderTypes::Type GetBestEffectShaderType() = 0;
+        virtual EffectShaderType GetBestEffectShaderType() = 0;
         
         virtual bool CheckError(const char* source) = 0;
         

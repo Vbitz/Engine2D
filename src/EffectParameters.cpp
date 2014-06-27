@@ -25,11 +25,21 @@
 
 namespace Engine {
     
-    EffectShaderTypes::Type shaderTypeFromString(std::string type) {
-        if (type == "glsl_150")
-            return EffectShaderTypes::GLSL_150;
-        else
-            return EffectShaderTypes::Unknown;
+#define EFFECT_SHADER_TYPE(str,enum) if (type == str) return enum;
+    
+    EffectShaderType shaderTypeFromString(std::string type) {
+             EFFECT_SHADER_TYPE("glsl_110", EffectShaderType::GLSL_110)
+        else EFFECT_SHADER_TYPE("glsl_120", EffectShaderType::GLSL_120)
+        else EFFECT_SHADER_TYPE("glsl_130", EffectShaderType::GLSL_130)
+        else EFFECT_SHADER_TYPE("glsl_140", EffectShaderType::GLSL_140)
+        else EFFECT_SHADER_TYPE("glsl_150", EffectShaderType::GLSL_150)
+        else EFFECT_SHADER_TYPE("glsl_330", EffectShaderType::GLSL_330)
+        else EFFECT_SHADER_TYPE("glsl_400", EffectShaderType::GLSL_400)
+        else EFFECT_SHADER_TYPE("glsl_410", EffectShaderType::GLSL_410)
+        else EFFECT_SHADER_TYPE("glsl_420", EffectShaderType::GLSL_420)
+        else EFFECT_SHADER_TYPE("glsl_430", EffectShaderType::GLSL_430)
+        else EFFECT_SHADER_TYPE("glsl_440", EffectShaderType::GLSL_440)
+        else return EffectShaderType::Unknown;
     }
     
     std::string resolvePath(std::string basePath, std::string path) {
@@ -93,7 +103,7 @@ namespace Engine {
     }
     
     ShaderSpec EffectParameters::_getBestShaderSpec() {
-        EffectShaderTypes::Type bestType = GetAppSingilton()->GetRender()->GetBestEffectShaderType();
+        EffectShaderType bestType = GetAppSingilton()->GetRender()->GetBestEffectShaderType();
         for (auto iter = this->_shaders.begin(); iter != this->_shaders.end(); iter++) {
             if (iter->type == bestType) {
                 return *iter;
