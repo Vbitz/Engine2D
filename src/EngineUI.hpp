@@ -25,7 +25,9 @@
 #include "Draw2D.hpp"
 
 namespace Engine {
-    class Application;
+    ENGINE_CLASS(Application);
+    
+    ENGINE_CLASS(EngineUI);
     
     class EngineUI {
     public:
@@ -35,7 +37,7 @@ namespace Engine {
             Profiler
         };
         
-        EngineUI(Application* app);
+        EngineUI(ApplicationPtr app);
         
         void Draw();
         void OnKeyPress(int key, int press, bool shift);
@@ -48,8 +50,8 @@ namespace Engine {
         
         bool ConsoleActive();
     private:
-        Application* _app;
-        Draw2D* _draw;
+        ApplicationPtr _app;
+        Draw2DPtr _draw;
         
         CurrentView _currentView = CurrentView::Console;
         

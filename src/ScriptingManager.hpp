@@ -21,15 +21,16 @@
 
 #pragma once
 
-#include "unordered_map"
+#include <unordered_map>
 
+#include "stdlib.hpp"
 #include "Scripting.hpp"
 #include "vendor/json/json.h"
 
 namespace Engine {
     namespace ScriptingManager {
-        class ScriptingObject;
-        class FunctionCallbackArgs;
+        ENGINE_CLASS(ScriptingObject);
+        ENGINE_CLASS(FunctionCallbackArgs);
         
         enum ObjectType {
             ObjectType_Invalid,
@@ -42,9 +43,11 @@ namespace Engine {
             ObjectType_Object
         };
         
-        typedef void (*ScriptingFunctionCallback)(FunctionCallbackArgs&);
+        typedef void (*ScriptingFunctionCallback)(FunctionCallbackArgsRef);
         
         void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch);
+        
+        ENGINE_CLASS(ScriptingContext);
         
         class ScriptingContext {
         public:
@@ -56,25 +59,27 @@ namespace Engine {
             
             virtual bool RunString(std::string code, std::string sourceFile) = 0;
             
-            void Set(std::string str, ScriptingObject* obj);
+            void Set(std::string str, ScriptingObjectPtr obj);
             
-            virtual ScriptingObject* CreateObject(ObjectType type) = 0;
-            virtual ScriptingObject* CreateFunction(ScriptingFunctionCallback cb) = 0;
+            virtual ScriptingObjectPtr CreateObject(ObjectType type) = 0;
+            virtual ScriptingObjectPtr CreateFunction(ScriptingFunctionCallback cb) = 0;
             
             virtual void Enter() = 0;
             virtual void Exit() = 0;
             
-            ScriptingObject* operator[](std::string name);
+            ScriptingObjectPtr operator[](std::string name);
         protected:
             virtual bool _globalInit() = 0;
             
-            virtual void _setGlobal(std::string name, ScriptingObject* obj) = 0;
-            virtual ScriptingObject* _getGlobal(std::string name) = 0;
+            virtual void _setGlobal(std::string name, ScriptingObjectPtr obj) = 0;
+            virtual ScriptingObjectPtr _getGlobal(std::string name) = 0;
             
         private:
             bool _created = false;
             bool _destroyed = false;
         };
+        
+        ENGINE_CLASS(ScriptingObject);
         
         class ScriptingObject {
         public:
@@ -93,33 +98,33 @@ namespace Engine {
             virtual std::string GetStringValue(std::string defaultValue = "") = 0;
             virtual bool GetBooleanValue(bool defaultValue = false) = 0;
             
-            virtual bool Call(ScriptingContext* context, ScriptingObject* args) = 0;
+            virtual bool Call(ScriptingContextPtr context, ScriptingObjectPtr args) = 0;
             
             virtual int Length() = 0;
             
-            void Set(std::string str, ScriptingObject* obj);
+            void Set(std::string str, ScriptingObjectPtr obj);
             
-            ScriptingObject* operator[](std::string name);
+            ScriptingObjectPtr operator[](std::string name);
             
         protected:
             
             virtual ScriptingObject* _getChild(std::string name) = 0;
-            virtual void _setChild(std::string name, ScriptingObject* obj) = 0;
+            virtual void _setChild(std::string name, ScriptingObjectPtr obj) = 0;
             void _setType(ObjectType type);
             
         private:
-            ScriptingContext* parent;
+            ScriptingContextPtr parent;
             ObjectType _type = ObjectType_Invalid;
         };
         
         class FunctionCallbackArgs {
         public:
-            ScriptingObject* operator[](int index);
+            ScriptingObjectPtr operator[](int index);
             
             virtual int Length();
         protected:
             
-            virtual ScriptingObject* _getArg(int index);
+            virtual ScriptingObjectPtr _getArg(int index);
         private:
             
         };
@@ -128,16 +133,16 @@ namespace Engine {
         public:
             bool RunString(std::string code, std::string sourceFile) override;
             
-            ScriptingObject* CreateObject(ObjectType type) override;
-            ScriptingObject* CreateFunction(ScriptingFunctionCallback cb) override;
+            ScriptingObjectPtr CreateObject(ObjectType type) override;
+            ScriptingObjectPtr CreateFunction(ScriptingFunctionCallback cb) override;
             
             void Enter() override;
             void Exit() override;
         protected:
             bool _globalInit() override;
             
-            void _setGlobal(std::string name, ScriptingObject* obj) override;
-            ScriptingObject* _getGlobal(std::string name) override;
+            void _setGlobal(std::string name, ScriptingObjectPtr obj) override;
+            ScriptingObjectPtr _getGlobal(std::string name) override;
         private:
             v8::Isolate* _isolate = NULL;
         };
@@ -150,12 +155,12 @@ namespace Engine {
             std::string GetStringValue(std::string defaultValue = "") override;
             bool GetBooleanValue(bool defaultValue = false) override;
             
-            bool Call(ScriptingContext* context, ScriptingObject* args) override;
+            bool Call(ScriptingContextPtr context, ScriptingObjectPtr args) override;
             
             int Length() override;
         protected:
-            ScriptingObject* _getChild(std::string name) override;
-            void _setChild(std::string name, ScriptingObject* obj) override;
+            ScriptingObjectPtr _getChild(std::string name) override;
+            void _setChild(std::string name, ScriptingObjectPtr obj) override;
         private:
             
         };
@@ -167,7 +172,7 @@ namespace Engine {
             }
         };
         
-        ScriptingContext* CreateScriptingContext(std::string providorName);
+        ScriptingContextPtr CreateScriptingContext(std::string providorName);
         
         Json::Value ObjectToJson(v8::Local<v8::Object> obj);
         v8::Local<v8::Object> GetObjectFromJson(Json::Value val);

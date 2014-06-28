@@ -32,9 +32,11 @@
  */
  
 namespace Engine {
-    class Texture;
+    ENGINE_CLASS(Texture);
     
     namespace ResourceManager {
+        ENGINE_CLASS(Source);
+        
         class Source {
         public:
             virtual void Unload() {
@@ -56,6 +58,8 @@ namespace Engine {
             long _savedDataLength;
         };
         
+        ENGINE_CLASS(DummySource);
+        
         class DummySource : public Source {
         public:
             bool NeedsUpdate() {
@@ -72,6 +76,8 @@ namespace Engine {
                 return new unsigned char[0];
             }
         };
+        
+        ENGINE_CLASS(FileSource);
         
         class FileSource : public Source {
         public:
@@ -94,6 +100,8 @@ namespace Engine {
             long _lastModify;
         };
         
+        ENGINE_CLASS(WebSource);
+        
         class WebSource : public Source {
         public:
             WebSource(std::string webRoot, std::string path);
@@ -107,6 +115,8 @@ namespace Engine {
         private:
             std::string _webRoot, _path;
         };
+        
+        ENGINE_CLASS(RawSource);
         
         class RawSource : public Source {
         public:
@@ -131,6 +141,8 @@ namespace Engine {
             unsigned char* data;
             long fileLength;
         };
+        
+        ENGINE_CLASS(Resource);
         
         class Resource {
         public:
@@ -157,10 +169,12 @@ namespace Engine {
             virtual void _load();
             virtual void _unload();
             
-            Source* _source;
+            SourcePtr _source;
             
             bool _loaded;
         };
+        
+        ENGINE_CLASS(ScriptResource);
         
         class ScriptResource : public Resource {
         public:
@@ -176,17 +190,19 @@ namespace Engine {
             void _unload() override;
         };
         
+        ENGINE_CLASS(ImageResource);
+        
         class ImageResource : public Resource {
         public:
             ImageResource() : Resource() {}
             ImageResource(std::string sourceID);
-            ImageResource(Texture* textureID);
+            ImageResource(TexturePtr textureID);
             
             bool IsCritical() override;
             
             std::string GetName() override;
             
-            Texture* GetTexture();
+            TexturePtr GetTexture();
             
         protected:
             void _load() override;
@@ -196,11 +212,11 @@ namespace Engine {
             
             bool _manualTexture;
             
-            Texture* _texture;
+            TexturePtr _texture;
         };
         
         void Load(std::string path);
-        void Load(std::string resourceID, Source* src);
+        void Load(std::string resourceID, SourcePtr src);
         void UnloadAll();
         bool HasSource(std::string sourceID);
     }

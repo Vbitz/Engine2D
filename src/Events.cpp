@@ -108,7 +108,7 @@ namespace Engine {
             v8::Persistent<v8::Function> _func;
         };
         
-        Platform::Mutex* _eventMutex;
+        Platform::MutexPtr _eventMutex;
         std::unordered_map<std::string, EventClass*> _events;
         
         int lastEventID = 0;

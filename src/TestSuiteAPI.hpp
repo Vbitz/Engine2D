@@ -23,7 +23,11 @@
 
 #include <string>
 
+#include "stdlib.hpp"
+
 namespace Engine {
+    ENGINE_CLASS(Test);
+    
     class Test {
     public:
         virtual void Setup() {}
@@ -44,6 +48,6 @@ namespace Engine {
     };
     
     namespace TestSuite {
-        void RegisterTest(Test* t);
+        void RegisterTest(TestPtr t);
     }
 }

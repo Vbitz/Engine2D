@@ -33,7 +33,7 @@ namespace Engine {
 	namespace JSMod {
         
         int _lastOpenModule = 0;
-        std::map<int, Platform::Libary*> _openModules;
+        std::map<int, Platform::LibaryPtr> _openModules;
 
         ENGINE_JS_METHOD(OpenModule) {
             ENGINE_JS_SCOPE_OPEN;
@@ -48,7 +48,7 @@ namespace Engine {
                 ENGINE_THROW_ARGERROR("module does not exist for this platform");
             }
             
-            Platform::Libary* lib = Platform::OpenLibary(Filesystem::GetRealPath(moduleName));
+            Platform::LibaryPtr lib = Platform::OpenLibary(Filesystem::GetRealPath(moduleName));
             
             if (!lib->IsValid()) {
                 ENGINE_THROW_ARGERROR("could not load module");

@@ -29,19 +29,19 @@
 #include "RenderDriver.hpp"
 
 namespace Engine {
-    class RenderGL3;
-    
     enum class ShaderType {
         All,
         VertexShader,
         FragmentShader
     };
     
+    ENGINE_CLASS(Shader);
+    
     class Shader {
     public:
         Shader();
-        Shader(RenderDriver* render);
-        Shader(RenderDriver* render, std::string shaderFilename);
+        Shader(RenderDriverPtr render);
+        Shader(RenderDriverPtr render, std::string shaderFilename);
         
         ~Shader();
         
@@ -73,7 +73,7 @@ namespace Engine {
         
         EffectShaderType _type;
         
-        RenderDriver* _render;
+        RenderDriverPtr _render;
         
         bool _loaded;
         

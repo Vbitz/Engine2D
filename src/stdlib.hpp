@@ -30,9 +30,16 @@
 
 typedef char string_char_t;
 
+#define ENGINE_CLASS(name) \
+    class name; \
+    typedef name& name ## Ref; \
+    typedef name* name ## Ptr;
+
 namespace Engine {
     
     class String;
+    
+    ENGINE_CLASS(Color4f);
     
     class Color4f {
     public:
@@ -73,11 +80,13 @@ namespace Engine {
         
     };
     
+    ENGINE_CLASS(StringBuilder);
+    
     class StringBuilder {
     public:
         String toString();
         
-        StringBuilder& operator<<(const String value);
+        StringBuilderRef operator<<(const String value);
         
         operator String();
     private:
@@ -87,6 +96,8 @@ namespace Engine {
     class CString {
         
     };
+    
+    ENGINE_CLASS(String);
     
     // The string class structure is a pretty blatent clone of JS's string prototype. Over time I will be looking carefuly at usage in order to extend the API
     class String {
@@ -162,6 +173,8 @@ namespace Engine {
         string_char_t* _str;
         size_t _len;
     };
+    
+    ENGINE_CLASS(BasicRandom);
     
     class BasicRandom {
     public:

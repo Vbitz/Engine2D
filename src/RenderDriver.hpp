@@ -31,10 +31,9 @@
 #include "FontSheet.hpp"
 
 namespace Engine {
-    class Texture;
-    class FontSheet;
-    
-    class RenderDriver;
+    ENGINE_CLASS(Texture);
+    ENGINE_CLASS(FontSheet);
+    ENGINE_CLASS(RenderDriver);
     
     class Drawable {
     public:
@@ -42,9 +41,9 @@ namespace Engine {
         
         virtual void Draw() = 0;
     protected:
-        Drawable(RenderDriver* render) : _render(render) {}
+        Drawable(RenderDriverPtr render) : _render(render) {}
         
-        RenderDriver* _render;
+        RenderDriverPtr _render;
         
         virtual void _init() {};
         virtual void _cleanup() {};
@@ -77,11 +76,11 @@ namespace Engine {
             }
             
         private:
-            DrawProfiler(RenderDriver* render, const char profileZone[]) : _render(render), _zone(profileZone) {
+            DrawProfiler(RenderDriverPtr render, const char profileZone[]) : _render(render), _zone(profileZone) {
                 _startTime = Platform::GetTime();
             }
             
-            RenderDriver* _render;
+            RenderDriverPtr _render;
             const char* _zone;
             bool _ended = false;
             double _startTime;
@@ -109,7 +108,7 @@ namespace Engine {
         void AddVert(float x, float y, float z, float s, float t);
         void AddVert(float x, float y, float z, Color4f col, float s, float t);
         
-        virtual void EnableTexture(Texture* texId) = 0;
+        virtual void EnableTexture(TexturePtr texId) = 0;
         virtual void DisableTexture() = 0;
         
         virtual void EnableSmooth() = 0;
@@ -150,7 +149,7 @@ namespace Engine {
         virtual void CameraRotate(float r) = 0;
         
         template<class T> inline auto CreateDrawable() -> T* {
-            Drawable* drawable = new T(this);
+            DrawablePtr drawable = new T(this);
             this->_managedDrawables.push_back(drawable);
             drawable->_init();
             return static_cast<T*>(drawable);
@@ -171,7 +170,7 @@ namespace Engine {
         
 		Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
         
-        FontSheet* _getSheet(std::string fontName);
+        FontSheetPtr _getSheet(std::string fontName);
         
         std::string _currentFontName = "basic";
         int _currentFontSize = 16;
@@ -185,9 +184,10 @@ namespace Engine {
             double max = std::numeric_limits<double>::min();
             int callCount = 0;
         };
+        typedef ProfileDataPoint& ProfileDataPointRef;
         
-        std::unordered_map<std::string, FontSheet*> _sheets;
-        FontSheet* _sheet = NULL;
+        std::unordered_map<std::string, FontSheetPtr> _sheets;
+        FontSheetPtr _sheet = NULL;
         
         bool _profiling = false;
         std::unordered_map<const char*, ProfileDataPoint> _profileResults;

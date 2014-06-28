@@ -454,7 +454,7 @@ namespace Engine {
             Events::GetEvent("postCreateContext")->Emit();
         }
         
-        RenderDriver* _render = NULL;
+        RenderDriverPtr _render = NULL;
         GLFWwindow* _window = NULL;
         
         glm::vec2 _size = glm::vec2(800, 600);

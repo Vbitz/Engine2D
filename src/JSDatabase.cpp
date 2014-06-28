@@ -27,7 +27,7 @@
 
 namespace Engine {
     namespace JSDatabase {
-        Database* currentDatabase = NULL;
+        DatabasePtr currentDatabase = NULL;
         
         ENGINE_JS_METHOD(OpenDatabase) {
             ENGINE_JS_SCOPE_OPEN;

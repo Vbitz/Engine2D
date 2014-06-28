@@ -187,8 +187,8 @@ namespace Engine {
             drawTable->Set(isolate, "Color", newColor);
         }
         
-        Draw2D* GetDraw2D(v8::Local<v8::Object> thisValue) {
-            return (Draw2D*) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_draw")).As<v8::External>()->Value();
+        inline Draw2DPtr GetDraw2D(v8::Local<v8::Object> thisValue) {
+            return (Draw2DPtr) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_draw")).As<v8::External>()->Value();
         }
         
 		ENGINE_JS_METHOD(Rect) {
@@ -445,7 +445,7 @@ namespace Engine {
 			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
         
-        bool _setColor(v8::Isolate* isolate, Draw2D* draw2D, v8::Local<v8::Value> value) {
+        bool _setColor(v8::Isolate* isolate, Draw2DPtr draw2D, v8::Local<v8::Value> value) {
             if (value->IsNumber()) {
                 int col = value.As<v8::Number>()->NumberValue();
                 
@@ -496,7 +496,7 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
         
-        v8::Local<v8::Value> _getColor(v8::Isolate* isolate, Draw2D* draw) {
+        v8::Local<v8::Value> _getColor(v8::Isolate* isolate, Draw2DPtr draw) {
             v8::Local<v8::Object> ret = v8::Object::New(isolate);
             
             Color4f col = draw->GetRender()->GetColor();
@@ -669,7 +669,7 @@ namespace Engine {
             
             GetDraw2D(args.This())->GetRender()->CheckError("JSDraw::Draw::PreDraw");
             
-            Texture* tex;
+            TexturePtr tex;
             float x, y, w, h;
             
             ENGINE_CHECK_ARGS_LENGTH(5);
@@ -680,7 +680,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Width of a rect");
             ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Height of a rect");
             
-            tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
             
             if (!tex->IsValid()) {
                 ENGINE_THROW_ARGERROR("Arg0 is not a valid texture");
@@ -704,7 +704,7 @@ namespace Engine {
             
             GetDraw2D(args.This())->GetRender()->CheckError("Pre Image Draw");
             
-            Texture* tex;
+            TexturePtr tex;
             float x1, y1, w1, h1,
             x2, y2, w2, h2;
             int imageWidth, imageHeight;
@@ -721,7 +721,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(3, "Arg7 has to be Width of a sub rectangle");
             ENGINE_CHECK_ARG_NUMBER(4, "Arg8 has to be Height of a sub rectangle");
             
-            tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
             
             if (!tex->IsValid()) {
                 ENGINE_THROW_ARGERROR("Arg0 is not a valid texture");
@@ -745,7 +745,7 @@ namespace Engine {
         ENGINE_JS_METHOD(DrawSprite) {
             ENGINE_JS_SCOPE_OPEN;
             
-            SpriteSheet* sheet;
+            SpriteSheetPtr sheet;
             std::string sprite;
             float x, y, w, h;
             
@@ -758,7 +758,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Width of a rect");
             ENGINE_CHECK_ARG_NUMBER(5, "Arg5 has to be Height of a rect");
             
-            sheet = (SpriteSheet*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            sheet = (SpriteSheetPtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
             
             if (!sheet->IsValid()) {
                 ENGINE_THROW_ARGERROR("Arg0 is not a valid spritesheet");
@@ -798,7 +798,7 @@ namespace Engine {
                 ResourceManager::Load(filename);
             }
             
-            ResourceManager::ImageResource* img = new ResourceManager::ImageResource(filename);
+            ResourceManager::ImageResourcePtr img = new ResourceManager::ImageResource(filename);
             
             img->Load();
             
@@ -996,7 +996,7 @@ namespace Engine {
                 }
             }
             
-            Texture* t = ImageReader::TextureFromBuffer(texID, pixels, width, height);
+            TexturePtr t = ImageReader::TextureFromBuffer(texID, pixels, width, height);
             
             if (!arr->HasIndexedPropertiesInExternalArrayData()) {
                 free(pixels);
@@ -1014,7 +1014,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is the index of the image returned from draw.createImage or draw.openImage");
             ENGINE_CHECK_ARG_STRING(1, "Arg1 is the filename to save the image as");
             
-            Texture* tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            TexturePtr tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
             
             if (!tex->IsValid()) {
                 ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
@@ -1039,7 +1039,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is the texture to free");
             
-            Texture* tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            TexturePtr tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
             
             tex->Invalidate();
             
@@ -1057,7 +1057,7 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), false));
             }
             
-            Texture* tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            TexturePtr tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
             
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), tex->IsValid()));
         }
@@ -1073,7 +1073,7 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), false));
             }
             
-            SpriteSheet* sprite = (SpriteSheet*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            SpriteSheetPtr sprite = (SpriteSheetPtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
             
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), sprite->IsValid()));
         }

@@ -93,11 +93,11 @@ namespace Engine {
             return this->RunString(std::string(fileContent, filesize), filename);
         }
         
-        void ScriptingContext::Set(std::string str, ScriptingObject* obj) {
+        void ScriptingContext::Set(std::string str, ScriptingObjectPtr obj) {
             this->_setGlobal(str, obj);
         }
         
-        ScriptingObject* ScriptingContext::operator[](std::string name) {
+        ScriptingObjectPtr ScriptingContext::operator[](std::string name) {
             return this->_getGlobal(name);
         }
         
@@ -108,7 +108,7 @@ namespace Engine {
             return this->_type;
         }
         
-        void ScriptingObject::Set(std::string str, ScriptingObject *obj) {
+        void ScriptingObject::Set(std::string str, ScriptingObjectPtr obj) {
             this->_setChild(str, obj);
         }
         
@@ -118,7 +118,7 @@ namespace Engine {
         
         // FunctionCallbackArgs
         
-        ScriptingObject* FunctionCallbackArgs::operator[](int index) {
+        ScriptingObjectPtr FunctionCallbackArgs::operator[](int index) {
             return this->_getArg(index);
         }
         
@@ -150,7 +150,7 @@ namespace Engine {
             }
         }
         
-        ScriptingObject* V8ScriptingContext::CreateObject(ObjectType type) {
+        ScriptingObjectPtr V8ScriptingContext::CreateObject(ObjectType type) {
             // TODO: assert to see if we have a valid scope
             
         }
@@ -162,7 +162,7 @@ namespace Engine {
             ScriptingFunctionCallback cb = (ScriptingFunctionCallback) ex->Value();
         }
         
-        ScriptingObject* V8ScriptingContext::CreateFunction(ScriptingFunctionCallback cb) {
+        ScriptingObjectPtr V8ScriptingContext::CreateFunction(ScriptingFunctionCallback cb) {
             // TODO: assert to see if we have a valid scope
             v8::Handle<v8::FunctionTemplate> func = v8::FunctionTemplate::New(this->_isolate);
             func->SetCallHandler(ScriptingFunctionDispatch, v8::External::New(this->_isolate, (void*) cb));
@@ -180,11 +180,11 @@ namespace Engine {
             return true;
         }
         
-        void V8ScriptingContext::_setGlobal(std::string name, ScriptingObject* obj) {
+        void V8ScriptingContext::_setGlobal(std::string name, ScriptingObjectPtr obj) {
             
         }
         
-        ScriptingObject* V8ScriptingContext::_getGlobal(std::string name) {
+        ScriptingObjectPtr V8ScriptingContext::_getGlobal(std::string name) {
             return new V8ScriptingObject(v8::Undefined(this->_isolate));
         }
         
@@ -214,7 +214,7 @@ namespace Engine {
             return 0;
         }
         
-        ScriptingObject* V8ScriptingObject::_getChild(std::string name) {
+        ScriptingObjectPtr V8ScriptingObject::_getChild(std::string name) {
             return new V8ScriptingObject(v8::Undefined(v8::Isolate::GetCurrent()));
         }
         
@@ -224,7 +224,7 @@ namespace Engine {
         
         // globals
         
-        ScriptingContext* CreateScriptingContext(std::string providorName) {
+        ScriptingContextPtr CreateScriptingContext(std::string providorName) {
             return new V8ScriptingContext();
         }
         

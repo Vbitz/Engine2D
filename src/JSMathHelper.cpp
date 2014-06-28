@@ -31,8 +31,8 @@
 namespace Engine {
     namespace JsMathHelper {
         
-        void DisposeRandomCallback(const v8::WeakCallbackData<v8::External, BasicRandom*>& data) {
-            delete (BasicRandom*) data.GetValue()->Value();
+        void DisposeRandomCallback(const v8::WeakCallbackData<v8::External, BasicRandomPtr>& data) {
+            delete (BasicRandomPtr) data.GetValue()->Value();
         }
         
         ENGINE_JS_METHOD(Random_New) {
@@ -43,7 +43,7 @@ namespace Engine {
                 ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
             }
             
-            BasicRandom* rand;
+            BasicRandomPtr rand;
             
             if (args.Length() == 1) {
                 rand = new BasicRandom(ENGINE_GET_ARG_NUMBER_VALUE(0));
@@ -67,7 +67,7 @@ namespace Engine {
             
             v8::Isolate* isolate = args.GetIsolate();
             
-            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
+            BasicRandomPtr rand = (BasicRandomPtr) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
             
             if (args.Length() == 0) {
                 ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, rand->Next()));
@@ -83,7 +83,7 @@ namespace Engine {
             
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
             
-            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
+            BasicRandomPtr rand = (BasicRandomPtr) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
             
             ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, rand->NextDouble()));
         }
@@ -93,7 +93,7 @@ namespace Engine {
             
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
             
-            BasicRandom* rand = (BasicRandom*) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
+            BasicRandomPtr rand = (BasicRandomPtr) args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "__rand")).As<v8::External>()->Value();
             
             ENGINE_JS_SCOPE_CLOSE(v8::Number::New(isolate, rand->NextNormal(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1))));
         }

@@ -26,7 +26,7 @@
 namespace Engine {
     namespace ResourceManager {
         
-        Source* _getSource(std::string sourceID);
+        SourcePtr _getSource(std::string sourceID);
         void _register(Resource* res);
         
         // Source
@@ -232,7 +232,7 @@ namespace Engine {
         }
         
         // ImageResource
-        ImageResource::ImageResource(Texture* t) : Resource(""), _manualTexture(true) {
+        ImageResource::ImageResource(TexturePtr t) : Resource(""), _manualTexture(true) {
             this->_loaded = true;
             this->_texture = t;
             this->_name = "ManualImage";
@@ -246,7 +246,7 @@ namespace Engine {
             return this->_name;
         }
         
-        Texture* ImageResource::GetTexture() {
+        TexturePtr ImageResource::GetTexture() {
             if (!this->IsLoaded()) {
                 this->_forceLoad();
             }
@@ -266,11 +266,11 @@ namespace Engine {
             }
         }
         
-        std::vector<Resource*> _resources;
-        std::map<std::string, Source*> _sources;
+        std::vector<ResourcePtr> _resources;
+        std::map<std::string, SourcePtr> _sources;
         
         // ResourceManager
-        Source* _getSource(std::string sourceID) {
+        SourcePtr _getSource(std::string sourceID) {
             if (_sources.count(sourceID) == 0) {
                 Logger::begin("ResourceManager", Logger::LogLevel_Error) << "Source: " << sourceID << " does not exist" << Logger::end();
                 return NULL;
@@ -278,7 +278,7 @@ namespace Engine {
             return _sources[sourceID];
         }
         
-        void _register(Resource* res) {
+        void _register(ResourcePtr res) {
             _resources.push_back(res);
         }
         
@@ -294,7 +294,7 @@ namespace Engine {
         
         void UnloadAll() {
             for (auto iter = _resources.begin(); iter != _resources.end(); iter++) {
-                Resource* res = *iter;
+                ResourcePtr res = *iter;
                 res->Unload();
             }
             _resources.clear();

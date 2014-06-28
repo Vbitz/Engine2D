@@ -29,10 +29,6 @@
 #include <OpenGL/gl3.h>
 
 namespace Engine {
-    RenderDriver* Draw2D::GetRender() {
-        return renderGL;
-    }
-    
     void Draw2D::Rect(float x, float y, float w, float h) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->BeginRendering(PolygonMode::Triangles);
@@ -56,7 +52,7 @@ namespace Engine {
         renderGL->EndRendering();
     }
     
-    void Draw2D::DrawImage(Texture* tex, float x, float y, float w, float h) {
+    void Draw2D::DrawImage(TexturePtr tex, float x, float y, float w, float h) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->EnableTexture(tex);
         
@@ -83,7 +79,7 @@ namespace Engine {
         renderGL->CheckError("Draw2D::DrawImage::PostDraw");
     }
     
-    void Draw2D::DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
+    void Draw2D::DrawImage(TexturePtr tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->EnableTexture(tex);
         
@@ -104,7 +100,7 @@ namespace Engine {
         renderGL->DisableTexture();
     }
     
-    void Draw2D::DrawSprite(SpriteSheet* sheet, std::string sprite, float x, float y, float w, float h) {
+    void Draw2D::DrawSprite(SpriteSheetPtr sheet, std::string sprite, float x, float y, float w, float h) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         Sprite s = sheet->GetSprite(sprite);
         this->DrawImage(s.tex, x, y, w, h, s.loc.x, s.loc.y, s.loc.w, s.loc.h);
@@ -167,7 +163,7 @@ namespace Engine {
         std::free(newPoints);
     }
     
-void Draw2D::Circle(float xCenter, float yCenter, float radius) {
+    void Draw2D::Circle(float xCenter, float yCenter, float radius) {
         this->Circle(xCenter, yCenter, radius, radius * 5, 0.0f, 1.0f, true);
     }
     
@@ -183,8 +179,7 @@ void Draw2D::Circle(float xCenter, float yCenter, float radius) {
         this->Circle(xCenter, yCenter, radius, radius, segments, start, end, fill);
     }
     
-    void Draw2D::Circle(float xCenter, float yCenter, float radius, float innerRadius,
-                        int segments, float start, float end, bool fill) {
+    void Draw2D::Circle(float xCenter, float yCenter, float radius, float innerRadius, int segments, float start, float end, bool fill) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         bool usingGl3 = renderGL->GetRendererType() == RendererType::OpenGL3;
         static double pi2 = 2 * 3.14159265358979323846;

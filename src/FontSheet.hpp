@@ -28,8 +28,8 @@
 #include "vendor/json/json.h"
 
 namespace Engine {
-    class Texture;
-    class RenderDriver;
+    ENGINE_CLASS(Texture);
+    ENGINE_CLASS(RenderDriver);
     
     struct FontRectangle {
         float width, x1, y1, x2, y2;
@@ -50,13 +50,15 @@ namespace Engine {
     
     typedef FontSize& FontSizeRef;
     
+    ENGINE_CLASS(FontSheet);
+    
     class FontSheet {
     public:
         FontSheet(Json::Value root, std::string basePath);
         
         bool IsValid();
         
-        void DrawText(RenderDriver* render, float x, float y, float charSize, std::string text);
+        void DrawText(RenderDriverPtr render, float x, float y, float charSize, std::string text);
         float MeasureText(float charSize, std::string text);
     private:
         std::string _texturePath;
@@ -73,6 +75,6 @@ namespace Engine {
     };
     
     namespace FontSheetReader {
-        FontSheet* LoadFont(std::string filename);
+        FontSheetPtr LoadFont(std::string filename);
     }
 }

@@ -38,9 +38,11 @@
 #define ENGINE_ASSERT(value, msg) GetAppSingilton()->Assert(value, msg, __FILE__, __LINE__)
 
 namespace Engine {
+    ENGINE_CLASS(EngineUI);
     
-    class RenderGL3;
-    class EngineUI;
+    ENGINE_CLASS(Application);
+    
+    ApplicationPtr GetAppSingilton();
     
     class Application {
     public:
@@ -53,13 +55,20 @@ namespace Engine {
         bool IsDelayedConfig(std::string configKey);
         
         // Public window functions
-        Window* GetWindow();
+        WindowPtr GetWindow() {
+            return this->_window;
+        }
         bool GetKeyPressed(int key);
         void UpdateScreen();
-        RenderDriver* GetRender();
+        RenderDriverPtr GetRender() {
+            ENGINE_ASSERT(this->_renderGL != NULL, "RenderGL3 is not initalized");
+            return _renderGL;
+        }
         
         // Public EngineUI functions
-        EngineUI* GetEngineUI();
+        EngineUIPtr GetEngineUI() {
+            return this->_engineUI;
+        }
         
         // Public script functions
         bool RunFile(std::string path, bool persist);
@@ -161,9 +170,9 @@ namespace Engine {
         
         std::vector<std::string> _jsArgs;
         
-        Window* _window = NULL;
-        EngineUI* _engineUI = NULL;
-        RenderDriver* _renderGL = NULL;
+        WindowPtr _window = NULL;
+        EngineUIPtr _engineUI = NULL;
+        RenderDriverPtr _renderGL = NULL;
         
         std::map<std::string, std::string> _delayedConfigs;
         
@@ -181,6 +190,4 @@ namespace Engine {
         
         long _frames = 0;
     };
-    
-    Application* GetAppSingilton();
 }

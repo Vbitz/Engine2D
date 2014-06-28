@@ -53,6 +53,8 @@ namespace Engine {
         }
     }
     
+    ENGINE_CLASS(RenderGL2);
+    
     class RenderGL2 : public RenderDriver {
     public:
         RendererType GetRendererType() override {
@@ -130,7 +132,7 @@ namespace Engine {
             glEnd();
         }
         
-        void EnableTexture(Texture* texId) override {
+        void EnableTexture(TexturePtr texId) override {
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
             
             glEnable(GL_TEXTURE_2D);
@@ -221,7 +223,7 @@ namespace Engine {
         int _currentVerts = 0;
     };
     
-    RenderDriver* CreateRenderGL2() {
+    RenderDriverPtr CreateRenderGL2() {
         return new RenderGL2();
     }
 }

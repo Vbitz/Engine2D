@@ -67,7 +67,7 @@ namespace Engine {
     
     Shader* EffectParameters::CreateShader() {
         ShaderSpec spec = this->_getBestShaderSpec();
-        Shader* shader = new Shader(GetAppSingilton()->GetRender());
+        ShaderPtr shader = new Shader(GetAppSingilton()->GetRender());
         Logger::begin("EffectParameters", Logger::LogLevel_Verbose) << "Using Shader: " << spec.vertexShaderPath << " : " << spec.fragmentShaderPath << Logger::end();
         shader->Init(spec.type, spec.vertexShaderPath, spec.fragmentShaderPath);
         return shader;
@@ -117,7 +117,7 @@ namespace Engine {
             return path.substr(0, path.find_last_of('/') + 1);
         }
         
-        EffectParameters* GetEffectFromFile(std::string filename) {
+        EffectParametersPtr GetEffectFromFile(std::string filename) {
             std::string fileContent = std::string(Filesystem::GetFileContent(filename));
             
             Json::Reader reader;

@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include "stdlib.hpp"
+
 #ifndef FARPROC
 typedef void* (*FARPROC)(void);
 #endif
@@ -59,6 +61,8 @@ typedef void* (*ThreadMethod)(void*);
 namespace Engine {
     namespace Platform {
         
+        ENGINE_CLASS(Libary);
+        
         class Libary {
         public:
             virtual ~Libary() {}
@@ -73,6 +77,8 @@ namespace Engine {
             }
         };
         
+        ENGINE_CLASS(Thread);
+        
         class Thread {
         public:
             virtual ~Thread() {}
@@ -82,6 +88,8 @@ namespace Engine {
             
             virtual unsigned char* GetThreadID() = 0;
         };
+        
+        ENGINE_CLASS(Mutex);
         
         class Mutex {
         public:
@@ -105,13 +113,13 @@ namespace Engine {
         
         int GetProcesserCount();
         
-        Libary* OpenLibary(std::string path);
-        Libary* GetThisLibary();
+        LibaryPtr OpenLibary(std::string path);
+        LibaryPtr GetThisLibary();
         
-        Thread* CreateThread(ThreadMethod entry, void* threadArgs);
-        Thread* GetCurrentThread();
+        ThreadPtr CreateThread(ThreadMethod entry, void* threadArgs);
+        ThreadPtr GetCurrentThread();
         
-        Mutex* CreateMutex();
+        MutexPtr CreateMutex();
         
         unsigned char* GenerateUUID();
         std::string StringifyUUID(unsigned char* uuidArr);

@@ -37,7 +37,7 @@ namespace Engine {
         
         double _startTime = -1;
         
-        Platform::Mutex* _logMutex;
+        Platform::MutexPtr _logMutex;
         
         std::ostream& operator<<(std::ostream& os, const StreamFlusher& rhs) {
 			LogText(_currentDomain, _currentLogLevel, _ss.str());

@@ -42,9 +42,11 @@ namespace Engine {
     };
     
     struct Sprite {
-        Texture* tex;
+        TexturePtr tex;
         SpriteLocation loc;
     };
+    
+    ENGINE_CLASS(SpriteSheet);
     
     class SpriteSheet {
     public:
@@ -68,10 +70,10 @@ namespace Engine {
         std::map<std::string, SpriteAnimation> _animations;
         std::map<std::string, SpriteAnimationStatus> _animationStatus;
         
-        Texture* _texture = NULL;
+        TexturePtr _texture = NULL;
     };
     
     namespace SpriteSheetReader {
-        SpriteSheet* LoadSpriteSheetFromFile(std::string filename);
+        SpriteSheetPtr LoadSpriteSheetFromFile(std::string filename);
     }
 }

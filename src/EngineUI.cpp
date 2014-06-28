@@ -57,7 +57,7 @@ namespace Engine {
         }
     }
     
-    EngineUI::EngineUI(Application* app) : _app(app) {
+    EngineUI::EngineUI(ApplicationPtr app) : _app(app) {
         this->_draw = new Draw2D(app->GetRender());
         
         for (int i = 0; i < 100; i++) {
@@ -72,8 +72,8 @@ namespace Engine {
             return;
         }
         
-        RenderDriver* renderGL = this->_draw->GetRender();
-        Window* window = this->_app->GetWindow();
+        RenderDriverPtr renderGL = this->_draw->GetRender();
+        WindowPtr window = this->_app->GetWindow();
         glm::vec2 windowSize = window->GetWindowSize();
         
         renderGL->ResetMatrix();
@@ -425,7 +425,7 @@ namespace Engine {
     }
     
     EventMagic EngineUI::_profilerHook(Json::Value args) {
-        EngineUI* eui = GetAppSingilton()->GetEngineUI();
+        EngineUIPtr eui = GetAppSingilton()->GetEngineUI();
         
         eui->_cachedProfilerDetails = args["results"];
     }

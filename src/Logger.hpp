@@ -27,6 +27,8 @@
 #include <sstream>
 #include <functional>
 
+#include "stdlib.hpp"
+
 namespace Engine {
     namespace Logger {
         class StreamFlusher { };
@@ -49,6 +51,8 @@ namespace Engine {
             LogType_Graphical
         };
         
+        ENGINE_CLASS(LogGraphEvent);
+        
         class LogGraphEvent {
         public:
             LogGraphEvent() {};
@@ -63,17 +67,19 @@ namespace Engine {
             }
         };
         
+        ENGINE_CLASS(LogEvent);
+        
         class LogEvent {
         public:
             LogEvent(std::string domain, LogLevel level, std::string event);
-            LogEvent(std::string domain, LogLevel level, LogGraphEvent* event);
+            LogEvent(std::string domain, LogLevel level, LogGraphEventPtr event);
             
             std::string FormatConsole();
             
             std::string Domain;
             LogLevel Level;
             LogType Type;
-            LogGraphEvent* GraphEvent;
+            LogGraphEventPtr GraphEvent;
             std::string Event;
             bool Hidden;
             double time;
@@ -84,7 +90,7 @@ namespace Engine {
         std::string GetLevelString(LogLevel level);
         
         void LogText(std::string domain, LogLevel level, std::string str);
-        void LogGraph(std::string domain, LogLevel level, LogGraphEvent* event);
+        void LogGraph(std::string domain, LogLevel level, LogGraphEventPtr event);
         
         std::ostream& begin(std::string domain, LogLevel level);
         StreamFlusher end();

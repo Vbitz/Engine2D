@@ -63,9 +63,9 @@ namespace Engine {
     
     namespace TestSuite {
         
-        std::vector<Test*> _tests;
+        std::vector<TestPtr> _tests;
         
-        void RegisterTest(Test* t) {
+        void RegisterTest(TestPtr t) {
             _tests.push_back(t);
         }
         
@@ -82,7 +82,7 @@ namespace Engine {
                 << "TestSuite Starting" << Logger::end();
             
             for (auto iter = _tests.begin(); iter != _tests.end(); iter++) {
-                Test* t = *iter;
+                TestPtr t = *iter;
                 
                 t->Setup();
                 

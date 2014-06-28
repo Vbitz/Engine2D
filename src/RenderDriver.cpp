@@ -142,7 +142,7 @@ namespace Engine {
         Events::GetEvent("onDrawProfileEnd")->Emit(resultsObj);
     }
     
-    FontSheet* RenderDriver::_getSheet(std::string fontName) {
+    FontSheetPtr RenderDriver::_getSheet(std::string fontName) {
         if (!this->IsFontLoaded("basic")) {
             Logger::begin("RenderDriver", Logger::LogLevel_Verbose) << "Loading NeoFont: " << Config::GetString("core.content.fontPath") << Logger::end();
             this->_sheets["basic"] = FontSheetReader::LoadFont(Config::GetString("core.content.fontPath"));
@@ -156,7 +156,7 @@ namespace Engine {
     
     void RenderDriver::_submitProfile(const char zone[], double time) {
         if (!this->_profiling) return;
-        ProfileDataPoint& pnt = this->_profileResults[zone];
+        ProfileDataPointRef pnt = this->_profileResults[zone];
         pnt.callCount++;
         if (pnt.avg == -1) {
             pnt.avg = time;

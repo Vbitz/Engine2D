@@ -44,7 +44,7 @@ namespace Engine {
         
     }
     
-    Shader::Shader(RenderDriver* render) : _render(render) {
+    Shader::Shader(RenderDriverPtr render) : _render(render) {
     }
     
     Shader::~Shader() {

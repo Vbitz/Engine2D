@@ -84,7 +84,7 @@ namespace Engine {
         sqlite3* _database;
     };
     
-    Database* Database::CreateDatabase(std::string filename) {
+    DatabasePtr Database::CreateDatabase(std::string filename) {
         return new SQLiteDatabase(filename);
     }
 }

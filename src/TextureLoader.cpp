@@ -110,23 +110,23 @@ namespace Engine {
     
     namespace ImageReader {
         
-        Texture* TextureFromFileBuffer(unsigned char *buffer, long bufferLength) {
+        TexturePtr TextureFromFileBuffer(unsigned char *buffer, long bufferLength) {
             int width, height, chaneals;
             unsigned char* pixel = SOIL_load_image_from_memory(buffer, bufferLength, &width, &height, &chaneals, SOIL_LOAD_RGBA);
             
-            Texture* tex = TextureFromBuffer(pixel, width, height);
+            TexturePtr tex = TextureFromBuffer(pixel, width, height);
             
             SOIL_free_image_data(pixel);
             
             return tex;
         }
         
-        Texture* TextureFromBuffer(unsigned char *texture, int width, int heigth) {
+        TexturePtr TextureFromBuffer(unsigned char *texture, int width, int heigth) {
             return TextureFromBuffer(UINT_MAX, texture, width, heigth);
         }
         
-        Texture* TextureFromBuffer(GLuint textureID, unsigned char *texture, int width, int height) {
-            RenderDriver* render = GetAppSingilton()->GetRender();
+        TexturePtr TextureFromBuffer(GLuint textureID, unsigned char *texture, int width, int height) {
+            RenderDriverPtr render = GetAppSingilton()->GetRender();
             
             GLuint text = 0;
             
@@ -153,12 +153,12 @@ namespace Engine {
             return new Texture(render, text);
         }
         
-        Texture* TextureFromBuffer(float* texture, int width, int height) {
+        TexturePtr TextureFromBuffer(float* texture, int width, int height) {
             return TextureFromBuffer(UINT_MAX, texture, width, height);
         }
         
-        Texture* TextureFromBuffer(GLuint textureID, float* texture, int width, int height) {
-            RenderDriver* render = GetAppSingilton()->GetRender();
+        TexturePtr TextureFromBuffer(GLuint textureID, float* texture, int width, int height) {
+            RenderDriverPtr render = GetAppSingilton()->GetRender();
             
             GLuint text = 0;
             

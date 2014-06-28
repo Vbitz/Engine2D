@@ -82,6 +82,8 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_CLASS(ScriptWorker);
+        
         class ScriptWorker {
         public:
             void Start() { // Can be called anywhere
@@ -178,12 +180,12 @@ namespace Engine {
             std::string scriptSource;
             unsigned char* threadID;
             
-            ScriptWorker* worker = NULL;
+            ScriptWorkerPtr worker = NULL;
             
-            Platform::Mutex* threadIDMutex = NULL;
+            Platform::MutexPtr threadIDMutex = NULL;
         };
         
-        std::vector<ScriptWorker*> _workers;
+        std::vector<ScriptWorkerPtr> _workers;
         
         void* ScriptWorkerFunc(void* scriptWorkerArgs) {
             ScriptWorkerArgs* args = (ScriptWorkerArgs*) scriptWorkerArgs;
@@ -216,7 +218,7 @@ namespace Engine {
             args->threadIDMutex = Platform::CreateMutex();
             args->threadIDMutex->Enter();
             
-            Platform::Thread* thread =
+            Platform::ThreadPtr thread =
                 Platform::CreateThread(ScriptWorkerFunc, args);
             args->threadID = thread->GetThreadID();
             

@@ -25,8 +25,11 @@
 #include <map>
 
 #include "Logger.hpp"
+#include "stdlib.hpp"
     
 namespace Engine {
+    ENGINE_CLASS(Database);
+    
     class Database {
     public:
         virtual ~Database() {}
@@ -34,6 +37,6 @@ namespace Engine {
         virtual bool Execute(std::string statement) = 0;
         virtual std::vector< std::map<std::string, std::string> > ExecutePrepare(std::string statement) = 0;
         
-        static Database* CreateDatabase(std::string filename);
+        static DatabasePtr CreateDatabase(std::string filename);
     };
 }

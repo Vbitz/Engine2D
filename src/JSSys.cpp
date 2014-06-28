@@ -43,8 +43,8 @@ namespace Engine {
             return Logger::LogLevel_User;
         }
         
-        Application* GetApp(v8::Local<v8::Object> thisValue) {
-            return (Application*) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_app")).As<v8::External>()->Value();
+        ApplicationPtr GetApp(v8::Local<v8::Object> thisValue) {
+            return (ApplicationPtr) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_app")).As<v8::External>()->Value();
         }
         
 		ENGINE_JS_METHOD(Println) {
@@ -554,7 +554,7 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = v8::Object::New(isolate);
             
-            Application* app = GetAppSingilton();
+            ApplicationPtr app = GetAppSingilton();
             
             OpenGLVersion glVersion = app->GetWindow()->GetGlVersion();
             

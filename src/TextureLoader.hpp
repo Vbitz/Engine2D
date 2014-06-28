@@ -25,17 +25,18 @@
 #include "RenderDriver.hpp"
 
 namespace Engine {
-    
-    class RenderDriver;
+    ENGINE_CLASS(RenderDriver);
     
     namespace ResourceManager {
-        class ImageResource;
+        ENGINE_CLASS(ImageResource);
     }
+    
+    ENGINE_CLASS(Texture);
     
     class Texture {
     public:
         Texture();
-        Texture(RenderDriver* render, uint textureID);
+        Texture(RenderDriverPtr render, uint textureID);
         ~Texture();
         
         void Invalidate();
@@ -54,21 +55,21 @@ namespace Engine {
         void _setTextureID(uint textureID);
         void _setTextureID(uint textureID, bool deleteOld);
         
-        RenderDriver* _render;
+        RenderDriverPtr _render;
         uint _textureID = UINT_MAX;
         int _width, _height;
     };
     
     namespace ImageReader {
-        Texture* TextureFromFileBuffer(unsigned char* texture, long bufferLength);
+        TexturePtr TextureFromFileBuffer(unsigned char* texture, long bufferLength);
         
-        Texture* TextureFromBuffer(unsigned char* texture, int width, int height);
-        Texture* TextureFromBuffer(uint textureID, unsigned char* texture, int width, int height);
+        TexturePtr TextureFromBuffer(unsigned char* texture, int width, int height);
+        TexturePtr TextureFromBuffer(uint textureID, unsigned char* texture, int width, int height);
 
-        Texture* TextureFromBuffer(float* texture, int width, int height);
-        Texture* TextureFromBuffer(uint textureID, float* texture, int width, int height);
+        TexturePtr TextureFromBuffer(float* texture, int width, int height);
+        TexturePtr TextureFromBuffer(uint textureID, float* texture, int width, int height);
         
-        ResourceManager::ImageResource* TextureFromFile(std::string filename);
+        ResourceManager::ImageResourcePtr TextureFromFile(std::string filename);
     }
     
     namespace ImageWriter {

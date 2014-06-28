@@ -31,6 +31,8 @@
 
 namespace Engine {
     
+    ENGINE_CLASS(Window);
+    
     class Window {
     public:
         Window(GraphicsVersion v) : _version(v) { this->_init(); }
@@ -78,7 +80,7 @@ namespace Engine {
         
         virtual int GetMaxTextureSize() = 0;
         
-        virtual RenderDriver* GetRender() = 0;
+        virtual RenderDriverPtr GetRender() = 0;
         
         GraphicsVersion GetGraphicsVersion() {
             return this->_version;
@@ -94,5 +96,5 @@ namespace Engine {
         GraphicsVersion _version;
     };
     
-    Window* CreateWindow(GraphicsVersion v);
+    WindowPtr CreateWindow(GraphicsVersion v);
 }

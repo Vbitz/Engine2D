@@ -150,7 +150,7 @@ namespace Engine {
             return path.substr(0, path.find_last_of('/') + 1);
         }
         
-        SpriteSheet* LoadSpriteSheetFromFile(std::string filename) {
+        SpriteSheetPtr LoadSpriteSheetFromFile(std::string filename) {
             std::string fileContent = std::string(Filesystem::GetFileContent(filename));
             
             Json::Reader reader;

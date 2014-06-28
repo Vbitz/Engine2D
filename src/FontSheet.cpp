@@ -43,7 +43,7 @@ namespace Engine {
         return this->_texture->IsValid();
     }
     
-    void FontSheet::DrawText(RenderDriver* render, float x, float y, float charSize, std::string text) {
+    void FontSheet::DrawText(RenderDriverPtr render, float x, float y, float charSize, std::string text) {
         if (!this->IsValid()) {
             Logger::begin("FontSheet", Logger::LogLevel_Verbose) << "FontSheet Texture reloaded" << Logger::end();
             this->_texture = ImageReader::TextureFromFile(this->_texturePath)->GetTexture();
@@ -140,7 +140,7 @@ namespace Engine {
     }
     
     namespace FontSheetReader {
-        FontSheet* LoadFont(std::string filename) {
+        FontSheetPtr LoadFont(std::string filename) {
             std::string fileContent = std::string(Filesystem::GetFileContent(filename));
             
             Json::Reader reader;

@@ -47,7 +47,7 @@ namespace Engine {
         }
     }
     
-    GL3Buffer::GL3Buffer(RenderDriver* render, EffectParameters* params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
+    GL3Buffer::GL3Buffer(RenderDriverPtr render, EffectParametersPtr params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
         this->_init();
     }
     
@@ -216,9 +216,5 @@ namespace Engine {
         this->_getRender()->CheckError("GL3Buffer::Upload::PostBindVertexAttributes");
         
         this->_getShader()->End();
-    }
-    
-    RenderDriver* GL3Buffer::_getRender() {
-        return this->_renderGL;
     }
 }

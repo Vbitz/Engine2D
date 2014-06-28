@@ -49,6 +49,8 @@
 namespace Engine {
     namespace Platform {
         
+        ENGINE_CLASS(OSXLibary);
+        
         class OSXLibary : public Libary {
         public:
             OSXLibary() {
@@ -97,6 +99,8 @@ namespace Engine {
             void* modulePointer;
         };
         
+        ENGINE_CLASS(OSXThread);
+        
         class OSXThread : public Thread {
         public:
             OSXThread(ThreadMethod entry, void* args) {
@@ -133,6 +137,8 @@ namespace Engine {
             pthread_t _thread;
             unsigned char* _uuid;
         };
+        
+        ENGINE_CLASS(OSXMutex);
         
         class OSXMutex : public Mutex {
         public:
@@ -236,23 +242,23 @@ namespace Engine {
                 // function will return more the 2^32 processers
         }
         
-        Libary* OpenLibary(std::string path) {
+        LibaryPtr OpenLibary(std::string path) {
             return new OSXLibary(path);
         }
         
-        Libary* GetThisLibary() {
+        LibaryPtr GetThisLibary() {
             return new OSXLibary();
         }
         
-        Thread* CreateThread(ThreadMethod entry, void* threadArgs) {
+        ThreadPtr CreateThread(ThreadMethod entry, void* threadArgs) {
             return new OSXThread(entry, threadArgs);
         }
         
-        Thread* GetCurrentThread() {
+        ThreadPtr GetCurrentThread() {
             return new OSXThread(pthread_self());
         }
         
-        Mutex* CreateMutex() {
+        MutexPtr CreateMutex() {
             return new OSXMutex();
         }
         

@@ -29,7 +29,7 @@
 
 namespace Engine {
     
-    class Shader;
+    ENGINE_CLASS(Shader);
     
     typedef struct {
         EffectShaderType type;
@@ -42,12 +42,14 @@ namespace Engine {
                     modelMatrixParam, viewMatrixParam, projectionMatrixParam;
     } ShaderSettings;
     
+    ENGINE_CLASS(EffectParameters);
+    
     class EffectParameters {
     public:
         EffectParameters();
         EffectParameters(std::string basePath, Json::Value root);
         
-        Shader* CreateShader();
+        ShaderPtr CreateShader();
         ShaderSettings GetShaderSettings();
         
         bool NeedsUpdate();
@@ -64,6 +66,6 @@ namespace Engine {
     };
     
     namespace EffectReader {
-        EffectParameters* GetEffectFromFile(std::string filename);
+        EffectParametersPtr GetEffectFromFile(std::string filename);
     }
 }

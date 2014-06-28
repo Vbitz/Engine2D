@@ -64,9 +64,11 @@ namespace Engine {
         }
     }
     
-    Texture* GenerateDefaultTexture() {
+    TexturePtr GenerateDefaultTexture() {
         return ImageReader::TextureFromBuffer(new float[4] {1.0f, 1.0f, 1.0f, 1.0f}, 1, 1);
     }
+    
+    ENGINE_CLASS(RenderGL3);
     
     class RenderGL3 : public RenderDriver {
     public:
@@ -323,19 +325,19 @@ namespace Engine {
         
         PolygonMode _currentMode = PolygonMode::Invalid;
         
-        EffectParameters* _currentEffect;
+        EffectParametersPtr _currentEffect;
         
-        Texture* _defaultTexture = NULL;
-        Texture* _activeTexture = NULL;
+        TexturePtr _defaultTexture = NULL;
+        TexturePtr _activeTexture = NULL;
         
-        Texture* _currentTexture = NULL;
+        TexturePtr _currentTexture = NULL;
         
-        GL3Buffer* _gl3Buffer = NULL;
+        GL3BufferPtr _gl3Buffer = NULL;
         
         glm::mat4 _currentModelMatrix;;
     };
     
-    RenderDriver* CreateRenderGL3() {
+    RenderDriverPtr CreateRenderGL3() {
         return new RenderGL3();
     }
 }

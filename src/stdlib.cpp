@@ -252,7 +252,7 @@ namespace Engine {
         return "";
     }
     
-    StringBuilder& StringBuilder::operator<<(const Engine::String value) {
+    StringBuilderRef StringBuilder::operator<<(const Engine::String value) {
         
     }
     

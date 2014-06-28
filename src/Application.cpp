@@ -344,10 +344,6 @@ namespace Engine {
 		sys_table->Set(v8::String::NewFromUtf8(isolate, "screenHeight"), v8::Number::New(isolate, size.y));
 	}
     
-    EngineUI* Application::GetEngineUI() {
-        return this->_engineUI;
-    }
-    
     void Application::_updateFrameTime() {
         v8::Isolate* isolate = v8::Isolate::GetCurrent();
 		v8::Local<v8::Object> sys_table = _getScriptTable("sys");
@@ -509,7 +505,7 @@ namespace Engine {
     void _resizeWindow(Json::Value val) {
         int w = val["width"].asInt(),
             h = val["height"].asInt();
-        Application* app = GetAppSingilton();
+        ApplicationPtr app = GetAppSingilton();
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
 		app->UpdateScreen();
         glViewport(0, 0, w, h);
@@ -572,7 +568,7 @@ namespace Engine {
     }
     
     EventMagic Application::_rawInputHandler(Json::Value val) {
-        Application* app = GetAppSingilton();
+        ApplicationPtr app = GetAppSingilton();
         
         app->_engineUI->OnKeyPress(val["rawKey"].asInt(), val["rawPress"].asInt(), val["shift"].asBool());
         
@@ -594,7 +590,7 @@ namespace Engine {
     }
     
     EventMagic Application::_postCreateContext(Json::Value val) {
-        Application* app = GetAppSingilton();
+        ApplicationPtr app = GetAppSingilton();
         app->_initGLContext(app->_window->GetGraphicsVersion());
         return EM_OK;
     }
@@ -779,10 +775,6 @@ namespace Engine {
         return this->_delayedConfigs.count(configKey) != 0;
     }
     
-    Window* Application::GetWindow() {
-        return this->_window;
-    }
-    
     std::vector<std::string> Application::GetCommandLineArgs() {
         return _jsArgs;
     }
@@ -840,7 +832,7 @@ namespace Engine {
     }
     
     EventMagic Application::_restartRenderer(Json::Value args) {
-        Application* app = GetAppSingilton();
+        ApplicationPtr app = GetAppSingilton();
         Logger::begin("Window", Logger::LogLevel_Log) << "Restarting renderer" << Logger::end();
         app->_window->Reset();
         app->_initGLContext(app->_window->GetGraphicsVersion());
@@ -848,13 +840,13 @@ namespace Engine {
     }
     
     EventMagic Application::_toggleFullscreen(Json::Value args) {
-        Application* app = GetAppSingilton();
+        ApplicationPtr app = GetAppSingilton();
         app->_window->SetFullscreen(!app->_window->GetFullscreen());
         app->UpdateScreen();
     }
     
     EventMagic Application::_saveScreenshot(Json::Value args) {
-        Application* app = GetAppSingilton();
+        ApplicationPtr app = GetAppSingilton();
         std::string targetFilename = args["filename"].asString();
         
         int width, height;
@@ -944,11 +936,6 @@ namespace Engine {
     
     bool Application::GetKeyPressed(int key) {
         return this->_window->GetKeyStatus(key) == Key_Press;
-    }
-    
-    RenderDriver* Application::GetRender() {
-        ENGINE_ASSERT(this->_renderGL != NULL, "RenderGL3 is not initalized");
-        return _renderGL;
     }
     
     std::string Application::GetEngineVersion() {
@@ -1300,9 +1287,9 @@ namespace Engine {
         }
     }
     
-    Application* _singilton = NULL;
+    ApplicationPtr _singilton = NULL;
     
-    Application* GetAppSingilton() {
+    ApplicationPtr GetAppSingilton() {
         if (_singilton == NULL) {
             _singilton = new Application();
         }

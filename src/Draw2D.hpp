@@ -31,22 +31,25 @@
 #define BUFFER_SIZE 4096
 
 namespace Engine {
+    ENGINE_CLASS(SpriteSheet);
     
-    class SpriteSheet;
+    ENGINE_CLASS(Draw2D);
     
     class Draw2D {
     public:
-        Draw2D(RenderDriver* renderGL) : renderGL(renderGL) {}
+        Draw2D(RenderDriverPtr renderGL) : renderGL(renderGL) {}
         
-        RenderDriver* GetRender();
+        RenderDriverPtr GetRender() {
+            return renderGL;
+        }
         
         // Primatives
         void Rect(float x, float y, float w, float h);
         void Grid(float x, float y, float w, float h);
         
-        void DrawImage(Texture* tex, float x, float y, float w, float h);
-        void DrawImage(Texture* tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2);
-        void DrawSprite(SpriteSheet* sheet, std::string sprite, float x, float y, float w, float h);
+        void DrawImage(TexturePtr tex, float x, float y, float w, float h);
+        void DrawImage(TexturePtr tex, float x1, float y1, float w1, float h1, float x2, float y2, float w2, float h2);
+        void DrawSprite(SpriteSheetPtr sheet, std::string sprite, float x, float y, float w, float h);
         
         void Grad(float x, float y, float w, float h, int col1, int col2, bool vert);
         
@@ -67,6 +70,6 @@ namespace Engine {
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int segments);
         void BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments);
     private:
-        RenderDriver* renderGL;
+        RenderDriverPtr renderGL;
     };
 }

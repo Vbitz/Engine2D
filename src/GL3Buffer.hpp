@@ -49,9 +49,11 @@ namespace Engine {
     typedef VertexBuffer& VertexBufferRef;
     typedef IndexBuffer& IndexBufferRef;
     
+    ENGINE_CLASS(GL3Buffer);
+    
 	class GL3Buffer {
 	public:
-		GL3Buffer(RenderDriver* render, EffectParameters* params);
+		GL3Buffer(RenderDriverPtr render, EffectParametersPtr params);
 		~GL3Buffer();
 
 		void Upload(VertexBufferRef vertBuffer, IndexBufferRef indexBuffer, int count);
@@ -67,20 +69,22 @@ namespace Engine {
 	private:
         void _init();
         void _shutdown();
-        Shader* _getShader();
+        ShaderPtr _getShader();
         
         void _begin();
         void _end();
         
 		void bindShader();
         
-        RenderDriver* _getRender();
+        RenderDriverPtr _getRender() {
+            return this->_renderGL;
+        }
         
         uint _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
         
-        RenderDriver* _renderGL = NULL;
-        Shader* _currentShader = NULL;
-        EffectParameters* _currentEffect;
+        RenderDriverPtr _renderGL = NULL;
+        ShaderPtr _currentShader = NULL;
+        EffectParametersPtr _currentEffect;
         
         bool _shaderBound = false;
 	};
