@@ -43,12 +43,18 @@ namespace Engine {
         glm::vec2 uv;
     };
     
+    typedef std::vector<BufferFormat> VertexBuffer;
+    typedef std::vector<ushort> IndexBuffer;
+    
+    typedef VertexBuffer& VertexBufferRef;
+    typedef IndexBuffer& IndexBufferRef;
+    
 	class GL3Buffer {
 	public:
 		GL3Buffer(RenderDriver* render, EffectParameters* params);
 		~GL3Buffer();
 
-		void Upload(BufferFormat *vertBuffer, ushort* indexBuffer, int count);
+		void Upload(VertexBufferRef vertBuffer, IndexBufferRef indexBuffer, int count);
 		void Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view, int vertexCount);
         
         bool NeedsUpdate();

@@ -114,7 +114,7 @@ namespace Engine {
         return true;
     }
     
-    void GL3Buffer::Upload(BufferFormat *vertBuffer, ushort* indexBuffer, int count) {
+    void GL3Buffer::Upload(VertexBufferRef vertBuffer, IndexBufferRef indexBuffer, int count) {
         RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
         
         this->_getRender()->CheckError("GL3Buffer::Upload::Pre");
@@ -125,11 +125,11 @@ namespace Engine {
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PreUploadBufferData");
         
-        glBufferData(GL_ARRAY_BUFFER, sizeof(BufferFormat) * count, vertBuffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(BufferFormat) * count, &vertBuffer[0], GL_STATIC_DRAW);
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadBufferData");
         
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort) * count, indexBuffer, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort) * count, &indexBuffer[0], GL_STATIC_DRAW);
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadIndexData");
         

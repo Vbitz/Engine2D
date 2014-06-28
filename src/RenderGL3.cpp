@@ -194,7 +194,7 @@ namespace Engine {
             
             this->CheckError("RenderGL3::FlushAll::PostUpdate");
             
-            this->_gl3Buffer->Upload(&this->_buffer[0], &this->_indexBuffer[0], this->_currentVerts);
+            this->_gl3Buffer->Upload(this->_vertexBuffer, this->_indexBuffer, this->_currentVerts);
             
             this->CheckError("RenderGL3::FlushAll::PostUpload");
             
@@ -212,7 +212,7 @@ namespace Engine {
              that day.
              */
             this->_currentVerts = 0;
-            this->_buffer.clear();
+            this->_vertexBuffer.clear();
             this->_indexBuffer.clear();
             
             // maybe zero the buffer
@@ -290,7 +290,7 @@ namespace Engine {
         }
         
         void _addVert(float x, float y, float z, Color4f col, float s, float t) override {
-            this->_buffer.push_back(BufferFormat({
+            this->_vertexBuffer.push_back(BufferFormat({
                 .pos = glm::vec3(x - _centerX, y - _centerY, z),
                 .col = col,
                 .uv = glm::vec2(s, t)
@@ -318,8 +318,8 @@ namespace Engine {
         
         int _currentVerts = 0;
         
-        std::vector<BufferFormat> _buffer;
-        std::vector<ushort> _indexBuffer;
+        VertexBuffer _vertexBuffer;
+        IndexBuffer _indexBuffer;
         
         PolygonMode _currentMode = PolygonMode::Invalid;
         
