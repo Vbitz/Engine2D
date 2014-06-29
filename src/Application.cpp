@@ -578,6 +578,7 @@ namespace Engine {
         
         std::string key = val["key"].asString();
         
+        Events::GetEvent("key_" + key)->Emit(val);
         Events::GetEvent("input")->Emit(val);
         
         return EM_OK;

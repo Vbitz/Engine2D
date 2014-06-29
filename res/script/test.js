@@ -393,23 +393,23 @@ sys.on("draw", "test.draw", function () {
 	}
 });
 
+event.key_S = function test_screenshot(e) {
+	if (e.state === "press") {
+		event.screenshot({filename: "testing.png"});
+	}
+};
+
+event.key_F = function test_fullscreen(e) {
+	if (e.state === "press") {
+		event.toggleFullscreen();
+	}
+};
+
 sys.on("input", "test.input", function (e) {
 	var key = e.key;
 	var press = e.state === "press" || e.state === "repeat";
 
 	console.log("[INPUT] : " + key + " : " + press);
-	
-	if (key === "S" && press) {
-		event.screenshot({filename: "testing.png"});
-	} else if (key === "I" && press) {
-		for (var i = 0; i < 20; i++) {
-			try {
-				draw.saveImage(i, "img" + i + ".png");
-			} catch (ex) { }
-		}
-	} else if (key === "F" && press) {
-		event.toggleFullscreen();
-	}
 });
 
 sys.on("mouseButton", "test.mouseButton", function (e) {
