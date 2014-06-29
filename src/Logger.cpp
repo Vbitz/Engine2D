@@ -130,6 +130,7 @@ namespace Engine {
         void LogText(std::string domain, LogLevel level, std::string str) {
             bool logConsole = Config::GetBoolean("core.log.enableConsole")
                 && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
+            bool logConsoleOnlyHighlight = Config::GetBoolean("core.log.levels.onlyHighlight") && logConsole;
             std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
             
             _logMutex->Enter();
@@ -146,7 +147,9 @@ namespace Engine {
                 }
 
                 if (logConsole) {
-                    std::cout << colorCode << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
+                    if ((logConsoleOnlyHighlight && level == LogLevel_Highlight) || !logConsoleOnlyHighlight) {
+                        std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
+                    }
                 }
             } else {
                 std::string strCopy = str;
@@ -160,7 +163,9 @@ namespace Engine {
                     _logEvents.push_back(newEvent);
                     
                     if (logConsole) {
-                        std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
+                        if ((logConsoleOnlyHighlight && level == LogLevel_Highlight) || !logConsoleOnlyHighlight) {
+                            std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
+                        }
                     }
                     
                     strCopy.erase(0, newLinePos + 1);
@@ -170,9 +175,11 @@ namespace Engine {
                 _logEvents.push_back(LogEvent(domain, level, strCopy));
                 
                 if (logConsole) {
-                    std::cout << colorCode << Platform::GetTime()
-                        << " : [" << GetLevelString(level) << "] "
-                        << domain << " | " << strCopy << std::endl;
+                    if ((logConsoleOnlyHighlight && level == LogLevel_Highlight) || !logConsoleOnlyHighlight) {
+                        std::cout << colorCode << Platform::GetTime()
+                            << " : [" << GetLevelString(level) << "] "
+                            << domain << " | " << strCopy << std::endl;
+                    }
                 }
             }
             

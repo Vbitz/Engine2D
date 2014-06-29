@@ -399,6 +399,7 @@ namespace Engine {
         Config::SetBoolean( "core.log.enableConsole",               true);
         Config::SetBoolean( "core.log.filePath",                    "");
         Config::SetBoolean( "core.log.levels.verbose",              this->_developerMode || this->_debugMode);
+        Config::SetBoolean("core.log.levels.onlyHighlight",         false);
         Config::SetBoolean( "core.log.showColors",                  true);
         Config::SetBoolean( "core.log.src.undefinedValue",          this->_developerMode);
         Config::SetBoolean( "core.log.src.perfIssues",              this->_developerMode);
