@@ -35,6 +35,11 @@ WINDOW_SYSTEM = "glfw";
 
 commands = {};
 
+class bcolors:
+    HEADER = '\x1b[0;42m\x1b[1;91m';
+    HIGHLIGHT = '\x1b[0;44m\x1b[1;91m';
+    ENDC = '\033[0m';
+
 def noop():
 	return True;
 
@@ -72,7 +77,7 @@ def require_in_path(arr):
 	return True;
 
 def shell_command(cmd, throw=True):
-	print("shell : %s" % (cmd));
+	print(bcolors.HEADER + "shell : %s" % (cmd) + bcolors.ENDC);
 	if throw:
 		subprocess.check_call(cmd);
 	else:
@@ -80,6 +85,9 @@ def shell_command(cmd, throw=True):
 
 def run_engine(args):
 	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name())] + args);
+
+def run_engine_test(args):
+	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name()), "-test", "-Ccore.log.levels.onlyHighlight=true"] + args);
 
 def get_git_hash():
 	# check for .git folder
@@ -91,7 +99,7 @@ def fetch_svn():
 		require_in_path(["svn"]);
 	except Exception, e:
 		# check for SVN in path, if we can find it then put it in the path
-		print("SVN not found: " + str(e));
+		print(bcolors.FAIL + "SVN not found: " + str(e));
 		# download a standalone copy of SVN and put it in third_party/svn then put it in the path
 		raise e
 	# at this point we have SVN in the path and can download GYP
@@ -177,10 +185,14 @@ def clean():
 	if sys.platform == "darwin": # OSX
 		shell_command(["xcodebuild", "clean"]);
 
-@command(requires=["gyp", "add_version_info"], usage="Builds executables")
-def build_bin():
+def _build_bin(output=True):
 	if sys.platform == "darwin": # OSX
 		shell_command(["xcodebuild"]);
+
+
+@command(requires=["gyp", "add_version_info"], usage="Builds executables")
+def build_bin():
+	_build_bin();
 
 @command(requires=["build_bin"], usage="Copys support files to the build path")
 def build_env():
@@ -192,11 +204,29 @@ def run():
 
 @command(requires=["build_env"], usage="Runs the engine in Test Mode")
 def test():
-	run_engine(["-test"]);
-	run_engine(["-test", "-Ccore.render.openGL=2.0"]);
-	run_engine(["-test", "-Ccore.test.testFrames=100"]);
-	#run_engine(["-test", "-Ccore.render.openGL=2.0", "-Ccore.test.testFrames=100"]); # broken due to bug in SprieSheets
-	run_engine(["-test", "-Ccore.render.neoFont=true", "-Ccore.test.testFrames=100"]);
+	run_engine_test([]);
+	run_engine_test(["-Ccore.render.openGL=2.0"]);
+	run_engine_test(["-Ccore.test.testFrames=100"]);
+
+@command(requires=["add_version_info", "fetch_gyp"], usage="Tests both GLFW and SDL")
+def test_full():
+	print("=== Starting Full Test Suite ===");
+	
+	print("=== Building GLFW Window ===");
+	clean();
+	WINDOW_SYSTEM = "glfw";
+	gyp();
+	build_bin();
+	print("=== Testing GLFW Window ===");
+	test();
+
+	print("=== Build SDL Window ===");
+	clean();
+	WINDOW_SYSTEM = "sdl";
+	gyp();
+	build_bin();
+	print("=== Testing SDL Window ===");
+	test();
 
 @command(usage="Build documentation using jsdoc")
 def doc():
@@ -242,7 +272,7 @@ def run_command(cmdName):
 			run_command(cmd);
 
 	# finaly run the commadn the user is intrested in
-	print("==== Running: %s ====" % (cmdName));
+	print(bcolors.HIGHLIGHT + "==== Running: %s ====" % (cmdName) + bcolors.ENDC);
 	commands[cmdName]();
 	commands[cmdName].run = True;
 
