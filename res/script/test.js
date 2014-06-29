@@ -163,6 +163,8 @@ var tests = {
 };
 
 var testResults = {};
+var passedTests = 0;
+var failedTests = 0;
 
 for (var i in tests) {
 	try {
@@ -172,14 +174,19 @@ for (var i in tests) {
 		});
 		if (testResults[i]) {
 			console.log("Test passed : " + i);
+			passedTests++;
 		} else {
 			console.error("Test failed : " + i);
+			failedTests++;
 		}
 	} catch (e) {
 		console.error("Test failed : " + i + " : " + e.message);
+		failedTests++;
 		testResults[i] = false;
 	}
 }
+
+console._log("highlight", "test.js Tests Complete: " + passedTests + " passed : " + failedTests + " failed");
 
 draw.clearColor(0x010101);
 
