@@ -61,6 +61,31 @@
 				"src/vendor/soil/image_helper.c",
 				"src/vendor/soil/SOIL.c",
 				"src/vendor/soil/stb_image_aug.c",
+
+				# ZLIB
+				"src/vendor/zlib123/adler32.c",
+				"src/vendor/zlib123/compress.c",
+				"src/vendor/zlib123/crc32.c",
+				"src/vendor/zlib123/deflate.c",
+				"src/vendor/zlib123/gzio.c",
+				"src/vendor/zlib123/infback.c",
+				"src/vendor/zlib123/inffast.c",
+				"src/vendor/zlib123/inflate.c",
+				"src/vendor/zlib123/inftrees.c",
+				"src/vendor/zlib123/trees.c",
+				"src/vendor/zlib123/uncompr.c",
+				"src/vendor/zlib123/zutil.c",
+
+				# PHYSFS
+				"src/vendor/physfs/physfs.c",
+    			"src/vendor/physfs/physfs_byteorder.c",
+    			"src/vendor/physfs/physfs_unicode.c",
+    			"src/vendor/physfs/platform/posix.c",
+    			"src/vendor/physfs/platform/unix.c",
+    			"src/vendor/physfs/platform/macosx.c",
+    			"src/vendor/physfs/platform/windows.c",
+    			"src/vendor/physfs/archivers/dir.c",
+    			"src/vendor/physfs/archivers/zip.c"
 			],
 			"conditions": [
 				['OS != "win"', {
@@ -84,7 +109,6 @@
 							"-pthread"
 						],
 						"OTHER_LDFLAGS": [
-							"-lphysfs",
 							"-lv8"
 						]
 					},
