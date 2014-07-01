@@ -30,16 +30,25 @@ Basicly the same as the RenderDriver API is right now in C++
 
 ```javascript
 enum PolygonMode {
-    RenderBuffer.Triangles
+    Triangles,
+    LineStrip,
+    Triangles,
+    LineLoop,
+    Lines,
+    TriangleStrip,
+    TriangleFan
 };
 
 new VertexBuffer2D(PolygonMode mode); // automaticly expanding
+VertexBuffer2D.fromFile(string filename);
 
 void VertexBuffer2D.prototype.addVert(Vector2f vertPositon, Color4f col = Color4f.White, Vector2f uv = null);
 void VertexBuffer2D.prototype.setAutoUV(bool val);
 
 void VertexBuffer2D.prototype.rect(Vector2f p1, Vector p2);
 // Potentioly other Draw2D Methods
+
+VertexBuffer2D.save(string filename);
 
 number VertexBuffer2D.prototype.verts;
 ```
