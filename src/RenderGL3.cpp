@@ -178,14 +178,6 @@ namespace Engine {
         }
         
         void FlushAll() override {
-            if (this->_gl3Buffer == NULL) {
-                this->_gl3Buffer = new GL3Buffer(this, this->_currentEffect);
-            }
-            
-            if (_currentVerts == 0) {
-                return; // nothing to draw
-            }
-            
             RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
             
             this->CheckError("RenderGL3::FlushAll::Pre");
@@ -194,30 +186,11 @@ namespace Engine {
                 Logger::begin("RenderGL3", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
             }
             
-            this->CheckError("RenderGL3::FlushAll::PostUpdate");
-            
-            this->_gl3Buffer->Upload(this->_vertexBuffer, this->_indexBuffer, this->_currentVerts);
-            
-            this->CheckError("RenderGL3::FlushAll::PostUpload");
-            
-            //std::cout << "Drawing Using: " << GLModeToString(_currentMode) << std::endl;
-            this->_gl3Buffer->Draw(_currentMode, _currentModelMatrix, glm::mat4(), _currentVerts);
+            this->_gl3Buffer->Draw(_currentMode, _currentModelMatrix, glm::mat4());
             
             this->CheckError("RenderGL3::FlushAll::PostDraw");
             
-            /* I think this line here needs a story. What happens when you forget it?
-             Well as it turns out it will eat though the buffer growing ever bigger until
-             it starts ruining C++ like a fucking pacman. I got 2 lovely crashes because I
-             forgot this line. The first was caused when any std::unordered_map tries to
-             rehash somehing, the second was the slow and painful death as a std::vector
-             exceptions it's self to death over the span of 3 frames. This was my best line
-             that day.
-             */
-            this->_currentVerts = 0;
-            this->_vertexBuffer.clear();
-            this->_indexBuffer.clear();
-            
-            // maybe zero the buffer
+            this->_gl3Buffer->Reset();
             
             if (this->_activeTexture != this->_currentTexture) {
                 this->_switchTextures();
@@ -230,6 +203,7 @@ namespace Engine {
             std::string gl3Effect = Config::GetString("core.render.basicEffect");
             this->_currentEffect = EffectReader::GetEffectFromFile(gl3Effect);
             this->_currentEffect->CreateShader();
+            this->_gl3Buffer = new GL3Buffer(this, this->_currentEffect);
             if (this->_defaultTexture == NULL || !this->_defaultTexture->IsValid()) {
                 Logger::begin("RenderGL3", Logger::LogLevel_Verbose) << "Creating Default Texture" << Logger::end();
                 this->_defaultTexture = GenerateDefaultTexture();
@@ -292,13 +266,9 @@ namespace Engine {
         }
         
         void _addVert(float x, float y, float z, Color4f col, float s, float t) override {
-            this->_vertexBuffer.push_back(BufferFormat({
-                .pos = glm::vec3(x - _centerX, y - _centerY, z),
-                .col = col,
-                .uv = glm::vec2(s, t)
-            }));
-            this->_indexBuffer.push_back(_currentVerts);
-            this->_currentVerts++;
+            this->_gl3Buffer->AddVert(glm::vec3(x - this->_centerX,
+                                                y - this->_centerY, z),
+                                      col, glm::vec2(s, t));
         }
         
     private:
@@ -317,11 +287,6 @@ namespace Engine {
         
         int _centerX = 0;
         int _centerY = 0;
-        
-        int _currentVerts = 0;
-        
-        VertexBuffer _vertexBuffer;
-        IndexBuffer _indexBuffer;
         
         PolygonMode _currentMode = PolygonMode::Invalid;
         

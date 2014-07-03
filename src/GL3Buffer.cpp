@@ -113,23 +113,43 @@ namespace Engine {
         
         return true;
     }
+
+    void GL3Buffer::AddVert(glm::vec3 pos) {
+        this->AddVert(pos, Color4f("white"), glm::vec2(0, 0));
+    }
     
-    void GL3Buffer::Upload(VertexBufferRef vertBuffer, IndexBufferRef indexBuffer, int count) {
+    void GL3Buffer::AddVert(glm::vec3 pos, Color4f col) {
+        this->AddVert(pos, col, glm::vec2(0, 0));
+    }
+    
+    void GL3Buffer::AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv) {
+        this->_vertexBuffer.push_back(BufferFormat({
+            .pos = pos,
+            .col = col,
+            .uv = uv
+        }));
+        this->_indexBuffer.push_back(this->_vertexCount);
+        this->_vertexCount++;
+        this->_dirty = true;
+    }
+    
+    void GL3Buffer::Reset() {
+        this->_vertexCount = 0;
+        this->_vertexBuffer.clear();
+        this->_indexBuffer.clear();
+        this->_dirty = true;
+    }
+    
+    void GL3Buffer::_upload() {
         RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
-        
-        this->_getRender()->CheckError("GL3Buffer::Upload::Pre");
-        
-        this->Update();
-        
-        this->_begin();
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PreUploadBufferData");
         
-        glBufferData(GL_ARRAY_BUFFER, sizeof(BufferFormat) * count, &vertBuffer[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(BufferFormat) * this->_vertexBuffer.size(), &this->_vertexBuffer[0], GL_STATIC_DRAW);
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadBufferData");
         
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort) * count, &indexBuffer[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort) * this->_vertexCount, &this->_indexBuffer[0], GL_STATIC_DRAW);
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadIndexData");
         
@@ -138,15 +158,22 @@ namespace Engine {
             this->_shaderBound = true;
         }
         
-        this->_end();
-        
         this->_getRender()->CheckError("GL3Buffer::Upload::Post");
     }
     
-    void GL3Buffer::Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view, int vertexCount) {
+    void GL3Buffer::Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view) {
+        if (this->_vertexCount == 0) {
+            return; // nothing to draw
+        }
+        
         RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
         
         this->_begin();
+        
+        if (this->_dirty) {
+            this->_upload();
+            this->_dirty = false;
+        }
         
         this->_getShader()->Begin();
         
@@ -166,7 +193,7 @@ namespace Engine {
         
         this->_getRender()->CheckError("GL3Buffer::Draw::PostUploadUniform");
         
-        glDrawElements(_polygonModeToGLMode(mode), vertexCount, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(_polygonModeToGLMode(mode), this->_vertexCount, GL_UNSIGNED_SHORT, 0);
         
         this->_getRender()->CheckError("GL3Buffer::Draw::PostDraw");
         

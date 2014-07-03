@@ -56,8 +56,13 @@ namespace Engine {
 		GL3Buffer(RenderDriverPtr render, EffectParametersPtr params);
 		~GL3Buffer();
 
-		void Upload(VertexBufferRef vertBuffer, IndexBufferRef indexBuffer, int count);
-		void Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view, int vertexCount);
+        void AddVert(glm::vec3 pos);
+        void AddVert(glm::vec3 pos, Color4f col);
+        void AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv);
+        
+        void Reset();
+        
+		void Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view);
         
         bool NeedsUpdate();
         bool Update();
@@ -76,11 +81,20 @@ namespace Engine {
         
 		void bindShader();
         
+		void _upload();
+        
         RenderDriverPtr _getRender() {
             return this->_renderGL;
         }
         
         uint _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
+        
+        VertexBuffer _vertexBuffer;
+        IndexBuffer _indexBuffer;
+        
+        ushort _vertexCount = 0;
+        
+        bool _dirty = false;
         
         RenderDriverPtr _renderGL = NULL;
         ShaderPtr _currentShader = NULL;

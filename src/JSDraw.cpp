@@ -34,6 +34,7 @@
 #include "Util.hpp"
 #include "Config.hpp"
 #include "FontSheet.hpp"
+#include "GL3Buffer.hpp"
 
 namespace Engine {
     
@@ -185,6 +186,61 @@ namespace Engine {
             newColor->SetCallHandler(CreateColor);
             
             drawTable->Set(isolate, "Color", newColor);
+        }
+        
+        ENGINE_JS_METHOD(CreateVertexBuffer) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            if (!args.IsConstructCall()) {
+                const int argc = args.Length();
+                std::vector<v8::Handle<v8::Value>> av(static_cast<size_t>(argc),v8::Undefined(isolate));
+                for(int i = 0; i < argc; ++i) av[i] = args[i];
+                ENGINE_JS_SCOPE_CLOSE(args.Callee()->NewInstance(argc, &av[0]));
+            }
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Effect filename to use");
+            
+            RenderDriverPtr render = GetAppSingilton()->GetRender();
+            
+            GL3BufferPtr buf = NULL;
+            
+            if (render->GetRendererType() == RendererType::OpenGL3) {
+                EffectParametersPtr effect = EffectReader::GetEffectFromFile(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                effect->CreateShader();
+                buf = new GL3Buffer(render, effect);
+            }
+            
+            args.This()->SetHiddenValue(v8::String::NewFromUtf8(isolate, "_buf"), v8::External::New(isolate, buf));
+            
+            return;
+        }
+        
+        ENGINE_JS_METHOD(VertexBuffer_AddVert) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        void InitVertexBuffer2DObject(v8::Handle<v8::ObjectTemplate> drawTable) {
+            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            v8::HandleScope scope(isolate);
+            
+            v8::Handle<v8::FunctionTemplate> newVertexBuffer = v8::FunctionTemplate::New(isolate);
+            
+            newVertexBuffer->SetClassName(v8::String::NewFromUtf8(isolate, "VertexBuffer2D"));
+            
+            v8::Handle<v8::ObjectTemplate> vbPrototypeTemplate = newVertexBuffer->PrototypeTemplate();
+            v8::Handle<v8::ObjectTemplate> vbInstanceTemplate = newVertexBuffer->InstanceTemplate();
+            
+            vbPrototypeTemplate->Set(isolate, "addVert", v8::FunctionTemplate::New(isolate, VertexBuffer_AddVert));
+            
+            newVertexBuffer->SetCallHandler(CreateVertexBuffer);
+            
+            drawTable->Set(isolate, "VertexBuffer2D", newVertexBuffer);
         }
         
         inline Draw2DPtr GetDraw2D(v8::Local<v8::Object> thisValue) {
@@ -1158,6 +1214,7 @@ namespace Engine {
         
         void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
             InitColorObject(drawTable);
+            InitVertexBuffer2DObject(drawTable);
             
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
             
