@@ -222,6 +222,55 @@ namespace Engine {
         ENGINE_JS_METHOD(VertexBuffer_AddVert) {
             ENGINE_JS_SCOPE_OPEN;
             
+            v8::Isolate* isolate = args.GetIsolate();
+            
+            glm::vec3 pos;
+            Color4f col = Color4f("white");
+            glm::vec2 uv;
+            
+            if (args.Length() >= 2) { // (x, y)
+                pos = glm::vec3(ENGINE_GET_ARG_NUMBER_VALUE(0),
+                                ENGINE_GET_ARG_NUMBER_VALUE(1),
+                                0.0f);
+            }
+            if (args.Length() >= 3) { // (x, y, col)
+                v8::Handle<v8::Object> obj = ENGINE_GET_ARG_OBJECT(2);
+                col.r = obj->Get(v8::String::NewFromUtf8(isolate, "r"))->NumberValue();
+                col.g = obj->Get(v8::String::NewFromUtf8(isolate, "g"))->NumberValue();
+                col.b = obj->Get(v8::String::NewFromUtf8(isolate, "b"))->NumberValue();
+                col.a = obj->Get(v8::String::NewFromUtf8(isolate, "a"))->NumberValue();
+            }
+            if (args.Length() >= 5) { // (x, y, col, u, v)
+                uv = glm::vec2(ENGINE_GET_ARG_NUMBER_VALUE(3),
+                               ENGINE_GET_ARG_NUMBER_VALUE(4));
+            }
+            
+            void* v = args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "_buf")).As<v8::External>()->Value();
+            
+            if (v == NULL) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            GL3BufferPtr buf = (GL3BufferPtr) v;
+            
+            buf->AddVert(pos, col, uv);
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(VertexBuffer_Draw) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            void* v = args.This()->GetHiddenValue(v8::String::NewFromUtf8(args.GetIsolate(), "_buf")).As<v8::External>()->Value();
+            
+            if (v == NULL) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            GL3BufferPtr buf = (GL3BufferPtr) v;
+            
+            buf->Draw(PolygonMode::Triangles, glm::mat4(), glm::mat4());
+            
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
@@ -237,6 +286,7 @@ namespace Engine {
             v8::Handle<v8::ObjectTemplate> vbInstanceTemplate = newVertexBuffer->InstanceTemplate();
             
             vbPrototypeTemplate->Set(isolate, "addVert", v8::FunctionTemplate::New(isolate, VertexBuffer_AddVert));
+            vbPrototypeTemplate->Set(isolate, "draw", v8::FunctionTemplate::New(isolate, VertexBuffer_Draw));
             
             newVertexBuffer->SetCallHandler(CreateVertexBuffer);
             
