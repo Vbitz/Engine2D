@@ -25,6 +25,7 @@
 #include "GL3Buffer.hpp"
 
 #include "Logger.hpp"
+#include "Filesystem.hpp"
 
 // TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
 #include "vendor/glm/glm.hpp"
@@ -200,6 +201,56 @@ namespace Engine {
         this->_getShader()->End();
         
         this->_end();
+    }
+    
+    void GL3Buffer::Save(std::string filename) {
+        unsigned char* buff = NULL;
+        long fileLength = 0;
+        
+        GL3BufferDiskFormat header;
+        
+        fileLength += sizeof(GL3BufferDiskFormat);
+        
+        header.vertexOffset = fileLength;
+        header.vertexCount = this->_vertexBuffer.size();
+        
+        fileLength += this->_vertexBuffer.size() * sizeof(BufferFormat);
+        
+        header.indexOffset = fileLength;
+        header.indexCount = this->_indexBuffer.size();
+        
+        fileLength += this->_indexBuffer.size() * sizeof(ushort);
+        
+        buff = (unsigned char*) std::malloc(fileLength);
+        
+        std::memcpy(&buff[header.vertexOffset], &this->_vertexBuffer[0],
+                    this->_vertexBuffer.size() * sizeof(BufferFormat));
+        std::memcpy(&buff[header.indexOffset], &this->_indexBuffer[0],
+                    this->_indexBuffer.size() * sizeof(ushort));
+        std::memcpy(&buff[0], &header, sizeof(GL3BufferDiskFormat));
+        
+        Filesystem::WriteFile(filename, (const char*) buff, fileLength);
+        
+        std::free(buff);
+    }
+    
+    void GL3Buffer::Load(std::string filename) {
+        this->Reset();
+        
+        long fileLength;
+        unsigned char* buff = (unsigned char*) Filesystem::GetFileContent(filename, fileLength);
+        
+        GL3BufferDiskFormat* header = (GL3BufferDiskFormat*) buff;
+        
+        this->_vertexBuffer.insert(this->_vertexBuffer.end(),
+            (BufferFormat*) &buff[header->vertexOffset],
+            (BufferFormat*) &buff[header->vertexOffset + (header->vertexCount * sizeof(BufferFormat))]);
+        
+        this->_indexBuffer.insert(this->_indexBuffer.end(),
+            (ushort*) &buff[header->indexOffset],
+            (ushort*) &buff[header->indexOffset + (header->indexCount * sizeof(ushort))]);
+        
+        this->_vertexCount = header->indexCount;
     }
     
     void GL3Buffer::_begin() {

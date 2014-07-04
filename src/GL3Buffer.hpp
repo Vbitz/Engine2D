@@ -43,6 +43,17 @@ namespace Engine {
         glm::vec2 uv;
     };
     
+    // .eglb format
+    struct GL3BufferDiskFormat {
+        unsigned char magic[4] = {'E', 'G', 'L', 'B'};
+        
+        unsigned int vertexOffset;
+        unsigned int vertexCount;
+        
+        unsigned int indexOffset;
+        unsigned int indexCount;
+    };
+    
     typedef std::vector<BufferFormat> VertexBuffer;
     typedef std::vector<ushort> IndexBuffer;
     
@@ -70,6 +81,9 @@ namespace Engine {
         void Invalidate() {
             this->_shaderBound = false;
         }
+        
+        void Save(std::string filename);
+        void Load(std::string filename);
 
 	private:
         void _init();

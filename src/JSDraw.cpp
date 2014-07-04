@@ -50,6 +50,29 @@ namespace Engine {
             delete[] args.GetParameter();
         }
         
+        v8::Persistent<v8::FunctionTemplate> colorTemplate, vertexBuffer2DTemplate;
+        
+        Color4f Color4fFromObject(v8::Isolate* isolate, v8::Handle<v8::Object> obj) {
+            Color4f col;
+            col.r = obj->Get(v8::String::NewFromUtf8(isolate, "r"))->NumberValue();
+            col.g = obj->Get(v8::String::NewFromUtf8(isolate, "g"))->NumberValue();
+            col.b = obj->Get(v8::String::NewFromUtf8(isolate, "b"))->NumberValue();
+            col.a = obj->Get(v8::String::NewFromUtf8(isolate, "a"))->NumberValue();
+            return col;
+        }
+        
+        v8::Local<v8::Object> Color4fToObject(v8::Isolate* isolate, Color4f col) {
+            std::vector<v8::Handle<v8::Value>> av(4, v8::Undefined(isolate));
+            
+            av[0] = v8::Number::New(isolate, col.r);
+            av[1] = v8::Number::New(isolate, col.g);
+            av[2] = v8::Number::New(isolate, col.b);
+            av[3] = v8::Number::New(isolate, col.a);
+            
+            v8::Local<v8::FunctionTemplate> func = v8::Local<v8::FunctionTemplate>::New(isolate, colorTemplate);
+            return func->GetFunction()->NewInstance(4, &av[0]);
+        }
+        
         ENGINE_JS_METHOD(CreateColor) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -122,14 +145,7 @@ namespace Engine {
             
             Color4f col = Color4f::FromHSV(hue, saturation, value);
             
-            std::vector<v8::Handle<v8::Value>> av(4, v8::Undefined(isolate));
-            
-            av[0] = v8::Number::New(isolate, col.r);
-            av[1] = v8::Number::New(isolate, col.g);
-            av[2] = v8::Number::New(isolate, col.b);
-            av[3] = v8::Number::New(isolate, col.a);
-            
-            ENGINE_JS_SCOPE_CLOSE(args.This().As<v8::Function>()->NewInstance(4, &av[0]));
+            ENGINE_JS_SCOPE_CLOSE(Color4fToObject(isolate, col));
         }
         
         ENGINE_JS_METHOD(Color_FromRandom) {
@@ -185,6 +201,8 @@ namespace Engine {
             
             newColor->SetCallHandler(CreateColor);
             
+            colorTemplate.Reset(isolate, newColor);
+            
             drawTable->Set(isolate, "Color", newColor);
         }
         
@@ -235,10 +253,7 @@ namespace Engine {
             }
             if (args.Length() >= 3) { // (x, y, col)
                 v8::Handle<v8::Object> obj = ENGINE_GET_ARG_OBJECT(2);
-                col.r = obj->Get(v8::String::NewFromUtf8(isolate, "r"))->NumberValue();
-                col.g = obj->Get(v8::String::NewFromUtf8(isolate, "g"))->NumberValue();
-                col.b = obj->Get(v8::String::NewFromUtf8(isolate, "b"))->NumberValue();
-                col.a = obj->Get(v8::String::NewFromUtf8(isolate, "a"))->NumberValue();
+                col = Color4fFromObject(isolate, obj);
             }
             if (args.Length() >= 5) { // (x, y, col, u, v)
                 uv = glm::vec2(ENGINE_GET_ARG_NUMBER_VALUE(3),
@@ -274,6 +289,46 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
+        ENGINE_JS_METHOD(VertexBuffer_Save) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to save to")
+            
+            void* v = args.This()->GetHiddenValue(v8::String::NewFromUtf8(args.GetIsolate(), "_buf")).As<v8::External>()->Value();
+            
+            if (v == NULL) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            GL3BufferPtr buf = (GL3BufferPtr) v;
+            
+            buf->Save(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
+        ENGINE_JS_METHOD(VertexBuffer_Load) {
+            ENGINE_JS_SCOPE_OPEN;
+            
+            ENGINE_CHECK_ARGS_LENGTH(1);
+            
+            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to load from")
+            
+            void* v = args.This()->GetHiddenValue(v8::String::NewFromUtf8(args.GetIsolate(), "_buf")).As<v8::External>()->Value();
+            
+            if (v == NULL) {
+                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            }
+            
+            GL3BufferPtr buf = (GL3BufferPtr) v;
+            
+            buf->Load(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            
+            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+        }
+        
         void InitVertexBuffer2DObject(v8::Handle<v8::ObjectTemplate> drawTable) {
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
             v8::HandleScope scope(isolate);
@@ -287,8 +342,12 @@ namespace Engine {
             
             vbPrototypeTemplate->Set(isolate, "addVert", v8::FunctionTemplate::New(isolate, VertexBuffer_AddVert));
             vbPrototypeTemplate->Set(isolate, "draw", v8::FunctionTemplate::New(isolate, VertexBuffer_Draw));
+            vbPrototypeTemplate->Set(isolate, "save", v8::FunctionTemplate::New(isolate, VertexBuffer_Save));
+            vbPrototypeTemplate->Set(isolate, "load", v8::FunctionTemplate::New(isolate, VertexBuffer_Load));
             
             newVertexBuffer->SetCallHandler(CreateVertexBuffer);
+            
+            vertexBuffer2DTemplate.Reset(isolate, newVertexBuffer);
             
             drawTable->Set(isolate, "VertexBuffer2D", newVertexBuffer);
         }
