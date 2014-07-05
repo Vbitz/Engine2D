@@ -71,8 +71,8 @@ void VertexBuffer2D.prototype.rect(Vector2f p1, Vector p2);
 
 [x] void VertexBuffer2D.prototype.draw();
 
-void VertexBuffer2D.prototype.save(string filename);
-void VertexBuffer2D.prototype.load(string filename);
+[x] void VertexBuffer2D.prototype.save(string filename);
+[x] void VertexBuffer2D.prototype.load(string filename);
 
 number VertexBuffer2D.prototype.verts;
 ```
