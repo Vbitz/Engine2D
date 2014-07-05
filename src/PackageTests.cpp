@@ -29,7 +29,28 @@ namespace Engine {
         std::string GetName() override { return "BasicPackageTest"; }
         
         void Run() {
+            PackagePtr p = Package::FromFile("testing.epkg");
             
+            std::string content = "Hello, World";
+            
+            unsigned char* fileData1 = (unsigned char*) content.c_str();
+            unsigned long fileLength1 = strlen((char*) fileData1);
+            
+            p->WriteFile("testing.txt", fileData1, fileLength1);
+            
+            p->GetIndex()["hello"] = "World";
+            
+            p->SaveIndex();
+            
+            delete p;
+            
+            PackagePtr p2 = Package::FromFile("testing.epkg");
+            
+            unsigned long fileLength2 = 0;
+            unsigned char* fileData2 = p2->ReadFile("testing.txt", fileLength2);
+            this->Assert("Check File Length", fileLength2 == fileLength1);
+            this->Assert("Check File Content", fileData2 == fileData1);
+            this->Assert("Check File Index Content", p2->GetIndex()["hello"].asString() == "World");
         }
     };
     
