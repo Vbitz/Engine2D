@@ -121,9 +121,11 @@ namespace Engine {
         
         MutexPtr CreateMutex();
         
-        unsigned char* GenerateUUID();
-        std::string StringifyUUID(unsigned char* uuidArr);
-        unsigned char* ParseUUID(std::string uuidStr);
+        typedef unsigned char* UUID;
+        
+        UUID GenerateUUID();
+        std::string StringifyUUID(UUID uuidArr);
+        UUID ParseUUID(std::string uuidStr);
         
         bool ShowMessageBox(std::string title, std::string text, bool modal);
         

@@ -26,10 +26,26 @@
 #include <string>
 #include <vector>
 
-#include <physfs.h>
-
 namespace Engine {
 	namespace Filesystem {
+        ENGINE_CLASS(File);
+        
+        enum class FileMode {
+            Read,
+            Write,
+            Append
+        };
+        
+        class File {
+        public:
+            
+            virtual ~File() {};
+            
+            virtual void Close() = 0;
+            virtual FileMode GetMode() = 0;
+            
+            static FilePtr Open(std::string path, FileMode mode);
+        };
         
 		bool						IsLoaded();
 
@@ -52,6 +68,7 @@ namespace Engine {
         
         char*                       GetFileContent(std::string path);
         char*                       GetFileContent(std::string path, long& fileSize);
+        
         void                        WriteFile(std::string path, const char* content, long length);
         void                        TouchFile(std::string path);
 

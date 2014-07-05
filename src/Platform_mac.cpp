@@ -262,13 +262,13 @@ namespace Engine {
             return new OSXMutex();
         }
         
-        unsigned char* GenerateUUID() {
-            unsigned char* uuid = new unsigned char[16];
+        UUID GenerateUUID() {
+            UUID uuid = new unsigned char[16];
             uuid_generate(uuid);
             return uuid;
         }
         
-        std::string StringifyUUID(unsigned char* uuidArr) {
+        std::string StringifyUUID(UUID uuidArr) {
             char* uuidString = new char[37];
             uuid_unparse(uuidArr, uuidString);
             std::string ret = std::string(uuidString);
@@ -276,7 +276,7 @@ namespace Engine {
             return ret;
         }
         
-        unsigned char* ParseUUID(std::string uuidStr) {
+        UUID ParseUUID(std::string uuidStr) {
             unsigned char* uuidArray = new unsigned char[16];
             uuid_parse(uuidStr.c_str(), uuidArray);
             return uuidArray;

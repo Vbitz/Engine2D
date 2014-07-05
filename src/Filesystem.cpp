@@ -21,9 +21,52 @@
 
 #include "Filesystem.hpp"
 
+#include "vendor/physfs/physfs.h"
+
 namespace Engine {
 	namespace Filesystem {
         bool hasSetUserDir = false;
+        
+        class PhysFSFile : public File {
+        public:
+            PhysFSFile(PHYSFS_File* file, FileMode mode) : _file(file), _mode(mode) {}
+            
+            ~PhysFSFile() override {
+                if (!this->_closed) {
+                    this->Close();
+                }
+            }
+            
+            void Close() override {
+                if (this->_closed) return;
+                PHYSFS_close(this->_file);
+            }
+            
+            FileMode GetMode() override {
+                
+            }
+            
+        private:
+            bool _closed = false;
+            PHYSFS_File* _file = NULL;
+            FileMode _mode;
+        };
+        
+        FilePtr File::Open(std::string path, FileMode mode) {
+            PHYSFS_File* file = NULL;
+            switch (mode) {
+                case FileMode::Read:
+                    file = PHYSFS_openRead(path.c_str());
+                    break;
+                case FileMode::Write:
+                    file = PHYSFS_openWrite(path.c_str());
+                    break;
+                case FileMode::Append:
+                    file = PHYSFS_openAppend(path.c_str());
+                    break;
+            }
+            return new PhysFSFile(file, mode);
+        }
         
 		bool IsLoaded() {
 			return PHYSFS_isInit();

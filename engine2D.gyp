@@ -42,6 +42,7 @@
 				"src/CoreTests.cpp",
 				"src/ScriptingTests.cpp",
 				"src/StdLibTests.cpp",
+				"src/PackageTests.cpp",
 				"src/EffectParameters.cpp",
 				"src/SpriteSheet.cpp",
 				"src/FontSheet.cpp",
@@ -49,6 +50,7 @@
 				"src/Timer.cpp",
 				"src/ScriptingManager.cpp",
 				"src/WorkerThreadPool.cpp",
+				"src/Package.cpp",
 
 				"src/Drawables/CubeDrawableTest.cpp",
 
