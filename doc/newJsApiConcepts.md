@@ -76,3 +76,14 @@ void VertexBuffer2D.prototype.rect(Vector2f p1, Vector p2);
 
 number VertexBuffer2D.prototype.verts;
 ```
+
+## Package
+```javascript
+new Package(string filename); // loads a pre existing package or starts a new one at that filename.
+
+string Package.prototype.readString(string filename);
+void Package.prototype.writeString(string filename, string content);
+
+object Package.prototype.index;
+void Package.prototype.saveIndex();
+```
