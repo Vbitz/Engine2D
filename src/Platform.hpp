@@ -61,6 +61,12 @@ typedef void* (*ThreadMethod)(void*);
 namespace Engine {
     namespace Platform {
         
+        struct UUID {
+            uint64_t partA, partB;
+        };
+        
+        static_assert(sizeof(UUID) == 16, "The size of UUID must equal 16 bytes");
+        
         ENGINE_CLASS(Libary);
         
         class Libary {
@@ -86,7 +92,7 @@ namespace Engine {
             virtual void Terminate() = 0;
             virtual void Exit(void* ret) = 0;
             
-            virtual unsigned char* GetThreadID() = 0;
+            virtual UUID GetThreadID() = 0;
         };
         
         ENGINE_CLASS(Mutex);
@@ -120,8 +126,6 @@ namespace Engine {
         ThreadPtr GetCurrentThread();
         
         MutexPtr CreateMutex();
-        
-        typedef unsigned char* UUID;
         
         UUID GenerateUUID();
         std::string StringifyUUID(UUID uuidArr);

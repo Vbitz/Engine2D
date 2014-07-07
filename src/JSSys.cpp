@@ -606,7 +606,7 @@ namespace Engine {
         ENGINE_JS_METHOD(GetUuid) {
             ENGINE_JS_SCOPE_OPEN;
             
-            unsigned char* uuid = Platform::GenerateUUID();
+            Platform::UUID uuid = Platform::GenerateUUID();
             
             ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(args.GetIsolate(), Platform::StringifyUUID(uuid).c_str()));
         }

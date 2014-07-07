@@ -178,7 +178,7 @@ namespace Engine {
         
         struct ScriptWorkerArgs {
             std::string scriptSource;
-            unsigned char* threadID;
+            Platform::UUID threadID;
             
             ScriptWorkerPtr worker = NULL;
             
@@ -192,7 +192,7 @@ namespace Engine {
             
             args->threadIDMutex->Enter();
             
-            unsigned char* threadID = args->threadID;
+            Platform::UUID threadID = args->threadID;
             
             args->threadIDMutex->Exit();
             

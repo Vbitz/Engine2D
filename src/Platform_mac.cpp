@@ -108,17 +108,11 @@ namespace Engine {
                     std::cout << "ERROR: pthread_create failed" << std::endl;
                 }
                 
-                unsigned char* uuid = new unsigned char[16];
-                uuid_generate(uuid);
-                this->_uuid = uuid;
+                this->_uuid = GenerateUUID();
             }
             
             OSXThread(pthread_t thread) {
                 _thread = thread;
-            }
-            
-            ~OSXThread() override {
-                delete [] this->_uuid;
             }
             
             void Terminate() override {
@@ -129,13 +123,13 @@ namespace Engine {
                 pthread_exit(ret);
             }
             
-            unsigned char* GetThreadID() override {
+            UUID GetThreadID() override {
                 return this->_uuid;
             }
             
         private:
             pthread_t _thread;
-            unsigned char* _uuid;
+            UUID _uuid;
         };
         
         ENGINE_CLASS(OSXMutex);
@@ -263,22 +257,22 @@ namespace Engine {
         }
         
         UUID GenerateUUID() {
-            UUID uuid = new unsigned char[16];
-            uuid_generate(uuid);
+            UUID uuid;
+            uuid_generate((unsigned char*) &uuid);
             return uuid;
         }
         
         std::string StringifyUUID(UUID uuidArr) {
             char* uuidString = new char[37];
-            uuid_unparse(uuidArr, uuidString);
+            uuid_unparse((unsigned char*) &uuidArr, uuidString);
             std::string ret = std::string(uuidString);
             delete [] uuidString;
             return ret;
         }
         
         UUID ParseUUID(std::string uuidStr) {
-            unsigned char* uuidArray = new unsigned char[16];
-            uuid_parse(uuidStr.c_str(), uuidArray);
+            UUID uuidArray;
+            uuid_parse(uuidStr.c_str(), (unsigned char*) &uuidArray);
             return uuidArray;
         }
         

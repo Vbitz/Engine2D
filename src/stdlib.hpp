@@ -24,6 +24,8 @@
 #include <stddef.h>
 #include <initializer_list>
 
+#include <type_traits>
+
 #include <ostream>
 #include <unordered_map>
 #include <random>
