@@ -130,7 +130,13 @@ namespace Engine {
         void LogText(std::string domain, LogLevel level, std::string str) {
             bool logConsole = Config::GetBoolean("core.log.enableConsole")
                 && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
-            bool logConsoleOnlyHighlight = Config::GetBoolean("core.log.levels.onlyHighlight") && logConsole;
+            if (logConsole && Config::GetBoolean("core.log.levels.onlyHighlight")) {
+                if (level == LogLevel_Highlight || level == LogLevel_TestError || level == LogLevel_TestLog) {
+                    logConsole = true;
+                } else {
+                    logConsole = false;
+                }
+            }
             std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
             
             _logMutex->Enter();
@@ -147,9 +153,7 @@ namespace Engine {
                 }
 
                 if (logConsole) {
-                    if ((logConsoleOnlyHighlight && level == LogLevel_Highlight) || !logConsoleOnlyHighlight) {
-                        std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
-                    }
+                    std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
                 }
             } else {
                 std::string strCopy = str;
@@ -163,9 +167,7 @@ namespace Engine {
                     _logEvents.push_back(newEvent);
                     
                     if (logConsole) {
-                        if ((logConsoleOnlyHighlight && level == LogLevel_Highlight) || !logConsoleOnlyHighlight) {
-                            std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
-                        }
+                        std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
                     }
                     
                     strCopy.erase(0, newLinePos + 1);
@@ -175,11 +177,9 @@ namespace Engine {
                 _logEvents.push_back(LogEvent(domain, level, strCopy));
                 
                 if (logConsole) {
-                    if ((logConsoleOnlyHighlight && level == LogLevel_Highlight) || !logConsoleOnlyHighlight) {
-                        std::cout << colorCode << Platform::GetTime()
-                            << " : [" << GetLevelString(level) << "] "
-                            << domain << " | " << strCopy << std::endl;
-                    }
+                    std::cout << colorCode << Platform::GetTime()
+                        << " : [" << GetLevelString(level) << "] "
+                        << domain << " | " << strCopy << std::endl;
                 }
             }
             
