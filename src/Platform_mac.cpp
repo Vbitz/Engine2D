@@ -180,7 +180,6 @@ namespace Engine {
                 if (fstat(this->_fd, &st) == 0) {
                     fileSize = st.st_size;
                 }
-                std::cout << fileSize << std::endl;
                 if (offset + size > fileSize) {
                     lseek(this->_fd, size - 1, SEEK_SET);
                     write(this->_fd, "", 1);
