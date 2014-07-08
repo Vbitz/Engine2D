@@ -71,6 +71,7 @@ namespace Engine {
         
         void                        WriteFile(std::string path, const char* content, long length);
         void                        TouchFile(std::string path);
+        void                        DeleteFile(std::string path);
 
 		std::string					GetRealPath(std::string path);
 		long						GetFileModifyTime(std::string path);

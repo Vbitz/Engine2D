@@ -29,6 +29,9 @@ namespace Engine {
         std::string GetName() override { return "BasicPackageTest"; }
         
         void Run() {
+            if (Filesystem::FileExists("testing.epkg")) {
+                Filesystem::DeleteFile("testing.epkg");
+            }
             PackagePtr p = Package::FromFile("testing.epkg");
             
             std::string content = "Hello, World";

@@ -215,6 +215,18 @@ namespace Engine {
             PHYSFS_File* f = PHYSFS_openWrite(path.c_str());
             PHYSFS_close(f);
         }
+        
+        void DeleteFile(std::string path) {
+            if (!IsLoaded()) {
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                return;
+            }
+            if (!hasSetUserDir) {
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "UserDir needs to be set to touchFiles" << Logger::end();
+                return;
+            }
+            PHYSFS_delete(path.c_str());
+        }
 
 		std::string GetRealPath(std::string path) {
 			const char* fontPath = PHYSFS_getRealDir(path.c_str());
