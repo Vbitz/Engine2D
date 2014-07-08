@@ -30,6 +30,8 @@
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
 #include <dlfcn.h>
 #include <mach-o/fat.h>
@@ -167,6 +169,44 @@ namespace Engine {
             bool _entered = false;
         };
         
+        class OSXMemoryMappedFile : public MemoryMappedFile {
+        public:
+            OSXMemoryMappedFile(int fd) : _fd(fd) { }
+            
+            MemoryMappedRegionPtr MapRegion(unsigned long offset, size_t size) override {
+                // Make sure the file is of the right length
+                size_t fileSize = 0;
+                struct stat st;
+                if (fstat(this->_fd, &st) == 0) {
+                    fileSize = st.st_size;
+                }
+                std::cout << fileSize << std::endl;
+                if (offset + size > fileSize) {
+                    lseek(this->_fd, size - 1, SEEK_SET);
+                    write(this->_fd, "", 1);
+                }
+                
+                void* region = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, this->_fd, offset);
+                if (errno == EINVAL) { throw errno; }
+                return new MemoryMappedRegion(this, region, size);
+            }
+            
+            void UnmapRegion(MemoryMappedRegionPtr r) override {
+                munmap(r->_data, r->_length);
+            }
+            
+            bool IsValid() override {
+                return fcntl(this->_fd, F_GETFD) != -1 || errno != EBADF;
+            }
+            
+            void Close() override {
+                close(this->_fd);
+            }
+            
+        private:
+            int _fd;
+        };
+        
         int _argc;
         const char** _argv;
         
@@ -254,6 +294,16 @@ namespace Engine {
         
         MutexPtr CreateMutex() {
             return new OSXMutex();
+        }
+        
+        MemoryMappedFilePtr OpenMemoryMappedFile(std::string filename, FileMode mode) {
+            int fmode;
+            switch (mode) {
+                case FileMode::Read:    fmode = O_RDONLY; break;
+                case FileMode::Write:   fmode = O_RDWR;   break;
+            }
+            int fd = open(filename.c_str(), fmode);
+            return new OSXMemoryMappedFile(fd);
         }
         
         UUID GenerateUUID() {

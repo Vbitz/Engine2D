@@ -17,9 +17,11 @@ namespace Engine {
      Package Format on Disk
      -------------------------------------------- Start
      PackageDiskHeader - 64 bytes length
+     PADDING - 448 bytes length
+     StringChunk - Index - 512 bytes length 502 bytes usable
+     PADDING - 3072 bytes length
+     PackageDiskFile Chunk - 4096 bytes length, 32 files per chunk
      -------------------------------------------- End of Header
-     StringChunk - Index - 512 bytes length 506 bytes usable
-     PackageDiskFile Chunk - 1024 bytes length, 8 files per chunk
      File Content - variable length
      
      More StringChunks or PackageDiskHeader Chunks
@@ -37,7 +39,11 @@ namespace Engine {
         
         uint32_t indexFirstOffset;
         
-        uint8_t padding[10] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        uint16_t numOfFiles = 0;
+        
+        // All regions alligned on 0x1000 (4096) bytes
+        uint32_t nextRegionOffset = 512;
+        uint32_t nextFileHeaderOffset;
     }; // length = 64 bytes
     
     static_assert(sizeof(PackageDiskHeader) == 64, "For alignment the size of PackageDiskHeader must equal 64");
@@ -53,7 +59,7 @@ namespace Engine {
 
 #pragma pack(0)
     struct PackageDiskFile {
-        unsigned char name[96];
+        uint32_t magic = 0xDEADBEEF;
         
         uint32_t offset;
         uint32_t size;
@@ -61,25 +67,29 @@ namespace Engine {
         PackageFileCompressionType compression;
         PackageFileEncryptionType encryption;
         uint8_t padding1[2] = {0x00, 0x00};
+        
+        uint32_t latestRevisonOffset = NULL;
         uint32_t nextFileOffset = NULL;
-        uint8_t padding2[16] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        uint8_t padding2[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        
+        unsigned char name[96];
     }; // length = 92 bytes
     
     static_assert(sizeof(PackageDiskFile) == 128, "For alignment the size of PackageDiskFile must equal 128");
     
 #pragma pack(0)
     struct PackageDiskFileChunk {
-        PackageDiskFile files[8];
+        PackageDiskFile files[PACKAGE_FILES_PER_CHUNK];
     };
     
-    static_assert(sizeof(PackageDiskFileChunk) == 1024, "For alignment the size of PackageDiskFileChunk must equal 1024");
+    static_assert(sizeof(PackageDiskFileChunk) == 4096, "For alignment the size of PackageDiskFileChunk must equal 1024");
     
 #pragma pack(0)
     struct StringChunk {
+        uint32_t magic = 0xCAFEBABE;
         uint32_t nextOffset;
         uint16_t length;
-        unsigned char content[512 - (sizeof(nextOffset) + sizeof(length))];
+        unsigned char content[512 - (sizeof(nextOffset) + sizeof(length) + sizeof(magic))];
     }; // length 512 bytes
         
     static_assert(sizeof(StringChunk) == 512, "");
@@ -88,20 +98,31 @@ namespace Engine {
     
     class Package {
     public:
+        ~Package();
+        
         void WriteFile(std::string filename, unsigned char* content, unsigned long contentLength);
         unsigned char* ReadFile(std::string filename, unsigned long& contentLength);
         
         Json::Value& GetIndex();
         void SaveIndex();
         
+        void Defragment();
+        
+        void Close();
+        
         static PackagePtr FromFile(std::string filename);
     private:
-        Package(Filesystem::File f);
+        Package(Platform::MemoryMappedFilePtr f);
+        
+        void _writeHeader();
+        
+        Platform::MemoryMappedFilePtr _file;
+        
+        std::unordered_map<std::string, uint32_t> _fastFileLookup;
+        
+        bool _writenHeader = false;
+        Platform::MemoryMappedRegionPtr _headerRegion;
         
         Json::Value _index = Json::Value(Json::objectValue);
-    };
-        
-    class PackageFile {
-            
     };
 }

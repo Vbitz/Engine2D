@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include <assert.h>
+
 #include "stdlib.hpp"
 
 #ifndef FARPROC
@@ -106,6 +108,51 @@ namespace Engine {
             virtual void Exit() = 0;
         };
         
+        enum class FileMode {
+            Read,
+            Write
+        };
+        
+        ENGINE_CLASS(MemoryMappedFile);
+        ENGINE_CLASS(MemoryMappedRegion);
+        
+        class MemoryMappedFile {
+        public:
+            ~MemoryMappedFile() {
+                if (this->IsValid()) this->Close();
+            }
+            
+            virtual MemoryMappedRegionPtr MapRegion(unsigned long offset, size_t size) = 0;
+            virtual void UnmapRegion(MemoryMappedRegionPtr r) = 0;
+            
+            virtual bool IsValid() = 0;
+            
+            virtual void Close() = 0;
+        };
+        
+        class MemoryMappedRegion {
+        public:
+            MemoryMappedRegion(MemoryMappedFilePtr parent, void* data, size_t length) : _parent(parent), _data(data), _length(length) { }
+            
+            ~MemoryMappedRegion() {
+                if (this->_parent != NULL) this->_parent->UnmapRegion(this);
+            }
+            
+            template<typename T>
+            T* Data() {
+                assert(this->_data != NULL);
+                return static_cast<T*>(this->_data);
+            }
+            
+            size_t Length() {
+                return this->_length;
+            }
+            
+            MemoryMappedFilePtr _parent;
+            void* _data;
+            size_t _length;
+        };
+        
         typedef struct {
             long totalVirtual, totalVirtualFree, myVirtualUsed;
             long totalPhysical, totalPhysicalFree, myPhysicalUsed;
@@ -126,6 +173,8 @@ namespace Engine {
         ThreadPtr GetCurrentThread();
         
         MutexPtr CreateMutex();
+        
+        MemoryMappedFilePtr OpenMemoryMappedFile(std::string filename, FileMode mode);
         
         UUID GenerateUUID();
         std::string StringifyUUID(UUID uuidArr);

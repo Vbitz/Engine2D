@@ -368,7 +368,7 @@ namespace Engine {
         
         Config::SetBoolean( "core.runOnIdle",                       false);
         Config::SetBoolean( "core.throttleOnIdle",                  true);
-        Config::SetBoolean( "core.catchErrors",                     !this->_debugMode);
+        Config::SetBoolean( "core.catchErrors",                     !this->_debugMode && !this->_testMode);
         
         Config::SetNumber(  "core.window.width",                    800);
         Config::SetNumber(  "core.window.height",                   600);

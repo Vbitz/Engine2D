@@ -42,7 +42,7 @@ namespace Engine {
             
             p->SaveIndex();
             
-            delete p;
+            p->Close();
             
             PackagePtr p2 = Package::FromFile("testing.epkg");
             
