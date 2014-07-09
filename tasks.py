@@ -31,7 +31,7 @@ PROJECT_BUILD_PATH = 2;
 
 CTAGS_PATH = "/usr/local/bin/ctags";
 
-WINDOW_SYSTEM = "glfw";
+WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw");
 
 commands = {};
 

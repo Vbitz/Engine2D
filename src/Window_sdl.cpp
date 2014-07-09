@@ -202,7 +202,7 @@ namespace Engine {
 
             // TODO: Implament for SDL
             
-            if (this->_version == Graphics_OpenGL_Modern) {
+            if (this->_version == GraphicsVersion::OpenGL_Modern) {
                 glGetIntegerv(GL_MAJOR_VERSION, &ret.major);
                 glGetIntegerv(GL_MINOR_VERSION, &ret.minor);
                 ret.revision = 0;
@@ -339,11 +339,11 @@ namespace Engine {
         }
         
         void _create() {
-            if (this->_version == Graphics_OpenGL_Modern) {
+            if (this->_version == GraphicsVersion::OpenGL_Modern) {
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-            } else if (this->_version == Graphics_OpenGL_Legacy) {
+            } else if (this->_version == GraphicsVersion::OpenGL_Legacy) {
                 
             }
 
@@ -380,10 +380,10 @@ namespace Engine {
             glGetError(); // GLEW always causes a GL error when it gets extentions
             
             switch (this->_version) {
-                case Graphics_OpenGL_Modern:
+                case GraphicsVersion::OpenGL_Modern:
                     this->_render = CreateRenderGL3();
                     break;
-                case Graphics_OpenGL_Legacy:
+                case GraphicsVersion::OpenGL_Legacy:
                     this->_render = CreateRenderGL2();
                     break;
             }
