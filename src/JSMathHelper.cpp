@@ -27,11 +27,13 @@
 #include "stdlib.hpp"
 
 #include <random>
+#include <iostream>
 
 namespace Engine {
     namespace JsMathHelper {
         
-        void DisposeRandomCallback(const v8::WeakCallbackData<v8::External, BasicRandomPtr>& data) {
+        void DisposeRandomCallback(const v8::WeakCallbackData<v8::External, v8::Persistent<v8::External>>& data) {
+            data.GetParameter()->ClearWeak();
             delete (BasicRandomPtr) data.GetValue()->Value();
         }
         
@@ -55,7 +57,7 @@ namespace Engine {
             
             v8::Persistent<v8::External> randGenPersist;
             randGenPersist.Reset(v8::Isolate::GetCurrent(), randGen);
-            randGenPersist.SetWeak<BasicRandom*>(&rand, DisposeRandomCallback);
+            randGenPersist.SetWeak<v8::Persistent<v8::External>>(&randGenPersist, DisposeRandomCallback);
             
             args.This()->SetHiddenValue(v8::String::NewFromUtf8(args.GetIsolate(), "__rand"), randGen);
             
