@@ -174,6 +174,7 @@ namespace Engine {
             OSXMemoryMappedFile(int fd) : _fd(fd) { }
             
             MemoryMappedRegionPtr MapRegion(unsigned long offset, size_t size) override {
+                assert(offset % 4096 == 0);
                 // Make sure the file is of the right length
                 size_t fileSize = 0;
                 struct stat st;
@@ -181,7 +182,7 @@ namespace Engine {
                     fileSize = st.st_size;
                 }
                 if (offset + size > fileSize) {
-                    lseek(this->_fd, size - 1, SEEK_SET);
+                    lseek(this->_fd, (offset + size) - 1, SEEK_SET);
                     write(this->_fd, "", 1);
                 }
                 
@@ -302,6 +303,7 @@ namespace Engine {
                 case FileMode::Write:   fmode = O_RDWR;   break;
             }
             int fd = open(filename.c_str(), fmode);
+            assert(fd != -1);
             return new OSXMemoryMappedFile(fd);
         }
         

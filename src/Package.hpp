@@ -37,7 +37,7 @@ namespace Engine {
         Platform::UUID thisUUID;
         Platform::UUID patchUUID; // filled with 0x00 if this is not a patch file
         
-        uint32_t indexFirstOffset;
+        uint32_t firstIndexOffset;
         
         uint16_t numOfFiles = 0;
         
@@ -61,19 +61,21 @@ namespace Engine {
     struct PackageDiskFile {
         uint32_t magic = 0xDEADBEEF;
         
-        uint32_t offset;
-        uint32_t size;
+        uint32_t offset = 0;
+        uint32_t size = 0;
         
-        PackageFileCompressionType compression;
-        PackageFileEncryptionType encryption;
+        PackageFileCompressionType compression =
+            PackageFileCompressionType::NoCompression;
+        PackageFileEncryptionType encryption =
+            PackageFileEncryptionType::NoEncryption;
         uint8_t padding1[2] = {0x00, 0x00};
         
         uint32_t latestRevisonOffset = NULL;
         uint32_t nextFileOffset = NULL;
         uint8_t padding2[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
         
-        unsigned char name[96];
-    }; // length = 92 bytes
+        unsigned char name[96] = { 0x00 };
+    }; // length = 128 bytes
     
     static_assert(sizeof(PackageDiskFile) == 128, "For alignment the size of PackageDiskFile must equal 128");
     
@@ -87,9 +89,9 @@ namespace Engine {
 #pragma pack(0)
     struct StringChunk {
         uint32_t magic = 0xCAFEBABE;
-        uint32_t nextOffset;
-        uint16_t length;
-        unsigned char content[512 - (sizeof(nextOffset) + sizeof(length) + sizeof(magic))];
+        uint32_t nextOffset = 0;
+        uint16_t length = 0;
+        unsigned char content[512 - (sizeof(nextOffset) + sizeof(length) + sizeof(magic))] = { 0x00 };
     }; // length 512 bytes
         
     static_assert(sizeof(StringChunk) == 512, "");
