@@ -93,6 +93,8 @@ namespace Engine {
             renderGL->SetColor(1.0f, 1.0f, 1.0f);
         }
         
+        renderGL->Print(10, 4, "-- Engine2D --");
+        
         if (Config::GetBoolean("core.debug.profiler")) {
             double drawTime = Profiler::GetTime("Draw");
             this->_lastDrawTimes[this->_currentLastDrawTimePos++] = drawTime;
@@ -101,20 +103,35 @@ namespace Engine {
                 this->_currentLastDrawTimePos = 0;
             }
             
-            this->_ss.str("");
-            this->_ss.precision(4);
-            this->_ss << "FPS: " << FramePerfMonitor::GetFPS();
-            this->_ss << " | DrawTime: " << drawTime;
-            renderGL->Print(windowSize.x - 220, 4, this->_ss.str().c_str());
-            
             renderGL->DisableSmooth();
             
-            this->_draw->LineGraph(windowSize.x - 430, 14, 2, 200, this->_lastDrawTimes, 100);
+            glLineWidth(0.1); // HACK: Until this is exposed by RenderGL
+            
+            this->_draw->LineGraph(windowSize.x - 440, 14, 2, 500, this->_lastDrawTimes, 100);
             
             renderGL->EnableSmooth();
+            
+            this->_ss.str("");
+            this->_ss << "FPS: " << FramePerfMonitor::GetFPS();
+            this->_ss << " | DrawTime (ms): ";
+            
+            renderGL->Print(windowSize.x - 230, 4, this->_ss.str().c_str());
+            
+            this->_ss.precision(6);
+            this->_ss.str("");
+            
+            double drawTimeMS = (drawTime * 1000);
+            
+            this->_ss << (drawTimeMS);
+            
+            if (drawTimeMS > (1000 / 60)) {
+                renderGL->SetColor("red");
+            } else {
+                renderGL->SetColor("green");
+            }
+            
+            renderGL->Print(windowSize.x - 60, 4, this->_ss.str().c_str());
         }
-        
-        renderGL->Print(10, 4, "-- Engine2D --");
         
         if (!_showConsole) {
             return;
