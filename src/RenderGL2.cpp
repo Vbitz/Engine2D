@@ -177,6 +177,8 @@ namespace Engine {
             
             ResetMatrix();
             
+            this->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+            
             CheckError("RenderGL2::Begin2d");
         }
         
