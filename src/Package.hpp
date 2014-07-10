@@ -8,6 +8,8 @@
 
 #define PACKAGE_MAX_SIZE 4294967296
 #define PACKAGE_FILES_PER_CHUNK 32
+#define PACKAGE_REGION_SIZE 4096
+#define PACKAGE_FILE_MAGIC 0xDEADBEEF
 
 namespace Engine {
     
@@ -42,7 +44,7 @@ namespace Engine {
         uint16_t numOfFiles = 0;
         
         // All regions alligned on 0x1000 (4096) bytes
-        uint32_t nextRegionOffset = 512;
+        uint32_t nextRegionOffset = 0;
         uint32_t nextFileHeaderOffset;
     }; // length = 64 bytes
     
@@ -59,7 +61,7 @@ namespace Engine {
 
 #pragma pack(0)
     struct PackageDiskFile {
-        uint32_t magic = 0xDEADBEEF;
+        uint32_t magic = PACKAGE_FILE_MAGIC;
         
         uint32_t offset = 0;
         uint32_t size = 0;
@@ -84,7 +86,7 @@ namespace Engine {
         PackageDiskFile files[PACKAGE_FILES_PER_CHUNK];
     };
     
-    static_assert(sizeof(PackageDiskFileChunk) == 4096, "For alignment the size of PackageDiskFileChunk must equal 1024");
+    static_assert(sizeof(PackageDiskFileChunk) == PACKAGE_REGION_SIZE, "For alignment the size of PackageDiskFileChunk must equal the region size");
     
 #pragma pack(0)
     struct StringChunk {
