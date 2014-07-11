@@ -6,7 +6,7 @@
 #include "Platform.hpp"
 #include "Filesystem.hpp"
 
-#define PACKAGE_MAX_SIZE 4294967296
+#define PACKAGE_MAX_SIZE 4294967295
 #define PACKAGE_FILES_PER_CHUNK 32
 #define PACKAGE_REGION_SIZE 4096
 #define PACKAGE_FILE_MAGIC 0xDEADBEEF
@@ -104,8 +104,8 @@ namespace Engine {
     public:
         ~Package();
         
-        void WriteFile(std::string filename, unsigned char* content, unsigned long contentLength);
-        unsigned char* ReadFile(std::string filename, unsigned long& contentLength);
+        void WriteFile(std::string filename, uint8_t* content, uint32_t contentLength);
+        unsigned char* ReadFile(std::string filename, uint32_t& contentLength);
         
         Json::Value& GetIndex();
         void SaveIndex();

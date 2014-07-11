@@ -37,7 +37,7 @@ namespace Engine {
             std::string content = "Hello, World";
             
             unsigned char* fileData1 = (unsigned char*) content.c_str();
-            unsigned long fileLength1 = strlen((char*) fileData1);
+            uint32_t fileLength1 = strlen((char*) fileData1);
             
             p->WriteFile("testing.txt", fileData1, fileLength1);
             
@@ -49,7 +49,7 @@ namespace Engine {
             
             PackagePtr p2 = Package::FromFile("testing.epkg");
             
-            unsigned long fileLength2 = 0;
+            uint32_t fileLength2 = 0;
             unsigned char* fileData2 = p2->ReadFile("testing.txt", fileLength2);
             this->Assert("Check File Length", fileLength2 == fileLength1);
             this->Assert("Check File Content", fileData2 == fileData1);

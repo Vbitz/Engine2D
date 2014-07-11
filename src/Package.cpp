@@ -8,14 +8,21 @@ namespace Engine {
     uint32_t localOffsetToRegion(uint32_t localOffset) {
         uint32_t rem = abs(localOffset) % PACKAGE_REGION_SIZE;
         if (rem == 0) return localOffset;
-        return localOffset + (PACKAGE_REGION_SIZE - rem);
+        return localOffset + (PACKAGE_REGION_SIZE - rem) - PACKAGE_REGION_SIZE;
     }
     
     uint32_t localOffsetToRegionOffset(uint32_t localOffset) {
         return abs(localOffset) % PACKAGE_REGION_SIZE;
     }
     
+    uint32_t roundSizeToRegionSize(uint32_t dataSize) {
+        uint32_t rem = abs(dataSize) % PACKAGE_REGION_SIZE;
+        if (rem == 0) return dataSize;
+        return dataSize + (PACKAGE_REGION_SIZE - rem);
+    }
+    
     bool strcmp_s(unsigned char* strA, uint32_t strASize, unsigned char* strB, uint32_t strBSize) {
+        // strB is assumed to be a static array of strBSize size so it may contain many null values
         if (strASize > strBSize) return false;
         for (uint32_t i = 0; i < UINT32_MAX; i++) {
             if (strA != strB) return false;
@@ -28,18 +35,67 @@ namespace Engine {
         this->Close();
     }
     
-    void Package::WriteFile(std::string filename, unsigned char *content, unsigned long contentLength) {
+    void Package::WriteFile(std::string filename, uint8_t *content, uint32_t contentLength) {
         if (!this->_writenHeader) {
             this->_writeHeader();
         }
         assert(filename.length() < 96);
-        // Get the first avalible file object
-        // Write the file to the next sector
-        // Write the updated sector info to the header
+        
+        PackageDiskHeader* header = this->_headerRegion->Data<PackageDiskHeader>();
+        assert(header != NULL);
+        
+        uint32_t oldNextFileHeader = header->nextFileHeaderOffset;
+        
+        // Find the file header slot
+        Platform::MemoryMappedRegionPtr fileRegion = this->_file->MapRegion(localOffsetToRegion(header->nextFileHeaderOffset), PACKAGE_REGION_SIZE);
+        char* data = fileRegion->Data<char>();
+        assert(data != NULL);
+        data += localOffsetToRegionOffset(header->nextFileHeaderOffset);
+        
+        // Write filedata to the file header
+        PackageDiskFile* file = (PackageDiskFile*) data;
+        assert(file->magic == PACKAGE_FILE_MAGIC);
+        
+        assert(header->nextRegionOffset % PACKAGE_REGION_SIZE == 0);
+        uint32_t fileOffset = header->nextRegionOffset;
+        
+        std::memcpy(&file->name, filename.c_str(), filename.length());
+        file->offset = fileOffset;
+        file->size = contentLength;
+        file->nextFileOffset = header->nextFileHeaderOffset += sizeof(PackageDiskFile);
+        
+        // Write the file to the next region
+        Platform::MemoryMappedRegionPtr contentRegion = this->_file->MapRegion(header->nextRegionOffset, roundSizeToRegionSize(contentLength));
+        char* contentData = contentRegion->Data<char>();
+        assert(contentData != NULL);
+        
+        std::memcpy(contentData, content, contentLength);
+        
+        header->nextRegionOffset += roundSizeToRegionSize(contentLength);
+        
+        // Check to see if we've exceaded the current file header region
+        if (oldNextFileHeader > localOffsetToRegion(header->nextFileHeaderOffset)) {
+            Platform::MemoryMappedRegionPtr fileChunk = this->_file->MapRegion(header->nextRegionOffset, sizeof(PackageDiskFileChunk));
+            
+            PackageDiskFileChunk* fileChunkData = fileChunk->Data<PackageDiskFileChunk>();
+            assert(fileChunkData != NULL);
+            PackageDiskFileChunk fileChunkTemplate;
+            std::memcpy(fileChunkData, &fileChunkTemplate, sizeof(fileChunkTemplate));
+            
+            this->_file->UnmapRegion(fileChunk);
+            
+            header->nextRegionOffset += PACKAGE_REGION_SIZE;
+        }
+        
         // Add the offset to the file object to the fast lookup table
+        this->_fastFileLookup[filename] = fileOffset;
+    
+        // Close regions
+        this->_file->UnmapRegion(fileRegion);
+        this->_file->UnmapRegion(contentRegion);
     }
     
-    unsigned char* Package::ReadFile(std::string filename, unsigned long& contentLength) {
+    unsigned char* Package::ReadFile(std::string filename, uint32_t& contentLength) {
         if (!this->_writenHeader) {
             throw "File not found";
         }
@@ -70,9 +126,12 @@ namespace Engine {
                     fileDataOffset = currentOffset;
                     break;
                 }
+                
                 // if we don't then go to the next file object
+                file++;
                 
                 // check that the next file object does'nt exist in another region
+                
             }
             this->_file->UnmapRegion(regionPtr);
             delete regionPtr;
@@ -81,6 +140,8 @@ namespace Engine {
         if (fileDataOffset == 0) {
             throw "File not Found";
         }
+        
+        // map the region and memcpy the data into a new array
     }
     
     Json::Value& Package::GetIndex() {
@@ -156,6 +217,7 @@ namespace Engine {
         
         header->firstFileOffset = 4096;
         header->nextRegionOffset += PACKAGE_REGION_SIZE;
+        header->nextFileHeaderOffset = 4096;
         
         this->_file->UnmapRegion(fileChunk);
         
