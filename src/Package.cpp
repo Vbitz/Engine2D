@@ -62,7 +62,7 @@ namespace Engine {
         header->numOfFiles++;
         
         // Check to see if we've exceaded the current file header region
-        if (oldNextFileHeader > localOffsetToRegion(header->nextFileHeaderOffset)) {
+        if (localOffsetToRegion(oldNextFileHeader) != localOffsetToRegion(header->nextFileHeaderOffset)) {
             Platform::MemoryMappedRegionPtr fileChunk = this->_file->MapRegion(header->nextRegionOffset, sizeof(PackageDiskFileChunk));
             
             PackageDiskFileChunk* fileChunkData = fileChunk->Data<PackageDiskFileChunk>();
@@ -71,6 +71,9 @@ namespace Engine {
             std::memcpy(fileChunkData, &fileChunkTemplate, sizeof(fileChunkTemplate));
             
             this->_file->UnmapRegion(fileChunk);
+            
+            file->nextFileOffset = header->nextRegionOffset;
+            header->nextFileHeaderOffset = header->nextRegionOffset;
             
             header->nextRegionOffset += PACKAGE_REGION_SIZE;
         }

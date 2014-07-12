@@ -29,6 +29,7 @@ namespace Engine {
         std::string GetName() override { return "BasicPackageTest"; }
         
         void Run() {
+            double startTime = Platform::GetTime();
             if (Filesystem::FileExists("testing.epkg")) {
                 Filesystem::DeleteFile("testing.epkg");
             }
@@ -40,6 +41,14 @@ namespace Engine {
             uint32_t fileLength1 = strlen((char*) fileData1);
             
             p->WriteFile("testing.txt", fileData1, fileLength1);
+            
+            for (int i = 0; i < 64; i++) {
+                std::string filename = std::to_string(i) + ".test";
+                uint8_t* randomBytes = new uint8_t[21341];
+                std::memset(randomBytes, 0xFEEDFACE, 21341);
+                p->WriteFile(filename, randomBytes, 21341);
+                delete [] randomBytes;
+            }
             
             p->GetIndex()["hello"] = "World";
             
@@ -54,6 +63,10 @@ namespace Engine {
             this->Assert("Check File Length", fileLength2 == fileLength1);
             this->Assert("Check File Content", content == std::string((char*) fileData2, fileLength2));
             this->Assert("Check File Index Content", p2->GetIndex()["hello"].asString() == "World");
+            
+            double endTime = Platform::GetTime();
+            
+            std::cout << "time = " << (endTime - startTime) << "s" << std::endl;
         }
     };
     
