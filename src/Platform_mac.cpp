@@ -188,11 +188,14 @@ namespace Engine {
                 
                 void* region = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, this->_fd, offset);
                 if (errno == EINVAL) { throw errno; }
+                this->_mappedRegions++;
                 return new MemoryMappedRegion(this, region, size);
             }
             
             void UnmapRegion(MemoryMappedRegionPtr r) override {
                 munmap(r->_data, r->_length);
+                delete r;
+                this->_mappedRegions--;
             }
             
             bool IsValid() override {
@@ -200,11 +203,13 @@ namespace Engine {
             }
             
             void Close() override {
+                assert(this->_mappedRegions == 0);
                 close(this->_fd);
             }
             
         private:
             int _fd;
+            size_t _mappedRegions = 0;
         };
         
         int _argc;

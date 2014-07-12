@@ -21,16 +21,6 @@ namespace Engine {
         return dataSize + (PACKAGE_REGION_SIZE - rem);
     }
     
-    bool strcmp_s(unsigned char* strA, uint32_t strASize, unsigned char* strB, uint32_t strBSize) {
-        // strB is assumed to be a static array of strBSize size so it may contain many null values
-        if (strASize > strBSize) return false;
-        for (uint32_t i = 0; i < UINT32_MAX; i++) {
-            if (strA != strB) return false;
-            else if (i > strASize) return false;
-            else strA++; strB++;
-        }
-    }
-    
     Package::~Package() {
         this->Close();
     }
@@ -42,18 +32,16 @@ namespace Engine {
         assert(filename.length() < 96);
         
         PackageDiskHeader* header = this->_headerRegion->Data<PackageDiskHeader>();
-        assert(header != NULL);
         
         uint32_t oldNextFileHeader = header->nextFileHeaderOffset;
         
         // Find the file header slot
         Platform::MemoryMappedRegionPtr fileRegion = this->_file->MapRegion(localOffsetToRegion(header->nextFileHeaderOffset), PACKAGE_REGION_SIZE);
-        char* data = fileRegion->Data<char>();
-        assert(data != NULL);
-        data += localOffsetToRegionOffset(header->nextFileHeaderOffset);
+        
+        uint32_t fileHeaderOffset = header->nextFileHeaderOffset;
         
         // Write filedata to the file header
-        PackageDiskFile* file = (PackageDiskFile*) data;
+        PackageDiskFile* file = fileRegion->Data<PackageDiskFile>(localOffsetToRegionOffset(fileHeaderOffset));
         assert(file->magic == PACKAGE_FILE_MAGIC);
         
         assert(header->nextRegionOffset % PACKAGE_REGION_SIZE == 0);
@@ -61,17 +49,17 @@ namespace Engine {
         
         std::memcpy(&file->name, filename.c_str(), filename.length());
         file->offset = fileOffset;
-        file->size = contentLength;
+        file->size = file->decompressedSize = contentLength;
         file->nextFileOffset = header->nextFileHeaderOffset += sizeof(PackageDiskFile);
         
         // Write the file to the next region
         Platform::MemoryMappedRegionPtr contentRegion = this->_file->MapRegion(header->nextRegionOffset, roundSizeToRegionSize(contentLength));
         char* contentData = contentRegion->Data<char>();
-        assert(contentData != NULL);
         
         std::memcpy(contentData, content, contentLength);
         
         header->nextRegionOffset += roundSizeToRegionSize(contentLength);
+        header->numOfFiles++;
         
         // Check to see if we've exceaded the current file header region
         if (oldNextFileHeader > localOffsetToRegion(header->nextFileHeaderOffset)) {
@@ -88,60 +76,91 @@ namespace Engine {
         }
         
         // Add the offset to the file object to the fast lookup table
-        this->_fastFileLookup[filename] = fileOffset;
+        this->_fastFileLookup[filename] = fileHeaderOffset;
     
         // Close regions
         this->_file->UnmapRegion(fileRegion);
         this->_file->UnmapRegion(contentRegion);
     }
     
-    unsigned char* Package::ReadFile(std::string filename, uint32_t& contentLength) {
+    uint8_t* Package::ReadFile(std::string filename, uint32_t& contentLength) {
         if (!this->_writenHeader) {
             throw "File not found";
         }
         
-        unsigned char* filename_c = (unsigned char*) filename.c_str();
+        const char* filename_c = filename.c_str();
         uint32_t filename_len = filename.length();
         
         PackageDiskHeader* header = this->_headerRegion->Data<PackageDiskHeader>();
-        assert(header != NULL);
         
         // Check the fast lookup table for the filename
-        uint32_t fileDataOffset = 0;
+        uint32_t fileHeaderOffset = 0;
         if (this->_fastFileLookup.count(filename) > 0) {
-            fileDataOffset = this->_fastFileLookup[filename];
+            fileHeaderOffset = this->_fastFileLookup[filename];
         } else {
             uint32_t currentOffset = header->firstFileOffset;
             uint32_t regionOffset = localOffsetToRegion(currentOffset);
             // map the current region into memory
             Platform::MemoryMappedRegionPtr regionPtr = this->_file->MapRegion(regionOffset, PACKAGE_REGION_SIZE);
             for (short i = 0; i < header->numOfFiles; i++) {
-                char* data = regionPtr->Data<char>();
-                data += localOffsetToRegionOffset(currentOffset);
-                PackageDiskFile* file = (PackageDiskFile*) data;
+                PackageDiskFile* file = regionPtr->Data<PackageDiskFile>(localOffsetToRegionOffset(currentOffset));
                 // assert on object magic
                 assert(file->magic == PACKAGE_FILE_MAGIC);
                 // check to see if we have the correct filename
-                if (strcmp_s(filename_c, filename_len, file->name, 96)) {
-                    fileDataOffset = currentOffset;
+                if (std::strncat((char*) file->name, filename_c, 96)) {
+                    fileHeaderOffset = currentOffset;
                     break;
                 }
                 
                 // if we don't then go to the next file object
-                file++;
+                currentOffset = file->nextFileOffset;
                 
                 // check that the next file object does'nt exist in another region
-                
+                if (regionOffset != localOffsetToRegion(currentOffset)) {
+                    this->_file->UnmapRegion(regionPtr);
+                    regionOffset = localOffsetToRegion(currentOffset);
+                    regionPtr = this->_file->MapRegion(regionOffset, PACKAGE_REGION_SIZE);
+                }
             }
             this->_file->UnmapRegion(regionPtr);
-            delete regionPtr;
         }
         
-        if (fileDataOffset == 0) {
+        if (fileHeaderOffset == 0) {
             throw "File not Found";
         }
         
-        // map the region and memcpy the data into a new array
+        // map the header
+        Platform::MemoryMappedRegionPtr headerPtr = this->_file->MapRegion(localOffsetToRegion(fileHeaderOffset), PACKAGE_REGION_SIZE);
+        PackageDiskFile* fileHeader = headerPtr->Data<PackageDiskFile>(localOffsetToRegionOffset(fileHeaderOffset));
+        
+        // map the region
+        Platform::MemoryMappedRegionPtr dataPtr = this->_file->MapRegion(fileHeader->offset, roundSizeToRegionSize(fileHeader->size));
+        
+        // copy file data into a heap allocated pointer
+        uint8_t* fileData = new uint8_t[fileHeader->size];
+        contentLength = fileHeader->size;
+        
+        std::memcpy(fileData, dataPtr->Data<uint8_t>(), fileHeader->size);
+        
+        // decompress the file if needed
+        if (fileHeader->compression == PackageFileCompressionType::NoCompression) {
+            assert(fileHeader->size == fileHeader->decompressedSize);
+        } else {
+            assert(false);
+        }
+        
+        // decrypt the file if needed
+        if (fileHeader->encryption == PackageFileEncryptionType::NoEncryption) {
+            // no need to do anything to the data
+        } else {
+            assert(false);
+        }
+        
+        // unmap both regions
+        this->_file->UnmapRegion(headerPtr);
+        this->_file->UnmapRegion(dataPtr);
+        
+        return fileData;
     }
     
     Json::Value& Package::GetIndex() {
@@ -160,7 +179,8 @@ namespace Engine {
     }
     
     void Package::Close() {
-        delete this->_headerRegion;
+        this->SaveIndex();
+        this->_file->UnmapRegion(this->_headerRegion);
         this->_file->Close();
     }
     
@@ -181,12 +201,13 @@ namespace Engine {
                                header->magic[1] == 'P' &&
                                header->magic[2] == 'K' &&
                                header->magic[3] == 'G');
+        
+        // load the index
     }
     
     void Package::_writeHeader() {
         // Write PackageDiskHeader
         PackageDiskHeader* header = this->_headerRegion->Data<PackageDiskHeader>();
-        assert(header != NULL);
         PackageDiskHeader headerTemplate;
         std::memcpy(header, &headerTemplate, sizeof(headerTemplate));
         header->thisUUID = Platform::GenerateUUID();
@@ -195,10 +216,7 @@ namespace Engine {
         // Write Index StringChunk and set data in header
         Platform::MemoryMappedRegionPtr stringChunk = this->_file->MapRegion(0, 1024);
         
-        char* stringChunkBase = stringChunk->Data<char>();
-        assert(stringChunkBase != NULL);
-        stringChunkBase += 512;
-        StringChunk* firstIndexChunk = (StringChunk*) stringChunkBase;
+        StringChunk* firstIndexChunk = stringChunk->Data<StringChunk>(512);
         StringChunk firstIndexChunkTemplate;
         std::memcpy(firstIndexChunk, &firstIndexChunkTemplate, sizeof(firstIndexChunkTemplate));
         
@@ -211,7 +229,6 @@ namespace Engine {
         Platform::MemoryMappedRegionPtr fileChunk = this->_file->MapRegion(header->nextRegionOffset, sizeof(PackageDiskFileChunk));
         
         PackageDiskFileChunk* firstFileChunk = fileChunk->Data<PackageDiskFileChunk>();
-        assert(firstFileChunk != NULL);
         PackageDiskFileChunk firstFileChunkTemplate;
         std::memcpy(firstFileChunk, &firstFileChunkTemplate, sizeof(firstFileChunkTemplate));
         

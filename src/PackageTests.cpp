@@ -52,7 +52,7 @@ namespace Engine {
             uint32_t fileLength2 = 0;
             unsigned char* fileData2 = p2->ReadFile("testing.txt", fileLength2);
             this->Assert("Check File Length", fileLength2 == fileLength1);
-            this->Assert("Check File Content", fileData2 == fileData1);
+            this->Assert("Check File Content", content == std::string((char*) fileData2, fileLength2));
             this->Assert("Check File Index Content", p2->GetIndex()["hello"].asString() == "World");
         }
     };

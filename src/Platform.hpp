@@ -134,14 +134,19 @@ namespace Engine {
         public:
             MemoryMappedRegion(MemoryMappedFilePtr parent, void* data, size_t length) : _parent(parent), _data(data), _length(length) { }
             
-            ~MemoryMappedRegion() {
-                if (this->_parent != NULL) this->_parent->UnmapRegion(this);
+            template<typename T>
+            inline T* Data() {
+                assert(this->_data != NULL);
+                return static_cast<T*>(this->_data);
             }
             
             template<typename T>
-            T* Data() {
+            inline T* Data(size_t offset) {
                 assert(this->_data != NULL);
-                return static_cast<T*>(this->_data);
+                assert(offset < this->_length);
+                uint8_t* data = (uint8_t*) this->_data;
+                data += offset;
+                return static_cast<T*>((void*) data);
             }
             
             size_t Length() {

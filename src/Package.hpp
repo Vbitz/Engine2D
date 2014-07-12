@@ -65,6 +65,7 @@ namespace Engine {
         
         uint32_t offset = 0;
         uint32_t size = 0;
+        uint32_t decompressedSize = 0;
         
         PackageFileCompressionType compression =
             PackageFileCompressionType::NoCompression;
@@ -74,7 +75,7 @@ namespace Engine {
         
         uint32_t latestRevisonOffset = NULL;
         uint32_t nextFileOffset = NULL;
-        uint8_t padding2[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        uint8_t padding2[4] = {0x00, 0x00, 0x00, 0x00};
         
         unsigned char name[96] = { 0x00 };
     }; // length = 128 bytes
@@ -105,7 +106,7 @@ namespace Engine {
         ~Package();
         
         void WriteFile(std::string filename, uint8_t* content, uint32_t contentLength);
-        unsigned char* ReadFile(std::string filename, uint32_t& contentLength);
+        uint8_t* ReadFile(std::string filename, uint32_t& contentLength);
         
         Json::Value& GetIndex();
         void SaveIndex();
