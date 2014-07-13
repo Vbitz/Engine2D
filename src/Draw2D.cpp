@@ -143,7 +143,7 @@ namespace Engine {
         renderGL->EndRendering();
     }
     
-    void Draw2D::Lines(float* points, unsigned int count) {
+    void Draw2D::Lines(double* points, unsigned int count) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         renderGL->BeginRendering(PolygonMode::LineStrip);
         for (int i = 0; i < count * 2; i += 2) {
@@ -152,9 +152,9 @@ namespace Engine {
         renderGL->EndRendering();
     }
     
-    void Draw2D::LineGraph(float xOff, float yOff, float xScale, float yScale, float* points, unsigned int count) {
+    void Draw2D::LineGraph(float xOff, float yOff, float xScale, float yScale, double* points, unsigned int count) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
-        float* newPoints = (float*) std::malloc(count * 2 * sizeof(float)); // twice the size of points
+        double* newPoints = (double*) std::malloc(count * 2 * sizeof(double)); // twice the size of points
         for (int x = 0; x < count; x++) {
             newPoints[x * 2] = xOff + (x * xScale);
             newPoints[x * 2 + 1] = yOff + ((-points[x]) * yScale);

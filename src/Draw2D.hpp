@@ -54,8 +54,8 @@ namespace Engine {
         void Grad(float x, float y, float w, float h, int col1, int col2, bool vert);
         
         void Line(float x1, float y1, float x2, float y2);
-        void Lines(float* points, unsigned int count);
-        void LineGraph(float xOff, float yOff, float xScale, float yScale, float* points, unsigned int count);
+        void Lines(double* points, unsigned int count);
+        void LineGraph(float xOff, float yOff, float xScale, float yScale, double* points, unsigned int count);
         
         void Circle(float xCenter, float yCenter, float radius);
         void Circle(float xCenter, float yCenter, float radius, bool fill);
