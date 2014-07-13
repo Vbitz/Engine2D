@@ -60,7 +60,7 @@ namespace Engine {
     EngineUI::EngineUI(ApplicationPtr app) : _app(app) {
         this->_draw = new Draw2D(app->GetRender());
         
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 400; i++) {
             this->_lastDrawTimes[i] = 0.0f;
         }
         
@@ -99,7 +99,7 @@ namespace Engine {
             double drawTime = Profiler::GetTime("Draw");
             this->_lastDrawTimes[this->_currentLastDrawTimePos++] = drawTime;
             
-            if (this->_currentLastDrawTimePos > 100) {
+            if (this->_currentLastDrawTimePos > 400) {
                 this->_currentLastDrawTimePos = 0;
             }
             
@@ -107,7 +107,9 @@ namespace Engine {
             
             glLineWidth(0.1); // HACK: Until this is exposed by RenderGL
             
-            this->_draw->LineGraph(windowSize.x - 440, 14, 2, 500, this->_lastDrawTimes, 100);
+            double lineGraphScale = Config::GetFloat("core.debug.engineUI.profilerScale");
+            
+            this->_draw->LineGraph(windowSize.x - 440, 14, 0.5, lineGraphScale, this->_lastDrawTimes, 400);
             
             renderGL->EnableSmooth();
             
@@ -266,34 +268,67 @@ namespace Engine {
                 }
             }
         } else if (this->_currentView == CurrentView::Profiler) {
-            int y = 100;
-            int x = 0;
+            int y = (windowSize.y / 2) - 50;
             
             std::stringstream ss;
             
+            // DrawTime Graph
             renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f, 0.8f);
             this->_draw->Rect(0, 50, windowSize.x, 25);
             
+            ss << "Current Scale : " << this->_profilerDrawTimeScale << " : Press [/] to increase and decrease";
+            
             renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
             renderGL->SetFont("basic", 16);
-            renderGL->Print(windowSize.x - 160, 55, "Press R to Refresh");
+            renderGL->Print(20, 55, "DrawTime Graph");
+            renderGL->Print(windowSize.x - 480, 55, ss.str().c_str());
+            
+            renderGL->SetColor("white");
+            
+            this->_draw->LineGraph(60, y - 70, ((windowSize.x - 100) / 400), this->_profilerDrawTimeScale, this->_lastDrawTimes, 400);
+            
+            renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
+            
+            this->_draw->Line(60, y - 70, windowSize.x - 40, y - 70);
+            this->_draw->Line(60, 95, 60, y - 70);
             
             renderGL->SetFont("basic", 10);
             
-            this->_draw->Rect(0, 80, windowSize.x, 18);
+            for (int gsY = y - 70; gsY > 95; gsY -= ((y - 70 - 95) / 10)) {
+                renderGL->Print(20, gsY - 5, "H");
+            }
+            
+            // RenderDriver Profiler
+            
+            int x = 0;
+            
+            ss.str("");
+            
+            renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f, 0.8f);
+            this->_draw->Rect(0, y - 50, windowSize.x, 25);
+            
+            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+            renderGL->SetFont("basic", 16);
+            renderGL->Print(20, y - 45, "RenderDriver Profiler");
+            renderGL->Print(windowSize.x - 160, y - 45, "Press R to Refresh");
+            
+            renderGL->SetFont("basic", 10);
+            
+            this->_draw->Rect(0, y - 20, windowSize.x, 18);
             
             renderGL->SetColor(0.1f, 0.1f, 0.1f);
             
-            renderGL->Print(20,  85, "Name");
-            renderGL->Print(680, 85, "Count");
-            renderGL->Print(750, 85, "Avg (ns)");
-            renderGL->Print(850, 85, "Min (ns)");
-            renderGL->Print(950, 85, "Max (ns)");
+            renderGL->Print(20,  y - 15, "Name");
+            renderGL->Print(680, y - 15, "Count");
+            renderGL->Print(750, y - 15, "Avg (ns)");
+            renderGL->Print(850, y - 15, "Min (ns)");
+            renderGL->Print(950, y - 15, "Max (ns)");
+            
+            y = (windowSize.y / 2) - 50;
             
             for (auto iter = this->_cachedProfilerDetails.begin();
                  iter != this->_cachedProfilerDetails.end();
                  iter++) {
-                std::string key = iter.key().asString();
                 
                 if (x++ % 2) {
                     renderGL->SetColor(60 / 255.0f, 60 / 255.0f, 60 / 255.0f, 0.9f);
@@ -301,6 +336,19 @@ namespace Engine {
                     renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
                 }
                 this->_draw->Rect(0, y, windowSize.x, 18);
+                
+                y += 18;
+                if (y > windowSize.y) {
+                    break;
+                }
+            }
+            
+            y = (windowSize.y / 2) - 50;
+            
+            for (auto iter = this->_cachedProfilerDetails.begin();
+                 iter != this->_cachedProfilerDetails.end();
+                 iter++) {
+                std::string key = iter.key().asString();
                 
                 renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
                 renderGL->Print(20, y + 4, key.c_str());
@@ -421,6 +469,14 @@ namespace Engine {
         } else if (this->_currentView == CurrentView::Profiler) {
             if (key == 'R' && press == Key_Press) {
                 Events::GetEvent("doDrawProfile")->Emit();
+            } else if (key == '[' && (press == Key_Press || press == Key_Repeat)) {
+                if (this->_profilerDrawTimeScale > 500) {
+                    this->_profilerDrawTimeScale -= 500;
+                }
+            } else if (key == ']' && (press == Key_Press || press == Key_Repeat)) {
+                if (this->_profilerDrawTimeScale < 40000) {
+                    this->_profilerDrawTimeScale += 500;
+                }
             }
         }
     }

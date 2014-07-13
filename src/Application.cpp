@@ -379,6 +379,7 @@ namespace Engine {
         Config::SetString(  "core.content.fontPath",                "fonts/open_sans.json");
         Config::SetBoolean( "core.debug.engineUI.showVerboseLog",   false);
         Config::SetBoolean( "core.debug.engineUI",                  this->_developerMode);
+        Config::SetNumber( "core.debug.engineUI.profilerScale",     500);
         Config::SetBoolean( "core.debug.profiler",                  this->_developerMode || this->_debugMode);
         Config::SetString(  "core.window.title",                    "Engine2D");
         Config::SetBoolean( "core.debug.debugRenderer",             false);

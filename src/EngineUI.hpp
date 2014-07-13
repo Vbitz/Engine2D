@@ -63,8 +63,9 @@ namespace Engine {
         bool _showConsole = false;
         
         // just temporey until the profiler has this built in
-        float _lastDrawTimes[100];
+        double _lastDrawTimes[400];
         int _currentLastDrawTimePos = 0;
+        double _profilerDrawTimeScale = 10000;
         
         std::vector<std::string> _commandHistory;
         size_t _currentHistoryLine = 0;
