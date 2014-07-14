@@ -72,5 +72,6 @@ namespace Engine {
         
         Json::Value _cachedProfilerDetails;
         static EventMagic _profilerHook(Json::Value args);
+        static EventMagic _captureLastDrawTimes(Json::Value args);
     };
 }

@@ -65,6 +65,7 @@ namespace Engine {
         }
         
         Events::GetEvent("onDrawProfileEnd")->AddListener("EngineUI::_profilerHook", Events::MakeTarget(_profilerHook));
+        Events::GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", Events::MakeTarget(_captureLastDrawTimes));
     }
     
     void EngineUI::Draw() {
@@ -285,17 +286,23 @@ namespace Engine {
             
             renderGL->SetColor("white");
             
-            this->_draw->LineGraph(60, y - 70, ((windowSize.x - 100) / 400), this->_profilerDrawTimeScale, this->_lastDrawTimes, 400);
+            this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / 400), this->_profilerDrawTimeScale, this->_lastDrawTimes, 400);
             
             renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
             
-            this->_draw->Line(60, y - 70, windowSize.x - 40, y - 70);
-            this->_draw->Line(60, 95, 60, y - 70);
+            this->_draw->Line(80, y - 70, windowSize.x - 40, y - 70);
+            this->_draw->Line(80, 95, 80, y - 70);
             
             renderGL->SetFont("basic", 10);
             
+            int graphHeight = y - 70 - 95;
+            double gsYinc = 0;
+            
             for (int gsY = y - 70; gsY > 95; gsY -= ((y - 70 - 95) / 10)) {
-                renderGL->Print(20, gsY - 5, "H");
+                ss.str("");
+                ss << (gsYinc * 1000) << "ms";
+                renderGL->Print(10, gsY - 5, ss.str().c_str());
+                gsYinc += 0;
             }
             
             // RenderDriver Profiler
@@ -501,5 +508,20 @@ namespace Engine {
         EngineUIPtr eui = GetAppSingilton()->GetEngineUI();
         
         eui->_cachedProfilerDetails = args["results"];
+    }
+    
+    EventMagic EngineUI::_captureLastDrawTimes(Json::Value args) {
+        EngineUIPtr eui = GetAppSingilton()->GetEngineUI();
+        
+        Json::Value eArgs(Json::objectValue);
+        Json::Value eArray(Json::arrayValue);
+        
+        for (int i = 0; i < 400; i++) {
+            eArray[0] = eui->_lastDrawTimes[i];
+        }
+        
+        eArgs["values"] = eArray;
+        
+        Events::GetEvent("captureLastDrawTimes_callback")->Emit(eArgs);
     }
 }
