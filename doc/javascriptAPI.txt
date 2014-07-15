@@ -30,7 +30,7 @@ Done	| Old Syntax														| New Syntax
 		| sys.saveScreenshot(path)											| process.saveScreenshot(filename)
 		| sys.resizeWindow(width, height)									| process.window.size = newSize
 		| sys.toggleFullscreen()											| REMOVED - Duplicates config options
-		| sys.restartRenderer()												| process.restartRenderer()
+	X	| sys.restartRenderer()												| REMOVED
 		| sys.getProfilerTime(zone)											| debug.profiler[zone]
 		| sys.getProfilerZones()											| for (var i in debug.profiler)
 		| sys.perf()														| debug.profile(name, func) returns the function wrapped
@@ -70,11 +70,11 @@ Done	| Old Syntax														| New Syntax
 	X	| draw.line(x0, y0, x1, y1)											| -
 	X	| draw.curve(x0, y0, x1, y1, x2, y2, x3, y3)						| -
 		| draw.colorPalette(name, color)									| draw.colors {}
-		| draw.setColorF(r, g, b)											| draw.color = new Color(r, g, b)
-		| draw.setColor(color)												| draw.color = {} (obj) or new Color() for the others
-		| draw.setColorI(r, g, b)											| draw.color = Color.fromInt(r, g, b)
+	X	| draw.setColorF(r, g, b)											| draw.color = new Color(r, g, b)
+	X	| draw.setColor(color)												| draw.color = {} (obj) or new Color() for the others
+	X	| draw.setColorI(r, g, b)											| draw.color = Color.fromInt(r, g, b)
 		| draw.clearColor(color)											| draw.clearColor (inline with HTML5 canvas)
-		| draw.getRGBFromHSV(h, s, v)										| Color.fromHSV(h, s, v)
+	X	| draw.getRGBFromHSV(h, s, v)										| Color.fromHSV(h, s, v)
 	X	| draw.print(x, y, str)												| -
 	X	| draw.getStringWidth(str)											| -
 		| draw.draw(texId, x, y, w, h)										| Rather then texID it will use texture objects
@@ -150,6 +150,7 @@ Done	| Old Syntax														| New Syntax
 		| 																	| new SpriteSheet(texture)
 		| 																	| SpriteSheet.prototype.bindSprite(name, x, y, w, h)
 		| 																	| SpriteSheet.prototype.bindAnimation(name, [frames], delay)
+		|																	| SpriteSheet.prototype.save(filename)
 		| 																	| process.emit(target, ...)
 		| 																	| process.on(target, id, cb, ...)
 	X	| 																	| events[target](args)
