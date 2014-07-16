@@ -1,5 +1,5 @@
 {
-	"core.script.entryPoint": "script/test",
+	"core.script.entryPoint": "lib/test",
 	"core.window.width": 1000,
 	"core.window.height": 600,
 	"core.window.fullscreen": false,
