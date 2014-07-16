@@ -106,6 +106,12 @@ namespace Engine {
         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
     }
     
+    ENGINE_JS_METHOD(EventToStringStub) {
+        ENGINE_JS_SCOPE_OPEN;
+        
+        ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(args.GetIsolate(), "[object Event]"));
+    }
+    
     static void EventGetterCallback(v8::Local<v8::String> name, const v8::PropertyCallbackInfo<v8::Value>& info) {
         v8::HandleScope scp(info.GetIsolate());
         
@@ -113,6 +119,9 @@ namespace Engine {
         
         if (nameStr == "EM_CANCEL") {
             info.GetReturnValue().Set(_EM_CANCEL);
+        } else if (nameStr == "toString") {
+            v8::Handle<v8::FunctionTemplate> toStringStub = v8::FunctionTemplate::New(info.GetIsolate(), EventToStringStub);
+            info.GetReturnValue().Set(toStringStub->GetFunction());
         } else {
             v8::Handle<v8::FunctionTemplate> t = v8::FunctionTemplate::New(info.GetIsolate());
         
@@ -143,6 +152,44 @@ namespace Engine {
         }
         
         Events::GetEvent(hookName)->AddListener(hookId, Events::MakeTarget(func));
+    }
+    
+    ENGINE_JS_METHOD(ConfigToStringStub) {
+        ENGINE_JS_SCOPE_OPEN;
+        
+        ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(args.GetIsolate(), "[object Config]"));
+    }
+    
+    static void ConfigGetterCallback(v8::Local<v8::String> name, const v8::PropertyCallbackInfo<v8::Value>& info) {
+        v8::HandleScope scp(info.GetIsolate());;
+        
+        std::string nameStr = std::string(*v8::String::Utf8Value(name));
+        
+        if (nameStr == "toString") {
+            v8::Handle<v8::FunctionTemplate> toStringStub = v8::FunctionTemplate::New(info.GetIsolate(), ConfigToStringStub);
+            info.GetReturnValue().Set(toStringStub->GetFunction());
+            return;
+        }
+        
+        Config::ConfigType type = Config::GetType(nameStr);
+        switch (type) {
+            case Config::ConfigType_Bool:
+                info.GetReturnValue().Set(v8::Boolean::New(info.GetIsolate(), Config::GetBoolean(nameStr)));
+                break;
+            case Config::ConfigType_Number:
+                info.GetReturnValue().Set(v8::Number::New(info.GetIsolate(), Config::GetFloat(nameStr)));
+                break;
+            case Config::ConfigType_String:
+                info.GetReturnValue().Set(v8::String::NewFromUtf8(info.GetIsolate(), Config::GetString(nameStr).c_str()));
+                break;
+            case Config::ConfigType_Unknown:
+                info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
+                break;
+        }
+    }
+    
+    static void ConfigSetterCallback(v8::Local<v8::String> name, v8::Local<v8::Value> val, const v8::PropertyCallbackInfo<v8::Value>& info) {
+    
     }
     
     void Application::_enableTypedArrays() {
@@ -197,6 +244,11 @@ namespace Engine {
         
         global->Set(isolate, "console", consoleTable);
         
+        // configTable
+        v8::Handle<v8::ObjectTemplate> configTable = v8::ObjectTemplate::New();
+        
+        configTable->SetNamedPropertyHandler(ConfigGetterCallback, ConfigSetterCallback);
+        
 		// sysTable
 		v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
         
@@ -211,8 +263,11 @@ namespace Engine {
         // for example on steam it can be the friends name or SteamID
         sysTable->Set(isolate, "username", v8::String::NewFromUtf8(isolate, Platform::GetUsername().c_str()));
         
+        sysTable->Set(isolate, "runtimeConfig", configTable);
+        
 		global->Set(isolate, "sys", sysTable);
         
+        // eventTable
         v8::Handle<v8::ObjectTemplate> eventTable = v8::ObjectTemplate::New();
         
         eventTable->SetNamedPropertyHandler(EventGetterCallback, EventSetterCallback);
@@ -369,6 +424,10 @@ namespace Engine {
         Config::SetBoolean( "core.runOnIdle",                       false);
         Config::SetBoolean( "core.throttleOnIdle",                  true);
         Config::SetBoolean( "core.catchErrors",                     !this->_debugMode && !this->_testMode);
+        
+        Config::SetBoolean( "core.debugMode",                       this->_debugMode);
+        Config::SetBoolean( "core.devMode",                         this->_developerMode);
+        Config::SetBoolean( "core.testMode",                        this->_testMode);
         
         Config::SetNumber(  "core.window.width",                    800);
         Config::SetNumber(  "core.window.height",                   600);
