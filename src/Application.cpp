@@ -161,7 +161,7 @@ namespace Engine {
     }
     
     static void ConfigGetterCallback(v8::Local<v8::String> name, const v8::PropertyCallbackInfo<v8::Value>& info) {
-        v8::HandleScope scp(info.GetIsolate());;
+        v8::HandleScope scp(info.GetIsolate());
         
         std::string nameStr = std::string(*v8::String::Utf8Value(name));
         
@@ -189,7 +189,19 @@ namespace Engine {
     }
     
     static void ConfigSetterCallback(v8::Local<v8::String> name, v8::Local<v8::Value> val, const v8::PropertyCallbackInfo<v8::Value>& info) {
-    
+        v8::HandleScope scp(info.GetIsolate());
+        
+        std::string nameStr = std::string(*v8::String::Utf8Value(name));
+        
+        Config::ConfigType type = Config::GetType(nameStr);
+        
+        if (val->IsString() || type == Config::ConfigType_String) {
+            Config::SetString(nameStr, std::string(*v8::String::Utf8Value(val)));
+        } else if (val->IsNumber() || type == Config::ConfigType_Number) {
+            Config::SetNumber(nameStr, (float) val->ToNumber()->Value());
+        } else if (val->IsBoolean() || type == Config::ConfigType_Bool) {
+            Config::SetBoolean(nameStr, val->ToBoolean()->Value());
+        }
     }
     
     void Application::_enableTypedArrays() {
