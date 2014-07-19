@@ -23,7 +23,6 @@
 
 #include <string>
 #include <sstream>
-#include <functional>
 #include <stdarg.h>
 
 #include <vector>
@@ -41,26 +40,9 @@ namespace Engine {
         
         class EventTarget {
         public:
-            EventMagic Run(std::function<bool(Json::Value)> filter, Json::Value& e) {
-                if (_hasFilter && filter(_filter)) {
-                    return _run(e);
-                } else {
-                    return EM_BADFILTER;
-                }
-            }
+            virtual EventMagic Run(Json::Value& e) = 0;
             
             virtual bool IsScript() { return true; }
-            
-        protected:
-            Json::Value _filter = Json::nullValue;
-            bool _hasFilter = false;
-            
-            void setFilter(Json::Value filter) {
-                _filter = filter;
-                _hasFilter = !filter.isNull();
-            }
-            
-            virtual EventMagic _run(Json::Value& e) { return EM_BADTARGET; }
         };
         
         struct Event {
@@ -86,7 +68,6 @@ namespace Engine {
         public:
             size_t GetDeferedMessageCount();
             void LogEvents(std::string logName);
-            void Emit(std::function<bool(Json::Value)> filter, Json::Value args);
             void Emit(Json::Value args);
             void Emit();
             EventClass* AddListener(std::string name, EventTarget* target);
@@ -110,8 +91,6 @@ namespace Engine {
         
         void Init();
         
-        EventTarget* MakeTarget(Json::Value e, EventTargetFunc target);
-        EventTarget* MakeTarget(Json::Value e, v8::Handle<v8::Function> target);
         EventTarget* MakeTarget(EventTargetFunc target);
         EventTarget* MakeTarget(v8::Handle<v8::Function> target);
         

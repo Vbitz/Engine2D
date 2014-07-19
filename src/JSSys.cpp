@@ -105,9 +105,7 @@ namespace Engine {
         ENGINE_JS_METHOD(EventsOn) {
             ENGINE_JS_SCOPE_OPEN;
             
-            if (args.Length() == 4) {
-                Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->AddListener(ENGINE_GET_ARG_CPPSTRING_VALUE(1), Events::MakeTarget(ScriptingManager::ObjectToJson(ENGINE_GET_ARG_OBJECT(2)), args[3].As<v8::Function>()));
-            } else if (args.Length() == 3) {
+            if (args.Length() == 3) {
                 Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->AddListener(ENGINE_GET_ARG_CPPSTRING_VALUE(1), Events::MakeTarget(args[2].As<v8::Function>()));
             } else {
                 

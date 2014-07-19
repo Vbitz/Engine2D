@@ -35,21 +35,18 @@ namespace Engine {
         
         class CPPEventTarget : public EventTarget {
         public:
-            CPPEventTarget(EventTargetFunc func, Json::Value filter)
-                : _func(func) {
-                    setFilter(filter);
-                }
+            CPPEventTarget(EventTargetFunc func)
+                : _func(func) { }
             
-            bool IsScript() override { return false; }
-            
-        protected:
-            EventMagic _run(Json::Value& e) {
+            EventMagic Run(Json::Value& e) override {
                 if (e.isNull()) {
                     return this->_func(Json::nullValue);
                 } else {
                     return this->_func(e);
                 }
             }
+            
+            bool IsScript() override { return false; }
             
         private:
             EventTargetFunc _func;
@@ -68,13 +65,11 @@ namespace Engine {
         
         class JSEventTarget : public EventTarget {
         public:
-            JSEventTarget(v8::Handle<v8::Function> func, Json::Value filter){
+            JSEventTarget(v8::Handle<v8::Function> func) {
                 _func.Reset(v8::Isolate::GetCurrent(), func);
-                    setFilter(filter);
-                }
+            }
             
-        protected:
-            EventMagic _run(Json::Value& e) {
+            EventMagic Run(Json::Value& e) override {
                 v8::Isolate* currentIsolate = v8::Isolate::GetCurrent();
                 v8::Local<v8::Context> ctx = currentIsolate->GetCurrentContext();
                 if (ctx.IsEmpty() || ctx->Global().IsEmpty()) return EM_BADTARGET;
@@ -127,7 +122,7 @@ namespace Engine {
             }
         }
         
-        void EventClass::Emit(std::function<bool(Json::Value)> filter, Json::Value args) {
+        void EventClass::Emit(Json::Value args) {
             static std::vector<int> deleteTargets;
             if (this->_alwaysDefered) {
                 this->_deferedMessages.push(args);
@@ -136,7 +131,7 @@ namespace Engine {
                 for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
                     if (iter->Target != NULL && iter->Active) {
                         if (!(this->Security.NoScript && iter->Target->IsScript())) {
-                            EventMagic ret = iter->Target->Run(filter, args);
+                            EventMagic ret = iter->Target->Run(args);
                             if (ret == EM_CANCEL) {
                                 break;
                             }
@@ -155,12 +150,8 @@ namespace Engine {
             }
         }
         
-        void EventClass::Emit(Json::Value args) {
-            this->Emit(emptyFilter, args);
-        }
-        
         void EventClass::Emit() {
-            this->Emit(emptyFilter, Json::nullValue);
+            this->Emit(Json::nullValue);
         }
         
         EventClass* EventClass::AddListener(std::string name, EventTarget* target) {
@@ -199,7 +190,7 @@ namespace Engine {
                     if (iter2->Target == NULL) { throw "Invalid Target"; }
                     if (iter2->Active) {
                         if (!(this->Security.NoScript && iter2->Target->IsScript())) {
-                            iter2->Target->Run(emptyFilter, this->_deferedMessages.front());
+                            iter2->Target->Run(this->_deferedMessages.front());
                         }
                     }
                 }
@@ -253,20 +244,12 @@ namespace Engine {
             return cls;
         }
         
-        EventTarget* MakeTarget(Json::Value e, EventTargetFunc target) {
-            return new CPPEventTarget(target, new Json::Value(e));
-        }
-        
-        EventTarget* MakeTarget(Json::Value e, v8::Handle<v8::Function> target) {
-            return new JSEventTarget(target, new Json::Value(e));
-        }
-        
         EventTarget* MakeTarget(EventTargetFunc target) {
-            return MakeTarget(Json::nullValue, target);
+            return new CPPEventTarget(target);
         }
         
         EventTarget* MakeTarget(v8::Handle<v8::Function> target) {
-            return MakeTarget(Json::nullValue, target);
+            return new JSEventTarget(target);
         }
         
         void Clear(std::string eventID) {
