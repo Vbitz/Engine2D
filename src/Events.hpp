@@ -40,9 +40,16 @@ namespace Engine {
         
         class EventTarget {
         public:
+            enum class Type {
+                Invalid,
+                CPlusPlus,
+                Javascript
+            };
+            
             virtual EventMagic Run(Json::Value& e) = 0;
             
             virtual bool IsScript() { return true; }
+            virtual Type GetType() { return Type::Invalid; }
         };
         
         struct Event {
@@ -68,6 +75,7 @@ namespace Engine {
         public:
             size_t GetDeferedMessageCount();
             void LogEvents(std::string logName);
+            void Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]);
             void Emit(Json::Value args);
             void Emit();
             EventClass* AddListener(std::string name, EventTarget* target);

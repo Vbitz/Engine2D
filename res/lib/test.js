@@ -269,7 +269,7 @@ var graphicsTests = {
 	
 };
 
-sys.on("draw", "test.draw", function () {
+sys.on("draw", "test.draw", function (e) {
 	if (!draw.isTexture(img)) {
 		console.log("Loading Image 1");
 		img = draw.openImage("texture/testing.png");

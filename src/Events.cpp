@@ -47,6 +47,7 @@ namespace Engine {
             }
             
             bool IsScript() override { return false; }
+            Type GetType() override { return Type::CPlusPlus; }
             
         private:
             EventTargetFunc _func;
@@ -69,14 +70,14 @@ namespace Engine {
                 _func.Reset(v8::Isolate::GetCurrent(), func);
             }
             
-            EventMagic Run(Json::Value& e) override {
+            inline EventMagic Run(Json::Value& e, int jsArgC, v8::Handle<v8::Value> jsArgV[]) {
                 v8::Isolate* currentIsolate = v8::Isolate::GetCurrent();
                 v8::Local<v8::Context> ctx = currentIsolate->GetCurrentContext();
                 if (ctx.IsEmpty() || ctx->Global().IsEmpty()) return EM_BADTARGET;
                 
                 v8::TryCatch tryCatch;
                 
-                v8::Local<v8::Value> args[1];
+                v8::Local<v8::Value>* args = new v8::Local<v8::Value>[1 + jsArgC];
                 
                 if ((e.isObject() || e.isArray()) &&
                     e.getMemberNames().size() == 0) {
@@ -87,10 +88,18 @@ namespace Engine {
                     args[0] = ScriptingManager::GetObjectFromJson(e);
                 }
                 
+                if (jsArgC > 0) {
+                    for (int i = 0; i < jsArgC; i++) {
+                        args[i + 1] = jsArgV[i];
+                    }
+                }
+                
                 v8::Local<v8::Function> func = v8::Local<v8::Function>::New(currentIsolate, _func);
                 
-                v8::Local<v8::Value> ret = func->Call(ctx->Global(), 1, args);
-            
+                v8::Local<v8::Value> ret = func->Call(ctx->Global(), 1 + jsArgC, args);
+                
+                delete [] args;
+                
                 if (!tryCatch.StackTrace().IsEmpty()) {
                     ScriptingManager::ReportException(currentIsolate, &tryCatch);
                     return EM_BADTARGET;
@@ -98,6 +107,12 @@ namespace Engine {
                     return GetScriptingReturnType(ret);
                 }
             }
+            
+            EventMagic Run(Json::Value& e) override {
+                this->Run(e, 0, {});
+            }
+            
+            Type GetType() override { return Type::Javascript; }
             
         private:
             v8::Persistent<v8::Function> _func;
@@ -122,7 +137,7 @@ namespace Engine {
             }
         }
         
-        void EventClass::Emit(Json::Value args) {
+        void EventClass::Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]) {
             static std::vector<int> deleteTargets;
             if (this->_alwaysDefered) {
                 this->_deferedMessages.push(args);
@@ -131,7 +146,13 @@ namespace Engine {
                 for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
                     if (iter->Target != NULL && iter->Active) {
                         if (!(this->Security.NoScript && iter->Target->IsScript())) {
-                            EventMagic ret = iter->Target->Run(args);
+                            EventMagic ret = EM_BADTARGET;
+                            if (jsArgC > 0 && iter->Target->GetType() == EventTarget::Type::Javascript) {
+                                JSEventTarget* target = (JSEventTarget*) iter->Target;
+                                ret = target->Run(args, jsArgC, jsArgV);
+                            } else {
+                                ret = iter->Target->Run(args);
+                            }
                             if (ret == EM_CANCEL) {
                                 break;
                             }
@@ -148,6 +169,10 @@ namespace Engine {
                     deleteTargets.empty();
                 }
             }
+        }
+        
+        void EventClass::Emit(Json::Value args) {
+            this->Emit(args, 0, {});
         }
         
         void EventClass::Emit() {

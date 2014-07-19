@@ -1166,7 +1166,10 @@ namespace Engine {
             this->GetRender()->Begin2d();
             
             Profiler::Begin("EventDraw", Config::GetFloat("core.render.targetFrameTime") / 3 * 2);
-            Events::GetEvent("draw")->Emit(); // this is when most Javascript runs
+            v8::Handle<v8::Value> args[1] = {
+                v8::Number::New(v8::Isolate::GetCurrent(), FramePerfMonitor::GetFrameTime())
+            };
+            Events::GetEvent("draw")->Emit(Json::nullValue, 1, args); // this is when most Javascript runs
             Profiler::End("EventDraw");
             
             this->GetRender()->End2d();
