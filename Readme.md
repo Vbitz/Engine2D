@@ -14,7 +14,7 @@ Right now the engine **only** builds out of the box on Mac OSX. To build it for 
 - [Subversion](https://subversion.apache.org/) (For GYP)
 - [GYP](https://code.google.com/p/gyp/)
 - [GLFW](http://www.glfw.org/) v3.0.x or [SDL](http://www.libsdl.org/) v2.0.3
-- [V8](https://code.google.com/p/v8/) v3.25.30
+- [V8](https://code.google.com/p/v8/) v3.28.28.2
 
 On a source level you will need to fill in or stub out `Platform_{x}.cpp`.
 

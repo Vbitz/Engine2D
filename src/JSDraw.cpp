@@ -1035,7 +1035,7 @@ namespace Engine {
             array->Set(v8::String::NewFromUtf8(isolate, "width"), v8::Number::New(isolate, imageWidth));
             array->Set(v8::String::NewFromUtf8(isolate, "height"), v8::Number::New(isolate, imageHeight));
             array->Set(v8::String::NewFromUtf8(isolate, "byteLength"),
-                       v8::Int32::New(isolate, static_cast<int32_t>(imageSize)), v8::ReadOnly);
+                       v8::Number::New(isolate, static_cast<int32_t>(imageSize)));
             
             int pos = 0;
             int i = 0;
@@ -1097,7 +1097,7 @@ namespace Engine {
             array->Set(v8::String::NewFromUtf8(isolate, "width"), v8::Number::New(isolate, imageWidth));
             array->Set(v8::String::NewFromUtf8(isolate, "height"), v8::Number::New(isolate, imageHeight));
             array->Set(v8::String::NewFromUtf8(isolate, "byteLength"),
-                       v8::Int32::New(isolate, static_cast<int32_t>(arraySize)), v8::ReadOnly);
+                       v8::Int32::New(isolate, static_cast<int32_t>(arraySize)));
             
             ENGINE_JS_SCOPE_CLOSE(array);
         }
