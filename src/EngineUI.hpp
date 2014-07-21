@@ -62,8 +62,10 @@ namespace Engine {
         bool _active = true;
         bool _showConsole = false;
         
-        // just temporey until the profiler has this built in
-        double _lastDrawTimes[400];
+        static const int timingResolution = 400;
+        
+        double _lastDrawTimes[timingResolution];
+        double _lastHeapUsages[timingResolution];
         int _currentLastDrawTimePos = 0;
         double _profilerDrawTimeScale = 10000;
         

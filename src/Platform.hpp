@@ -168,6 +168,7 @@ namespace Engine {
         const char** GetRawCommandLineArgV();
         
         engine_memory_info GetMemoryInfo();
+        double GetMemoryUsage();
         
         int GetProcesserCount();
         

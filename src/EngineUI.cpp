@@ -57,11 +57,18 @@ namespace Engine {
         }
     }
     
+    double _getHeapUsage() {
+        v8::HeapStatistics stats;
+        v8::Isolate::GetCurrent()->GetHeapStatistics(&stats);
+        return (double) stats.used_heap_size() / (double) stats.total_heap_size();
+    }
+    
     EngineUI::EngineUI(ApplicationPtr app) : _app(app) {
         this->_draw = new Draw2D(app->GetRender());
         
-        for (int i = 0; i < 400; i++) {
+        for (int i = 0; i < timingResolution; i++) {
             this->_lastDrawTimes[i] = 0.0f;
+            this->_lastHeapUsages[i] = 0.0f;
         }
         
         Events::GetEvent("onDrawProfileEnd")->AddListener("EngineUI::_profilerHook", Events::MakeTarget(_profilerHook));
@@ -98,9 +105,10 @@ namespace Engine {
         
         if (Config::GetBoolean("core.debug.profiler")) {
             double drawTime = Profiler::GetTime("Draw");
+            this->_lastHeapUsages[this->_currentLastDrawTimePos] = _getHeapUsage();
             this->_lastDrawTimes[this->_currentLastDrawTimePos++] = drawTime;
             
-            if (this->_currentLastDrawTimePos > 400) {
+            if (this->_currentLastDrawTimePos >= timingResolution) {
                 this->_currentLastDrawTimePos = 0;
             }
             
@@ -110,7 +118,7 @@ namespace Engine {
             
             double lineGraphScale = Config::GetFloat("core.debug.engineUI.profilerScale");
             
-            this->_draw->LineGraph(windowSize.x - 440, 14, 0.5, lineGraphScale, this->_lastDrawTimes, 400);
+            this->_draw->LineGraph(windowSize.x - 440, 14, 0.5, lineGraphScale, this->_lastDrawTimes, timingResolution);
             
             renderGL->EnableSmooth();
             
@@ -286,7 +294,11 @@ namespace Engine {
             
             renderGL->SetColor("white");
             
-            this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / 400), this->_profilerDrawTimeScale, this->_lastDrawTimes, 400);
+            this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), this->_profilerDrawTimeScale, this->_lastDrawTimes, timingResolution);
+            
+            renderGL->SetColor("red");
+            
+            this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), y - 70 - 95, this->_lastHeapUsages, timingResolution);
             
             renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
             

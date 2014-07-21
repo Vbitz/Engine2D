@@ -276,6 +276,11 @@ namespace Engine {
             return ret;
         }
         
+        double GetMemoryUsage() {
+            engine_memory_info mem = GetMemoryInfo();
+            return (double) mem.myPhysicalUsed / (double) mem.totalPhysical;
+        }
+        
         int GetProcesserCount() {
             return (int) sysconf(_SC_NPROCESSORS_ONLN); // Show me a system where that
                 // function will return more the 2^32 processers
