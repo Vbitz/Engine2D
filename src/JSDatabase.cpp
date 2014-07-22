@@ -23,25 +23,23 @@
 
 #include "Database.hpp"
 #include "Util.hpp"
+#include "ScriptingManager.hpp"
 #include "Filesystem.hpp"
 
 namespace Engine {
     namespace JSDatabase {
         DatabasePtr currentDatabase = NULL;
         
-        ENGINE_JS_METHOD(OpenDatabase) {
-            ENGINE_JS_SCOPE_OPEN;
+        void OpenDatabase(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the database");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the filename of the database")) return;
             
-            if (!Filesystem::HasSetUserDir()) {
-                ENGINE_THROW_ARGERROR("fs.configDir needs to be called before db.open can be called");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
+            if (args.Assert(Filesystem::HasSetUserDir(), "fs.configDir needs to be called before db.open can be called")) return;
             
-            std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
+            std::string path = args.StringValue(0);
             
             Filesystem::TouchFile(path);
             
@@ -51,72 +49,55 @@ namespace Engine {
             }
             
             currentDatabase = Database::CreateDatabase(Filesystem::GetRealPath(path));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(CloseDatabase) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CloseDatabase(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            if (currentDatabase == NULL) {
-                ENGINE_THROW_ARGERROR("A database needs to be loaded with fs.open before it can be closed");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            } else {
-                delete currentDatabase;
-                currentDatabase = NULL;
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
+            if (args.Assert(currentDatabase != NULL, "A database needs to be loaded with fs.open before it can be closed")) return;
+            
+            delete currentDatabase;
+            currentDatabase = NULL;
         }
         
-        ENGINE_JS_METHOD(Exec) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Exec(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the query to be run on the database");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the query to be run on the database")) return;
             
-            if (currentDatabase == NULL) {
-                ENGINE_THROW_ARGERROR("A database needs to be loaded with fs.open before queries can be executed");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
+            if (args.Assert(currentDatabase != NULL, "A database needs to be loaded with fs.open before it can be closed")) return;
             
-            currentDatabase->Execute(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            currentDatabase->Execute(args.StringValue(0));
         }
         
-        ENGINE_JS_METHOD(ExecPrepare) {
-            ENGINE_JS_SCOPE_OPEN;
+        void ExecPrepare(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
+            v8::Handle<v8::Number> num = v8::Number::New(args.GetIsolate(), 2);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the query to be run on the database");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the query to be run on the database")) return;
             
-            if (currentDatabase == NULL) {
-                ENGINE_THROW_ARGERROR("A database needs to be loaded with fs.open before queries can be executed");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
+            if (args.Assert(currentDatabase != NULL, "A database needs to be loaded with fs.open before it can be closed")) return;
             
-            v8::Local<v8::Array> arr = v8::Array::New(isolate);
+            v8::Handle<v8::Array> arr = v8::Array::New(args.GetIsolate());
             
-            std::vector< std::map<std::string, std::string> > ret = currentDatabase->ExecutePrepare(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            typedef std::vector< std::map<std::string, std::string> >::iterator it_type1;
-            typedef std::map<std::string, std::string>::iterator it_type2;
+            std::vector<std::map<std::string, std::string>> ret = currentDatabase->ExecutePrepare(args.StringValue(0));
             
             int rows = 0;
             
-            for (it_type1 iterator1 = ret.begin(); iterator1 != ret.end(); iterator1++) {
-                v8::Local<v8::Object> row = v8::Object::New(isolate);
-                for (it_type2 iterator2 = iterator1->begin(); iterator2 != iterator1->end(); iterator2++) {
-                    row->Set(v8::String::NewFromUtf8(isolate, iterator2->first.c_str()), v8::String::NewFromUtf8(isolate, iterator2->second.c_str()));
+            for (auto iterator1 = ret.begin(); iterator1 != ret.end(); iterator1++) {
+                v8::Local<v8::Object> row = args.NewObject();
+                for (auto iterator2 = iterator1->begin(); iterator2 != iterator1->end(); iterator2++) {
+                    row->Set(args.NewString(iterator2->first), args.NewString(iterator2->second));
                 }
                 arr->Set(rows++, row);
             }
             
-            ENGINE_JS_SCOPE_CLOSE(arr);
+            args.SetReturnValue(arr);
         }
         
 #define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
