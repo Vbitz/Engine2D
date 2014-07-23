@@ -73,17 +73,10 @@ namespace Engine {
             return func->GetFunction()->NewInstance(4, &av[0]);
         }
         
-        ENGINE_JS_METHOD(CreateColor) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CreateColor(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
-            
-            if (!args.IsConstructCall()) {
-                const int argc = args.Length();
-                std::vector<v8::Handle<v8::Value>> av(static_cast<size_t>(argc),v8::Undefined(isolate));
-                for(int i = 0; i < argc; ++i) av[i] = args[i];
-                ENGINE_JS_SCOPE_CLOSE(args.Callee()->NewInstance(argc, &av[0]));
-            }
+            if (args.RecallAsConstructor()) return;
             
             Color4f col;
             
@@ -91,95 +84,78 @@ namespace Engine {
                 col = Color4f();
             } else if (args.Length() == 1) { // new Color(number(0xrrggbb) || string('predefined'))
                 if (args[0]->IsNumber()) {
-                    col = Color4f(ENGINE_GET_ARG_INT32_VALUE(0));
+                    col = Color4f(args.Int32Value(0));
                 } else if (args[0]->IsString()) {
-                    col = Color4f(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                    col = Color4f(args.StringValue(0));
                 } else {
                     col = Color4f();
                 }
             } else if (args.Length() == 2) { // new Color(number(0xrrggbb), number(alpha))
-                col = Color4f(ENGINE_GET_ARG_INT32_VALUE(0));
-                col.a = ENGINE_GET_ARG_NUMBER_VALUE(1);
+                col = Color4f(args.Int32Value(0));
+                col.a = args.NumberValue(1);
             } else if (args.Length() == 3) { // new Color(number(r), number(g), number(b))
-                col = Color4f(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                              ENGINE_GET_ARG_NUMBER_VALUE(1),
-                              ENGINE_GET_ARG_NUMBER_VALUE(2),
+                col = Color4f(args.NumberValue(0),
+                              args.NumberValue(1),
+                              args.NumberValue(2),
                               1.0f);
             } else if (args.Length() == 4) { // new Color(number(r), number(g), number(b), number(a))
-                col = Color4f(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                              ENGINE_GET_ARG_NUMBER_VALUE(1),
-                              ENGINE_GET_ARG_NUMBER_VALUE(2),
+                col = Color4f(args.NumberValue(0),
+                              args.NumberValue(1),
+                              args.NumberValue(2),
                               1.0f);
             } else { // undefined
                 col = Color4f();
             }
             
-            args.This()->Set(v8::String::NewFromUtf8(isolate, "r"),
-                             v8::Number::New(isolate, col.r));
-            args.This()->Set(v8::String::NewFromUtf8(isolate, "g"),
-                             v8::Number::New(isolate, col.g));
-            args.This()->Set(v8::String::NewFromUtf8(isolate, "b"),
-                             v8::Number::New(isolate, col.b));
-            args.This()->Set(v8::String::NewFromUtf8(isolate, "a"),
-                             v8::Number::New(isolate, col.a));
-            
-            return; // Override the normal behavior of ENGINE_JS_SCOPE_CLOSE;
+            args.This()->Set(args.NewString("r"), args.NewNumber(col.r));
+            args.This()->Set(args.NewString("g"), args.NewNumber(col.g));
+            args.This()->Set(args.NewString("b"), args.NewNumber(col.b));
+            args.This()->Set(args.NewString("a"), args.NewNumber(col.a));
         }
         
-        ENGINE_JS_METHOD(Color_FromHSV) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Color_FromHSV(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
+            args.AssertCount(3);
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
+            args.Assert(args[0]->IsNumber(), "Arg0 is the Hue Component between 0 and 360");
+            args.Assert(args[1]->IsNumber(), "Arg1 is the Saturation Component between 0.0f and 1.0f");
+            args.Assert(args[2]->IsNumber(), "Arg2 is the Value Component between 0.0f and 1.0f");
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Hue Component between 0 and 360");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Saturation Component between 0.0f and 1.0f");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Value Component between 0.0f and 1.0f");
+            v8::Handle<v8::Object> ret = args.NewObject();
             
-            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
-            
-            float hue = ENGINE_GET_ARG_NUMBER_VALUE(0),
-            saturation = ENGINE_GET_ARG_NUMBER_VALUE(1),
-            value = ENGINE_GET_ARG_NUMBER_VALUE(2);
+            float hue = args.NumberValue(0),
+            saturation = args.NumberValue(1),
+            value = args.NumberValue(2);
             
             Color4f col = Color4f::FromHSV(hue, saturation, value);
             
-            ENGINE_JS_SCOPE_CLOSE(Color4fToObject(isolate, col));
+            args.SetReturnValue(Color4fToObject(args.GetIsolate(), col));
         }
         
-        ENGINE_JS_METHOD(Color_FromRandom) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Color_FromRandom(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
             static BasicRandom rand = BasicRandom();
             
-            v8::Isolate* isolate = args.GetIsolate();
-            
-            std::vector<v8::Handle<v8::Value>> av(4, v8::Undefined(isolate));
-            
-            av[0] = v8::Number::New(isolate, rand.NextDouble());
-            av[1] = v8::Number::New(isolate, rand.NextDouble());
-            av[2] = v8::Number::New(isolate, rand.NextDouble());
-            av[3] = v8::Number::New(isolate, 1.0f);
-            
-            ENGINE_JS_SCOPE_CLOSE(args.This().As<v8::Function>()->NewInstance(4, &av[0]));
+            args.SetReturnValue(Color4fToObject(args.GetIsolate(), Color4f(rand.NextDouble(), rand.NextDouble(), rand.NextDouble(), 1.0f)));
         }
         
-        ENGINE_JS_METHOD(Color_ToString) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Color_ToString(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
             std::stringstream sb;
             
             sb << "[color rgba(";
             
-            sb << std::floor(args.This()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "r"))->NumberValue() * 255) << ", ";
-            sb << std::floor(args.This()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "g"))->NumberValue() * 255) << ", ";
-            sb << std::floor(args.This()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "b"))->NumberValue() * 255) << ", ";
-            sb << std::floor(args.This()->Get(v8::String::NewFromUtf8(args.GetIsolate(), "a"))->NumberValue() * 255);
+            sb << std::floor(args.This()->Get(args.NewString("r"))->NumberValue() * 255) << ", ";
+            sb << std::floor(args.This()->Get(args.NewString("g"))->NumberValue() * 255) << ", ";
+            sb << std::floor(args.This()->Get(args.NewString("b"))->NumberValue() * 255) << ", ";
+            sb << std::floor(args.This()->Get(args.NewString("a"))->NumberValue() * 255);
             
             sb << ") ]";
             
-            ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(args.GetIsolate(), sb.str().c_str()));
+            args.SetReturnValue(args.NewString(sb.str()));
         }
         
         void InitColorObject(v8::Handle<v8::ObjectTemplate> drawTable) {
@@ -206,127 +182,108 @@ namespace Engine {
             drawTable->Set(isolate, "Color", newColor);
         }
         
-        ENGINE_JS_METHOD(CreateVertexBuffer) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CreateVertexBuffer(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
+            if (args.RecallAsConstructor()) return;
             
-            if (!args.IsConstructCall()) {
-                const int argc = args.Length();
-                std::vector<v8::Handle<v8::Value>> av(static_cast<size_t>(argc),v8::Undefined(isolate));
-                for(int i = 0; i < argc; ++i) av[i] = args[i];
-                ENGINE_JS_SCOPE_CLOSE(args.Callee()->NewInstance(argc, &av[0]));
-            }
+            args.AssertCount(1);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Effect filename to use");
+            args.Assert(args[0]->IsString(), "Arg0 is the Effect filename to use");
             
             RenderDriverPtr render = GetAppSingilton()->GetRender();
             
             GL3BufferPtr buf = NULL;
             
             if (render->GetRendererType() == RendererType::OpenGL3) {
-                EffectParametersPtr effect = EffectReader::GetEffectFromFile(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                EffectParametersPtr effect = EffectReader::GetEffectFromFile(args.StringValue(0));
                 effect->CreateShader();
                 buf = new GL3Buffer(render, effect);
             }
             
-            args.This()->SetHiddenValue(v8::String::NewFromUtf8(isolate, "_buf"), v8::External::New(isolate, buf));
-            
-            return;
+            args.This()->SetHiddenValue(args.NewString("_buf"), args.NewExternal(buf));
         }
         
-        ENGINE_JS_METHOD(VertexBuffer_AddVert) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            v8::Isolate* isolate = args.GetIsolate();
+        void VertexBuffer_AddVert(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
             glm::vec3 pos;
             Color4f col = Color4f("white");
             glm::vec2 uv;
             
             if (args.Length() >= 2) { // (x, y)
-                pos = glm::vec3(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                                ENGINE_GET_ARG_NUMBER_VALUE(1),
+                pos = glm::vec3(args.NumberValue(0),
+                                args.NumberValue(1),
                                 0.0f);
             }
             if (args.Length() >= 3) { // (x, y, col)
-                v8::Handle<v8::Object> obj = ENGINE_GET_ARG_OBJECT(2);
-                col = Color4fFromObject(isolate, obj);
+                v8::Handle<v8::Object> obj = args[2]->ToObject();
+                col = Color4fFromObject(args.GetIsolate(), obj);
             }
             if (args.Length() >= 5) { // (x, y, col, u, v)
-                uv = glm::vec2(ENGINE_GET_ARG_NUMBER_VALUE(3),
-                               ENGINE_GET_ARG_NUMBER_VALUE(4));
+                uv = glm::vec2(args.NumberValue(3),
+                               args.NumberValue(4));
             }
             
-            void* v = args.This()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "_buf")).As<v8::External>()->Value();
+            void* v = args.This()->GetHiddenValue(args.NewString("_buf")).As<v8::External>()->Value();
             
             if (v == NULL) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                return;
             }
             
             GL3BufferPtr buf = (GL3BufferPtr) v;
             
             buf->AddVert(pos, col, uv);
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(VertexBuffer_Draw) {
-            ENGINE_JS_SCOPE_OPEN;
+        void VertexBuffer_Draw(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            void* v = args.This()->GetHiddenValue(v8::String::NewFromUtf8(args.GetIsolate(), "_buf")).As<v8::External>()->Value();
+            void* v = args.This()->GetHiddenValue(args.NewString("_buf")).As<v8::External>()->Value();
             
             if (v == NULL) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                return;
             }
             
             GL3BufferPtr buf = (GL3BufferPtr) v;
             
             buf->Draw(PolygonMode::Triangles, glm::mat4(), glm::mat4());
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(VertexBuffer_Save) {
-            ENGINE_JS_SCOPE_OPEN;
+        void VertexBuffer_Save(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to save to")
+            if (args.Assert(args[0]->IsString(), "Arg0 is the filename to save to")) return;
             
-            void* v = args.This()->GetHiddenValue(v8::String::NewFromUtf8(args.GetIsolate(), "_buf")).As<v8::External>()->Value();
+            void* v = args.This()->GetHiddenValue(args.NewString("_buf")).As<v8::External>()->Value();
             
             if (v == NULL) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                return;
             }
             
             GL3BufferPtr buf = (GL3BufferPtr) v;
             
-            buf->Save(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            buf->Save(args.StringValue(0));
         }
         
-        ENGINE_JS_METHOD(VertexBuffer_Load) {
-            ENGINE_JS_SCOPE_OPEN;
+        void VertexBuffer_Load(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to load from")
+            if (args.Assert(args[0]->IsString(), "Arg0 is the filename to load from")) return;
             
-            void* v = args.This()->GetHiddenValue(v8::String::NewFromUtf8(args.GetIsolate(), "_buf")).As<v8::External>()->Value();
+            void* v = args.This()->GetHiddenValue(args.NewString("_buf")).As<v8::External>()->Value();
             
             if (v == NULL) {
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                return;
             }
             
             GL3BufferPtr buf = (GL3BufferPtr) v;
             
-            buf->Load(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            buf->Load(args.StringValue(0));
         }
         
         void InitVertexBuffer2DObject(v8::Handle<v8::ObjectTemplate> drawTable) {
@@ -356,174 +313,148 @@ namespace Engine {
             return (Draw2DPtr) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_draw")).As<v8::External>()->Value();
         }
         
-		ENGINE_JS_METHOD(Rect) {
-            ENGINE_JS_SCOPE_OPEN;
+		void Rect(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-			float x, y, w, h;
+            if (args.AssertCount(4)) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(4);
+            if (args.Assert(args[0]->IsNumber(), "Arg0 has to be X of a rect") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 has to be Y of a rect") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 has to be Width of a rect") ||
+                args.Assert(args[3]->IsNumber(), "Arg3 has to be Height of a rect")) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 has to be X of a rect");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be Y of a rect");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Width of a rect");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Height of a rect");
-            
-			x = (float)ENGINE_GET_ARG_NUMBER_VALUE(0);
-			y = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
-			w = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
-			h = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            
-            GetDraw2D(args.This())->Rect(x, y, w, h);
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->Rect(args.NumberValue(0),
+                                         args.NumberValue(1),
+                                         args.NumberValue(2),
+                                         args.NumberValue(3));
 		}
 		
-		ENGINE_JS_METHOD(Grid) {
-            ENGINE_JS_SCOPE_OPEN;
+		void Grid(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-			float x, y, w, h;
+            if (args.AssertCount(4)) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(4);
+            if (args.Assert(args[0]->IsNumber(), "Arg0 has to be X of a grid") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 has to be Y of a grid") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 has to be Width of a grid") ||
+                args.Assert(args[3]->IsNumber(), "Arg3 has to be Height of a grid")) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 has to be X of a rect");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be Y of a rect");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Width of a rect");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Height of a rect");
-            
-			x = (float)ENGINE_GET_ARG_NUMBER_VALUE(0);
-			y = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
-			w = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
-			h = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            
-            GetDraw2D(args.This())->Grid(x, y, w, h);
-            
-			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->Grid(args.NumberValue(0),
+                                         args.NumberValue(1),
+                                         args.NumberValue(2),
+                                         args.NumberValue(3));
 		}
 		
-		ENGINE_JS_METHOD(Grad) {
-            ENGINE_JS_SCOPE_OPEN;
+		void Grad(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-			float x, y, w, h;
+            if (args.AssertCount(7)) return;
             
-            unsigned int col1, col2;
+            if (args.Assert(args[0]->IsNumber(), "Arg0 has to be X of a gradient") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 has to be Y of a gradient") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 has to be Width of a gradient") ||
+                args.Assert(args[3]->IsNumber(), "Arg3 has to be Height of a gradient") ||
+                args.Assert(args[4]->IsInt32(), "Arg4 is Color1 of the gradient") ||
+                args.Assert(args[5]->IsInt32(), "Arg5 is Color2 of the gradient") ||
+                args.Assert(args[6]->IsBoolean(), "Arg6 set's orientation of the gradient")) return;
             
-            bool vert;
-            
-            ENGINE_CHECK_ARGS_LENGTH(7);
-            
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 has to be X of a rect");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be Y of a rect");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Width of a rect");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Height of a rect");
-            ENGINE_CHECK_ARG_INT32(4, "Arg4 is Color1 of the gradient");
-            ENGINE_CHECK_ARG_INT32(5, "Arg5 is Color2 of the gradient");
-            ENGINE_CHECK_ARG_BOOLEAN(6, "Arg6 set's orientation of the gradient");
-            
-			x = (float)ENGINE_GET_ARG_NUMBER_VALUE(0);
-			y = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
-			w = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
-			h = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            
-			col1 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(4);
-			col2 = (unsigned int)ENGINE_GET_ARG_INT32_VALUE(5);
-            
-			vert = ENGINE_GET_ARG_BOOLEAN_VALUE(6);
-            
-            GetDraw2D(args.This())->Grad(x, y, w, h, col1, col2, vert);
-            
-			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->Grad(args.NumberValue(0),
+                                         args.NumberValue(1),
+                                         args.NumberValue(2),
+                                         args.NumberValue(3),
+                                         args.Int32Value(4),
+                                         args.Int32Value(5),
+                                         args.BooleanValue(6));
 		}
         
-        ENGINE_JS_METHOD(Circle) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Circle(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X center of the circle");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y center of the circle");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the radius of the circle");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the X center of the circle") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the Y center of the circle") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 is the radius of the circle")) return;
             
             if (args.Length() == 4) {
-                ENGINE_CHECK_ARG_BOOLEAN(3, "Arg4 sets the fill style of the circle");
-                GetDraw2D(args.This())->Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(1),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(2),
-                                               ENGINE_GET_ARG_BOOLEAN_VALUE(3));
+                if (args.Assert(args[3]->IsBoolean(), "Arg3 sets the fill style of the circle")) return;
+                GetDraw2D(args.This())->Circle(args.NumberValue(0),
+                                               args.NumberValue(1),
+                                               args.NumberValue(2),
+                                               args.BooleanValue(3));
             } else if (args.Length() == 5) {
-                ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the number of sides to the circle");
-                ENGINE_CHECK_ARG_BOOLEAN(4, "Arg4 sets the fill style of the circle");
-                GetDraw2D(args.This())->Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(1),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(2),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(3),
-                                               ENGINE_GET_ARG_BOOLEAN_VALUE(4));
+                if (args.Assert(args[3]->IsNumber(), "Arg3 is the number of sides to the circle") ||
+                    args.Assert(args[4]->IsBoolean(), "Arg4 sets the fill style of the circle")) return;
+                GetDraw2D(args.This())->Circle(args.NumberValue(0),
+                                               args.NumberValue(1),
+                                               args.NumberValue(2),
+                                               args.NumberValue(3),
+                                               args.BooleanValue(4));
             } else if (args.Length() == 7) {
-                ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the number of sides to the circle");
-                ENGINE_CHECK_ARG_NUMBER(4, "Arg4 is the start % of the circle");
-                ENGINE_CHECK_ARG_NUMBER(5, "Arg5 is the end % of the circle");
-                ENGINE_CHECK_ARG_BOOLEAN(6, "Arg6 sets the fill style of the circle");
-                GetDraw2D(args.This())->Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(1),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(2),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(3),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(4),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(5),
-                                               ENGINE_GET_ARG_BOOLEAN_VALUE(6));
+                if (args.Assert(args[3]->IsNumber(), "Arg3 is the number of sides to the circle") ||
+                    args.Assert(args[4]->IsNumber(), "Arg4 is the start % of the circle") ||
+                    args.Assert(args[5]->IsNumber(), "Arg5 is the end % of the circle") ||
+                    args.Assert(args[6]->IsBoolean(), "Arg6 sets the fill style of the circle")) return;
+                GetDraw2D(args.This())->Circle(args.NumberValue(0),
+                                               args.NumberValue(1),
+                                               args.NumberValue(2),
+                                               args.NumberValue(3),
+                                               args.NumberValue(4),
+                                               args.NumberValue(5),
+                                               args.BooleanValue(6));
             } else if (args.Length() == 8) {
-                ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the inner radius of the circle");
-                ENGINE_CHECK_ARG_NUMBER(4, "Arg3 is the number of sides to the circle");
-                ENGINE_CHECK_ARG_NUMBER(5, "Arg4 is the start % of the circle");
-                ENGINE_CHECK_ARG_NUMBER(6, "Arg5 is the end % of the circle");
-                ENGINE_CHECK_ARG_BOOLEAN(7, "Arg6 sets the fill style of the circle");
-                GetDraw2D(args.This())->Circle(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(1),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(2),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(3),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(4),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(5),
-                                               ENGINE_GET_ARG_NUMBER_VALUE(6),
-                                               ENGINE_GET_ARG_BOOLEAN_VALUE(7));
+                if (args.Assert(args[3]->IsBoolean(), "Arg3 is the inner radius of the circle") ||
+                    args.Assert(args[4]->IsNumber(), "Arg3 is the number of sides to the circle") ||
+                    args.Assert(args[5]->IsNumber(), "Arg4 is the start % of the circle") ||
+                    args.Assert(args[6]->IsNumber(), "Arg5 is the end % of the circle") ||
+                    args.Assert(args[7]->IsBoolean(), "Arg6 sets the fill style of the circle")) return;
+                GetDraw2D(args.This())->Circle(args.NumberValue(0),
+                                               args.NumberValue(1),
+                                               args.NumberValue(2),
+                                               args.NumberValue(3),
+                                               args.NumberValue(4),
+                                               args.NumberValue(5),
+                                               args.NumberValue(6),
+                                               args.BooleanValue(7));
             } else {
-                ENGINE_THROW_ARGERROR("");
+                args.ThrowError("Wrong number of Arguments");
             }
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(Line) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Line(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(4);
+            if (args.AssertCount(4)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the First X point of the line");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the First Y point of the line");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Second X point of the line");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the Second Y point of the line");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 has to be the first X point of the line") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 has to be the first Y point of the line") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 has to be the second X point of the line") ||
+                args.Assert(args[3]->IsNumber(), "Arg3 has to be the second Y point of the line")) return;
             
-            GetDraw2D(args.This())->Line(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1),
-                                         ENGINE_GET_ARG_NUMBER_VALUE(2), ENGINE_GET_ARG_NUMBER_VALUE(3));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->Line(args.NumberValue(0),
+                                         args.NumberValue(1),
+                                         args.NumberValue(2),
+                                         args.NumberValue(3));
         }
         
-        ENGINE_JS_METHOD(Polygon) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Polygon(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
+            if (args.AssertCount(3)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X center of the polygon");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y center of the polygon");
-            ENGINE_CHECK_ARG_ARRAY(2, "Arg2 is the points to the circle in the format [x, y, x, y]");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the X center of the polygon") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the Y center of the polygon") ||
+                args.Assert(args[2]->IsArray(), "Arg2 is the points to the circle in the format [x, y, x, y]")) return;
             
             v8::Handle<v8::Array> arr = args[2].As<v8::Array>();
             
@@ -534,51 +465,47 @@ namespace Engine {
                 circlePoints[i] = arr->Get(i).As<v8::Number>()->Value();
             }
             
-            GetDraw2D(args.This())->Polygon(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), circlePoints, circlePointCount);
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->Polygon(args.NumberValue(0), args.NumberValue(1), circlePoints, circlePointCount);
         }
         
-        ENGINE_JS_METHOD(Curve) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Curve(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(8);
+            if (args.AssertCount(8)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the x value of point 1");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the y value of point 1");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the x value of point 2");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 is the y value of point 2");
-            ENGINE_CHECK_ARG_NUMBER(4, "Arg4 is the x value of point 3");
-            ENGINE_CHECK_ARG_NUMBER(5, "Arg5 is the y value of point 3");
-            ENGINE_CHECK_ARG_NUMBER(6, "Arg6 is the x value of point 4");
-            ENGINE_CHECK_ARG_NUMBER(7, "Arg7 is the y value of point 4");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the x value of point 1") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the y value of point 1") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 is the x value of point 2") ||
+                args.Assert(args[3]->IsNumber(), "Arg3 is the y value of point 2") ||
+                args.Assert(args[4]->IsNumber(), "Arg4 is the x value of point 3") ||
+                args.Assert(args[5]->IsNumber(),  "Arg5 is the y value of point 3") ||
+                args.Assert(args[6]->IsNumber(), "Arg6 is the x value of point 4") ||
+                args.Assert(args[7]->IsNumber(), "Arg7 is the y value of point 4")) return;
             
-            GetDraw2D(args.This())->BezierCurve(ENGINE_GET_ARG_NUMBER_VALUE(0),
-                                                ENGINE_GET_ARG_NUMBER_VALUE(1),
-                                                ENGINE_GET_ARG_NUMBER_VALUE(2),
-                                                ENGINE_GET_ARG_NUMBER_VALUE(3),
-                                                ENGINE_GET_ARG_NUMBER_VALUE(4),
-                                                ENGINE_GET_ARG_NUMBER_VALUE(5),
-                                                ENGINE_GET_ARG_NUMBER_VALUE(6),
-                                                ENGINE_GET_ARG_NUMBER_VALUE(7));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->BezierCurve(args.NumberValue(0),
+                                                args.NumberValue(1),
+                                                args.NumberValue(2),
+                                                args.NumberValue(3),
+                                                args.NumberValue(4),
+                                                args.NumberValue(5),
+                                                args.NumberValue(6),
+                                                args.NumberValue(7));
         }
 		
-        ENGINE_JS_METHOD(ColorPalette) {
-            ENGINE_JS_SCOPE_OPEN;
+        void ColorPalette(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
             if (args.Length() == 2) {
-                ENGINE_CHECK_ARG_STRING(0, "Arg0 is a name for the color");
-                ENGINE_CHECK_ARG_INT32(1, "Arg1 is the color to associate the name with");
+                if (args.Assert(args[0]->IsString(), "Arg0 is a name for the color") ||
+                    args.Assert(args[1]->IsInt32(), "Arg1 is the color to associate the name with")) return;
                 
-                Color4f::SetDefinedColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1));
+                Color4f::SetDefinedColor(args.StringValue(0), args.Int32Value(1));
             } else if (args.Length() == 1) {
-                ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is an object containing a list of colors");
+                if (args.Assert(args[0]->IsObject(), "Arg0 is an object containing a list of colors")) return;
                 
-                v8::Local<v8::Object> obj = ENGINE_GET_ARG_OBJECT(0);
+                v8::Local<v8::Object> obj = args[0]->ToObject();
                 
                 v8::Local<v8::Array> objNames = obj->GetPropertyNames();
                 
@@ -589,25 +516,21 @@ namespace Engine {
                     Color4f::SetDefinedColor(std::string(*v8::String::Utf8Value(objKey)), (int) objItem->NumberValue());
                 }
             } else {
-                ENGINE_THROW_ARGERROR("draw.colorPalette takes 1 or 2 args");
+                args.ThrowArgError("draw.colorPalette takes 1 or 2 args");
             }
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-		ENGINE_JS_METHOD(SetColorF) {
-			ENGINE_JS_SCOPE_OPEN;
+		void SetColorF(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
+            if (args.AssertCount(3)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Red Component between 0.0f and 1.0f");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0.0f and 1.0f");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0.0f and 1.0f");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the Red Component between 0.0f and 1.0f") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the Green Component between 0.0f and 1.0f") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 is the Blue Component between 0.0f and 1.0f")) return;
             
             GetDraw2D(args.This())->GetRender()->SetColor(
-                ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), ENGINE_GET_ARG_NUMBER_VALUE(2));
-            
-			ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                args.NumberValue(0), args.NumberValue(1), args.NumberValue(2));
 		}
         
         bool _setColor(v8::Isolate* isolate, Draw2DPtr draw2D, v8::Local<v8::Value> value) {
@@ -636,29 +559,25 @@ namespace Engine {
             }
         }
 		
-		ENGINE_JS_METHOD(SetColor) {
-            ENGINE_JS_SCOPE_OPEN;
+		void SetColor(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
             _setColor(args.GetIsolate(), GetDraw2D(args.This()), args[0]);
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
 		
-		ENGINE_JS_METHOD(SetColorI) {
-            ENGINE_JS_SCOPE_OPEN;
+		void SetColorI(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
+            if (args.AssertCount(3)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Red Component between 0 and 255");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Green Component between 0 and 255");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Blue Component between 0 and 255");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the Red Component between 0 and 255") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the Green Component between 0 and 255") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 is the Blue Component between 0 and 255")) return;
             
 			GetDraw2D(args.This())->GetRender()->SetColor(
-                ENGINE_GET_ARG_NUMBER_VALUE(0) / 255, ENGINE_GET_ARG_NUMBER_VALUE(1) / 255, ENGINE_GET_ARG_NUMBER_VALUE(2) / 255);
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                args.NumberValue(0) / 255, args.NumberValue(1) / 255, args.NumberValue(2) / 255);
 		}
         
         v8::Local<v8::Value> _getColor(v8::Isolate* isolate, Draw2DPtr draw) {
@@ -674,10 +593,10 @@ namespace Engine {
             return ret;
         }
         
-        ENGINE_JS_METHOD(GetColor) {
-            ENGINE_JS_SCOPE_OPEN;
+        void GetColor(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_JS_SCOPE_CLOSE(_getColor(args.GetIsolate(), GetDraw2D(args.This())));
+            args.SetReturnValue(_getColor(args.GetIsolate(), GetDraw2D(args.This())));
         }
         
         ENGINE_JS_METHOD(GetRGBFromHSV) {

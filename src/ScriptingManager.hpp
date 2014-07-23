@@ -28,7 +28,7 @@
 #include "Scripting.hpp"
 #include "vendor/json/json.h"
 
-#define SCRIPTINGMANAGER_INLINE
+#define SCRIPTINGMANAGER_INLINE inline
 
 namespace Engine {
     namespace ScriptingManager {
@@ -51,7 +51,7 @@ namespace Engine {
                 return v8::Number::New(this->_isolate, value);
             }
             
-            SCRIPTINGMANAGER_INLINE v8::Handle<v8::Number> NewNumber(int value) {
+            SCRIPTINGMANAGER_INLINE v8::Handle<v8::Number> NewInt32(int value) {
                 return v8::Number::New(this->_isolate, value);
             }
             
@@ -61,6 +61,10 @@ namespace Engine {
             
             SCRIPTINGMANAGER_INLINE v8::Handle<v8::Object> NewObject() {
                 return v8::Object::New(this->_isolate);
+            }
+            
+            SCRIPTINGMANAGER_INLINE v8::Handle<v8::External> NewExternal(void* value) {
+                return v8::External::New(this->_isolate, value);
             }
             
             SCRIPTINGMANAGER_INLINE void ThrowError(const char* msg) {
@@ -94,8 +98,36 @@ namespace Engine {
                 return std::string(*v8::String::Utf8Value(this->_args[arg]));
             }
             
+            SCRIPTINGMANAGER_INLINE uint32_t Int32Value(int arg) {
+                return this->_args[arg]->Int32Value();
+            }
+            
+            SCRIPTINGMANAGER_INLINE double NumberValue(int arg) {
+                return this->_args[arg]->NumberValue();
+            }
+            
+            SCRIPTINGMANAGER_INLINE bool BooleanValue(bool arg) {
+                return this->_args[arg]->BooleanValue();
+            }
+            
+            SCRIPTINGMANAGER_INLINE bool RecallAsConstructor() {
+                if (!this->IsConstructCall()) {
+                    const int argc = this->_args.Length();
+                    std::vector<v8::Handle<v8::Value>> av(static_cast<size_t>(argc),v8::Undefined(this->_isolate));
+                    for(int i = 0; i < argc; ++i) av[i] = this->_args[i];
+                    this->SetReturnValue(this->_args.Callee()->NewInstance(argc, &av[0]));
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            
             SCRIPTINGMANAGER_INLINE v8::Isolate* GetIsolate() {
-                return this->_args.GetIsolate();
+                return this->_isolate;
+            }
+            
+            SCRIPTINGMANAGER_INLINE bool IsConstructCall() {
+                return this->_args.IsConstructCall();
             }
             
             SCRIPTINGMANAGER_INLINE size_t Length() {
@@ -104,6 +136,10 @@ namespace Engine {
             
             SCRIPTINGMANAGER_INLINE void SetReturnValue(v8::Handle<v8::Value> ret) {
                 this->_args.GetReturnValue().Set(ret);
+            }
+            
+            SCRIPTINGMANAGER_INLINE v8::Local<v8::Object> This() {
+                return this->_args.This();
             }
             
             SCRIPTINGMANAGER_INLINE v8::Handle<v8::Value> operator[](int index) {
