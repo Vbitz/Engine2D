@@ -241,19 +241,13 @@ namespace Engine {
     }
     
     // from http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
-    glm::vec3 _calculateBezierPoint(float t, glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3) {
-        float u = 1.0f - t;
-        float tt = t*t;
-        float uu = u*u;
-        float uuu = uu * u;
-        float ttt = tt * t;
+    inline glm::vec3 _calculateBezierPoint(float t, glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3) {
+        const float u = 1.0f - t;
         
-        glm::vec3 p = uuu * p0; //first term
-        p += 3 * uu * t * p1;   //second term
-        p += 3 * u * tt * p2;   //third term
-        p += ttt * p3;          //fourth term
-        
-        return p;
+        return ((u * u * u) * p0) +        //first term
+                (3 * (u * u) * t * p1) +   //second term
+                (3 * u * (t * t) * p2) +   //third term
+                ((t * t * t) * p3);        //fourth term
     }
     
     void Draw2D::BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
@@ -272,21 +266,23 @@ namespace Engine {
         glm::vec3 vec2 = glm::vec3(x2, y2, 0.0f);
         glm::vec3 vec3 = glm::vec3(x3, y3, 0.0f);
         glm::vec3 vec4 = glm::vec3(x4, y4, 0.0f);
+        
         this->BezierCurve(vec1, vec2, vec3, vec4, segments);
     }
     
     void Draw2D::BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments) {
         RenderDriver::DrawProfiler p = renderGL->Profile(__PRETTY_FUNCTION__);
         glm::vec3 q0 = _calculateBezierPoint(0, vec1, vec2, vec3, vec4);
+        glm::vec3 q1;
         
-        renderGL->BeginRendering(PolygonMode::LineStrip);
-        
-        renderGL->AddVert(q0.x, q0.y, q0.z);
+        renderGL->BeginRendering(PolygonMode::Lines);
         
         for (int i = 1; i <= segments; i++) {
             float t = (1 / (float) segments) * i;
-            q0 = _calculateBezierPoint(t, vec1, vec2, vec3, vec4);
+            q1 = _calculateBezierPoint(t, vec1, vec2, vec3, vec4);
             renderGL->AddVert(q0.x, q0.y, q0.z);
+            renderGL->AddVert(q1.x, q1.y, q1.z);
+            q0 = q1;
         }
         renderGL->EndRendering();
     }
