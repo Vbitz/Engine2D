@@ -409,11 +409,11 @@ namespace Engine {
                                                args.NumberValue(5),
                                                args.BooleanValue(6));
             } else if (args.Length() == 8) {
-                if (args.Assert(args[3]->IsBoolean(), "Arg3 is the inner radius of the circle") ||
-                    args.Assert(args[4]->IsNumber(), "Arg3 is the number of sides to the circle") ||
-                    args.Assert(args[5]->IsNumber(), "Arg4 is the start % of the circle") ||
-                    args.Assert(args[6]->IsNumber(), "Arg5 is the end % of the circle") ||
-                    args.Assert(args[7]->IsBoolean(), "Arg6 sets the fill style of the circle")) return;
+                if (args.Assert(args[3]->IsNumber(), "Arg3 is the inner radius of the circle") ||
+                    args.Assert(args[4]->IsNumber(), "Arg4 is the number of sides to the circle") ||
+                    args.Assert(args[5]->IsNumber(), "Arg5 is the start % of the circle") ||
+                    args.Assert(args[6]->IsNumber(), "Arg6 is the end % of the circle") ||
+                    args.Assert(args[7]->IsBoolean(), "Arg7 sets the fill style of the circle")) return;
                 GetDraw2D(args.This())->Circle(args.NumberValue(0),
                                                args.NumberValue(1),
                                                args.NumberValue(2),
@@ -800,10 +800,10 @@ namespace Engine {
             ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Y of a rect");
             ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Width of a rect");
             ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Height of a rect");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg5 has to be X of a sub rectangle");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg6 has to be Y of a sub rectangle");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg7 has to be Width of a sub rectangle");
-            ENGINE_CHECK_ARG_NUMBER(4, "Arg8 has to be Height of a sub rectangle");
+            ENGINE_CHECK_ARG_NUMBER(5, "Arg5 has to be X of a sub rectangle");
+            ENGINE_CHECK_ARG_NUMBER(6, "Arg6 has to be Y of a sub rectangle");
+            ENGINE_CHECK_ARG_NUMBER(7, "Arg7 has to be Width of a sub rectangle");
+            ENGINE_CHECK_ARG_NUMBER(8, "Arg8 has to be Height of a sub rectangle");
             
             tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
             

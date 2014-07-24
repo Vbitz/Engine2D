@@ -106,7 +106,7 @@ namespace Engine {
                 return this->_args[arg]->NumberValue();
             }
             
-            SCRIPTINGMANAGER_INLINE bool BooleanValue(bool arg) {
+            SCRIPTINGMANAGER_INLINE bool BooleanValue(int arg) {
                 return this->_args[arg]->BooleanValue();
             }
             
