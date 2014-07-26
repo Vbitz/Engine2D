@@ -54,7 +54,7 @@ namespace Engine {
     }
     
     bool SpriteSheet::IsValid() {
-        return this->_texture->IsValid();
+        return this != NULL && this->_texture->IsValid();
     }
     
     Sprite SpriteSheet::GetSprite(std::string index) {
@@ -62,22 +62,22 @@ namespace Engine {
             double dt = FramePerfMonitor::GetFrameTime();
             if (this->_animationStatus.count(index) == 0) {
                 this->_createAnimationStatus(index);
-            } else {
-                SpriteAnimationStatus* status = &this->_animationStatus[index];
-                status->currentTime += dt;
-                if (status->currentTime > status->animation->delay) {
-                    status->currentTime = 0.0f;
-                    status->currentIndex++;
-                    if (status->currentIndex
-                        > status->animation->locations.size() - 1) {
-                        status->currentIndex = 0;
-                    }
-                }
-                Sprite ret;
-                ret.tex = this->_texture;
-                ret.loc = status->animation->locations[status->currentIndex];
-                return ret;
             }
+            
+            SpriteAnimationStatus* status = &this->_animationStatus[index];
+            status->currentTime += dt;
+            if (status->currentTime > status->animation->delay) {
+                status->currentTime = 0.0f;
+                status->currentIndex++;
+                if (status->currentIndex
+                    > status->animation->locations.size() - 1) {
+                    status->currentIndex = 0;
+                }
+            }
+            Sprite ret;
+            ret.tex = this->_texture;
+            ret.loc = status->animation->locations[status->currentIndex];
+            return ret;
         } else {
             Sprite ret;
             ret.tex = this->_texture;

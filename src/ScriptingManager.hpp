@@ -67,6 +67,10 @@ namespace Engine {
                 return v8::External::New(this->_isolate, value);
             }
             
+            SCRIPTINGMANAGER_INLINE v8::Handle<v8::Boolean> NewBoolean(bool value) {
+                return v8::Boolean::New(this->_isolate, value);
+            }
+            
             SCRIPTINGMANAGER_INLINE void ThrowError(const char* msg) {
                 this->_isolate->ThrowException(v8::Exception::Error(this->NewString(msg)));
             }
@@ -94,6 +98,10 @@ namespace Engine {
                 return this->Assert(this->Length() == count, "Wrong number of arguments");
             }
             
+            SCRIPTINGMANAGER_INLINE const char* CStringValue(int arg) {
+                return *v8::String::Utf8Value(this->_args[arg]);
+            }
+            
             SCRIPTINGMANAGER_INLINE std::string StringValue(int arg) {
                 return std::string(*v8::String::Utf8Value(this->_args[arg]));
             }
@@ -108,6 +116,10 @@ namespace Engine {
             
             SCRIPTINGMANAGER_INLINE bool BooleanValue(int arg) {
                 return this->_args[arg]->BooleanValue();
+            }
+            
+            SCRIPTINGMANAGER_INLINE void* ExternalValue(int arg) {
+                return v8::Handle<v8::External>::Cast(this->_args[arg])->Value();
             }
             
             SCRIPTINGMANAGER_INLINE bool RecallAsConstructor() {

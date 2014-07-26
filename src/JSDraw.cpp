@@ -599,284 +599,211 @@ namespace Engine {
             args.SetReturnValue(_getColor(args.GetIsolate(), GetDraw2D(args.This())));
         }
         
-        ENGINE_JS_METHOD(GetRGBFromHSV) {
-            ENGINE_JS_SCOPE_OPEN;
+        void GetRGBFromHSV(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
+            if (args.AssertCount(3)) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
-            
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the Hue Component between 0 and 360");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Saturation Component between 0.0f and 1.0f");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 is the Value Component between 0.0f and 1.0f");
-            
-            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
-            
-            float hue = ENGINE_GET_ARG_NUMBER_VALUE(0),
-            saturation = ENGINE_GET_ARG_NUMBER_VALUE(1),
-            value = ENGINE_GET_ARG_NUMBER_VALUE(2);
-            
-            Color4f col = Color4f::FromHSV(hue, saturation, value);
-            
-            ret->Set(v8::String::NewFromUtf8(isolate, "r"), v8::Number::New(isolate, col.r));
-            ret->Set(v8::String::NewFromUtf8(isolate, "g"), v8::Number::New(isolate, col.g));
-            ret->Set(v8::String::NewFromUtf8(isolate, "b"), v8::Number::New(isolate, col.b));
-            ret->Set(v8::String::NewFromUtf8(isolate, "a"), v8::Number::New(isolate,col.a));
-            
-            ENGINE_JS_SCOPE_CLOSE(ret);
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the Hue Component between 0 and 360") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the Saturation Component between 0.0f and 1.0f") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 is the Value Component between 0.0f and 1.0f")) return;
+
+            args.SetReturnValue(Color4fToObject(args.GetIsolate(), Color4f::FromHSV(args.NumberValue(0), args.NumberValue(1), args.NumberValue(2))));
         }
         
-        ENGINE_JS_METHOD(ClearColor) {
-            ENGINE_JS_SCOPE_OPEN;
+        void ClearColor(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_GL;
-            
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
             if (args[0]->IsNumber()) {
-                int col = ENGINE_GET_ARG_INT32_VALUE(0);
-                
-                if (col > (256 * 256 * 256))
-                {
-                    ENGINE_THROW_ARGERROR("Arg0 is beyond 0xffffff");
-                    ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-                }
-                
-                GetDraw2D(args.This())->GetRender()->ClearColor(col); // yay now draw2d handles it
+                GetDraw2D(args.This())->GetRender()->ClearColor(args.Int32Value(0));
             } else if (args[0]->IsString()) {
-                GetDraw2D(args.This())->GetRender()->ClearColor(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+                GetDraw2D(args.This())->GetRender()->ClearColor(args.StringValue(0));
             } else if (args[0]->IsObject()) {
-                v8::Local<v8::Object> obj = ENGINE_GET_ARG_OBJECT(0);
-                double r = obj->Get(v8::String::NewFromUtf8(isolate, "r"))->NumberValue();
-                double g = obj->Get(v8::String::NewFromUtf8(isolate, "g"))->NumberValue();
-                double b = obj->Get(v8::String::NewFromUtf8(isolate, "b"))->NumberValue();
-                GetDraw2D(args.This())->GetRender()->ClearColor(r, g, b);
+                GetDraw2D(args.This())->GetRender()->ClearColor(Color4fFromObject(args.GetIsolate(), args[0]->ToObject()));
             } else {
-                ENGINE_THROW_ARGERROR("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb)");
+                args.ThrowArgError("Arg0 needs to be a string(colorName) or a number(in the format 0xrrggbb)");
             }
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(LoadFont) {
-            ENGINE_JS_SCOPE_OPEN;
+        void LoadFont(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
+            if (args.AssertCount(2)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name you use to refer to the font");
-            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the filename of the font");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the name you use to refer to the font") ||
+                args.Assert(args[1]->IsString(), "Arg1 is the filename of the font")) return;
             
-            GetDraw2D(args.This())->GetRender()->LoadFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->GetRender()->LoadFont(args.StringValue(0), args.StringValue(1));
         }
         
-        ENGINE_JS_METHOD(GetAllFonts) {
-            ENGINE_JS_SCOPE_OPEN;
+        void SetFont(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
+            
+            if (args.AssertCount(2)) return;
+            
+            if (args.Assert(args[0]->IsString(), "Arg0 is the name of the font to use") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the size of the font to use")) return;
+            
+            GetDraw2D(args.This())->GetRender()->SetFont(args.StringValue(0), args.NumberValue(1));
         }
         
-        ENGINE_JS_METHOD(SetFont) {
-            ENGINE_JS_SCOPE_OPEN;
+        void IsFontLoaded(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to use");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the size of the font to use");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the name of the font to check")) return;
             
-            GetDraw2D(args.This())->GetRender()->SetFont(ENGINE_GET_ARG_CPPSTRING_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            args.SetReturnValue(args.NewBoolean(GetDraw2D(args.This())->GetRender()->IsFontLoaded(args.StringValue(0))));
         }
         
-        ENGINE_JS_METHOD(IsFontLoaded) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Print(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(3)) return;
+
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the X position of Arg2") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the Y position of Arg2") ||
+                args.Assert(args[2]->IsString(), "Arg2 is the string to render")) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the font to check");
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetDraw2D(args.This())->GetRender()->IsFontLoaded(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            GetDraw2D(args.This())->GetRender()->Print(args.NumberValue(0), args.NumberValue(1), args.CStringValue(2));
         }
         
-        ENGINE_JS_METHOD(Print) {
-            ENGINE_JS_SCOPE_OPEN;
+        void GetStringWidth(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(3);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X position of Arg2");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y position of Arg2");
-            ENGINE_CHECK_ARG_STRING(2, "Arg2 is the string to print");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the string to get the width of")) return;
             
-            std::string str = ENGINE_GET_ARG_CPPSTRING_VALUE(2);
-            
-            GetDraw2D(args.This())->GetRender()->Print(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1), (const char*) str.c_str());
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
-        ENGINE_JS_METHOD(GetStringWidth) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_GL;
-            
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the string to get the width of");
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), GetDraw2D(args.This())->GetRender()->CalcStringWidth(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            args.SetReturnValue(args.NewNumber(GetDraw2D(args.This())->GetRender()->CalcStringWidth(args.StringValue(0))));
         }
         
         // Texture Handling
         
-        ENGINE_JS_METHOD(CreateTexture) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Draw(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
-        ENGINE_JS_METHOD(Draw) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
             GetDraw2D(args.This())->GetRender()->CheckError("JSDraw::Draw::PreDraw");
             
-            TexturePtr tex;
-            float x, y, w, h;
+            if (args.AssertCount(5)) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(5);
+            if (args.Assert(args[0]->IsExternal(), "Arg0 is a valid texture that's been loaded since the last context change") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 has to be X of a rect") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 has to be Y of a rect") ||
+                args.Assert(args[3]->IsNumber(), "Arg3 has to be Width of a rect") ||
+                args.Assert(args[4]->IsNumber(), "Arg4 has to be Height of a rect")) return;
             
-            ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is a valid texture that's been loaded since the last context change");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be X of a rect");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Y of a rect");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Width of a rect");
-            ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Height of a rect");
+            TexturePtr tex = (TexturePtr)args.ExternalValue(0);
             
-            tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
-            
-            if (!tex->IsValid()) {
-                ENGINE_THROW_ARGERROR("Arg0 is not a valid texture");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            if (tex->IsValid()) {
+                GetDraw2D(args.This())->DrawImage(tex,
+                                                  args.NumberValue(1),
+                                                  args.NumberValue(2),
+                                                  args.NumberValue(3),
+                                                  args.NumberValue(4));
+            } else {
+                args.ThrowArgError("Arg0 is not a valid texture");
             }
-            
-            x = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
-            y = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
-            w = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            h = (float)ENGINE_GET_ARG_NUMBER_VALUE(4);
-            
-            GetDraw2D(args.This())->DrawImage(tex, x, y, w, h);
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(DrawSub) {
-            ENGINE_JS_SCOPE_OPEN;
+        void DrawSub(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            GetDraw2D(args.This())->GetRender()->CheckError("Pre Image Draw");
+            GetDraw2D(args.This())->GetRender()->CheckError("JSDraw::DrawSub::PreDraw");
             
-            TexturePtr tex;
-            float x1, y1, w1, h1,
-            x2, y2, w2, h2;
-            int imageWidth, imageHeight;
+            if (args.AssertCount(9)) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(9);
+            if (args.Assert(args[0]->IsExternal(), "Arg0 is a valid texture that's been loaded since the last context change") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 has to be X of a rect") ||
+                args.Assert(args[2]->IsNumber(), "Arg2 has to be Y of a rect") ||
+                args.Assert(args[3]->IsNumber(), "Arg3 has to be Width of a rect") ||
+                args.Assert(args[4]->IsNumber(), "Arg4 has to be Height of a rect") ||
+                args.Assert(args[5]->IsNumber(), "Arg5 has to be X of a sub rectangle") ||
+                args.Assert(args[6]->IsNumber(), "Arg6 has to be Y of a sub rectangle") ||
+                args.Assert(args[7]->IsNumber(), "Arg7 has to be Width of a sub rectangle") ||
+                args.Assert(args[8]->IsNumber(), "Arg8 has to be Height of a sub rectangle")) return;
             
-            ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is a valid texture that's been loaded since the last context change");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 has to be X of a rect");
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be Y of a rect");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Width of a rect");
-            ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Height of a rect");
-            ENGINE_CHECK_ARG_NUMBER(5, "Arg5 has to be X of a sub rectangle");
-            ENGINE_CHECK_ARG_NUMBER(6, "Arg6 has to be Y of a sub rectangle");
-            ENGINE_CHECK_ARG_NUMBER(7, "Arg7 has to be Width of a sub rectangle");
-            ENGINE_CHECK_ARG_NUMBER(8, "Arg8 has to be Height of a sub rectangle");
+            TexturePtr tex = (TexturePtr)args.ExternalValue(0);
             
-            tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
-            
-            if (!tex->IsValid()) {
-                ENGINE_THROW_ARGERROR("Arg0 is not a valid texture");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            if (tex->IsValid()) {
+                GetDraw2D(args.This())->DrawImage(tex,
+                                                  args.NumberValue(1),
+                                                  args.NumberValue(2),
+                                                  args.NumberValue(3),
+                                                  args.NumberValue(4),
+                                                  args.NumberValue(5),
+                                                  args.NumberValue(6),
+                                                  args.NumberValue(7),
+                                                  args.NumberValue(8));
+            } else {
+                args.ThrowArgError("Arg0 is not a valid texture");
             }
-            
-            x1 = (float)ENGINE_GET_ARG_NUMBER_VALUE(1);
-            y1 = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
-            w1 = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            h1 = (float)ENGINE_GET_ARG_NUMBER_VALUE(4);
-            x2 = (float)ENGINE_GET_ARG_NUMBER_VALUE(5);
-            y2 = (float)ENGINE_GET_ARG_NUMBER_VALUE(6);
-            w2 = (float)ENGINE_GET_ARG_NUMBER_VALUE(7);
-            h2 = (float)ENGINE_GET_ARG_NUMBER_VALUE(8);
-            
-            GetDraw2D(args.This())->DrawImage(tex, x1, y1, w1, h1, x2, y2, w2, h2);
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(DrawSprite) {
-            ENGINE_JS_SCOPE_OPEN;
+        void DrawSprite(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            SpriteSheetPtr sheet;
-            std::string sprite;
-            float x, y, w, h;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(6);
+            if (args.AssertCount(6)) return;
             
-            ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is a valid spritesheet that's been loaded since the last context change");
-            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the sprite or animation to draw")
-            ENGINE_CHECK_ARG_NUMBER(2, "Arg2 has to be X of a rect");
-            ENGINE_CHECK_ARG_NUMBER(3, "Arg3 has to be Y of a rect");
-            ENGINE_CHECK_ARG_NUMBER(4, "Arg4 has to be Width of a rect");
-            ENGINE_CHECK_ARG_NUMBER(5, "Arg5 has to be Height of a rect");
+            if (args.Assert(args[0]->IsExternal(), "Arg0 is a valid spritesheet that's been loaded since the last context change") ||
+                args.Assert(args[1]->IsString(), "Arg1 is the sprite or animation to draw") ||
+                args.Assert(args[2]->IsNumber(), "Arg1 has to be X of a rect") ||
+                args.Assert(args[3]->IsNumber(), "Arg2 has to be Y of a rect") ||
+                args.Assert(args[4]->IsNumber(), "Arg3 has to be Width of a rect") ||
+                args.Assert(args[5]->IsNumber(), "Arg4 has to be Height of a rect")) return;
             
-            sheet = (SpriteSheetPtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            SpriteSheetPtr sheet = (SpriteSheetPtr) args.ExternalValue(0);
             
-            if (!sheet->IsValid()) {
-                ENGINE_THROW_ARGERROR("Arg0 is not a valid spritesheet");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            if (sheet->IsValid()) {
+                GetDraw2D(args.This())->DrawSprite(sheet,
+                                                   args.StringValue(1),
+                                                   args.NumberValue(2),
+                                                   args.NumberValue(3),
+                                                   args.NumberValue(4),
+                                                   args.NumberValue(5));
+            } else {
+                args.ThrowArgError("Arg0 is not a valid spritesheet");
             }
-            
-            sprite = ENGINE_GET_ARG_CPPSTRING_VALUE(1);
-            x = (float)ENGINE_GET_ARG_NUMBER_VALUE(2);
-            y = (float)ENGINE_GET_ARG_NUMBER_VALUE(3);
-            w = (float)ENGINE_GET_ARG_NUMBER_VALUE(4);
-            h = (float)ENGINE_GET_ARG_NUMBER_VALUE(5);
-            
-            GetDraw2D(args.This())->DrawSprite(sheet, sprite, x, y, w, h);
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(OpenImage) {
-            ENGINE_JS_SCOPE_OPEN;
+        void OpenImage(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the image to load");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the filename of the image to load")) return;
             
             GetDraw2D(args.This())->GetRender()->CheckError("Pre Image Load");
             
-            if (!Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))) {
-                ENGINE_THROW_ARGERROR("File does not Exist");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            if (!Filesystem::FileExists(args.StringValue(0))) {
+                args.ThrowArgError("File does not Exist");
+                return;
             }
             
-            std::string filename = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
+            std::string filename = args.StringValue(0);
             
             if (!ResourceManager::HasSource(filename)) {
                 ResourceManager::Load(filename);
@@ -886,43 +813,39 @@ namespace Engine {
             
             img->Load();
             
-            ENGINE_JS_SCOPE_CLOSE(v8::External::New(args.GetIsolate(), img->GetTexture()));
+            args.SetReturnValue(args.NewExternal(img->GetTexture()));
         }
         
-        ENGINE_JS_METHOD(OpenSpriteSheet) {
-            ENGINE_JS_SCOPE_OPEN;
+        void OpenSpriteSheet(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the scriptsheet json to load");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the filename of the spritesheet json to load")) return;
             
-            std::string filename = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
+            std::string filename = args.StringValue(0);
             
             if (!ResourceManager::HasSource(filename)) {
                 ResourceManager::Load(filename);
             }
             
-            ENGINE_JS_SCOPE_CLOSE(v8::External::New(args.GetIsolate(), SpriteSheetReader::LoadSpriteSheetFromFile(filename)));
+            args.SetReturnValue(args.NewExternal(SpriteSheetReader::LoadSpriteSheetFromFile(filename)));
         }
         
-        ENGINE_JS_METHOD(GetImageArray) {
-            ENGINE_JS_SCOPE_OPEN;
+        void GetImageArray(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.Assert(args[0]->IsString(), "Arg0 is the filename to load")) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename to load");
-            
-            v8::Handle<v8::Object> array = v8::Object::New(args.GetIsolate());
-            
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            v8::Handle<v8::Object> array = args.NewObject();
             
             long fileSize = 0;
             
-            unsigned char* file = (unsigned char*) Filesystem::GetFileContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0), fileSize);
+            unsigned char* file = (unsigned char*) Filesystem::GetFileContent(args.StringValue(0), fileSize);
             
             int imageWidth, imageHeight, chaneals;
             
@@ -941,30 +864,29 @@ namespace Engine {
             
             v8::Persistent<v8::Object> arr;
             
-            arr.Reset(isolate, array);
+            arr.Reset(args.GetIsolate(), array);
             
             arr.MarkIndependent();
             arr.SetWeak(rawArray, ReadBufferWeakCallback);
             
-            isolate->AdjustAmountOfExternalAllocatedMemory(imageSize * sizeof(float));
+            args.GetIsolate()->AdjustAmountOfExternalAllocatedMemory(imageSize * sizeof(float));
             
             array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, imageSize * sizeof(float));
             
-            array->Set(v8::String::NewFromUtf8(isolate, "length"), v8::Number::New(isolate, imageSize));
-            array->Set(v8::String::NewFromUtf8(isolate, "width"), v8::Number::New(isolate, imageWidth));
-            array->Set(v8::String::NewFromUtf8(isolate, "height"), v8::Number::New(isolate, imageHeight));
-            array->Set(v8::String::NewFromUtf8(isolate, "byteLength"),
-                       v8::Number::New(isolate, static_cast<int32_t>(imageSize)));
+            array->Set(args.NewString("length"), args.NewNumber(imageSize));
+            array->Set(args.NewString("width"), args.NewNumber(imageWidth));
+            array->Set(args.NewString("height"), args.NewNumber(imageHeight));
+            array->Set(args.NewString("byteLength"), args.NewNumber(static_cast<int32_t>(imageSize)));
             
             int pos = 0;
             int i = 0;
             
             for (int x = 0; x < imageWidth; x++) {
                 for (int y = 0; y < imageHeight; y++) {
-                    array->Set(i + 0, v8::Number::New(isolate, (float) pixel[pos + 2] / 256.f));
-                    array->Set(i + 1, v8::Number::New(isolate, (float) pixel[pos + 1] / 256.f));
-                    array->Set(i + 2, v8::Number::New(isolate, (float) pixel[pos + 0] / 256.f));
-                    array->Set(i + 3, v8::Number::New(isolate, 1.0f));
+                    array->Set(i + 0, args.NewNumber((float) pixel[pos + 2] / 256.f));
+                    array->Set(i + 1, args.NewNumber((float) pixel[pos + 1] / 256.f));
+                    array->Set(i + 2, args.NewNumber((float) pixel[pos + 0] / 256.f));
+                    array->Set(i + 3, args.NewNumber(1.0f));
                     pos += 4;
                     i += 4;
                 }
@@ -972,27 +894,25 @@ namespace Engine {
             
             SOIL_free_image_data(pixel);
             
-            ENGINE_JS_SCOPE_CLOSE(array);
+            args.SetReturnValue(array);
         }
         
-        ENGINE_JS_METHOD(CreateImageArray) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CreateImageArray(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
+            if (args.AssertCount(2)) return;
             
-            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the width of the new Image Array");
-            ENGINE_CHECK_ARG_INT32(1, "Arg1 is the height of the new Image Array");
+            if (args.Assert(args[0]->IsInt32(), "Arg0 is the width of the new Image Array") ||
+                args.Assert(args[1]->IsInt32(), "Arg1 is the height of the new Image Array")) return;
             
-            int imageWidth = ENGINE_GET_ARG_INT32_VALUE(0),
-            imageHeight = ENGINE_GET_ARG_INT32_VALUE(1);
+            int imageWidth = args.Int32Value(0),
+                imageHeight = args.Int32Value(1);
             
             int arraySize = imageWidth * imageHeight * 4;
             
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            v8::Handle<v8::Object> array = args.NewObject();
             
-            v8::Handle<v8::Object> array = v8::Object::New(isolate);
-            
-            float* rawArray = new float[arraySize]; // sadly this is a memory leak right now
+            float* rawArray = new float[arraySize];
             
             for (int i = 0; i < arraySize; i += 4) {
                 rawArray[i] = 1.0f;
@@ -1003,48 +923,48 @@ namespace Engine {
             
             v8::Persistent<v8::Object> arr;
             
-            arr.Reset(isolate, array);
+            arr.Reset(args.GetIsolate(), array);
             
             arr.MarkIndependent();
             arr.SetWeak(rawArray, ReadBufferWeakCallback);
             
-            isolate->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
+            args.GetIsolate()->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
             
             array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));
             
-            array->Set(v8::String::NewFromUtf8(isolate, "length"), v8::Number::New(isolate, arraySize));
-            array->Set(v8::String::NewFromUtf8(isolate, "width"), v8::Number::New(isolate, imageWidth));
-            array->Set(v8::String::NewFromUtf8(isolate, "height"), v8::Number::New(isolate, imageHeight));
-            array->Set(v8::String::NewFromUtf8(isolate, "byteLength"),
-                       v8::Int32::New(isolate, static_cast<int32_t>(arraySize)));
+            array->Set(args.NewString("length"), args.NewNumber(arraySize));
+            array->Set(args.NewString("width"), args.NewNumber(imageWidth));
+            array->Set(args.NewString("height"), args.NewNumber(imageHeight));
+            array->Set(args.NewString("byteLength"), args.NewNumber(arraySize * sizeof(float)));
             
-            ENGINE_JS_SCOPE_CLOSE(array);
+            args.SetReturnValue(array);
         }
         
-        ENGINE_JS_METHOD(CreateImage) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CreateImage(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
             if (args.Length() < 3) {
-                ENGINE_THROW_ARGERROR("Wrong number of args draw.createImage takes 3 or 4 args");
+                args.ThrowArgError("Wrong number of args draw.createImage takes 3 or 4 args");
+                return;
             }
             
-            ENGINE_CHECK_ARG_OBJECT(0, "Arg0 is a Object");
-            ENGINE_CHECK_ARG_INT32(1, "Arg1 is the width of the new image");
-            ENGINE_CHECK_ARG_INT32(2, "Arg2 is the height of the new image");
+            if (args.Assert(args[0]->IsObject(), "Arg0 is a Object") ||
+                args.Assert(args[1]->IsInt32(), "Arg1 is the width of the new image") ||
+                args.Assert(args[2]->IsInt32(), "Arg2 is the height of the new image")) return;
             
             unsigned int texID = 0;
             
             if (args.Length() == 4) {
-                ENGINE_CHECK_ARG_INT32(3, "Arg3 is the texture ID to reuse");
-                texID = ENGINE_GET_ARG_INT32_VALUE(3);
+                if (args.Assert(args[3]->IsInt32(), "Arg3 is the texture ID to reuse")) return;
+                texID = args.Int32Value(3);
             }
             
-            v8::Local<v8::Array> arr = ENGINE_GET_ARG_ARRAY(0);
+            v8::Handle<v8::Object> arr = v8::Handle<v8::Object>::Cast(args[0]);
             
-            int width = ENGINE_GET_ARG_INT32_VALUE(1);
-            int height = ENGINE_GET_ARG_INT32_VALUE(2);
+            int width = args.Int32Value(1),
+                height = args.Int32Value(2);
             
             float* pixels = NULL;
             
@@ -1055,12 +975,12 @@ namespace Engine {
                 
                 bool noClamp = !Config::GetBoolean("core.render.clampTexture");
                 
-                if (arr->Length() != width * height * 3) {
-                    ENGINE_THROW_ARGERROR("Array size != width * height * 3");
-                    ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                if (arr->Get(args.NewString("length"))->NumberValue() != width * height * 4) {
+                    args.ThrowArgError("Array size != width * height * 3");
+                    return;
                 }
                 
-                pixels = (float*) malloc(sizeof(float) * len * 4);
+                pixels = new float[len * 4];
                 
                 int i2 = 0;
                 
@@ -1069,12 +989,12 @@ namespace Engine {
                         pixels[i + 0] = (float) arr->Get(i2 + 0)->NumberValue();
                         pixels[i + 1] = (float) arr->Get(i2 + 1)->NumberValue();
                         pixels[i + 2] = (float) arr->Get(i2 + 2)->NumberValue();
-                        pixels[i + 3] = 1.0f;
+                        pixels[i + 3] = (float) arr->Get(i2 + 4)->NumberValue();
                     } else {
                         pixels[i + 0] = glm::clamp((float) arr->Get(i2 + 0)->NumberValue(), 0.0f, 1.0f);
                         pixels[i + 1] = glm::clamp((float) arr->Get(i2 + 1)->NumberValue(), 0.0f, 1.0f);
                         pixels[i + 2] = glm::clamp((float) arr->Get(i2 + 2)->NumberValue(), 0.0f, 1.0f);
-                        pixels[i + 3] = 1.0f;
+                        pixels[i + 3] = glm::clamp((float) arr->Get(i2 + 3)->NumberValue(), 0.0f, 1.0f);
                     }
                     i2 += 3;
                 }
@@ -1083,10 +1003,10 @@ namespace Engine {
             TexturePtr t = ImageReader::TextureFromBuffer(texID, pixels, width, height);
             
             if (!arr->HasIndexedPropertiesInExternalArrayData()) {
-                free(pixels);
+                delete [] pixels;
             }
             
-            ENGINE_JS_SCOPE_CLOSE(v8::External::New(args.GetIsolate(), t));
+            args.SetReturnValue(args.NewExternal(t));
         }
         
         ENGINE_JS_METHOD(SaveImage) {
