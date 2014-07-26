@@ -35,77 +35,98 @@
 #include "RenderTypes.hpp"
 
 namespace Engine {
-    namespace Events {
-        typedef EventMagic (*EventTargetFunc)(Json::Value e);
-        
-        class EventTarget {
-        public:
-            enum class Type {
-                Invalid,
-                CPlusPlus,
-                Javascript
-            };
-            
-            virtual EventMagic Run(Json::Value& e) = 0;
-            
-            virtual bool IsScript() { return true; }
-            virtual Type GetType() { return Type::Invalid; }
+    namespace Platform {
+        ENGINE_CLASS(Mutex);
+    }
+    
+    typedef EventMagic (*EventTargetFunc)(Json::Value e);
+    
+    ENGINE_CLASS(EventTarget);
+    
+    class EventTarget {
+    public:
+        enum class Type {
+            Invalid,
+            CPlusPlus,
+            Javascript
         };
         
-        struct Event {
-            std::string Label;
-            EventTarget* Target = NULL;
-            bool Active = false;
-            
-            Event() : Label(""), Active(false) {}
-            Event(std::string Label, EventTarget* target) : Label(Label), Target(target), Active(true) { }
+        virtual EventMagic Run(Json::Value& e) = 0;
+        
+        virtual bool IsScript() { return true; }
+        virtual Type GetType() { return Type::Invalid; }
+    };
+        
+    struct Event {
+        std::string Label;
+        EventTarget* Target = NULL;
+        bool Active = false;
+        
+        Event() : Label(""), Active(false) {}
+        Event(std::string Label, EventTarget* target) : Label(Label), Target(target), Active(true) { }
         };
         
-        struct EventClassSecurity {
-            bool NoScript = false;
+    struct EventClassSecurity {
+        bool NoScript = false;
             
-            std::string ToString() {
-                std::stringstream ss;
-                ss << "NoScript=" << this->NoScript;
-                return ss.str();
-            }
-        };
-        
-        class EventClass {
-        public:
-            size_t GetDeferedMessageCount();
-            void LogEvents(std::string logName);
-            void Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]);
-            void Emit(Json::Value args);
-            void Emit();
-            EventClass* AddListener(std::string name, EventTarget* target);
-            void Clear(std::string eventID);
-            EventClass* SetDefered(bool defered);
-            EventClass* SetNoScript(bool noScript);
-            void PollDeferedMessages();
-            void AddDeferedMessage(Json::Value e);
+        std::string ToString() {
+            std::stringstream ss;
+            ss << "NoScript=" << this->NoScript;
+            return ss.str();
+        }
+    };
+    
+    ENGINE_CLASS(EventClass);
+    
+    class EventClass {
+    public:
+        size_t GetDeferedMessageCount();
+        void LogEvents(std::string logName);
+        void Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]);
+        void Emit(Json::Value args);
+        void Emit();
+        EventClass* AddListener(std::string name, EventTarget* target);
+        void Clear(std::string eventID);
+        EventClass* SetDefered(bool defered);
+        EventClass* SetNoScript(bool noScript);
+        void PollDeferedMessages();
+        void AddDeferedMessage(Json::Value e);
             
-            std::string TargetName;
-            EventClassSecurity Security;
-        private:
-            bool _alwaysDefered = false;
-            std::vector<Event> _events;
-            std::queue<Json::Value> _deferedMessages;
-        };
-        
-        typedef EventClass*& EventClassPtrRef;
+        std::string TargetName;
+        EventClassSecurity Security;
+    private:
+        bool _alwaysDefered = false;
+        std::vector<Event> _events;
+        std::queue<Json::Value> _deferedMessages;
+    };
+    
+    typedef EventClass*& EventClassPtrRef;
+    
+    ENGINE_CLASS(EventEmitter);
+    
+    class EventEmitter {
+    public:
+        EventEmitter();
         
         EventClassPtrRef GetEvent(std::string eventName);
         
-        void Init();
-        
-        EventTarget* MakeTarget(EventTargetFunc target);
-        EventTarget* MakeTarget(v8::Handle<v8::Function> target);
-        
         void Clear(std::string eventID);
-    
+        
         void PollDeferedMessages();
         void PollDeferedMessages(std::string eventName);
         void EmitThread(std::string threadID, std::string evnt, Json::Value e);
-    }
+        
+        static EventTargetPtr MakeTarget(EventTargetFunc target);
+        static EventTargetPtr MakeTarget(v8::Handle<v8::Function> target);
+        
+    private:
+        static EventMagic _debug(Json::Value args);
+        
+        Platform::MutexPtr _eventMutex;
+        std::unordered_map<std::string, EventClassPtr> _events;
+        
+        int lastEventID = 0;
+    };
+    
+    EventEmitterPtr GetEventsSingilton();
 }

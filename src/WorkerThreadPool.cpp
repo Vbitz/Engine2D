@@ -62,7 +62,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the event to target");
             ENGINE_CHECK_ARG_OBJECT(1, "Arg1 is the object to submit to the event handler");
             
-            Events::EmitThread(
+            GetEventsSingilton()->EmitThread(
                     std::string(*v8::String::Utf8Value(args.Data()->ToString())),
                     ENGINE_GET_ARG_CPPSTRING_VALUE(0),
                     ScriptingManager::ObjectToJson(args[1].As<v8::Object>()));

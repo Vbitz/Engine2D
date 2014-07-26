@@ -57,21 +57,21 @@ namespace Engine {
         void Run() {
             double startTime = Platform::GetTime();
             
-            Events::EventClassPtrRef testingEvent1 =
-                Events::GetEvent("testingEvent1");
-            Events::EventClassPtrRef testingEvent2 =
-                Events::GetEvent("testingEvent1");
-            Events::EventClassPtrRef testingEvent1Fake =
-                Events::GetEvent("testingEvent1Fake");
-            Events::EventClassPtrRef testingEvent2Fake =
-                Events::GetEvent("testingEvent1Fake");
-            Events::EventClassPtrRef testingEventJS1 =
-                Events::GetEvent("testingEventJS1");
-            Events::EventClassPtrRef testingEventJS2 =
-                Events::GetEvent("testingEventJS1");
+            EventClassPtrRef testingEvent1 =
+                GetEventsSingilton()->GetEvent("testingEvent1");
+            EventClassPtrRef testingEvent2 =
+                GetEventsSingilton()->GetEvent("testingEvent1");
+            EventClassPtrRef testingEvent1Fake =
+                GetEventsSingilton()->GetEvent("testingEvent1Fake");
+            EventClassPtrRef testingEvent2Fake =
+                GetEventsSingilton()->GetEvent("testingEvent1Fake");
+            EventClassPtrRef testingEventJS1 =
+                GetEventsSingilton()->GetEvent("testingEventJS1");
+            EventClassPtrRef testingEventJS2 =
+                GetEventsSingilton()->GetEvent("testingEventJS1");
             
-            testingEvent1->AddListener("TestEvent1", Events::MakeTarget(AdderTest1));
-            testingEvent1->AddListener("TestEvent2", Events::MakeTarget(AdderTest2));
+            testingEvent1->AddListener("TestEvent1", GetEventsSingilton()->MakeTarget(AdderTest1));
+            testingEvent1->AddListener("TestEvent2", GetEventsSingilton()->MakeTarget(AdderTest2));
             
             double endTime = Platform::GetTime();
             Logger::begin("CoreEventTest", Logger::LogLevel_Log) << "C++ Event::On Performance Test x 2: " << (endTime - startTime) << "s" << Logger::end();

@@ -101,7 +101,7 @@ namespace Engine {
         
         std::string eventNameStr = std::string(*v8::String::Utf8Value(eventName));
         
-        Events::GetEvent(eventNameStr)->Emit(eventArgs);
+        GetEventsSingilton()->GetEvent(eventNameStr)->Emit(eventArgs);
         
         ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
     }
@@ -151,7 +151,7 @@ namespace Engine {
             return;
         }
         
-        Events::GetEvent(hookName)->AddListener(hookId, Events::MakeTarget(func));
+        GetEventsSingilton()->GetEvent(hookName)->AddListener(hookId, EventEmitter::MakeTarget(func));
     }
     
     ENGINE_JS_METHOD(ConfigToStringStub) {
@@ -507,11 +507,11 @@ namespace Engine {
     }
     
     void Application::_hookConfigs() {
-        Events::GetEvent("config:core.render.aa")->AddListener("Application::Config_CoreRenderAA", Events::MakeTarget(_config_CoreRenderAA));
-        Events::GetEvent("config:core.window.vsync")->AddListener("Application::Config_CoreWindowVSync", Events::MakeTarget(_config_CoreWindowVSync));
-        Events::GetEvent("config:core.window.width")->AddListener("Application::ConfigWindowSize_Width", Events::MakeTarget(_config_CoreWindowSize));
-        Events::GetEvent("config:core.window.height")-> AddListener("Application::ConfigWindowSize_Height", Events::MakeTarget(_config_CoreWindowSize));
-        Events::GetEvent("config:core.window.title")->AddListener("Application::Config_CoreWindowTitle", Events::MakeTarget(_config_CoreWindowTitle));
+        GetEventsSingilton()->GetEvent("config:core.render.aa")->AddListener("Application::Config_CoreRenderAA", EventEmitter::MakeTarget(_config_CoreRenderAA));
+        GetEventsSingilton()->GetEvent("config:core.window.vsync")->AddListener("Application::Config_CoreWindowVSync", EventEmitter::MakeTarget(_config_CoreWindowVSync));
+        GetEventsSingilton()->GetEvent("config:core.window.width")->AddListener("Application::ConfigWindowSize_Width", EventEmitter::MakeTarget(_config_CoreWindowSize));
+        GetEventsSingilton()->GetEvent("config:core.window.height")-> AddListener("Application::ConfigWindowSize_Height", EventEmitter::MakeTarget(_config_CoreWindowSize));
+        GetEventsSingilton()->GetEvent("config:core.window.title")->AddListener("Application::Config_CoreWindowTitle", EventEmitter::MakeTarget(_config_CoreWindowTitle));
     }
     
     void Application::_loadConfigFile() {
@@ -565,15 +565,15 @@ namespace Engine {
     }
     
     void Application::_hookEvents() {
-        Events::GetEvent("exit")->AddListener("Application::_appEvent_Exit", Events::MakeTarget(_appEvent_Exit));
-        Events::GetEvent("dumpScripts")->AddListener("Applicaton::_appEvent_DumpScripts", Events::MakeTarget(_appEvent_DumpScripts));
+        GetEventsSingilton()->GetEvent("exit")->AddListener("Application::_appEvent_Exit", EventEmitter::MakeTarget(_appEvent_Exit));
+        GetEventsSingilton()->GetEvent("dumpScripts")->AddListener("Applicaton::_appEvent_DumpScripts", EventEmitter::MakeTarget(_appEvent_DumpScripts));
         
-        Events::GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", Events::MakeTarget(_toggleFullscreen))->SetDefered(true);
-        Events::GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", Events::MakeTarget(_restartRenderer))->SetDefered(true);
-        Events::GetEvent("screenshot")->AddListener("Application::_saveScreenshot", Events::MakeTarget(_saveScreenshot))->SetDefered(true);
-        Events::GetEvent("dumpProfile")->AddListener("Application::_dumpProfile", Events::MakeTarget(_dumpProfile))->SetDefered(true);
-        Events::GetEvent("dumpLog")->AddListener("Application::_dumpLog", Events::MakeTarget(_dumpLog));
-        Events::GetEvent("doDrawProfile")->AddListener("Application::_doDrawProfile", Events::MakeTarget(_doDrawProfile))->SetDefered(true);
+        GetEventsSingilton()->GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", EventEmitter::MakeTarget(_toggleFullscreen))->SetDefered(true);
+        GetEventsSingilton()->GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", EventEmitter::MakeTarget(_restartRenderer))->SetDefered(true);
+        GetEventsSingilton()->GetEvent("screenshot")->AddListener("Application::_saveScreenshot", EventEmitter::MakeTarget(_saveScreenshot))->SetDefered(true);
+        GetEventsSingilton()->GetEvent("dumpProfile")->AddListener("Application::_dumpProfile", EventEmitter::MakeTarget(_dumpProfile))->SetDefered(true);
+        GetEventsSingilton()->GetEvent("dumpLog")->AddListener("Application::_dumpLog", EventEmitter::MakeTarget(_dumpLog));
+        GetEventsSingilton()->GetEvent("doDrawProfile")->AddListener("Application::_doDrawProfile", EventEmitter::MakeTarget(_doDrawProfile))->SetDefered(true);
     }
 	
     void _resizeWindow(Json::Value val) {
@@ -652,8 +652,8 @@ namespace Engine {
         
         std::string key = val["key"].asString();
         
-        Events::GetEvent("key_" + key)->Emit(val);
-        Events::GetEvent("input")->Emit(val);
+        GetEventsSingilton()->GetEvent("key_" + key)->Emit(val);
+        GetEventsSingilton()->GetEvent("input")->Emit(val);
         
         return EM_OK;
     }
@@ -678,10 +678,10 @@ namespace Engine {
 	void Application::_initOpenGL() {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init Window" << Logger::end();
         
-        Events::GetEvent("destroyWindow")->AddListener("Application::RendererKillHandler", Events::MakeTarget(_rendererKillHandler));
-        Events::GetEvent("rawInput")->AddListener("Application::RawInputHandler", Events::MakeTarget(_rawInputHandler));
-        Events::GetEvent("postCreateContext")->AddListener("Application::_postCreateContext", Events::MakeTarget(_postCreateContext));
-        Events::GetEvent("rawResize")->AddListener("Application::RawResizeHandler", Events::MakeTarget(_rawResizeHandler));
+        GetEventsSingilton()->GetEvent("destroyWindow")->AddListener("Application::RendererKillHandler", EventEmitter::MakeTarget(_rendererKillHandler));
+        GetEventsSingilton()->GetEvent("rawInput")->AddListener("Application::RawInputHandler", EventEmitter::MakeTarget(_rawInputHandler));
+        GetEventsSingilton()->GetEvent("postCreateContext")->AddListener("Application::_postCreateContext", EventEmitter::MakeTarget(_postCreateContext));
+        GetEventsSingilton()->GetEvent("rawResize")->AddListener("Application::RawResizeHandler", EventEmitter::MakeTarget(_rawResizeHandler));
         
         Window::StaticInit();
         
@@ -830,7 +830,7 @@ namespace Engine {
                     Json::Value args = Json::Value(Json::objectValue);
                     args["filename"] = iterator->first;
                     this->RunFile(iterator->first, true);
-                    Events::GetEvent("scriptReloaded")->Emit(args);
+                    GetEventsSingilton()->GetEvent("scriptReloaded")->Emit(args);
                 }
             }
         } else {
@@ -839,7 +839,7 @@ namespace Engine {
                     Json::Value args = Json::Value(Json::objectValue);
                     args["filename"] = iterator->first;
                     this->RunFile(iterator->first, true);
-                    Events::GetEvent("scriptReloaded")->Emit(args);
+                    GetEventsSingilton()->GetEvent("scriptReloaded")->Emit(args);
                 }
             }
         }
@@ -940,7 +940,7 @@ namespace Engine {
         
         saveArgs["filename"] = Filesystem::GetRealPath(targetFilename);
         
-        Events::GetEvent("onSaveScreenshot")->Emit(saveArgs);
+        GetEventsSingilton()->GetEvent("onSaveScreenshot")->Emit(saveArgs);
     }
     
     EventMagic Application::_dumpProfile(Json::Value args) {
@@ -959,7 +959,7 @@ namespace Engine {
         
         saveArgs["filename"] = Filesystem::GetRealPath(targetFilename);
         
-        Events::GetEvent("onSaveLog")->Emit(saveArgs);
+        GetEventsSingilton()->GetEvent("onSaveLog")->Emit(saveArgs);
     }
     
     EventMagic Application::_doDrawProfile(Json::Value args) {
@@ -1135,7 +1135,7 @@ namespace Engine {
             FramePerfMonitor::BeginFrame();
             Profiler::StartProfileFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
-            Events::PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
+            GetEventsSingilton()->PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
             this->_processScripts();
             
             /*if (this->_debugMode) {
@@ -1151,7 +1151,7 @@ namespace Engine {
             
             Profiler::Begin("Frame", Config::GetFloat("core.render.targetFrameTime"));
             
-            Events::PollDeferedMessages("doDrawProfile");
+            GetEventsSingilton()->PollDeferedMessages("doDrawProfile");
             
             this->_updateFrameTime();
             
@@ -1169,7 +1169,7 @@ namespace Engine {
             v8::Handle<v8::Value> args[1] = {
                 v8::Number::New(v8::Isolate::GetCurrent(), FramePerfMonitor::GetFrameTime())
             };
-            Events::GetEvent("draw")->Emit(Json::nullValue, 1, args); // this is when most Javascript runs
+            GetEventsSingilton()->GetEvent("draw")->Emit(Json::nullValue, 1, args); // this is when most Javascript runs
             Profiler::End("EventDraw");
             
             this->GetRender()->End2d();
@@ -1206,10 +1206,10 @@ namespace Engine {
                 Profiler::End("ScriptGC");
             }
             
-            Events::PollDeferedMessages("toggleFullscreen");
-            Events::PollDeferedMessages("restartRenderer");
-            Events::PollDeferedMessages("screenshot");
-            Events::PollDeferedMessages("dumpProfile");
+            GetEventsSingilton()->PollDeferedMessages("toggleFullscreen");
+            GetEventsSingilton()->PollDeferedMessages("restartRenderer");
+            GetEventsSingilton()->PollDeferedMessages("screenshot");
+            GetEventsSingilton()->PollDeferedMessages("dumpProfile");
             
             if (this->_detailFrames > 0) {
                 Profiler::CaptureDetail();
@@ -1246,7 +1246,6 @@ namespace Engine {
         
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
         
-        Events::Init();
         Config::EnableConfigEvents();
         this->_hookEvents();
         // The events system is now ready
@@ -1299,7 +1298,7 @@ namespace Engine {
         
         this->_disablePreload();
         
-        Events::GetEvent("postLoad")->Emit();
+        GetEventsSingilton()->GetEvent("postLoad")->Emit();
         
         GetRender()->CheckError("On JS Post Load");
         

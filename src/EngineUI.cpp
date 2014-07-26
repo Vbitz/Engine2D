@@ -71,8 +71,8 @@ namespace Engine {
             this->_lastHeapUsages[i] = 0.0f;
         }
         
-        Events::GetEvent("onDrawProfileEnd")->AddListener("EngineUI::_profilerHook", Events::MakeTarget(_profilerHook));
-        Events::GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", Events::MakeTarget(_captureLastDrawTimes));
+        GetEventsSingilton()->GetEvent("onDrawProfileEnd")->AddListener("EngineUI::_profilerHook", EventEmitter::MakeTarget(_profilerHook));
+        GetEventsSingilton()->GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", EventEmitter::MakeTarget(_captureLastDrawTimes));
     }
     
     void EngineUI::Draw() {
@@ -431,7 +431,7 @@ namespace Engine {
         if (key == Key_Console && press == Key_Press) { // `
             this->ToggleConsole();
         } else if (key == Key_F10 && press == Key_Press) { // f10
-            Events::GetEvent("dumpProfile")->Emit();
+            GetEventsSingilton()->GetEvent("dumpProfile")->Emit();
         }
 
         if (!_showConsole) {
@@ -487,7 +487,7 @@ namespace Engine {
             }
         } else if (this->_currentView == CurrentView::Profiler) {
             if (key == 'R' && press == Key_Press) {
-                Events::GetEvent("doDrawProfile")->Emit();
+                GetEventsSingilton()->GetEvent("doDrawProfile")->Emit();
             } else if (key == '[' && (press == Key_Press || press == Key_Repeat)) {
                 if (this->_profilerDrawTimeScale > 500) {
                     this->_profilerDrawTimeScale -= 500;
@@ -534,6 +534,6 @@ namespace Engine {
         
         eArgs["values"] = eArray;
         
-        Events::GetEvent("captureLastDrawTimes_callback")->Emit(eArgs);
+        GetEventsSingilton()->GetEvent("captureLastDrawTimes_callback")->Emit(eArgs);
     }
 }

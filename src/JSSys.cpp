@@ -106,7 +106,7 @@ namespace Engine {
             ENGINE_JS_SCOPE_OPEN;
             
             if (args.Length() == 3) {
-                Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->AddListener(ENGINE_GET_ARG_CPPSTRING_VALUE(1), Events::MakeTarget(args[2].As<v8::Function>()));
+                GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->AddListener(ENGINE_GET_ARG_CPPSTRING_VALUE(1), EventEmitter::MakeTarget(args[2].As<v8::Function>()));
             } else {
                 
             }
@@ -120,10 +120,9 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
             
             if (args.Length() == 2) {
-                Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->Emit(
-                             ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(args[1].As<v8::Object>())));
+                GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->Emit(ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(args[1].As<v8::Object>())));
             } else if (args.Length() == 1) {
-                Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->Emit();
+                GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->Emit();
             } else {
                 ENGINE_THROW_ARGERROR("sys.emit takes 1 or 2 args");
             }
@@ -139,7 +138,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to target");
             ENGINE_CHECK_ARG_BOOLEAN(1, "Arg1 is set to defer messages sent to the event");
             
-            Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->SetDefered(ENGINE_GET_ARG_BOOLEAN_VALUE(1));
+            GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->SetDefered(ENGINE_GET_ARG_BOOLEAN_VALUE(1));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -151,7 +150,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to target");
             
-            Events::GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->PollDeferedMessages();
+            GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->PollDeferedMessages();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -198,7 +197,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the eventID to clear");
             
-            Events::Clear(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            GetEventsSingilton()->Clear(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

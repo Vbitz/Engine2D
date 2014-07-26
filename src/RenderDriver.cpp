@@ -139,7 +139,7 @@ namespace Engine {
         
         resultsObj["results"] = results;
         
-        Events::GetEvent("onDrawProfileEnd")->Emit(resultsObj);
+        GetEventsSingilton()->GetEvent("onDrawProfileEnd")->Emit(resultsObj);
     }
     
     FontSheetPtr RenderDriver::_getSheet(std::string fontName) {

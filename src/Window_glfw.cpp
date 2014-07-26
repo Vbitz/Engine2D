@@ -330,7 +330,7 @@ namespace Engine {
             if (this->_window == NULL) return;
             glfwDestroyWindow(this->_window);
             this->_window = NULL;
-            Events::GetEvent("destroyWindow")->Emit();
+            GetEventsSingilton()->GetEvent("destroyWindow")->Emit();
         }
         
         void _resizeCallback(int width, int height) {
@@ -341,7 +341,7 @@ namespace Engine {
             val["width"] = width;
             val["height"] = height;
             
-            Events::GetEvent("rawResize")->Emit(val);
+            GetEventsSingilton()->GetEvent("rawResize")->Emit(val);
         }
         
         void _keypressCallback(int rawKey, int scanCode, int state, int mods) {
@@ -359,7 +359,7 @@ namespace Engine {
             val["state"] = glfwGetKeyStateName(state);
             val["shift"] = (mods & GLFW_MOD_SHIFT);
             
-            Events::GetEvent("rawInput")->Emit(val);
+            GetEventsSingilton()->GetEvent("rawInput")->Emit(val);
         }
         
         void _mouseButtonCallback(int button, int action, int mods) {
@@ -376,7 +376,7 @@ namespace Engine {
             val["x"] = std::floor(cursorPos.x);
             val["y"] = std::floor(cursorPos.y);
             
-            Events::GetEvent("mouseButton")->Emit(val);
+            GetEventsSingilton()->GetEvent("mouseButton")->Emit(val);
         }
         
         static void WindowResize(GLFWwindow* window, int width, int height) {
@@ -451,7 +451,7 @@ namespace Engine {
                     break;
             }
             
-            Events::GetEvent("postCreateContext")->Emit();
+            GetEventsSingilton()->GetEvent("postCreateContext")->Emit();
         }
         
         RenderDriverPtr _render = NULL;
