@@ -412,7 +412,7 @@ namespace Engine {
             } else if (strcmp(argv[i], "-headless") == 0) {
                 // enable headless mode
             } else if (strcmp(argv[i], "-v8-options") == 0) {
-                ScriptingManager::ScriptingContext::RunHelpCommand();
+                ScriptingManager::Context::RunHelpCommand();
                 _exit = true; // v8 exits automaticly but let's just help it along
             } else if (strcmp(argv[i], "-Cvars") == 0) {
                 _configVarsMode = true;
@@ -472,7 +472,7 @@ namespace Engine {
                 
                 Logger::begin("Scripting_CFG", Logger::LogLevel_Log) << "Setting V8 Option: " << key << Logger::end();
                 
-                ScriptingManager::ScriptingContext::SetFlag(std::string(key));
+                ScriptingManager::Context::SetFlag(std::string(key));
                 
                 free(key);
             } else if (strncmp(argv[i], "-mountPath=", 11) == 0) {
@@ -842,7 +842,7 @@ namespace Engine {
             return 0;
         }
         
-        this->_scripting = new ScriptingManager::ScriptingContext();
+        this->_scripting = new ScriptingManager::Context();
         
         // Scripting has now initalized, Javascript may punch in during any event
         

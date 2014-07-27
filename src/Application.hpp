@@ -77,7 +77,7 @@ namespace Engine {
         }
         
         // Public Scripting functions
-        ScriptingManager::ScriptingContextPtr GetScriptingContext() {
+        ScriptingManager::ContextPtr GetScriptingContext() {
             return this->_scripting;
         }
         
@@ -169,7 +169,7 @@ namespace Engine {
         WindowPtr _window = NULL;
         EngineUIPtr _engineUI = NULL;
         RenderDriverPtr _renderGL = NULL;
-        ScriptingManager::ScriptingContextPtr _scripting = NULL;
+        ScriptingManager::ContextPtr _scripting = NULL;
         
         std::map<std::string, std::string> _delayedConfigs;
         

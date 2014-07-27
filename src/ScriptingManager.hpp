@@ -167,12 +167,12 @@ namespace Engine {
             v8::HandleScope _scope;
         };
         
-        ENGINE_CLASS(ScriptingContext);
+        ENGINE_CLASS(Context);
         
-        class ScriptingContext {
+        class Context {
         public:
-            ScriptingContext();
-            ~ScriptingContext();
+            Context();
+            ~Context();
             
             bool RunFile(std::string path, bool persist);
             void RunCommand(std::string str);

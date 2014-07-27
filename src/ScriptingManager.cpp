@@ -220,7 +220,7 @@ namespace Engine {
             }
         }
         
-        ScriptingContext::ScriptingContext() : _isolate(v8::Isolate::New()), _scope(this->_isolate) {
+        Context::Context() : _isolate(v8::Isolate::New()), _scope(this->_isolate) {
             this->_isolate->Enter();
             
             Profiler::Begin("InitScripting");
@@ -230,21 +230,21 @@ namespace Engine {
             ctx->Enter();
         }
         
-        ScriptingContext::~ScriptingContext() {
+        Context::~Context() {
             
             JSMod::CloseAllOpenModules();
         }
         
-        void ScriptingContext::_enableTypedArrays() {
+        void Context::_enableTypedArrays() {
             v8::V8::SetArrayBufferAllocator(new MallocArrayBufferAllocator());
         }
         
-        void ScriptingContext::_enableHarmony() {
+        void Context::_enableHarmony() {
             const char* harmony = "-harmony";
             v8::V8::SetFlagsFromString(harmony, std::strlen(harmony));
         }
         
-        void ScriptingContext::_createEventMagic() {
+        void Context::_createEventMagic() {
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
             if (_EM_CANCEL.IsEmpty()) {
                 _EM_CANCEL.Reset(isolate, v8::External::New(isolate, new EventMagic(EM_CANCEL)));
@@ -253,7 +253,7 @@ namespace Engine {
         
 #define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
         
-        v8::Handle<v8::Context> ScriptingContext::_initScripting() {
+        v8::Handle<v8::Context> Context::_initScripting() {
             Logger::begin("ScriptingContext", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
             
             this->_enableTypedArrays();
@@ -367,21 +367,21 @@ namespace Engine {
                 GetAppSingilton()->GetEngineUI()->ToggleConsole(); // give them something to debug using
             }
             
-            Logger::begin("Scripting", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
+            Logger::begin("ScriptingContext", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
             
             return handle_scope.Escape(ctx);
         }
         
 #undef addItem
         
-        v8::Local<v8::Object> ScriptingContext::GetScriptTable(std::string name) {
+        v8::Local<v8::Object> Context::GetScriptTable(std::string name) {
             v8::Local<v8::Context> ctx = this->_isolate->GetCurrentContext();
             
             v8::Local<v8::Object> obj = ctx->Global();
             return v8::Local<v8::Object>::Cast(obj->Get(v8::String::NewFromUtf8(this->_isolate, name.c_str())));
         }
         
-        void ScriptingContext::CheckUpdate() {
+        void Context::CheckUpdate() {
             if (Config::GetBoolean("core.script.autoReload")) {
                 for (auto iterator = this->_loadedFiles.begin(); iterator != this->_loadedFiles.end(); iterator++) {
                     long lastMod = Filesystem::GetFileModifyTime(iterator->first);
@@ -404,7 +404,7 @@ namespace Engine {
             }
         }
         
-        bool ScriptingContext::_runFile(std::string path, bool persist) {
+        bool Context::_runFile(std::string path, bool persist) {
             Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Loading File: " << path << Logger::end();
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
             v8::HandleScope scp(isolate);
@@ -438,7 +438,7 @@ namespace Engine {
             }
         }
         
-        bool ScriptingContext::RunFile(std::string path, bool persist) {
+        bool Context::RunFile(std::string path, bool persist) {
             if (!Filesystem::FileExists(path)) {
                 Logger::begin("Scripting", Logger::LogLevel_Error) << path << " Not Found" << Logger::end();
                 return false;
@@ -452,7 +452,7 @@ namespace Engine {
             }
         }
         
-        void ScriptingContext::RunCommand(std::string str) {
+        void Context::RunCommand(std::string str) {
             v8::HandleScope scp(this->_isolate);
             v8::Local<v8::Context> ctx = this->_isolate->GetCurrentContext();
             v8::Context::Scope ctx_scope(ctx);
@@ -483,16 +483,16 @@ namespace Engine {
             }
         }
         
-        void ScriptingContext::InvalidateScript(std::string scriptName) {
+        void Context::InvalidateScript(std::string scriptName) {
             Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Invalidating Script: " << scriptName << Logger::end();
             this->_loadedFiles[scriptName] = -1;
         }
         
-        void ScriptingContext::SetFlag(std::string flag) {
+        void Context::SetFlag(std::string flag) {
             v8::V8::SetFlagsFromString(flag.c_str(), flag.length());
         }
         
-        void ScriptingContext::RunHelpCommand() {
+        void Context::RunHelpCommand() {
             v8::V8::SetFlagsFromString("--help", 6);
         }
         
