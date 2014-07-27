@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <assert.h>
+
 #include <unordered_map>
 #include <iostream>
 
@@ -88,6 +90,7 @@ namespace Engine {
             }
             
             SCRIPTINGMANAGER_INLINE bool Assert(bool value, const char* msg) {
+                assert(msg != "");
                 if (!value) {
                     this->ThrowArgError(msg);
                 }
