@@ -99,7 +99,7 @@ namespace Engine {
             
             std::string scriptFilename = *ENGINE_GET_ARG_CSTRING_VALUE(0) + std::string(".js");
 			
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetAppSingilton()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1))));
+            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetAppSingilton()->GetScriptingContext()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1))));
 		}
         
         ENGINE_JS_METHOD(EventsOn) {
@@ -525,7 +525,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ReloadRootScript) {
             ENGINE_JS_SCOPE_OPEN;
             
-            GetAppSingilton()->InvalidateScript(Config::GetString("core.script.entryPoint"));
+            GetAppSingilton()->GetScriptingContext()->InvalidateScript(Config::GetString("core.script.entryPoint"));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -537,7 +537,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the script to reload");
             
-            GetAppSingilton()->InvalidateScript(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            GetAppSingilton()->GetScriptingContext()->InvalidateScript(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }

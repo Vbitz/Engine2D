@@ -29,6 +29,8 @@
 #include "Util.hpp"
 #include "Platform.hpp"
 
+#include "Application.hpp"
+
 namespace Engine {
     std::string _getVersionString(EffectShaderType type) {
         switch (type) {

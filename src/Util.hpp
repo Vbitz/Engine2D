@@ -30,14 +30,6 @@
 #include <unistd.h>
 #endif
 
-namespace Engine {
-    bool HasGLContext();
-    
-    void EnableGLContext();
-    
-    void DisableGLContext();
-}
-
 #define ENGINE_THROW_ARGCOUNT(count) v8::Isolate::GetCurrent()->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "Wrong number of arguments, expected " + count)));
 #define ENGINE_THROW_ARGERROR(str) v8::Isolate::GetCurrent()->ThrowException(v8::Exception::TypeError(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), str)));
 

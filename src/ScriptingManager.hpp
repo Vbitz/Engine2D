@@ -167,6 +167,37 @@ namespace Engine {
             v8::HandleScope _scope;
         };
         
+        ENGINE_CLASS(ScriptingContext);
+        
+        class ScriptingContext {
+        public:
+            ScriptingContext();
+            ~ScriptingContext();
+            
+            bool RunFile(std::string path, bool persist);
+            void RunCommand(std::string str);
+            void InvalidateScript(std::string filename);
+            void CheckUpdate();
+            v8::Local<v8::Object> GetScriptTable(std::string name);
+            
+            v8::Isolate* GetIsolate() {
+                return this->_isolate;
+            }
+        private:
+            v8::Isolate* _isolate = NULL;
+            v8::HandleScope _scope;
+            
+            void _enableTypedArrays();
+            void _enableHarmony();
+            void _createEventMagic();
+            v8::Handle<v8::Context> _initScripting();
+            void _disablePreload();
+            
+            bool _runFile(std::string filename, bool persist);
+            
+            std::map<std::string, long> _loadedFiles;
+        };
+        
         Json::Value ObjectToJson(v8::Local<v8::Object> obj);
         v8::Local<v8::Object> GetObjectFromJson(Json::Value val);
     }

@@ -38,6 +38,12 @@
 #define ENGINE_ASSERT(value, msg) GetAppSingilton()->Assert(value, msg, __FILE__, __LINE__)
 
 namespace Engine {
+    bool HasGLContext();
+    
+    void EnableGLContext();
+    
+    void DisableGLContext();
+    
     ENGINE_CLASS(EngineUI);
     
     ENGINE_CLASS(Application);
@@ -70,17 +76,19 @@ namespace Engine {
             return this->_engineUI;
         }
         
-        // Public script functions
-        bool RunFile(std::string path, bool persist);
-        void RunCommand(std::string str);
-        void InvalidateScript(std::string filename);
+        // Public Scripting functions
+        ScriptingManager::ScriptingContextPtr GetScriptingContext() {
+            return this->_scripting;
+        }
         
+        // Public Scripting support functions
         void AddScript(const char* filename_str, size_t filename_len);
         void DumpScripts();
         
         // Public debug functions
         void DetailProfile(int frames, std::string filename);
         bool IsDebugMode();
+        bool IsDeveloperMode();
         void Assert(bool value, std::string reason, std::string line, int lineNumber);
         
         // Static functions
@@ -124,19 +132,6 @@ namespace Engine {
         static EventMagic _config_CoreWindowSize(Json::Value args);
         static EventMagic _config_CoreWindowTitle(Json::Value args);
         
-        // Scripting
-        bool _runFile(std::string path, bool persist);
-        void _checkUpdate();
-        void _shutdownScripting();
-        void _enableV8Debugger();
-        void _handleDebugMessage();
-        v8::Handle<v8::Context> _initScripting();
-        v8::Local<v8::Object> _getScriptTable(std::string name);
-        void _enableTypedArrays();
-        void _enableHarmony();
-        void _createEventMagic();
-        void _disablePreload();
-        
         // Testing
         void _loadTests();
         
@@ -149,6 +144,7 @@ namespace Engine {
         void _hookEvents();
         void _printConfigVars();
         void _loadConfigFile();
+        void _disablePreload();
         
         // OpenGL
         void _shutdownOpenGL();
@@ -173,10 +169,9 @@ namespace Engine {
         WindowPtr _window = NULL;
         EngineUIPtr _engineUI = NULL;
         RenderDriverPtr _renderGL = NULL;
+        ScriptingManager::ScriptingContextPtr _scripting = NULL;
         
         std::map<std::string, std::string> _delayedConfigs;
-        
-        std::map<std::string, long> _loadedFiles;
         
         std::vector<std::string> _archivePaths;
         

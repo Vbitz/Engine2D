@@ -478,7 +478,7 @@ namespace Engine {
                 }
             } else if (key == Key_Enter && press == Key_Press) {
                 std::string command = this->_currentConsoleInput.str();
-                this->_app->RunCommand(command);
+                this->_app->GetScriptingContext()->RunCommand(command);
                 if (this->_commandHistory.size() == 0 || this->_commandHistory[this->_commandHistory.size() - 1] != command) {
                     this->_commandHistory.push_back(command);
                 }
