@@ -1009,145 +1009,124 @@ namespace Engine {
             args.SetReturnValue(args.NewExternal(t));
         }
         
-        ENGINE_JS_METHOD(SaveImage) {
-            ENGINE_JS_SCOPE_OPEN;
+        void SaveImage(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
-            ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is the index of the image returned from draw.createImage or draw.openImage");
-            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the filename to save the image as");
+            if (args.AssertCount(2)) return;
             
-            TexturePtr tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
+            if (args.Assert(args[0]->IsExternal(), "Arg0 is the index of the image returned from draw.createImage or draw.openImage") ||
+                args.Assert(args[1]->IsString(), "Arg1 is the filename to save the image as")) return;
             
-            if (!tex->IsValid()) {
-                ENGINE_THROW_ARGERROR("Arg0 is not a valid textureID");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            TexturePtr tex = (TexturePtr)args.ExternalValue(0);
+            
+            if (tex->IsValid()) {
+                tex->Save(args.StringValue(1));
+                
+                Logger::begin("SaveImage", Logger::LogLevel_Log)
+                << "Saved image as: " << Filesystem::GetRealPath(args.StringValue(1))
+                << Logger::end();
+            } else {
+                args.ThrowArgError("Arg0 is not a valid textureID");
             }
-            
-            tex->Save(ENGINE_GET_ARG_CPPSTRING_VALUE(1));
-            
-            Logger::begin("SaveImage", Logger::LogLevel_Log)
-            << "Saved image as: " << Filesystem::GetRealPath(ENGINE_GET_ARG_CPPSTRING_VALUE(1))
-            << Logger::end();
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(FreeImage) {
-            ENGINE_JS_SCOPE_OPEN;
+        void FreeImage(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is the texture to free");
+            if (args.Assert(args[0]->IsExternal(), "Arg0 is the texture to free")) return;
             
-            TexturePtr tex = (Texture*)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
-            
-            tex->Invalidate();
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            ((TexturePtr) args.ExternalValue(0))->Invalidate();
         }
         
-        ENGINE_JS_METHOD(IsTexture) {
-            ENGINE_JS_SCOPE_OPEN;
+        void IsTexture(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            if (!args[0]->IsExternal()) {
-                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), false));
+            if (args[0]->IsExternal()) {
+                args.SetReturnValue(args.NewBoolean(((TexturePtr) args.ExternalValue(0))->IsValid()));
+            } else {
+                args.SetReturnValue(args.NewBoolean(0));
             }
-            
-            TexturePtr tex = (TexturePtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), tex->IsValid()));
         }
         
-        ENGINE_JS_METHOD(IsSpriteSheet) {
-            ENGINE_JS_SCOPE_OPEN;
+        void IsSpriteSheet(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            if (!args[0]->IsExternal()) {
-                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), false));
+            if (args[0]->IsExternal()) {
+                args.SetReturnValue(args.NewBoolean(((SpriteSheetPtr) args.ExternalValue(0))->IsValid()));
+            } else {
+                args.SetReturnValue(args.NewBoolean(0));
             }
-            
-            SpriteSheetPtr sprite = (SpriteSheetPtr)ENGINE_GET_ARG_EXTERNAL_VALUE(0);
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), sprite->IsValid()));
         }
         
         // basicly restarts 2d drawing
-        ENGINE_JS_METHOD(CameraReset) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CameraReset(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
             GetDraw2D(args.This())->GetRender()->Reset();
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(CameraPan) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CameraPan(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
+            if (args.AssertCount(2)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the X Distince to pan");
-            ENGINE_CHECK_ARG_NUMBER(1, "Arg1 is the Y Distince to pan");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the X Distince to pan") ||
+                args.Assert(args[1]->IsNumber(), "Arg1 is the Y Distince to pan")) return;
             
-            GetDraw2D(args.This())->GetRender()->CameraPan(ENGINE_GET_ARG_NUMBER_VALUE(0), ENGINE_GET_ARG_NUMBER_VALUE(1));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->GetRender()->CameraPan(args.NumberValue(0), args.NumberValue(1));
         }
         
-        ENGINE_JS_METHOD(CameraZoom) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CameraZoom(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to zoom the camera");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the factor to zoom the camera")) return;
             
-            GetDraw2D(args.This())->GetRender()->CameraZoom(ENGINE_GET_ARG_NUMBER_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->GetRender()->CameraZoom(args.NumberValue(0));
         }
         
-        ENGINE_JS_METHOD(CameraRotate) {
-            ENGINE_JS_SCOPE_OPEN;
+        void CameraRotate(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_GL;
+            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_NUMBER(0, "Arg0 is the factor to rotate the camera");
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the factor to rotate the camera by")) return;
             
-            GetDraw2D(args.This())->GetRender()->CameraRotate(ENGINE_GET_ARG_NUMBER_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->GetRender()->CameraRotate(args.NumberValue(0));
         }
         
-        ENGINE_JS_METHOD(SetCenter) {
-            ENGINE_JS_SCOPE_OPEN;
+        void SetCenter(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
+            if (args.AssertCount(2)) return;
             
-            ENGINE_CHECK_ARG_INT32(0, "Arg0 is the x to offset drawing by");
-            ENGINE_CHECK_ARG_INT32(1, "Arg1 is the y to offset drawing by");
+            if (args.Assert(args[0]->IsInt32(), "Arg0 is the x to offset drawing by") ||
+                args.Assert(args[1]->IsInt32(), "Arg1 is the y to offset drawing by")) return;
             
-            GetDraw2D(args.This())->GetRender()->SetCenter(ENGINE_GET_ARG_INT32_VALUE(0),
-                                                           ENGINE_GET_ARG_INT32_VALUE(1));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetDraw2D(args.This())->GetRender()->SetCenter(args.Int32Value(0), args.Int32Value(1));
         }
         
         void DrawColorGetter(v8::Local<v8::String> prop, const v8::PropertyCallbackInfo<v8::Value>& info) {
