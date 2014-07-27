@@ -488,6 +488,14 @@ namespace Engine {
             this->_loadedFiles[scriptName] = -1;
         }
         
+        void ScriptingContext::SetFlag(std::string flag) {
+            v8::V8::SetFlagsFromString(flag.c_str(), flag.length());
+        }
+        
+        void ScriptingContext::RunHelpCommand() {
+            v8::V8::SetFlagsFromString("--help", 6);
+        }
+        
         // Globals
         
         Json::Value _getValueFromV8Object(v8::Local<v8::Value> val) {

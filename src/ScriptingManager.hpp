@@ -183,6 +183,9 @@ namespace Engine {
             v8::Isolate* GetIsolate() {
                 return this->_isolate;
             }
+            
+            static void RunHelpCommand();
+            static void SetFlag(std::string flag);
         private:
             v8::Isolate* _isolate = NULL;
             v8::HandleScope _scope;
