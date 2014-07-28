@@ -36,9 +36,12 @@ namespace Engine {
     namespace ScriptingManager {
         void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch);
         
-        class Arguments {
+        ENGINE_CLASS(Factory);
+        
+        class Factory {
         public:
-            Arguments(const v8::FunctionCallbackInfo<v8::Value>& args) : _args(args), _scope(args.GetIsolate()), _isolate(args.GetIsolate()) {
+            Factory(v8::Isolate* isolate) : _isolate(isolate), _scope(isolate) {
+                
             }
             
             SCRIPTINGMANAGER_INLINE v8::Handle<v8::String> NewString(const char* str) {
@@ -97,6 +100,21 @@ namespace Engine {
                 return !value;
             }
             
+            SCRIPTINGMANAGER_INLINE v8::Isolate* GetIsolate() {
+                return this->_isolate;
+            }
+        private:
+            v8::Isolate* _isolate;
+            v8::HandleScope _scope;
+        };
+        
+        ENGINE_CLASS(Arguments);
+        
+        class Arguments : public Factory {
+        public:
+            Arguments(const v8::FunctionCallbackInfo<v8::Value>& args) : _args(args), Factory(args.GetIsolate()) {
+            }
+            
             SCRIPTINGMANAGER_INLINE bool AssertCount(size_t count) {
                 return this->Assert(this->Length() == count, "Wrong number of arguments");
             }
@@ -128,17 +146,13 @@ namespace Engine {
             SCRIPTINGMANAGER_INLINE bool RecallAsConstructor() {
                 if (!this->IsConstructCall()) {
                     const int argc = this->_args.Length();
-                    std::vector<v8::Handle<v8::Value>> av(static_cast<size_t>(argc),v8::Undefined(this->_isolate));
+                    std::vector<v8::Handle<v8::Value>> av(static_cast<size_t>(argc),v8::Undefined(this->GetIsolate()));
                     for(int i = 0; i < argc; ++i) av[i] = this->_args[i];
                     this->SetReturnValue(this->_args.Callee()->NewInstance(argc, &av[0]));
                     return true;
                 } else {
                     return false;
                 }
-            }
-            
-            SCRIPTINGMANAGER_INLINE v8::Isolate* GetIsolate() {
-                return this->_isolate;
             }
             
             SCRIPTINGMANAGER_INLINE bool IsConstructCall() {
@@ -163,8 +177,6 @@ namespace Engine {
             
         private:
             const v8::FunctionCallbackInfo<v8::Value>& _args;
-            v8::Isolate* _isolate;
-            v8::HandleScope _scope;
         };
         
         ENGINE_CLASS(Context);
