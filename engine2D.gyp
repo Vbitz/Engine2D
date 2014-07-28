@@ -1,6 +1,7 @@
 {
 	"variables": {
-		"WINDOW%": "glfw"
+		"WINDOW%": "glfw",
+		"GPERFTOOLS%": "off"
 	},
 	"targets": [
 		{
@@ -154,6 +155,14 @@
 						"/usr/local/include/SDL2"
 					]
 				}],
+				['("<(GPERFTOOLS)" == "on") & (OS == "mac")', {
+					"xcode_settings": {
+						"OTHER_LDFLAGS": [
+							"-ltcmalloc",
+							"-lprofiler"
+						]
+					}
+				}]
 			]
 		}
 	]

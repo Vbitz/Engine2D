@@ -32,6 +32,7 @@ PROJECT_BUILD_PATH = 2;
 CTAGS_PATH = "/usr/local/bin/ctags";
 
 WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw");
+ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off");
 
 commands = {};
 
@@ -122,6 +123,7 @@ def gyp():
 			resolve_path(PROJECT_ROOT, "third_party/gyp/gyp"),
 			"--depth=0",
 			"-DWINDOW=" + WINDOW_SYSTEM,
+			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
 		]);
 
