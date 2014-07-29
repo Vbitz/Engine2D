@@ -97,7 +97,7 @@ namespace Engine {
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the script to load");
             ENGINE_CHECK_ARG_BOOLEAN(1, "Arg1 is set to automaticly reload Arg0 when it's changed");
             
-            std::string scriptFilename = *ENGINE_GET_ARG_CSTRING_VALUE(0) + std::string(".js");
+            std::string scriptFilename = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
 			
             ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetAppSingilton()->GetScriptingContext()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1))));
 		}

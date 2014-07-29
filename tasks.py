@@ -190,6 +190,10 @@ def clean():
 def _build_bin(output=True):
 	if sys.platform == "darwin": # OSX
 		shell_command(["xcodebuild"]);
+		shell_command(["install_name_tool", "-change",
+			"/usr/local/lib/libengine2D.dylib",
+			"@executable_path/libengine2D.dylib",
+			resolve_path(PROJECT_BUILD_PATH, get_exe_name())]);
 
 
 @command(requires=["gyp", "add_version_info"], usage="Builds executables")

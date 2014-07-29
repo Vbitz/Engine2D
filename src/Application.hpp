@@ -50,6 +50,8 @@ namespace Engine {
     
     ApplicationPtr GetAppSingilton();
     
+    int EngineMain(int argc, char const *argv[]);
+    
     class Application {
     public:
         // Startup/Shutdown
@@ -119,6 +121,7 @@ namespace Engine {
         static EventMagic _appEvent_Exit(Json::Value v);
         static EventMagic _appEvent_DumpScripts(Json::Value v);
         static EventMagic _doDrawProfile(Json::Value v);
+        static EventMagic _requireDynamicLibary(Json::Value v);
         
         // Window Events
         static EventMagic _rawInputHandler(Json::Value v);

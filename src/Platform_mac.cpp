@@ -21,6 +21,8 @@
 
 #include "Platform.hpp"
 
+#include "Logger.hpp"
+
 #include <iostream>
 
 #include <pwd.h>
@@ -63,6 +65,9 @@ namespace Engine {
             
             OSXLibary(std::string modulePath) {
                 this->modulePointer = dlopen(modulePath.c_str(), RTLD_LAZY);
+                if (this->modulePointer == NULL) {
+                    Logger::begin("OSXLibrary", Logger::LogLevel_Error) << "Error loading: " << modulePointer << " : " << dlerror() << Logger::end();
+                }
             }
             
             ~OSXLibary() override {

@@ -25,8 +25,6 @@
 
 #include "TextureLoader.hpp"
 
-#include <FreeImage.h>
-
 /*
  Think of Resources like this, If you could put it on the filesystem then it's a Source otherwise it's a Resource
  */

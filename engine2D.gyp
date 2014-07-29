@@ -7,10 +7,17 @@
 		{
 			"target_name": "engine2D",
 			"type": "executable",
+			"dependencies": ["libengine2D"],
+			"sources": [
+				"src/main.cpp"
+			]
+		},
+		{
+			"target_name": "libengine2D",
+			"type": "shared_library",
 			"dependencies": [],
 			"sources": [
 				"src/stdlib.cpp",
-				"src/main.cpp",
 				"src/JSInput.cpp",
 				"src/JSDraw.cpp",
 				"src/JSSys.cpp",

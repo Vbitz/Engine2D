@@ -444,12 +444,13 @@ namespace Engine {
             if (GetEventsSingilton()->GetEvent("runFile")->Emit(eArgs) == EM_CANCEL) {
                 return;
             }
-            if (!Filesystem::FileExists(path)) {
-                Logger::begin("Scripting", Logger::LogLevel_Error) << path << " Not Found" << Logger::end();
+            std::string realFile = path + ".js";
+            if (!Filesystem::FileExists(realFile)) {
+                Logger::begin("Scripting", Logger::LogLevel_Error) << realFile << " Not Found" << Logger::end();
                 return false;
             } else {
-                if (!_runFile(path, persist)) {
-                    Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not load File : " << path << Logger::end();
+                if (!_runFile(realFile, persist)) {
+                    Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not load File : " << realFile << Logger::end();
                     return false;
                 } else {
                     return true;

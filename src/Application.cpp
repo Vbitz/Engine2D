@@ -262,6 +262,8 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("dumpProfile")->AddListener("Application::_dumpProfile", EventEmitter::MakeTarget(_dumpProfile))->SetDefered(true);
         GetEventsSingilton()->GetEvent("dumpLog")->AddListener("Application::_dumpLog", EventEmitter::MakeTarget(_dumpLog));
         GetEventsSingilton()->GetEvent("doDrawProfile")->AddListener("Application::_doDrawProfile", EventEmitter::MakeTarget(_doDrawProfile))->SetDefered(true);
+        
+        GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary));
     }
 	
     void _resizeWindow(Json::Value val) {
@@ -581,6 +583,21 @@ namespace Engine {
     EventMagic Application::_doDrawProfile(Json::Value args) {
         GetAppSingilton()->GetRender()->BeginProfiling();
         return EM_OK;
+    }
+    
+    EventMagic Application::_requireDynamicLibary(Json::Value args) {
+        static size_t endingLength = strlen(_PLATFORM_DYLINK);
+        std::string filename = args["path"].asString();
+        if (0 == filename.compare(filename.length() - endingLength, endingLength, _PLATFORM_DYLINK)) {
+            Logger::begin("Application::_requireDynamicLibary", Logger::LogLevel_Verbose) << "Loading shared library: " << filename << Logger::end();
+            Platform::LibaryPtr lib = Platform::OpenLibary(Filesystem::GetRealPath(filename));
+            if (!lib->IsValid()) {
+                Logger::begin("Application::_requireDynamicLibary", Logger::LogLevel_Error) << "Error loading shared library: " << filename << Logger::end();
+            }
+            return EM_CANCEL;
+        } else {
+            return EM_OK;
+        }
     }
     
     void Application::DetailProfile(int frames, std::string filename) {
@@ -924,6 +941,10 @@ namespace Engine {
         } else {
             return this->_postStart();
         }
+    }
+    
+    int EngineMain(int argc, char const *argv[]) {
+        return GetAppSingilton()->Start(argc, argv);
     }
     
     ApplicationPtr _singilton = NULL;

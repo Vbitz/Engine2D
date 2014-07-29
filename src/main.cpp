@@ -19,11 +19,11 @@
    limitations under the License.
 */
 
-#include "main.hpp"
-
-#include "Application.hpp"
+namespace Engine {
+    extern int EngineMain(int argc, char const *argv[]);
+}
 
 int main(int argc, char const *argv[])
 {
-	return Engine::GetAppSingilton()->Start(argc, argv);
+	return Engine::EngineMain(argc, argv);
 }
