@@ -85,9 +85,9 @@ namespace Engine {
     public:
         size_t GetDeferedMessageCount();
         void LogEvents(std::string logName);
-        void Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]);
-        void Emit(Json::Value args);
-        void Emit();
+        EventMagic Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]);
+        EventMagic Emit(Json::Value args);
+        EventMagic Emit();
         
         EventClassPtr AddListener(size_t priority, std::string name, EventTarget* target);
         EventClassPtr AddListener(std::string name, EventTargetPtr target);

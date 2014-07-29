@@ -130,12 +130,14 @@ namespace Engine {
         }
     }
         
-    void EventClass::Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]) {
+    EventMagic EventClass::Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]) {
         static std::vector<int> deleteTargets;
         if (this->_alwaysDefered) {
             this->_deferedMessages.push(args);
+            return EM_DEFERED;
         } else {
             int index = 0;
+            bool canceled = false;
             for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
                 if (iter->second.Target != NULL && iter->second.Active) {
                     if (!(this->Security.NoScript && iter->second.Target->IsScript())) {
@@ -147,6 +149,7 @@ namespace Engine {
                             ret = iter->second.Target->Run(args);
                         }
                         if (ret == EM_CANCEL) {
+                            canceled = true;
                             break;
                         }
                     }
@@ -161,15 +164,16 @@ namespace Engine {
                 }
                 deleteTargets.empty();
             }
+            return canceled ? EM_CANCEL : EM_OK;
         }
     }
         
-    void EventClass::Emit(Json::Value args) {
-        this->Emit(args, 0, {});
+    EventMagic EventClass::Emit(Json::Value args) {
+        return this->Emit(args, 0, {});
     }
         
-    void EventClass::Emit() {
-        this->Emit(Json::nullValue);
+    EventMagic EventClass::Emit() {
+        return this->Emit(Json::nullValue);
     }
         
     EventClassPtr EventClass::AddListener(size_t priority, std::string name, EventTargetPtr target) {

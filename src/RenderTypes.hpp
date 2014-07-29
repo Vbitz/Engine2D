@@ -125,6 +125,8 @@ namespace Engine {
         EM_OK,
         EM_CANCEL,
         
+        EM_DEFERED,
+        
         // internal values
         EM_BADFILTER,
         EM_BADTARGET
