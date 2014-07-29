@@ -100,17 +100,15 @@ namespace Engine {
             args.SetReturnValue(arr);
         }
         
-#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
-        
         void InitDatabase(v8::Handle<v8::ObjectTemplate> dbTable) {
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             
-            addItem(dbTable, "open", OpenDatabase);
-            addItem(dbTable, "close", CloseDatabase);
-            addItem(dbTable, "exec", Exec);
-            addItem(dbTable, "execPrepare", ExecPrepare);
+            f.FillTemplate(dbTable, {
+                {FTT_Static, "open", f.NewFunctionTemplate(OpenDatabase)},
+                {FTT_Static, "close", f.NewFunctionTemplate(CloseDatabase)},
+                {FTT_Static, "exec", f.NewFunctionTemplate(Exec)},
+                {FTT_Static, "execPrepare", f.NewFunctionTemplate(ExecPrepare)}
+            });
         }
-        
-#undef addItem
     }
 }
