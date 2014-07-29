@@ -166,6 +166,7 @@ namespace Engine {
         void SetRawCommandLine(int argc, const char** argv);
         int GetRawCommandLineArgC();
         const char** GetRawCommandLineArgV();
+        std::string GetExecutablePath();
         
         engine_memory_info GetMemoryInfo();
         double GetMemoryUsage();

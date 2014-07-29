@@ -36,6 +36,7 @@
 #include <sys/stat.h>
 
 #include <dlfcn.h>
+#include <mach-o/dyld.h>
 #include <mach-o/fat.h>
 #include <mach-o/loader.h>
 
@@ -231,6 +232,16 @@ namespace Engine {
         
         const char** GetRawCommandLineArgV() {
             return _argv;
+        }
+        
+        std::string GetExecutablePath() {
+            char buffer[1000];
+            uint32_t bufferSize = sizeof(buffer);
+            if (_NSGetExecutablePath(buffer, &bufferSize) == 0) {
+                return std::string(buffer);
+            } else {
+                assert(false);
+            }
         }
         
         engine_memory_info GetMemoryInfo() {
