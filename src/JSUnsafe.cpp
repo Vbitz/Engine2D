@@ -21,9 +21,10 @@
 
 #include "JSUnsafe.hpp"
 
-#include "Util.hpp"
+#include "ScriptingManager.hpp"
 
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <sys/mman.h>
 
@@ -31,22 +32,22 @@ namespace Engine {
     
 	namespace JsUnsafe {
 
-        ENGINE_JS_METHOD(GetNumberAddress) {
-            ENGINE_JS_SCOPE_OPEN;
+        void GetNumberAddress(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
             int* numAddr = (int*) malloc(sizeof(int));
             
-            *numAddr = ENGINE_GET_ARG_INT32_VALUE(0);
+            *numAddr = args.NumberValue(0);
             
             // MEMORY LEAK: Kind of the point of this
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), (long) numAddr));
+            args.SetReturnValue(args.NewNumber((long) numAddr));
         }
 
-        ENGINE_JS_METHOD(GetNative) {
-            ENGINE_JS_SCOPE_OPEN;
+        void GetNative(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            long offset = (long) ENGINE_GET_ARG_NUMBER_VALUE(0);
-            int length = ENGINE_GET_ARG_INT32_VALUE(1);
+            long offset = (long) args.NumberValue(0);
+            int length = args.Int32Value(1);
 
             v8::Handle<v8::Object> array = v8::Object::New(args.GetIsolate());
 
@@ -54,30 +55,30 @@ namespace Engine {
 
             array->SetIndexedPropertiesToExternalArrayData(rawPointer, v8::kExternalUnsignedByteArray, length * sizeof(unsigned char));
 
-            ENGINE_JS_SCOPE_CLOSE(array);
+            args.SetReturnValue(array);
         }
 
         typedef void* (*FARPROC)(void);
 
-        ENGINE_JS_METHOD(Call) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Call(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
 
-            long address = (long) ENGINE_GET_ARG_NUMBER_VALUE(0);
+            long address = (long) args.NumberValue(0);
 
             FARPROC func = (FARPROC) address;
             
             try {
                 func();
-                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), true));
+                args.SetReturnValue(args.NewBoolean(true));
             } catch (...) {
-                ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), false));
+                args.SetReturnValue(args.NewBoolean(false));
             }
         }
 
-        ENGINE_JS_METHOD(Malloc) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Malloc(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
 
-            int arrayLength = ENGINE_GET_ARG_INT32_VALUE(0);
+            int arrayLength = args.Int32Value(0);
 
             v8::Handle<v8::Object> array = v8::Object::New(args.GetIsolate());
 
@@ -85,52 +86,46 @@ namespace Engine {
 
             array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalByteArray, arrayLength * sizeof(char));
 
-            ENGINE_JS_SCOPE_CLOSE(array);
+            args.SetReturnValue(array);
         }
 
-        ENGINE_JS_METHOD(Free) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Free(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
 
-            v8::Handle<v8::Array> arr = v8::Handle<v8::Array>(ENGINE_GET_ARG_ARRAY(0));
+            v8::Handle<v8::Array> arr = v8::Handle<v8::Array>::Cast(args[0]);
 
             void* rawAddr = arr->GetIndexedPropertiesExternalArrayData();
 
             free(rawAddr);
-
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
 
-        ENGINE_JS_METHOD(AddressOf) {
-            ENGINE_JS_SCOPE_OPEN;
+        void AddressOf(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Handle<v8::Array> arr = v8::Handle<v8::Array>(ENGINE_GET_ARG_ARRAY(0));
+            v8::Handle<v8::Array> arr = v8::Handle<v8::Array>::Cast(args[0]);
 
             void* rawAddr = arr->GetIndexedPropertiesExternalArrayData();
 
             long address = (long) rawAddr;
 
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), (double) address));
+            args.SetReturnValue(args.NewNumber((double) address));
         }
         
-        ENGINE_JS_METHOD(AddressOfExternal) {
-            ENGINE_JS_SCOPE_OPEN;
+        void AddressOfExternal(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            long exAddr = (long) args.ExternalValue(0);
             
-            ENGINE_CHECK_ARG_EXTERNAL(0, "Arg0 is the value to return the indexof");
-            
-            long exAddr = (long) ENGINE_GET_ARG_EXTERNAL_VALUE(0);
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), (double) exAddr));
+            args.SetReturnValue(args.NewNumber((double) exAddr));
         }
 
-        ENGINE_JS_METHOD(MProtect) {
-            ENGINE_JS_SCOPE_OPEN;
+        void MProtect(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            long address = (long) ENGINE_GET_ARG_NUMBER_VALUE(0);
+            long address = (long) args.NumberValue(0);
 
-            int length = ENGINE_GET_ARG_INT32_VALUE(1);
-            bool enable = ENGINE_GET_ARG_BOOLEAN_VALUE(2);
+            int length = args.Int32Value(1);
+            bool enable = args.BooleanValue(2);
 
             int res = -1;
 
@@ -140,33 +135,30 @@ namespace Engine {
                 res = mprotect((void*) address, length, PROT_READ | PROT_WRITE);
             }
 
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), res > -1));
+            args.SetReturnValue(args.NewBoolean(res > -1));
         }
 
-        ENGINE_JS_METHOD(GetPageSize) {
-            ENGINE_JS_SCOPE_OPEN;
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), getpagesize()));
+        void GetPageSize(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            args.SetReturnValue(args.NewNumber(getpagesize()));
         }
-        
-#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
         
         void InitUnsafe(v8::Handle<v8::ObjectTemplate> unsafeTable) {
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             
-            addItem(unsafeTable, "getNumberAddress", GetNumberAddress);
-            addItem(unsafeTable, "getNative", GetNative);
-            addItem(unsafeTable, "call", Call);
-            addItem(unsafeTable, "malloc", Malloc);
-            addItem(unsafeTable, "free", Free);
-            addItem(unsafeTable, "addressOf", AddressOf);
-            addItem(unsafeTable, "addressOfExternal", AddressOfExternal);
-            addItem(unsafeTable, "mprotect", MProtect);
-            addItem(unsafeTable, "getPageSize", GetPageSize);
-            
-            unsafeTable->Set(isolate, "pageSize", v8::Number::New(isolate, getpagesize()));
+            f.FillTemplate(unsafeTable, {
+                {FTT_Static, "getNumberAddress", f.NewFunctionTemplate(GetNumberAddress)},
+                {FTT_Static, "getNative", f.NewFunctionTemplate(GetNative)},
+                {FTT_Static, "call", f.NewFunctionTemplate(Call)},
+                {FTT_Static, "malloc", f.NewFunctionTemplate(Malloc)},
+                {FTT_Static, "free", f.NewFunctionTemplate(Free)},
+                {FTT_Static, "addressOf", f.NewFunctionTemplate(AddressOf)},
+                {FTT_Static, "addressOfExternal", f.NewFunctionTemplate(AddressOfExternal)},
+                {FTT_Static, "mprotect", f.NewFunctionTemplate(MProtect)},
+                {FTT_Static, "getPageSize", f.NewFunctionTemplate(GetPageSize)},
+                {FTT_Static, "pageSize", f.NewNumber(getpagesize())}
+            });
         }
-        
-#undef addItem
 
     }
 }
