@@ -185,6 +185,8 @@ namespace Engine {
         
         ~BasicRandom();
         
+        void SetSeed(long seed);
+        
         int Next();
         int Next(int max);
         int Next(int min, int max);

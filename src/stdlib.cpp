@@ -373,6 +373,10 @@ namespace Engine {
         
     }
     
+    void BasicRandom::SetSeed(long seed) {
+        this->_gen.seed(seed);
+    }
+    
     int BasicRandom::Next() {
         return this->_gen();
     }
