@@ -29,13 +29,6 @@ var tests = {
 
 		return db.execPrepare("SELECT * FROM testing")[0].t1 === "hello world";
 	},
-	"Module": function () {
-		var m = mod.open("modules/testing");
-
-		mod.call(m, "testing");
-
-		return true;
-	},
 	"Unsafe": function () {
 		// get the pagesize
 		var pagesize = unsafe.getPageSize();

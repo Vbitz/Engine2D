@@ -27,7 +27,6 @@
 #include "JSInput.hpp"
 #include "JSFS.hpp"
 #include "JSDatabase.hpp"
-#include "JSMod.hpp"
 #include "JSUnsafe.hpp"
 #include "JSMathHelper.hpp"
 
@@ -232,7 +231,6 @@ namespace Engine {
         
         Context::~Context() {
             
-            JSMod::CloseAllOpenModules();
         }
         
         void Context::_enableTypedArrays() {
@@ -338,13 +336,6 @@ namespace Engine {
             JsInput::InitInput(inputTable);
             
             global->Set(isolate, "input", inputTable);
-            
-            // moduleTable
-            v8::Handle<v8::ObjectTemplate> moduleTable = v8::ObjectTemplate::New();
-            
-            JSMod::InitMod(moduleTable);
-            
-            global->Set(isolate, "mod", moduleTable);
             
             // unsafeTable
             
