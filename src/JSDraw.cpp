@@ -1137,61 +1137,58 @@ namespace Engine {
             _setColor(info.GetIsolate(), GetDraw2D(info.Holder()), value);
         }
         
-#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
-        
         void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
             InitColorObject(drawTable);
             InitVertexBuffer2DObject(drawTable);
             
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             
-            addItem(drawTable, "rect", Rect);
-            addItem(drawTable, "grid", Grid);
-            addItem(drawTable, "grad", Grad);
-            addItem(drawTable, "circle", Circle);
-            addItem(drawTable, "curve", Curve);
-            addItem(drawTable, "line", Line);
-            addItem(drawTable, "polygon", Polygon);
+            f.FillTemplate(drawTable, {
+                {FTT_Static, "rect", f.NewFunctionTemplate(Rect)},
+                {FTT_Static, "grid", f.NewFunctionTemplate(Grid)},
+                {FTT_Static, "grad", f.NewFunctionTemplate(Grad)},
+                {FTT_Static, "circle", f.NewFunctionTemplate(Circle)},
+                {FTT_Static, "curve", f.NewFunctionTemplate(Curve)},
+                {FTT_Static, "line", f.NewFunctionTemplate(Rect)},
+                {FTT_Static, "polygon", f.NewFunctionTemplate(Polygon)},
+                
+                {FTT_Static, "colorPalette", f.NewFunctionTemplate(ColorPalette)},
+                {FTT_Static, "setColorF", f.NewFunctionTemplate(SetColorF)},
+                {FTT_Static, "setColor", f.NewFunctionTemplate(SetColor)},
+                {FTT_Static, "setColorI", f.NewFunctionTemplate(SetColorI)},
+                {FTT_Static, "getColor", f.NewFunctionTemplate(GetColor)},
+                {FTT_Static, "clearColor", f.NewFunctionTemplate(ClearColor)},
+                {FTT_Static, "getRGBFromHSV", f.NewFunctionTemplate(GetRGBFromHSV)},
+                
+                {FTT_Static, "print", f.NewFunctionTemplate(Print)},
+                {FTT_Static, "getStringWidth", f.NewFunctionTemplate(GetStringWidth)},
+                {FTT_Static, "draw", f.NewFunctionTemplate(Draw)},
+                {FTT_Static, "drawSub", f.NewFunctionTemplate(DrawSub)},
+                {FTT_Static, "drawSprite", f.NewFunctionTemplate(DrawSprite)},
+                {FTT_Static, "openImage", f.NewFunctionTemplate(OpenImage)},
+                {FTT_Static, "openSpriteSheet", f.NewFunctionTemplate(OpenSpriteSheet)},
+                {FTT_Static, "getImageArray", f.NewFunctionTemplate(GetImageArray)},
+                {FTT_Static, "createImageArray", f.NewFunctionTemplate(CreateImageArray)},
+                {FTT_Static, "createImage", f.NewFunctionTemplate(CreateImage)},
+                {FTT_Static, "saveImage", f.NewFunctionTemplate(SaveImage)},
+                {FTT_Static, "freeImage", f.NewFunctionTemplate(FreeImage)},
+                {FTT_Static, "isTexture", f.NewFunctionTemplate(IsTexture)},
+                {FTT_Static, "isSpriteSheet", f.NewFunctionTemplate(IsSpriteSheet)},
+                
+                {FTT_Static, "cameraReset", f.NewFunctionTemplate(CameraReset)},
+                {FTT_Static, "cameraPan", f.NewFunctionTemplate(CameraPan)},
+                {FTT_Static, "cameraZoom", f.NewFunctionTemplate(CameraZoom)},
+                {FTT_Static, "cameraRotate", f.NewFunctionTemplate(CameraRotate)},
+                
+                {FTT_Static, "setFont", f.NewFunctionTemplate(SetFont)},
+                {FTT_Static, "loadFont", f.NewFunctionTemplate(LoadFont)},
+                {FTT_Static, "isFontLoaded", f.NewFunctionTemplate(IsFontLoaded)},
+                
+                {FTT_Static, "setCenter", f.NewFunctionTemplate(SetCenter)},
+            });
             
-            addItem(drawTable, "colorPalette", ColorPalette);
-            addItem(drawTable, "setColorF", SetColorF);
-            addItem(drawTable, "setColor", SetColor);
-            addItem(drawTable, "setColorI", SetColorI);
-            addItem(drawTable, "getColor", GetColor);
-            addItem(drawTable, "clearColor", ClearColor);
-            addItem(drawTable, "getRGBFromHSV", GetRGBFromHSV);
-            
-            addItem(drawTable, "print", Print);
-            addItem(drawTable, "getStringWidth", GetStringWidth);
-            
-            addItem(drawTable, "draw", Draw);
-            addItem(drawTable, "drawSub", DrawSub);
-            addItem(drawTable, "drawSprite", DrawSprite);
-            addItem(drawTable, "openImage", OpenImage);
-            addItem(drawTable, "openSpriteSheet", OpenSpriteSheet);
-            addItem(drawTable, "getImageArray", GetImageArray);
-            addItem(drawTable, "createImageArray", CreateImageArray);
-            addItem(drawTable, "createImage", CreateImage);
-            addItem(drawTable, "saveImage", SaveImage);
-            addItem(drawTable, "freeImage", FreeImage);
-            addItem(drawTable, "isTexture", IsTexture);
-            addItem(drawTable, "isSpriteSheet", IsSpriteSheet);
-            
-            addItem(drawTable, "cameraReset", CameraReset);
-            addItem(drawTable, "cameraPan", CameraPan);
-            addItem(drawTable, "cameraZoom", CameraZoom);
-            addItem(drawTable, "cameraRotate", CameraRotate);
-            
-            addItem(drawTable, "setFont", SetFont);
-            addItem(drawTable, "loadFont", LoadFont);
-            addItem(drawTable, "isFontLoaded", IsFontLoaded);
-            
-            addItem(drawTable, "setCenter", SetCenter);
-            
-            drawTable->SetAccessor(v8::String::NewFromUtf8(isolate, "drawColor"), DrawColorGetter, DrawColorSetter);
+            drawTable->SetAccessor(f.NewString("drawColor"), DrawColorGetter, DrawColorSetter);
         }
-        
-#undef addItem
         
     } // namespace JsDraw
 } // namespace Engine
