@@ -108,6 +108,56 @@ namespace Engine {
             v8::HandleScope _scope;
         };
         
+        ENGINE_CLASS(ObjectWrap);
+        
+        // Very closely related to the Node.js ObjectWrap with an easier API
+        // https://github.com/joyent/node/blob/master/src/node_object_wrap.h
+        class ObjectWrap {
+        public:
+            virtual ~ObjectWrap() {
+                if (this->_handle.IsEmpty()) {
+                    return;
+                }
+                assert(this->_handle.IsNearDeath());
+                this->_handle.ClearWeak();
+                this->_handle.Reset();
+            }
+            
+            template<class T>
+            static inline auto Wrap(v8::Isolate* isolate, v8::Handle<v8::Object> handle) -> T* {
+                T* instance = new T();
+                ObjectWrapPtr wrap = static_cast<ObjectWrapPtr>(instance);
+                assert(wrap->_handle.IsEmpty());
+                assert(handle->InternalFieldCount() > 0);
+                handle->SetAlignedPointerInInternalField(0, instance);
+                wrap->_handle.Reset(isolate, handle);
+                wrap->_handle.SetWeak(wrap, WeakCallback);
+                wrap->_handle.MarkIndependent();
+                return instance;
+            }
+            
+            template<class T>
+            static inline auto Unwarp(v8::Handle<v8::Object> handle) -> T* {
+                assert(!handle.IsEmpty());
+                void* ptr = handle->GetAlignedPointerFromInternalField(0);
+                ObjectWrapPtr wrap = static_cast<ObjectWrapPtr>(ptr);
+                return static_cast<T*>(wrap);
+            }
+        private:
+            
+            static void WeakCallback(const v8::WeakCallbackData<v8::Object, ObjectWrap>& data) {
+                v8::Isolate* isolate = data.GetIsolate();
+                v8::HandleScope scope(isolate);
+                ObjectWrapPtr wrap = data.GetParameter();
+                assert(wrap->_handle.IsNearDeath());
+                assert(data.GetValue() == v8::Local<v8::Object>::New(isolate, wrap->_handle));
+                wrap->_handle.Reset();
+                delete wrap;
+            }
+            
+            v8::Persistent<v8::Object> _handle;
+        };
+        
         ENGINE_CLASS(Arguments);
         
         class Arguments : public Factory {
