@@ -19,9 +19,7 @@
    limitations under the License.
 */
 
-#include "JSUnsafe.hpp"
-
-#include "ScriptingManager.hpp"
+#include "../ScriptingManager.hpp"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -143,8 +141,15 @@ namespace Engine {
             args.SetReturnValue(args.NewNumber(getpagesize()));
         }
         
-        void InitUnsafe(v8::Handle<v8::ObjectTemplate> unsafeTable) {
+        __attribute__((constructor))
+        void InitUnsafe() {
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
+            v8::Local<v8::Context> ctx = f.GetIsolate()->GetCurrentContext();
+            v8::Context::Scope ctx_scope(ctx);
+            
+            v8::Local<v8::Object> obj = ctx->Global();
+            
+            v8::Local<v8::ObjectTemplate> unsafeTable = v8::ObjectTemplate::New(f.GetIsolate());
             
             f.FillTemplate(unsafeTable, {
                 {FTT_Static, "getNumberAddress", f.NewFunctionTemplate(GetNumberAddress)},
@@ -156,8 +161,11 @@ namespace Engine {
                 {FTT_Static, "addressOfExternal", f.NewFunctionTemplate(AddressOfExternal)},
                 {FTT_Static, "mprotect", f.NewFunctionTemplate(MProtect)},
                 {FTT_Static, "getPageSize", f.NewFunctionTemplate(GetPageSize)},
+                
                 {FTT_Static, "pageSize", f.NewNumber(getpagesize())}
             });
+            
+            obj->Set(f.NewString("unsafe"), unsafeTable->NewInstance());
         }
 
     }

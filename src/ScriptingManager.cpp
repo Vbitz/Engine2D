@@ -27,7 +27,6 @@
 #include "JSInput.hpp"
 #include "JSFS.hpp"
 #include "JSDatabase.hpp"
-#include "JSUnsafe.hpp"
 #include "JSMathHelper.hpp"
 
 #include "Events.hpp"
@@ -337,16 +336,6 @@ namespace Engine {
             
             global->Set(isolate, "input", inputTable);
             
-            // unsafeTable
-            
-            if (GetAppSingilton()->IsDeveloperMode()) {
-                v8::Handle<v8::ObjectTemplate> unsafeTable = v8::ObjectTemplate::New();
-                
-                JsUnsafe::InitUnsafe(unsafeTable);
-                
-                global->Set(isolate, "unsafe", unsafeTable);
-            }
-            
             v8::Local<v8::Context> ctx = v8::Context::New(isolate, NULL, global);
             
             ctx->Enter();
@@ -433,7 +422,7 @@ namespace Engine {
             Json::Value eArgs(Json::objectValue);
             eArgs["path"] = path;
             if (GetEventsSingilton()->GetEvent("runFile")->Emit(eArgs) == EM_CANCEL) {
-                return;
+                return true;
             }
             std::string realFile = path + ".js";
             if (!Filesystem::FileExists(realFile)) {

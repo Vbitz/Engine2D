@@ -30,6 +30,10 @@ var tests = {
 		return db.execPrepare("SELECT * FROM testing")[0].t1 === "hello world";
 	},
 	"Unsafe": function () {
+		if (!sys.runFile("modules/js_unsafe.dylib", false)) {
+			return false; // If we can't load the module then fail the test
+		}
+
 		// get the pagesize
 		var pagesize = unsafe.getPageSize();
 

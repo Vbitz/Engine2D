@@ -23,7 +23,6 @@
 				"src/JSSys.cpp",
 				"src/JSFS.cpp",
 				"src/JSDatabase.cpp",
-				"src/JSUnsafe.cpp",
 				"src/JSMathHelper.cpp",
 				"src/Database.cpp",
 				"src/Filesystem.cpp",
