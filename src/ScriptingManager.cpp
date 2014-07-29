@@ -439,6 +439,11 @@ namespace Engine {
         }
         
         bool Context::RunFile(std::string path, bool persist) {
+            Json::Value eArgs(Json::objectValue);
+            eArgs["path"] = path;
+            if (GetEventsSingilton()->GetEvent("runFile")->Emit(eArgs) == EM_CANCEL) {
+                return;
+            }
             if (!Filesystem::FileExists(path)) {
                 Logger::begin("Scripting", Logger::LogLevel_Error) << path << " Not Found" << Logger::end();
                 return false;
