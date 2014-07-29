@@ -1,15 +1,20 @@
 #include "../Events.hpp"
 #include "../Logger.hpp"
+#include "../Draw2D.hpp"
+#include "../Application.hpp"
 
 using namespace Engine;
 
-EventMagic testing_testingEvent(Json::Value args) {
-	Logger::begin("", Logger::LogLevel_Log) << "Hello World" << Logger::end();
+Draw2DPtr draw;
+
+EventMagic testing_draw(Json::Value args) {
+	draw->Rect(100, 100, 50, 50);
 	return EM_OK;
 }
 
 __attribute__((constructor))
 void startup() {
-	std::cout << "Running Startup" << std::endl;
-	GetEventsSingilton()->GetEvent("testingEvent")->AddListener("testing_testingEvent", EventEmitter::MakeTarget(testing_testingEvent));
+	Logger::begin("testingAddon", Logger::LogLevel_Log) << "Loading Testing Addon" << Logger::end();
+	draw = new Draw2D(GetAppSingilton()->GetRender());
+	GetEventsSingilton()->GetEvent("draw")->AddListener("testing_draw", EventEmitter::MakeTarget(testing_draw));
 }
