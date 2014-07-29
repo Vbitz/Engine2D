@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -12,7 +14,7 @@ def compile(sources, outputFilename, args):
 	if outputFilename == None:
 		outputFilename = "addon.dylib"
 	args = ["clang++", "-dynamiclib", "-std=gnu++11",
-		"-stdlib=libc++", "-lengine2D", "-Lbuild/Default", "-o", outputFilename] + sources
+		"-stdlib=libc++", "-lengine2D", "-lv8", "-Lbuild/Default", "-o", outputFilename] + sources
 	shell_command(args)
 	shell_command(["install_name_tool", "-change", "/usr/local/lib/libengine2D.dylib",
 		"@executable_path/libengine2D.dylib", outputFilename])
