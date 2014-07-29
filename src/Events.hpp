@@ -26,6 +26,7 @@
 #include <stdarg.h>
 
 #include <vector>
+#include <map>
 #include <queue>
 
 #include "vendor/json/json.h"
@@ -50,6 +51,8 @@ namespace Engine {
             CPlusPlus,
             Javascript
         };
+        
+        virtual ~EventTarget() {}
         
         virtual EventMagic Run(Json::Value& e) = 0;
         
@@ -85,10 +88,13 @@ namespace Engine {
         void Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]);
         void Emit(Json::Value args);
         void Emit();
-        EventClass* AddListener(std::string name, EventTarget* target);
+        
+        EventClassPtr AddListener(size_t priority, std::string name, EventTarget* target);
+        EventClassPtr AddListener(std::string name, EventTargetPtr target);
+        
         void Clear(std::string eventID);
-        EventClass* SetDefered(bool defered);
-        EventClass* SetNoScript(bool noScript);
+        EventClassPtr SetDefered(bool defered);
+        EventClassPtr SetNoScript(bool noScript);
         void PollDeferedMessages();
         void AddDeferedMessage(Json::Value e);
             
@@ -96,7 +102,7 @@ namespace Engine {
         EventClassSecurity Security;
     private:
         bool _alwaysDefered = false;
-        std::vector<Event> _events;
+        std::multimap<size_t, Event> _events;
         std::queue<Json::Value> _deferedMessages;
     };
     

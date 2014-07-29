@@ -125,7 +125,7 @@ namespace Engine {
              iter2 != this->_events.end();
              iter2++) {
             Logger::begin(logName, Logger::LogLevel_Log)
-                << "        " << (iter2->Target->IsScript() ? "Script" : "C++   ") << " | " << iter2->Label
+                << "        | " << iter2->first << " | " << (iter2->second.Target->IsScript() ? "Script" : "C++   ") << " | " << iter2->second.Label
                 << Logger::end();
         }
     }
@@ -137,14 +137,14 @@ namespace Engine {
         } else {
             int index = 0;
             for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
-                if (iter->Target != NULL && iter->Active) {
-                    if (!(this->Security.NoScript && iter->Target->IsScript())) {
+                if (iter->second.Target != NULL && iter->second.Active) {
+                    if (!(this->Security.NoScript && iter->second.Target->IsScript())) {
                         EventMagic ret = EM_BADTARGET;
-                        if (jsArgC > 0 && iter->Target->GetType() == EventTarget::Type::Javascript) {
-                            JSEventTarget* target = (JSEventTarget*) iter->Target;
+                        if (jsArgC > 0 && iter->second.Target->GetType() == EventTarget::Type::Javascript) {
+                            JSEventTarget* target = (JSEventTarget*) iter->second.Target;
                             ret = target->Run(args, jsArgC, jsArgV);
                         } else {
-                            ret = iter->Target->Run(args);
+                            ret = iter->second.Target->Run(args);
                         }
                         if (ret == EM_CANCEL) {
                             break;
@@ -157,7 +157,7 @@ namespace Engine {
             }
             if (deleteTargets.size() > 0) {
                 for (auto iter = deleteTargets.begin(); iter != deleteTargets.end(); iter++) {
-                    this->_events.erase(this->_events.begin() + *iter);
+                    this->_events.erase(*iter);
                 }
                 deleteTargets.empty();
             }
@@ -172,22 +172,27 @@ namespace Engine {
         this->Emit(Json::nullValue);
     }
         
-    EventClass* EventClass::AddListener(std::string name, EventTarget* target) {
+    EventClassPtr EventClass::AddListener(size_t priority, std::string name, EventTargetPtr target) {
         for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
-            if (iter->Label == name) {
-                delete iter->Target;
-                iter->Target = target;
+            if (iter->second.Label == name) {
+                delete iter->second.Target;
+                iter->second.Target = target;
                 return;
             }
         }
-        this->_events.push_back(Event(name, target));
+        this->_events.insert(std::pair<size_t, Event>(priority, Event(name, target)));
         return this;
+    }
+    
+    EventClassPtr EventClass::AddListener(std::string name, EventTargetPtr target) {
+        return this->AddListener(500, name, target);
     }
     
     void EventClass::Clear(std::string eventID) {
         for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
-            if (iter->Label == eventID) {
-                iter->Active = false;
+            if (iter->second.Label == eventID) {
+                iter->second.Active = false;
+                return;
             }
         }
     }
@@ -205,10 +210,10 @@ namespace Engine {
     void EventClass::PollDeferedMessages() {
         while (this->_deferedMessages.size() > 0) {
             for (auto iter2 = this->_events.begin(); iter2 != this->_events.end(); iter2++) {
-                if (iter2->Target == NULL) { throw "Invalid Target"; }
-                if (iter2->Active) {
-                    if (!(this->Security.NoScript && iter2->Target->IsScript())) {
-                        iter2->Target->Run(this->_deferedMessages.front());
+                if (iter2->second.Target == NULL) { throw "Invalid Target"; }
+                if (iter2->second.Active) {
+                    if (!(this->Security.NoScript && iter2->second.Target->IsScript())) {
+                        iter2->second.Target->Run(this->_deferedMessages.front());
                     }
                 }
             }
