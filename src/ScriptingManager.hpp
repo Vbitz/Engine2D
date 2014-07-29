@@ -33,8 +33,20 @@
 #define SCRIPTINGMANAGER_INLINE inline
 
 namespace Engine {
+    enum FunctionTemplateTemplates { // It's way too long as an enum class
+        FTT_Prototype,
+        FTT_Instance,
+        FTT_Static
+    };
+    
     namespace ScriptingManager {
         void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch);
+        
+        struct FunctionTemplateValues {
+            FunctionTemplateTemplates location;
+            const char* key;
+            v8::Handle<v8::Data> value;
+        };
         
         ENGINE_CLASS(Factory);
         
@@ -76,6 +88,10 @@ namespace Engine {
                 return v8::Boolean::New(this->_isolate, value);
             }
             
+            SCRIPTINGMANAGER_INLINE v8::Handle<v8::FunctionTemplate> NewFunctionTemplate(v8::FunctionCallback callback) {
+                return v8::FunctionTemplate::New(this->_isolate, callback);
+            }
+            
             SCRIPTINGMANAGER_INLINE void ThrowError(const char* msg) {
                 this->_isolate->ThrowException(v8::Exception::Error(this->NewString(msg)));
             }
@@ -102,6 +118,35 @@ namespace Engine {
             
             SCRIPTINGMANAGER_INLINE v8::Isolate* GetIsolate() {
                 return this->_isolate;
+            }
+
+            
+            SCRIPTINGMANAGER_INLINE void FillTemplate(v8::Handle<v8::ObjectTemplate> handle, std::vector<FunctionTemplateValues> values) {
+                for (auto iter = values.begin(); iter != values.end(); iter++) {
+                    switch (iter->location) {
+                        case FTT_Static:
+                            handle->Set(this->NewString(iter->key), iter->value);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            
+            SCRIPTINGMANAGER_INLINE void FillTemplate(v8::Handle<v8::FunctionTemplate> handle, std::vector<FunctionTemplateValues> values) {
+                for (auto iter = values.begin(); iter != values.end(); iter++) {
+                    switch (iter->location) {
+                        case FTT_Prototype:
+                            handle->PrototypeTemplate()->Set(this->NewString(iter->key), iter->value);
+                            break;
+                        case FTT_Instance:
+                            handle->InstanceTemplate()->Set(this->NewString(iter->key), iter->value);
+                            break;
+                        case FTT_Static:
+                            handle->Set(this->NewString(iter->key), iter->value);
+                            break;
+                    }
+                }
             }
         private:
             v8::Isolate* _isolate;

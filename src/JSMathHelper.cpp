@@ -73,19 +73,21 @@ namespace Engine {
             }
             
             static void CreateInterface(v8::Isolate* isolate, v8::Handle<v8::Object> math_table) {
-                v8::Handle<v8::FunctionTemplate> random_template = v8::FunctionTemplate::New(isolate);
+                ScriptingManager::Factory f(isolate);
+                
+                v8::Handle<v8::FunctionTemplate> random_template = v8::FunctionTemplate::New(f.GetIsolate());
                 
                 random_template->SetCallHandler(JS_BasicRandom::New);
                 
-                v8::Handle<v8::ObjectTemplate> random_proto = random_template->PrototypeTemplate();
-                
-                random_proto->Set(isolate, "next", v8::FunctionTemplate::New(isolate, JS_BasicRandom::Next));
-                random_proto->Set(isolate, "nextDouble", v8::FunctionTemplate::New(isolate, JS_BasicRandom::NextDouble));
-                random_proto->Set(isolate, "nextNormal", v8::FunctionTemplate::New(isolate, JS_BasicRandom::NextNormal));
+                f.FillTemplate(random_template, {
+                    {FTT_Prototype, "next", f.NewFunctionTemplate(JS_BasicRandom::Next)},
+                    {FTT_Prototype, "nextDouble", f.NewFunctionTemplate(JS_BasicRandom::NextDouble)},
+                    {FTT_Prototype, "nextNormal", f.NewFunctionTemplate(JS_BasicRandom::NextNormal)},
+                });
                 
                 random_template->InstanceTemplate()->SetInternalFieldCount(1);
                 
-                math_table->Set(v8::String::NewFromUtf8(isolate, "Random"), random_template->GetFunction());
+                math_table->Set(f.NewString("Random"), random_template->GetFunction());
             }
         };
         
