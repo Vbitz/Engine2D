@@ -16,7 +16,7 @@ def compile(sources, outputFilename):
 		outputFilename = "addon.dylib"
 	args = ["clang++", "-dynamiclib", "-std=gnu++11",
 		"-stdlib=libc++", "-lengine2D", "-lv8", "-Lbuild/Default", "-o", outputFilename]
-	args += ["-DBUILD_UUID=\"" + uuid.uuid4() + "\""]
+	args += ["-D_BUILD_UUID=\"" + str(uuid.uuid4()) + "\""]
 	args += sources
 	shell_command(args)
 	shell_command(["install_name_tool", "-change", "/usr/local/lib/libengine2D.dylib",
