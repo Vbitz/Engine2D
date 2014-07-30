@@ -368,7 +368,7 @@ namespace Engine {
                     if (lastMod > iterator->second) {
                         Json::Value args = Json::Value(Json::objectValue);
                         args["filename"] = iterator->first;
-                        this->RunFile(iterator->first, true);
+                        this->_runFile(iterator->first, true);
                         GetEventsSingilton()->GetEvent("scriptReloaded")->Emit(args);
                     }
                 }
@@ -377,7 +377,7 @@ namespace Engine {
                     if (iterator->second < 0) {
                         Json::Value args = Json::Value(Json::objectValue);
                         args["filename"] = iterator->first;
-                        this->RunFile(iterator->first, true);
+                        this->_runFile(iterator->first, true);
                         GetEventsSingilton()->GetEvent("scriptReloaded")->Emit(args);
                     }
                 }
