@@ -38,11 +38,11 @@ namespace Engine {
     public:
         Addon(AddonSpec spec) : _spec(spec) { }
         
-        void GetName() {
+        const char* GetName() {
             return this->_spec.name;
         }
         
-        void GetAuthor() {
+        const char* GetAuthor() {
             return this->_spec.author;
         }
         

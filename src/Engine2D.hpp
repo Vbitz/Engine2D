@@ -19,6 +19,8 @@
  limitations under the License.
  */
 
+#pragma once
+
 #define ENGINE_CONSTRUCTOR __attribute__((constructor))
 
 #ifndef _BUILD_UUID
