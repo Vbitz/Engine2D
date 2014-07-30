@@ -1,3 +1,4 @@
+#include "../Engine2D.hpp"
 #include "../Events.hpp"
 #include "../Logger.hpp"
 #include "../Draw2D.hpp"
@@ -12,9 +13,10 @@ EventMagic testing_draw(Json::Value args) {
 	return EM_OK;
 }
 
-__attribute__((constructor))
 void startup() {
 	Logger::begin("testingAddon", Logger::LogLevel_Log) << "Loading Testing Addon" << Logger::end();
 	draw = new Draw2D(GetAppSingilton()->GetRender());
 	GetEventsSingilton()->GetEvent("draw")->AddListener("testing_draw", EventEmitter::MakeTarget(testing_draw));
 }
+
+ENGINE_ADDON("testingAddon", "Engine2D", startup, NULL, LoadOrder::PreScript)
