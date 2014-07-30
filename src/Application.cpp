@@ -202,8 +202,7 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("config:core.window.title")->AddListener("Application::Config_CoreWindowTitle", EventEmitter::MakeTarget(_config_CoreWindowTitle));
     }
     
-    void Application::_loadConfigFile() {
-        std::string configPath = Config::GetString("core.config.path");
+    void Application::_loadConfigFile(std::string configPath) {
         Logger::begin("Application", Logger::LogLevel_Log) << "Loading Config: " << configPath << Logger::end();
         Json::Value root;
         Json::Reader reader;
@@ -264,6 +263,7 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("doDrawProfile")->AddListener("Application::_doDrawProfile", EventEmitter::MakeTarget(_doDrawProfile))->SetDefered(true);
         
         GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary));
+        GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireConfigFile", EventEmitter::MakeTarget(_requireConfigFile));
     }
 	
     void _resizeWindow(Json::Value val) {
@@ -600,6 +600,17 @@ namespace Engine {
         }
     }
     
+    EventMagic Application::_requireConfigFile(Json::Value args) {
+        static size_t endingLength = strlen(".json");
+        std::string filename = args["path"].asString();
+        if (0 == filename.compare(filename.length() - endingLength, endingLength, ".json")) {
+            GetAppSingilton()->_loadConfigFile(filename);
+            return EM_CANCEL;
+        } else {
+            return EM_OK;
+        }
+    }
+    
     void Application::DetailProfile(int frames, std::string filename) {
         Profiler::ResetDetail();
         _detailFrames = frames;
@@ -857,7 +868,7 @@ namespace Engine {
         
         // The filesystem is now ready for reading files
         
-        this->_loadConfigFile();
+        this->_loadConfigFile(Config::GetString("core.config.path"));
         
         this->_applyDelayedConfigs();
         

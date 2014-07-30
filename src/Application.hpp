@@ -126,7 +126,10 @@ namespace Engine {
         static EventMagic _appEvent_Exit(Json::Value v);
         static EventMagic _appEvent_DumpScripts(Json::Value v);
         static EventMagic _doDrawProfile(Json::Value v);
+        
+        // Require Events
         static EventMagic _requireDynamicLibary(Json::Value v);
+        static EventMagic _requireConfigFile(Json::Value v);
         
         // Window Events
         static EventMagic _rawInputHandler(Json::Value v);
@@ -151,7 +154,7 @@ namespace Engine {
         void _hookConfigs();
         void _hookEvents();
         void _printConfigVars();
-        void _loadConfigFile();
+        void _loadConfigFile(std::string configPath);
         void _disablePreload();
         void _updateAddonLoad(LoadOrder load);
         
