@@ -20,6 +20,7 @@
 */
 
 #include "../ScriptingManager.hpp"
+#include "../Engine2D.hpp"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -28,7 +29,7 @@
 
 namespace Engine {
     
-	namespace JsUnsafe {
+	namespace JSUnsafe {
 
         void GetNumberAddress(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
@@ -140,8 +141,7 @@ namespace Engine {
             ScriptingManager::Arguments args(_args);
             args.SetReturnValue(args.NewNumber(getpagesize()));
         }
-        
-        __attribute__((constructor))
+
         void InitUnsafe() {
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             v8::Local<v8::Context> ctx = f.GetIsolate()->GetCurrentContext();
@@ -170,3 +170,9 @@ namespace Engine {
 
     }
 }
+
+void Addon_Init() {
+    Engine::JSUnsafe::InitUnsafe();
+}
+
+ENGINE_ADDON("JSUnsafe", "Engine2D", Addon_Init, NULL, Engine::LoadOrder::PreGraphics)

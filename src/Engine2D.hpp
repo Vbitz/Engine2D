@@ -21,6 +21,10 @@
 
 #define ENGINE_CONSTRUCTOR __attribute__((constructor))
 
+#ifndef _BUILD_UUID
+#define _BUILD_UUID "INTERNAL_ADDON"
+#endif
+
 namespace Engine {
     using AddonStartup = void (*) ();
     using AddonShutdown = void (*) ();
@@ -45,10 +49,10 @@ namespace Engine {
     void RegisterAddon(AddonSpec spec);
 }
 
-#define ENGINE_ADDON(UUID, Name, Author, Startup, Shutdown, LoadOrder) \
+#define ENGINE_ADDON(Name, Author, Startup, Shutdown, LoadOrder) \
 namespace { \
     Engine::AddonSpec Addon = { \
-        UUID, \
+        _BUILD_UUID, \
         Name, \
         Author, \
         Startup, \

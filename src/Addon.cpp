@@ -31,7 +31,7 @@ namespace Engine {
     
     void Addon::DoStartup() {
         assert(!this->_loaded);
-        Logger::begin("Addon", Logger::LogLevel_Verbose) << "Loading Addon \"" << this->_spec.name << "\" by \"" << this->_spec.author << Logger::end();
+        Logger::begin("Addon", Logger::LogLevel_Verbose) << "Loading Addon \"" << this->_spec.name << "\" by \"" << this->_spec.author << "\"" << Logger::end();
         this->_spec.startup();
         this->_loaded = true;
     }
@@ -88,5 +88,5 @@ namespace Engine {
         Logger::begin("BasicAddon", Logger::LogLevel_Log) << "BasicAddon Loaded" << Logger::end();
     }
     
-    ENGINE_ADDON("fb460e49-ad8c-4bf9-85fb-e1c10e1ba47d", "BasicAddon", "Engine2D", BasicAddon_Startup, NULL, LoadOrder::PreScript);
+    ENGINE_ADDON("BasicAddon", "Engine2D", BasicAddon_Startup, NULL, LoadOrder::PreScript);
 }
