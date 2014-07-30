@@ -22,6 +22,7 @@
 #pragma once
 
 #include "Window.hpp"
+#include "Addon.hpp"
 
 #include "EngineUI.hpp"
 
@@ -93,6 +94,10 @@ namespace Engine {
         bool IsDeveloperMode();
         void Assert(bool value, std::string reason, std::string line, int lineNumber);
         
+        LoadOrder GetCurrentLoadState() {
+            return this->_currentLoadingState;
+        }
+        
         // Static functions
         static std::string GetEngineVersion();
         
@@ -148,6 +153,7 @@ namespace Engine {
         void _printConfigVars();
         void _loadConfigFile();
         void _disablePreload();
+        void _updateAddonLoad(LoadOrder load);
         
         // OpenGL
         void _shutdownOpenGL();
@@ -166,6 +172,7 @@ namespace Engine {
         
         // Vars
         bool _running = false;
+        LoadOrder _currentLoadingState = LoadOrder::Startup;
         
         std::vector<std::string> _jsArgs;
         

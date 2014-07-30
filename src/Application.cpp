@@ -711,6 +711,11 @@ namespace Engine {
         }
     }
     
+    void Application::_updateAddonLoad(LoadOrder load) {
+        Addon::LoadAll(load);
+        this->_currentLoadingState = load;
+    }
+    
     void Application::_mainLoop() {
         this->_running = true;
         
@@ -813,6 +818,11 @@ namespace Engine {
                 }
             }
             
+            if (this->_frames == 0) {
+                this->_updateAddonLoad(LoadOrder::FirstFrame);
+                if (!this->_testMode) this->_frames++;
+            }
+            
             if (this->_testMode && this->_frames++ > Config::GetInt("core.test.testFrames")) {
                 this->Exit();
             }
@@ -859,9 +869,13 @@ namespace Engine {
             return 0;
         }
         
+        this->_updateAddonLoad(LoadOrder::PreScript);
+        
         this->_scripting = new ScriptingManager::Context();
         
         // Scripting has now initalized, Javascript may punch in during any event
+        
+        this->_updateAddonLoad(LoadOrder::PreGraphics);
         
         Profiler::Begin("InitOpenGL");
         this->_initOpenGL();
@@ -887,6 +901,8 @@ namespace Engine {
         
         GetRender()->CheckError("Post Finish Loading");
         
+        this->_updateAddonLoad(LoadOrder::Loaded);
+        
         Logger::begin("Application", Logger::LogLevel_Highlight) << "Loaded" << Logger::end();
         
         this->_hookConfigs(); // this is the last stage of the boot process so previous code does'nt interfere.
@@ -907,6 +923,8 @@ namespace Engine {
 		this->_shutdownOpenGL();
         
         delete this->_scripting;
+        
+        Addon::Shutdown();
         
 		Filesystem::Destroy();
         

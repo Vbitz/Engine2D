@@ -57,6 +57,7 @@
 				"src/ScriptingManager.cpp",
 				"src/WorkerThreadPool.cpp",
 				"src/Package.cpp",
+				"src/Addon.cpp",
 
 				"src/Drawables/CubeDrawableTest.cpp",
 
