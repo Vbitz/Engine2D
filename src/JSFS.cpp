@@ -21,156 +21,144 @@
 
 #include "JSFS.hpp"
 
-#include "Util.hpp"
+#include "ScriptingManager.hpp"
 #include "Filesystem.hpp"
 
 namespace Engine {
     namespace JsFS {
-        ENGINE_JS_METHOD(ReadFile) {
-            ENGINE_JS_SCOPE_OPEN;
+        void ReadFile(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
+            if (args.Assert(args[0]->IsString(), "Arg0 is the path to the file to read")) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file to read");
-            
-            std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
+            std::string path = args.StringValue(0);
             
             if (!Filesystem::FileExists(path)) {
-                ENGINE_THROW_ARGERROR("File does not exist");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                args.ThrowArgError("File does not exist");
+                return;
             }
             
             if (args.Length() == 2) {
-                ENGINE_CHECK_ARG_BOOLEAN(1, "Set Arg1 if you need a raw byte array");
+                if (args.Assert(args[0]->IsBoolean(), "Set Arg1 if you need a raw byte array")) return;
                 long fileLength = 0;
                 char* file = Filesystem::GetFileContent(path, fileLength);
-                v8::Handle<v8::Array> arr = v8::Array::New(isolate);
+                v8::Handle<v8::Array> arr = args.NewArray();
                 for (int i = 0; i < fileLength; i++) {
-                    arr->Set(i, v8::Number::New(isolate, (unsigned char) file[i]));
+                    arr->Set(i, args.NewNumber((unsigned char) file[i]));
                 }
-                ENGINE_JS_SCOPE_CLOSE(arr);
+                args.SetReturnValue(arr);
             } else {
-                ENGINE_JS_SCOPE_CLOSE(v8::String::NewFromUtf8(isolate, Filesystem::GetFileContent(path)));
+                args.SetReturnValue(args.NewString(Filesystem::GetFileContent(path)));
             }
         }
         
-        ENGINE_JS_METHOD(WriteFile) {
-            ENGINE_JS_SCOPE_OPEN;
+        void WriteFile(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file to write");
-            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the content to write to the file");
+            if (args.AssertCount(2)) return;
             
-            Filesystem::WriteFile(ENGINE_GET_ARG_CPPSTRING_VALUE(0), *ENGINE_GET_ARG_CSTRING_VALUE(1), args[1]->ToString()->Length());
+            if (args.Assert(args[0]->IsString(), "Arg0 is the path to the file to write") ||
+                args.Assert(args[1]->IsString(), "Arg1 is the content to write to the file")) return;
             
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            Filesystem::WriteFile(args.StringValue(0), *v8::String::Utf8Value(args[1]), args[1]->ToString()->Length());
         }
         
-        ENGINE_JS_METHOD(FileExists) {
-            ENGINE_JS_SCOPE_OPEN;
+        void FileExists(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the path to the file")) return;
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), Filesystem::FileExists(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            args.SetReturnValue(args.NewBoolean(Filesystem::FileExists(args.StringValue(0))));
         }
         
-        ENGINE_JS_METHOD(FileSize) {
-            ENGINE_JS_SCOPE_OPEN;
+        void FileSize(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the file");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the path to the file")) return;
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(args.GetIsolate(), (int) Filesystem::FileSize(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
+            args.SetReturnValue(args.NewInt32((int) Filesystem::FileSize(args.StringValue(0))));
         }
         
-        ENGINE_JS_METHOD(MountFile) {
-            ENGINE_JS_SCOPE_OPEN;
+        void MountFile(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
+            if (args.AssertCount(2)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the archivefile");
-            ENGINE_CHECK_ARG_STRING(1, "Arg1 is the path to mount the archive to");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the path to the archivefile") ||
+                args.Assert(args[1]->IsString(), "Arg1 is the path to mount the archive to")) return;
             
-            std::string path = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
+            std::string path = args.StringValue(0);
             
             if (!Filesystem::FileExists(path)) {
-                ENGINE_THROW_ARGERROR("File does not exist");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+                bool result = Filesystem::Mount(Filesystem::GetRealPath(path), args.StringValue(1));
+                
+                args.SetReturnValue(args.NewBoolean(result));
+            } else {
+                args.ThrowArgError("File does not exist");
             }
-            
-            bool result = Filesystem::Mount(Filesystem::GetRealPath(path), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), result));
         }
         
-        ENGINE_JS_METHOD(ConfigDir) {
-            ENGINE_JS_SCOPE_OPEN;
+        void ConfigDir(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the application name");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the application name")) return;
             
-            Filesystem::SetupUserDir(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            Filesystem::SetupUserDir(args.StringValue(0));
         }
         
         void HasSetConfigDir(v8::Local<v8::String> name, const v8::PropertyCallbackInfo<v8::Value>& args) {
             args.GetReturnValue().Set(Filesystem::HasSetUserDir());
         }
         
-        ENGINE_JS_METHOD(Mkdir) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Mkdir(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path to the directory to create");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the path to the directory to create")) return;
             
-            Filesystem::Mkdir(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            Filesystem::Mkdir(args.StringValue(0));
         }
         
-        ENGINE_JS_METHOD(Lsdir) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Lsdir(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.Assert(args[0]->IsString(), "Arg0 is the path to the directory to list")) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the path of the directory to list");
+            v8::Handle<v8::Array> ret = args.NewArray();
             
-            v8::Handle<v8::Array> ret = v8::Array::New(isolate);
-            
-            std::vector<std::string> files = Filesystem::GetDirectoryContent(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            std::vector<std::string> files = Filesystem::GetDirectoryContent(args.StringValue(0));
             
             for (size_t i = 0; i < files.size(); i++) {
-                ret->Set(i, v8::String::NewFromUtf8(isolate, files[i].c_str()));
+                ret->Set(i, args.NewString(files[i]));
             }
             
-            ENGINE_JS_SCOPE_CLOSE(ret);
+            args.SetReturnValue(ret);
         }
-        
-#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
         
         void InitFS(v8::Handle<v8::ObjectTemplate> fsTable) {
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             
-            addItem(fsTable, "readFile", ReadFile);
-            addItem(fsTable, "writeFile", WriteFile);
-            addItem(fsTable, "fileExists", FileExists);
-            addItem(fsTable, "fileSize", FileSize);
-            addItem(fsTable, "mountFile", MountFile);
-            addItem(fsTable, "configDir", ConfigDir);
-            addItem(fsTable, "mkdir", Mkdir);
-            addItem(fsTable, "lsdir", Lsdir);
+            f.FillTemplate(fsTable, {
+                {FTT_Static, "readFile", f.NewFunctionTemplate(ReadFile)},
+                {FTT_Static, "writeFile", f.NewFunctionTemplate(WriteFile)},
+                {FTT_Static, "fileExists", f.NewFunctionTemplate(FileExists)},
+                {FTT_Static, "fileSize", f.NewFunctionTemplate(FileSize)},
+                {FTT_Static, "mountFile", f.NewFunctionTemplate(MountFile)},
+                {FTT_Static, "configDir", f.NewFunctionTemplate(ConfigDir)},
+                {FTT_Static, "mkdir", f.NewFunctionTemplate(Mkdir)},
+                {FTT_Static, "lsdir", f.NewFunctionTemplate(Lsdir)}
+            });
             
-            fsTable->SetAccessor(v8::String::NewFromUtf8(isolate, "hasSetConfigDir"), HasSetConfigDir);
+            fsTable->SetAccessor(f.NewString("hasSetConfigDir"), HasSetConfigDir);
         }
-        
-#undef addItem
-        
     }
 }
