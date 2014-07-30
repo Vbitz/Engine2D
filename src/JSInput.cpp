@@ -28,7 +28,7 @@
 namespace Engine {
     namespace JsInput {
         
-        char *convertToUpper(char *str){
+        char *convertToUpper(const char *str){
             char *newstr, *p;
             p = newstr = strdup(str);
             while(*p++ != 0x00) {
@@ -37,27 +37,25 @@ namespace Engine {
             return newstr;
         }
         
-        ENGINE_JS_METHOD(KeyDown) {
-            ENGINE_JS_SCOPE_OPEN;
+        void KeyDown(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(1);
+            if (args.AssertCount(1)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Key to check the status of");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the Key to check the status of")) return;
             
-            const char* str = convertToUpper(*ENGINE_GET_ARG_CSTRING_VALUE(0));
+            const char* str = convertToUpper(args.CStringValue(0));
             
             int key = (int) str[0];
             
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetAppSingilton()->GetKeyPressed(key)));
+            args.SetReturnValue(args.NewBoolean(GetAppSingilton()->GetKeyPressed(key)));
         }
-        
-#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
         
         void InitInput(v8::Handle<v8::ObjectTemplate> inputTable) {
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
-            addItem(inputTable, "keyDown", KeyDown);
+            ScriptingManager::Factory f(v8::Isolate::GetCurrent());
+            f.FillTemplate(inputTable, {
+                {FTT_Static, "keyDown", f.NewFunctionTemplate(KeyDown)}
+            });
         }
-        
-#undef addItem
     }
 }
