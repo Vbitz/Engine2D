@@ -50,6 +50,7 @@ namespace Engine {
         
         virtual glm::vec2 GetCursorPos() = 0;
         virtual bool GetMouseButtonPressed(MouseButton b) = 0;
+        virtual void SetCaptureMouse(bool capture) = 0;
         
         virtual KeyStatus GetKeyStatus(int key) = 0;
         

@@ -282,6 +282,13 @@ namespace Engine {
             this->_debug = debug;
         }
         
+        void SetCaptureMouse(bool capture) override {
+            this->_captureMouse = capture;
+            if (this->_window  != NULL) {
+                glfwSetInputMode(this->_window, GLFW_CURSOR, capture ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+            }
+        }
+        
         OpenGLVersion GetGlVersion() override {
             assert(this->_window != NULL);
             OpenGLVersion ret;
@@ -442,6 +449,10 @@ namespace Engine {
             glfwSetKeyCallback(this->_window, WindowKeyPress);
             glfwSetMouseButtonCallback(this->_window, WindowMouseButton);
             
+            if (this->_captureMouse) {
+                glfwSetInputMode(this->_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
+            
             switch (this->_version) {
                 case GraphicsVersion::OpenGL_Modern:
                     this->_render = CreateRenderGL3();
@@ -460,6 +471,7 @@ namespace Engine {
         glm::vec2 _size = glm::vec2(800, 600);
         bool _visible = false;
         bool _fullscreen = false;
+        bool _captureMouse = false;
         std::string _title = "Engine2D";
         int _aaSamples = 0;
         bool _debug = false;
