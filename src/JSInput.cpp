@@ -51,10 +51,19 @@ namespace Engine {
             args.SetReturnValue(args.NewBoolean(GetAppSingilton()->GetKeyPressed(key)));
         }
         
+        void SetCaptureMouse(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            
+            if (args.AssertCount(1)) return;
+            
+            GetAppSingilton()->GetWindow()->SetCaptureMouse(args.BooleanValue(0));
+        }
+        
         void InitInput(v8::Handle<v8::ObjectTemplate> inputTable) {
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             f.FillTemplate(inputTable, {
-                {FTT_Static, "keyDown", f.NewFunctionTemplate(KeyDown)}
+                {FTT_Static, "keyDown", f.NewFunctionTemplate(KeyDown)},
+                {FTT_Static, "setCaptureMouse", f.NewFunctionTemplate(SetCaptureMouse)}
             });
         }
     }
