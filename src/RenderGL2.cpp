@@ -125,10 +125,14 @@ namespace Engine {
         }
         
         void BeginRendering(PolygonMode mode) override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glBegin(_polygonModeToGLMode(mode));
         }
         
         void EndRendering() override {
+            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            
             glEnd();
         }
         
