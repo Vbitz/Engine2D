@@ -25,13 +25,99 @@
 #include <unordered_map>
 #include <sstream>
 #include <map>
+#include <stack>
+
+#include "vendor/json/json.h"
 
 #include "Logger.hpp"
 #include "Config.hpp"
+#include "Events.hpp"
 
 #include "Platform.hpp"
 
 namespace Engine {
+    namespace Profiler_New {
+        struct ProfileZoneMetadata {
+            ProfileZoneMetadata *parent = NULL;
+            std::string name;
+            unsigned int callCount = 0;
+            double totalTime = 0;
+            double avgTime = -1; // Using a CMA (Cumulative Moving Average)
+            double minTime = std::numeric_limits<double>::max();
+            double maxTime = std::numeric_limits<double>::min();
+            std::unordered_map<std::string, ProfileZoneMetadata*> children;
+        };
+        
+        ProfileZoneMetadata *rootZone, *currentZone;
+        
+        void BeginProfile(ScopePtr scope) {
+            if (currentZone == NULL) return;
+            std::string scopeName = scope->GetName();
+            if (currentZone->children.count(scopeName) == 0) {
+                ProfileZoneMetadata* newZone = new ProfileZoneMetadata();
+                newZone->name = scopeName;
+                newZone->parent = currentZone;
+                currentZone->children[scopeName] = newZone;
+                currentZone = newZone;
+            } else {
+                currentZone = currentZone->children[scopeName];
+            }
+        }
+        
+        void SubmitProfile(ScopePtr scope) {
+            if (currentZone == NULL) return;
+            assert(currentZone->parent != NULL);
+            double time = scope->GetElapsedTime();
+            currentZone->callCount++;
+            currentZone->totalTime += time;
+            if (currentZone->avgTime == -1) {
+                currentZone->avgTime = time;
+            } else {
+                currentZone->avgTime += (time - currentZone->avgTime) / currentZone->callCount;
+            }
+            if (time > currentZone->maxTime) {
+                currentZone->maxTime = time;
+            }
+            if (time < currentZone->minTime) {
+                currentZone->minTime = time;
+            }
+            currentZone = currentZone->parent;
+        }
+        
+        void BeginProfileFrame() {
+            rootZone = currentZone = new ProfileZoneMetadata();
+            currentZone->name = "Root";
+        }
+        
+        void _freeZone(ProfileZoneMetadata* zone) {
+            for (auto iter = zone->children.begin(); iter != zone->children.end(); iter++) {
+                _freeZone(iter->second);
+            }
+            delete zone;
+        }
+        
+        Json::Value _buildJSONFromZone(ProfileZoneMetadata* zone) {
+            Json::Value ret(Json::objectValue);
+            ret["name"] = zone->name;
+            ret["count"] = zone->callCount;
+            ret["total"] = zone->totalTime;
+            ret["avg"] = zone->avgTime;
+            ret["min"] = zone->minTime;
+            ret["max"] = zone->maxTime;
+            Json::Value children(Json::objectValue);
+            for (auto iter = zone->children.begin(); iter != zone->children.end(); iter++) {
+                children[iter->first] = _buildJSONFromZone(iter->second);
+            }
+            return ret;
+        }
+        
+        void EndProfileFrame() {
+            assert(currentZone == rootZone);
+            GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(_buildJSONFromZone(rootZone));
+            _freeZone(rootZone);
+        }
+    }
+    
     namespace Profiler {
         
         std::stringstream _detail;

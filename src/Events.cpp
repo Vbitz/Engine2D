@@ -27,6 +27,7 @@
 
 #include "Logger.hpp"
 #include "Platform.hpp"
+#include "Profiler.hpp"
 
 namespace Engine {
     static std::function<bool(Json::Value)> emptyFilter = [](Json::Value e) { return true; };
@@ -131,6 +132,7 @@ namespace Engine {
     }
         
     EventMagic EventClass::Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]) {
+        ENGINE_PROFILER_SCOPE;
         static std::vector<int> deleteTargets;
         if (this->_alwaysDefered) {
             this->_deferedMessages.push(args);
@@ -212,6 +214,7 @@ namespace Engine {
     }
     
     void EventClass::PollDeferedMessages() {
+        ENGINE_PROFILER_SCOPE;
         while (this->_deferedMessages.size() > 0) {
             for (auto iter2 = this->_events.begin(); iter2 != this->_events.end(); iter2++) {
                 if (iter2->second.Target == NULL) { throw "Invalid Target"; }

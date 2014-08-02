@@ -24,7 +24,62 @@
 #include <vector>
 #include <string>
 
+#include "stdlib.hpp"
+#include "Platform.hpp"
+
+#define PROFILER
+
+#ifdef PROFILER
+#define ENGINE_PROFILER_SCOPE Engine::Profiler_New::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__)
+#else
+#define ENGINE_PROFILER_SCOPE
+#endif
+
 namespace Engine {
+    namespace Profiler_New {
+        ENGINE_CLASS(Scope);
+        
+        void BeginProfile(ScopePtr scope);
+        void SubmitProfile(ScopePtr scope);
+        
+        class Scope {
+        public:
+            Scope(const char* functionName) {
+                this->_startTime = Platform::GetTime();
+                this->_name = functionName;
+                BeginProfile(this);
+            }
+            
+            void Close() {
+                if (this->_running) {
+                    this->_endTime = Platform::GetTime();
+                    SubmitProfile(this);
+                    this->_running = false;
+                }
+            }
+            
+            ~Scope() {
+                this->Close();
+            }
+            
+            std::string GetName() {
+                return std::string(this->_name);
+            }
+            
+            double GetElapsedTime() {
+                return this->_endTime - this->_startTime;
+            }
+        private:
+            const char* _name;
+            double _startTime;
+            double _endTime;
+            bool _running = true;
+        };
+        
+        void BeginProfileFrame();
+        void EndProfileFrame();
+    }
+    
     namespace Profiler {
         void Begin(std::string zone);
         void Begin(std::string zone, double maxTime);
