@@ -182,132 +182,101 @@ namespace Engine {
             drawTable->Set(isolate, "Color", newColor);
         }
         
-        void CreateVertexBuffer(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.RecallAsConstructor()) return;
-            
-            args.AssertCount(1);
-            
-            args.Assert(args[0]->IsString(), "Arg0 is the Effect filename to use");
-            
-            RenderDriverPtr render = GetAppSingilton()->GetRender();
-            
-            GL3BufferPtr buf = NULL;
-            
-            if (render->GetRendererType() == RendererType::OpenGL3) {
-                EffectParametersPtr effect = EffectReader::GetEffectFromFile(args.StringValue(0));
-                effect->CreateShader();
-                buf = new GL3Buffer(render, effect);
-            }
-            
-            args.This()->SetHiddenValue(args.NewString("_buf"), args.NewExternal(buf));
-        }
+        class JS_VertexBuffer2D : public GL3Buffer, public ScriptingManager::ObjectWrap {
+        public:
         
-        void VertexBuffer_AddVert(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            glm::vec3 pos;
-            Color4f col = Color4f("white");
-            glm::vec2 uv;
-            
-            if (args.Length() >= 2) { // (x, y)
-                pos = glm::vec3(args.NumberValue(0),
-                                args.NumberValue(1),
-                                0.0f);
-            }
-            if (args.Length() >= 3) { // (x, y, col)
-                v8::Handle<v8::Object> obj = args[2]->ToObject();
-                col = Color4fFromObject(args.GetIsolate(), obj);
-            }
-            if (args.Length() >= 5) { // (x, y, col, u, v)
-                uv = glm::vec2(args.NumberValue(3),
-                               args.NumberValue(4));
-            }
-            
-            void* v = args.This()->GetHiddenValue(args.NewString("_buf")).As<v8::External>()->Value();
-            
-            if (v == NULL) {
-                return;
+            static void Create(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.RecallAsConstructor()) return;
+                
+                args.AssertCount(1);
+                
+                args.Assert(args[0]->IsString(), "Arg0 is the Effect filename to use");
+                
+                RenderDriverPtr render = GetAppSingilton()->GetRender();
+                
+                JS_VertexBuffer2D::Wrap<JS_VertexBuffer2D>(args.GetIsolate(), args.This());
+                
+                if (render->GetRendererType() == RendererType::OpenGL3) {
+                    EffectParametersPtr effect = EffectReader::GetEffectFromFile(args.StringValue(0));
+                    effect->CreateShader();
+                    JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::Init(render, effect);
+                }
             }
             
-            GL3BufferPtr buf = (GL3BufferPtr) v;
-            
-            buf->AddVert(pos, col, uv);
-        }
-        
-        void VertexBuffer_Draw(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            void* v = args.This()->GetHiddenValue(args.NewString("_buf")).As<v8::External>()->Value();
-            
-            if (v == NULL) {
-                return;
+            static void AddVert(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                glm::vec3 pos;
+                Color4f col = Color4f("white");
+                glm::vec2 uv;
+                
+                if (args.Length() >= 2) { // (x, y)
+                    pos = glm::vec3(args.NumberValue(0),
+                                    args.NumberValue(1),
+                                    0.0f);
+                }
+                if (args.Length() >= 3) { // (x, y, col)
+                    v8::Handle<v8::Object> obj = args[2]->ToObject();
+                    col = Color4fFromObject(args.GetIsolate(), obj);
+                }
+                if (args.Length() >= 5) { // (x, y, col, u, v)
+                    uv = glm::vec2(args.NumberValue(3),
+                                   args.NumberValue(4));
+                }
+                
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::AddVert(pos, col, uv);
             }
             
-            GL3BufferPtr buf = (GL3BufferPtr) v;
-            
-            buf->Draw(PolygonMode::Triangles, glm::mat4(), glm::mat4());
-        }
-        
-        void VertexBuffer_Save(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.AssertCount(1)) return;
-            
-            if (args.Assert(args[0]->IsString(), "Arg0 is the filename to save to")) return;
-            
-            void* v = args.This()->GetHiddenValue(args.NewString("_buf")).As<v8::External>()->Value();
-            
-            if (v == NULL) {
-                return;
+            static void Draw(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::Draw(PolygonMode::Triangles, glm::mat4(), glm::mat4());
             }
             
-            GL3BufferPtr buf = (GL3BufferPtr) v;
-            
-            buf->Save(args.StringValue(0));
-        }
-        
-        void VertexBuffer_Load(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.AssertCount(1)) return;
-            
-            if (args.Assert(args[0]->IsString(), "Arg0 is the filename to load from")) return;
-            
-            void* v = args.This()->GetHiddenValue(args.NewString("_buf")).As<v8::External>()->Value();
-            
-            if (v == NULL) {
-                return;
+            static void Save(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(args[0]->IsString(), "Arg0 is the filename to save to")) return;
+                
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::Save(args.StringValue(0));
             }
             
-            GL3BufferPtr buf = (GL3BufferPtr) v;
+            static void Load(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(args[0]->IsString(), "Arg0 is the filename to load from")) return;
+                
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::Load(args.StringValue(0));
+            }
             
-            buf->Load(args.StringValue(0));
-        }
-        
-        void InitVertexBuffer2DObject(v8::Handle<v8::ObjectTemplate> drawTable) {
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
-            v8::HandleScope scope(isolate);
-            
-            v8::Handle<v8::FunctionTemplate> newVertexBuffer = v8::FunctionTemplate::New(isolate);
-            
-            newVertexBuffer->SetClassName(v8::String::NewFromUtf8(isolate, "VertexBuffer2D"));
-            
-            v8::Handle<v8::ObjectTemplate> vbPrototypeTemplate = newVertexBuffer->PrototypeTemplate();
-            v8::Handle<v8::ObjectTemplate> vbInstanceTemplate = newVertexBuffer->InstanceTemplate();
-            
-            vbPrototypeTemplate->Set(isolate, "addVert", v8::FunctionTemplate::New(isolate, VertexBuffer_AddVert));
-            vbPrototypeTemplate->Set(isolate, "draw", v8::FunctionTemplate::New(isolate, VertexBuffer_Draw));
-            vbPrototypeTemplate->Set(isolate, "save", v8::FunctionTemplate::New(isolate, VertexBuffer_Save));
-            vbPrototypeTemplate->Set(isolate, "load", v8::FunctionTemplate::New(isolate, VertexBuffer_Load));
-            
-            newVertexBuffer->SetCallHandler(CreateVertexBuffer);
-            
-            vertexBuffer2DTemplate.Reset(isolate, newVertexBuffer);
-            
-            drawTable->Set(isolate, "VertexBuffer2D", newVertexBuffer);
-        }
+            static void Init(v8::Handle<v8::ObjectTemplate> drawTable) {
+                ScriptingManager::Factory f(v8::Isolate::GetCurrent());
+                v8::HandleScope scope(f.GetIsolate());
+                
+                v8::Handle<v8::FunctionTemplate> newVertexBuffer = f.NewFunctionTemplate(Create);
+                
+                newVertexBuffer->SetClassName(f.NewString("VertexBuffer2D"));
+                
+                f.FillTemplate(newVertexBuffer, {
+                    {FTT_Prototype, "addVert", f.NewFunctionTemplate(AddVert)},
+                    {FTT_Prototype, "draw", f.NewFunctionTemplate(Draw)},
+                    {FTT_Prototype, "save", f.NewFunctionTemplate(Save)},
+                    {FTT_Prototype, "load", f.NewFunctionTemplate(Load)}
+                });
+                
+                newVertexBuffer->InstanceTemplate()->SetInternalFieldCount(1);
+                
+                vertexBuffer2DTemplate.Reset(f.GetIsolate(), newVertexBuffer);
+                
+                drawTable->Set(f.GetIsolate(), "VertexBuffer2D", newVertexBuffer);
+            }
+        };
         
         inline Draw2DPtr GetDraw2D(v8::Local<v8::Object> thisValue) {
             return (Draw2DPtr) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_draw")).As<v8::External>()->Value();
@@ -1139,7 +1108,7 @@ namespace Engine {
         
         void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
             InitColorObject(drawTable);
-            InitVertexBuffer2DObject(drawTable);
+            JS_VertexBuffer2D::Init(drawTable);
             
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             

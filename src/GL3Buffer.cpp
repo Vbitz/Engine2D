@@ -48,12 +48,29 @@ namespace Engine {
         }
     }
     
+    GL3Buffer::GL3Buffer() : _shaderBound(false) {
+        
+    }
+    
     GL3Buffer::GL3Buffer(RenderDriverPtr render, EffectParametersPtr params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
         this->_init();
     }
     
     GL3Buffer::~GL3Buffer() {
         this->_shutdown();
+    }
+    
+    bool GL3Buffer::IsValid() {
+        if (this->_currentEffect == NULL) return false;
+        if (this->_renderGL == NULL) return false;
+        return true;
+    }
+    
+    void GL3Buffer::Init(RenderDriverPtr render, EffectParametersPtr params) {
+        this->_currentEffect = params;
+        this->_shaderBound = false;
+        this->_renderGL = render;
+        this->_init();
     }
     
     void GL3Buffer::_init() {
@@ -87,6 +104,7 @@ namespace Engine {
     }
     
     bool GL3Buffer::Update() {
+        assert(this->_renderGL != NULL);
         if (!this->NeedsUpdate()) {
             return false;
         }

@@ -64,8 +64,12 @@ namespace Engine {
     
 	class GL3Buffer {
 	public:
+        GL3Buffer();
 		GL3Buffer(RenderDriverPtr render, EffectParametersPtr params);
 		~GL3Buffer();
+
+        bool IsValid();
+        void Init(RenderDriverPtr render, EffectParametersPtr params);
 
         void AddVert(glm::vec3 pos);
         void AddVert(glm::vec3 pos, Color4f col);
@@ -112,7 +116,7 @@ namespace Engine {
         
         RenderDriverPtr _renderGL = NULL;
         ShaderPtr _currentShader = NULL;
-        EffectParametersPtr _currentEffect;
+        EffectParametersPtr _currentEffect = NULL;
         
         bool _shaderBound = false;
 	};
