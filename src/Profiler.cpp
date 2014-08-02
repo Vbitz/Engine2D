@@ -108,12 +108,15 @@ namespace Engine {
             for (auto iter = zone->children.begin(); iter != zone->children.end(); iter++) {
                 children[iter->first] = _buildJSONFromZone(iter->second);
             }
+            ret["children"] = children;
             return ret;
         }
         
         void EndProfileFrame() {
             assert(currentZone == rootZone);
-            GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(_buildJSONFromZone(rootZone));
+            Json::Value args(Json::objectValue);
+            args["results"] = _buildJSONFromZone(rootZone);
+            GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(args);
             _freeZone(rootZone);
         }
     }

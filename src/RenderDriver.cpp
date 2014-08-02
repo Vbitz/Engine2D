@@ -22,6 +22,7 @@
 #include "RenderDriver.hpp"
 
 #include "Application.hpp"
+#include "Profiler.hpp"
 
 namespace Engine {
     Drawable::~Drawable() {
@@ -46,9 +47,10 @@ namespace Engine {
     }
     
     void RenderDriver::Print(float x, float y, const char* string) {
-        RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+        const char* realStirng = strdup(string);
+        ENGINE_PROFILER_SCOPE;
         
-        this->_getSheet(this->_currentFontName)->DrawText(this, x, y, this->_currentFontSize, string);
+        this->_getSheet(this->_currentFontName)->DrawText(this, x, y, this->_currentFontSize, realStirng);
     }
     
     float RenderDriver::CalcStringWidth(std::string str) {

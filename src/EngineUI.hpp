@@ -50,6 +50,8 @@ namespace Engine {
         
         bool ConsoleActive();
     private:
+        int _renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value data, int x, int xIndent, int y);
+        
         ApplicationPtr _app;
         Draw2DPtr _draw;
         
@@ -72,7 +74,9 @@ namespace Engine {
         std::vector<std::string> _commandHistory;
         size_t _currentHistoryLine = 0;
         
-        Json::Value _cachedProfilerDetails;
+        Json::Value _cachedProfilerDetails, _currentProfilerDetails;
+        double _currentProfilerScroll = 0;
+        int _profilerX = 0;
         static EventMagic _profilerHook(Json::Value args);
         static EventMagic _captureLastDrawTimes(Json::Value args);
     };

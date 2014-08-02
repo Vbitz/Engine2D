@@ -31,6 +31,7 @@
 #include "Config.hpp"
 
 #include "Application.hpp"
+#include "Profiler.hpp"
 
 // TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
 #include "vendor/glm/glm.hpp"
@@ -89,7 +90,7 @@ namespace Engine {
         }
         
         std::vector<std::string> GetExtentions() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             std::vector<std::string> ret;
             
@@ -111,7 +112,7 @@ namespace Engine {
         }
         
         void ResetMatrix() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             //glPushMatrix();
             glDisable(GL_DEPTH_TEST);
@@ -125,19 +126,19 @@ namespace Engine {
         }
         
         void BeginRendering(PolygonMode mode) override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             glBegin(_polygonModeToGLMode(mode));
         }
         
         void EndRendering() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             glEnd();
         }
         
         void EnableTexture(TexturePtr texId) override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             glEnable(GL_TEXTURE_2D);
                 
@@ -145,7 +146,7 @@ namespace Engine {
         }
         
         void DisableTexture() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             glBindTexture(GL_TEXTURE_2D, 0);
                 
@@ -153,7 +154,7 @@ namespace Engine {
         }
         
         void EnableSmooth() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             glEnable(GL_LINE_SMOOTH);
             glEnable(GL_POLYGON_SMOOTH);
@@ -162,7 +163,7 @@ namespace Engine {
         }
         
         void DisableSmooth() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             glDisable(GL_LINE_SMOOTH);
             glDisable(GL_POLYGON_SMOOTH);
@@ -172,8 +173,8 @@ namespace Engine {
 		
         void Init2d() override { }
         
-		void Begin2d() override {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+        void Begin2d() override {
+            ENGINE_PROFILER_SCOPE;
             
             EnableSmooth();
             

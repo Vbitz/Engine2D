@@ -71,7 +71,7 @@ namespace Engine {
             this->_lastHeapUsages[i] = 0.0f;
         }
         
-        GetEventsSingilton()->GetEvent("onDrawProfileEnd")->AddListener("EngineUI::_profilerHook", EventEmitter::MakeTarget(_profilerHook));
+        GetEventsSingilton()->GetEvent("onProfileEnd")->AddListener("EngineUI::_profilerHook", EventEmitter::MakeTarget(_profilerHook));
         GetEventsSingilton()->GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", EventEmitter::MakeTarget(_captureLastDrawTimes));
     }
     
@@ -329,7 +329,7 @@ namespace Engine {
             renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
             renderGL->SetFont("basic", 16);
             renderGL->Print(20, y - 45, "RenderDriver Profiler");
-            renderGL->Print(windowSize.x - 160, y - 45, "Press R to Refresh");
+            renderGL->Print(windowSize.x - 280, y - 45, "Press R to Refresh | </> to Scroll");
             
             renderGL->SetFont("basic", 10);
             
@@ -345,58 +345,9 @@ namespace Engine {
             
             y = (windowSize.y / 2) - 50;
             
-            for (auto iter = this->_cachedProfilerDetails.begin();
-                 iter != this->_cachedProfilerDetails.end();
-                 iter++) {
-                
-                if (x++ % 2) {
-                    renderGL->SetColor(60 / 255.0f, 60 / 255.0f, 60 / 255.0f, 0.9f);
-                } else {
-                    renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
-                }
-                this->_draw->Rect(0, y, windowSize.x, 18);
-                
-                y += 18;
-                if (y > windowSize.y) {
-                    break;
-                }
-            }
+            this->_profilerX = 0;
             
-            y = (windowSize.y / 2) - 50;
-            
-            for (auto iter = this->_cachedProfilerDetails.begin();
-                 iter != this->_cachedProfilerDetails.end();
-                 iter++) {
-                std::string key = iter.key().asString();
-                
-                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
-                renderGL->Print(20, y + 4, key.c_str());
-                
-                ss.str("");
-                ss << (*iter)["count"].asDouble();
-                
-                renderGL->Print(680, y + 4, ss.str().c_str());
-                
-                ss.str("");
-                ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
-                
-                renderGL->Print(750, y + 4, ss.str().c_str());
-                
-                ss.str("");
-                ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
-                
-                renderGL->Print(850, y + 4, ss.str().c_str());
-                
-                ss.str("");
-                ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
-                
-                renderGL->Print(950, y + 4, ss.str().c_str());
-                
-                y += 18;
-                if (y > windowSize.y) {
-                    break;
-                }
-            }
+            y = this->_renderProfileZone(renderGL, windowSize, this->_cachedProfilerDetails["children"], x, 0, y);
         }
         
         renderGL->SetFont("basic", 10);
@@ -421,6 +372,54 @@ namespace Engine {
         else
             renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
         renderGL->Print(250, 24, "Profiler (F3)");
+    }
+    
+    int EngineUI::_renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value data, int x, int xIndent, int y) {
+        static std::stringstream ss;
+        for (auto iter = data.begin();
+             iter != data.end();
+             iter++) {
+            
+            if (this->_profilerX++ % 2) {
+                renderGL->SetColor(60 / 255.0f, 60 / 255.0f, 60 / 255.0f, 0.9f);
+            } else {
+                renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+            }
+            this->_draw->Rect(0, y, windowSize.x, 18);
+            
+            std::string key = iter.key().asString();
+            
+            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+            renderGL->Print(xIndent + 20, y + 4, key.c_str());
+            
+            ss.str("");
+            ss << (*iter)["count"].asDouble();
+            
+            renderGL->Print(680, y + 4, ss.str().c_str());
+            
+            ss.str("");
+            ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
+            
+            renderGL->Print(750, y + 4, ss.str().c_str());
+            
+            ss.str("");
+            ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
+            
+            renderGL->Print(850, y + 4, ss.str().c_str());
+            
+            ss.str("");
+            ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
+            
+            renderGL->Print(950, y + 4, ss.str().c_str());
+            
+            y += 18;
+            if (y > windowSize.y) {
+                break;
+            }
+            
+            y = this->_renderProfileZone(renderGL, windowSize, (*iter)["children"], x, xIndent + 25, y);
+        }
+        return y;
     }
 
     void EngineUI::OnKeyPress(int key, int press, bool shift) {
@@ -487,7 +486,7 @@ namespace Engine {
             }
         } else if (this->_currentView == CurrentView::Profiler) {
             if (key == 'R' && press == Key_Press) {
-                GetEventsSingilton()->GetEvent("doDrawProfile")->Emit();
+                this->_cachedProfilerDetails = this->_currentProfilerDetails;
             } else if (key == '[' && (press == Key_Press || press == Key_Repeat)) {
                 if (this->_profilerDrawTimeScale > 500) {
                     this->_profilerDrawTimeScale -= 500;
@@ -495,6 +494,14 @@ namespace Engine {
             } else if (key == ']' && (press == Key_Press || press == Key_Repeat)) {
                 if (this->_profilerDrawTimeScale < 40000) {
                     this->_profilerDrawTimeScale += 500;
+                }
+            } else if (key == '<' && (press == Key_Press || press == Key_Repeat)) {
+                if (this->_currentProfilerScroll > 0) {
+                    this->_currentProfilerScroll += 10;
+                }
+            } else if (key == '>' && (press == Key_Press || press == Key_Repeat)) {
+                if (this->_currentProfilerScroll > 6000) {
+                    this->_currentProfilerScroll -= 10;
                 }
             }
         }
@@ -519,7 +526,7 @@ namespace Engine {
     EventMagic EngineUI::_profilerHook(Json::Value args) {
         EngineUIPtr eui = GetAppSingilton()->GetEngineUI();
         
-        eui->_cachedProfilerDetails = args["results"];
+        eui->_currentProfilerDetails = args["results"];
     }
     
     EventMagic EngineUI::_captureLastDrawTimes(Json::Value args) {
