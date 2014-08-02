@@ -276,7 +276,7 @@ namespace Engine {
         
     private:
         void _switchTextures() {
-            RenderDriver::DrawProfiler p = this->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             this->_activeTexture = this->_currentTexture;
             

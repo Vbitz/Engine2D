@@ -26,6 +26,8 @@
 
 #include "Filesystem.hpp"
 
+#include "Profiler.hpp"
+
 #include "Util.hpp"
 #include "Platform.hpp"
 
@@ -60,19 +62,19 @@ namespace Engine {
     
     void Shader::Begin() {
         if (this->checkProgramPointer()) {
-            RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             glUseProgram(this->_programPointer);
         }
     }
     
     void Shader::End() {
-        RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         glUseProgram(0);
     }
     
     bool Shader::Update() {
         if (this->NeedsUpdate()) {
-            RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             
             this->_render->CheckError("Shader::Update::Pre");
             
@@ -131,7 +133,7 @@ namespace Engine {
     
     void Shader::UploadUniform(std::string token, float x, float y) {
         if (this->checkProgramPointer()) {
-            RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             glUniform2f(this->_uniforms[token], x, y);
         }
     }
@@ -139,7 +141,7 @@ namespace Engine {
     void Shader::UploadUniform(std::string token, glm::mat4 matrix) {
         if (this->checkProgramPointer()) {
             if (this->_matrix_uniform_cache.count(token) == 0 || this->_matrix_uniform_cache[token] != matrix) {
-                RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+                ENGINE_PROFILER_SCOPE;
                 glUniformMatrix4fv(this->_uniforms[token], 1, GL_FALSE, &matrix[0][0]);
                 this->_matrix_uniform_cache[token] = matrix;
             }
@@ -148,7 +150,7 @@ namespace Engine {
     
     void Shader::UploadUniform(std::string token, float* data, int verts) {
         if (this->checkProgramPointer()) {
-            RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+            ENGINE_PROFILER_SCOPE;
             glUniform2fv(this->_uniforms[token], verts, data);
         }
     }
@@ -158,7 +160,7 @@ namespace Engine {
             return;
         }
         
-        RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         GLuint attribPos = glGetAttribLocation(_programPointer, token.c_str());
         
@@ -189,7 +191,7 @@ namespace Engine {
     }
     
     void Shader::Init(EffectShaderType type, std::string vertShaderFilename, std::string fragShaderFilename) {
-        RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         this->_type = type;
         
@@ -219,7 +221,7 @@ namespace Engine {
     }
     
     bool Shader::compile(const char* vertSource, const char* fragSource) {
-        RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         this->_vertPointer = glCreateShader(GL_VERTEX_SHADER);
         this->_fragPointer = glCreateShader(GL_FRAGMENT_SHADER);

@@ -260,7 +260,6 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("screenshot")->AddListener("Application::_saveScreenshot", EventEmitter::MakeTarget(_saveScreenshot))->SetDefered(true);
         GetEventsSingilton()->GetEvent("dumpProfile")->AddListener("Application::_dumpProfile", EventEmitter::MakeTarget(_dumpProfile))->SetDefered(true);
         GetEventsSingilton()->GetEvent("dumpLog")->AddListener("Application::_dumpLog", EventEmitter::MakeTarget(_dumpLog));
-        GetEventsSingilton()->GetEvent("doDrawProfile")->AddListener("Application::_doDrawProfile", EventEmitter::MakeTarget(_doDrawProfile))->SetDefered(true);
         
         GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary));
         GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireConfigFile", EventEmitter::MakeTarget(_requireConfigFile));
@@ -580,11 +579,6 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("onSaveLog")->Emit(saveArgs);
     }
     
-    EventMagic Application::_doDrawProfile(Json::Value args) {
-        GetAppSingilton()->GetRender()->BeginProfiling();
-        return EM_OK;
-    }
-    
     EventMagic Application::_requireDynamicLibary(Json::Value args) {
         static size_t endingLength = strlen(_PLATFORM_DYLINK);
         std::string filename = args["path"].asString();
@@ -759,8 +753,6 @@ namespace Engine {
             
             Profiler::Begin("Frame", Config::GetFloat("core.render.targetFrameTime"));
             
-            GetEventsSingilton()->PollDeferedMessages("doDrawProfile");
-            
             this->_updateFrameTime();
             
             this->_updateMousePos();
@@ -840,7 +832,6 @@ namespace Engine {
             }
             
             FramePerfMonitor::EndFrame();
-            this->_renderGL->EndProfilingFrame();
             Profiler_New::EndProfileFrame();
         }
     }

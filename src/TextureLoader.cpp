@@ -25,6 +25,7 @@
 #include "TextureLoader.hpp"
 
 #include "Application.hpp"
+#include "Profiler.hpp"
 
 #include "vendor/soil/SOIL.h"
 
@@ -68,7 +69,7 @@ namespace Engine {
             throw "Invalid Texture";
         }
         
-        RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         this->_render->CheckError("Texture::Begin::PreBind");
         glBindTexture(GL_TEXTURE_2D, this->_textureID);
@@ -77,8 +78,7 @@ namespace Engine {
     }
     
     void Texture::End() {
-        
-        RenderDriver::DrawProfiler p = this->_render->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         glBindTexture(GL_TEXTURE_2D, 0);
     }

@@ -26,6 +26,7 @@
 
 #include "Logger.hpp"
 #include "Filesystem.hpp"
+#include "Profiler.hpp"
 
 // TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
 #include "vendor/glm/glm.hpp"
@@ -108,7 +109,7 @@ namespace Engine {
         if (!this->NeedsUpdate()) {
             return false;
         }
-        RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         this->_renderGL->CheckError("GL3Buffer::Update::Pre");
         
@@ -160,7 +161,7 @@ namespace Engine {
     }
     
     void GL3Buffer::_upload() {
-        RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PreUploadBufferData");
         
@@ -185,7 +186,7 @@ namespace Engine {
             return; // nothing to draw
         }
         
-        RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         this->_begin();
         
@@ -291,7 +292,7 @@ namespace Engine {
     }
     
     void GL3Buffer::bindShader() {
-        RenderDriver::DrawProfiler p = this->_renderGL->Profile(__PRETTY_FUNCTION__);
+        ENGINE_PROFILER_SCOPE;
         
         this->_getShader()->Begin();
         

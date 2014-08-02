@@ -119,31 +119,6 @@ namespace Engine {
         this->_currentColor = Color4f(r, g, b, a);
     }
     
-    void RenderDriver::BeginProfiling() {
-        this->_profiling = true;
-        this->_profileResults.clear();
-    }
-    
-    void RenderDriver::EndProfilingFrame() {
-        if (!this->_profiling) return;
-        this->_profiling = false;
-        Json::Value resultsObj(Json::objectValue);
-        Json::Value results(Json::objectValue);
-        
-        for (auto iter = this->_profileResults.begin(); iter != this->_profileResults.end(); iter++) {
-            Json::Value resultPoint(Json::objectValue);
-            resultPoint["count"] = iter->second.callCount;
-            resultPoint["avg"] = iter->second.avg;
-            resultPoint["min"] = iter->second.min;
-            resultPoint["max"] = iter->second.max;
-            results[iter->first] = resultPoint;
-        }
-        
-        resultsObj["results"] = results;
-        
-        GetEventsSingilton()->GetEvent("onDrawProfileEnd")->Emit(resultsObj);
-    }
-    
     FontSheetPtr RenderDriver::_getSheet(std::string fontName) {
         if (!this->IsFontLoaded("basic")) {
             Logger::begin("RenderDriver", Logger::LogLevel_Verbose) << "Loading NeoFont: " << Config::GetString("core.content.fontPath") << Logger::end();
@@ -154,22 +129,5 @@ namespace Engine {
     
     void RenderDriver::_cleanupDrawable(DrawablePtr drawable) {
         
-    }
-    
-    void RenderDriver::_submitProfile(const char zone[], double time) {
-        if (!this->_profiling) return;
-        ProfileDataPointRef pnt = this->_profileResults[zone];
-        pnt.callCount++;
-        if (pnt.avg == -1) {
-            pnt.avg = time;
-        } else {
-            pnt.avg += (time - pnt.avg) / pnt.callCount;
-        }
-        if (time > pnt.max) {
-            pnt.max = time;
-        }
-        if (time < pnt.min) {
-            pnt.min = time;
-        }
     }
 }

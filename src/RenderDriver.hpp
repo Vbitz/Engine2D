@@ -62,32 +62,6 @@ namespace Engine {
             RenderDriverError(const char* source, int err, std::string errorString) : Source(source), Error(err), ErrorString(errorString) { }
         };
         
-        class DrawProfiler {
-        public:
-            
-            void End() {
-                if (this->_ended) return;
-                this->_ended = true;
-                this->_render->_submitProfile(this->_zone, Platform::GetTime() - this->_startTime);
-            }
-            
-            ~DrawProfiler() {
-                this->End();
-            }
-            
-        private:
-            DrawProfiler(RenderDriverPtr render, const char profileZone[]) : _render(render), _zone(profileZone) {
-                _startTime = Platform::GetTime();
-            }
-            
-            RenderDriverPtr _render;
-            const char* _zone;
-            bool _ended = false;
-            double _startTime;
-            
-            friend class RenderDriver;
-        };
-        
         virtual RendererType GetRendererType() = 0;
         virtual OpenGLVersion GetOpenGLVersion() = 0;
         virtual EffectShaderType GetBestEffectShaderType() = 0;
@@ -154,13 +128,6 @@ namespace Engine {
             drawable->_init();
             return static_cast<T*>(drawable);
         }
-        
-        void BeginProfiling();
-        void EndProfilingFrame();
-        
-        inline DrawProfiler Profile(const char profileZone[]) {
-            return DrawProfiler(this, profileZone);
-        }
     
     protected:
         void _cleanupDrawable(DrawablePtr drawable);
@@ -178,21 +145,8 @@ namespace Engine {
         std::vector<DrawablePtr> _managedDrawables;
         
     private:
-        struct ProfileDataPoint {
-            double avg = -1; // Using a CMA (Cumulative Moving Average)
-            double min = std::numeric_limits<double>::max();
-            double max = std::numeric_limits<double>::min();
-            int callCount = 0;
-        };
-        typedef ProfileDataPoint& ProfileDataPointRef;
-        
         std::unordered_map<std::string, FontSheetPtr> _sheets;
         FontSheetPtr _sheet = NULL;
-        
-        bool _profiling = false;
-        std::unordered_map<const char*, ProfileDataPoint> _profileResults;
-        
-        void _submitProfile(const char zone[], double time);
         
         friend class Drawable;
         friend class RenderDriverDrawProfiler;
