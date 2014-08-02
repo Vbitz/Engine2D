@@ -329,7 +329,7 @@ namespace Engine {
             renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
             renderGL->SetFont("basic", 16);
             renderGL->Print(20, y - 45, "RenderDriver Profiler");
-            renderGL->Print(windowSize.x - 280, y - 45, "Press R to Refresh | </> to Scroll");
+            renderGL->Print(windowSize.x - 280, y - 45, "Press R to Refresh | -/= to Scroll");
             
             renderGL->SetFont("basic", 10);
             
@@ -347,7 +347,7 @@ namespace Engine {
             
             this->_profilerX = 0;
             
-            y = this->_renderProfileZone(renderGL, windowSize, this->_cachedProfilerDetails["children"], x, 0, y);
+            y = this->_renderProfileZone(renderGL, windowSize, this->_cachedProfilerDetails["children"], x, 0, y, y);
         }
         
         renderGL->SetFont("basic", 10);
@@ -374,50 +374,51 @@ namespace Engine {
         renderGL->Print(250, 24, "Profiler (F3)");
     }
     
-    int EngineUI::_renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value data, int x, int xIndent, int y) {
+    int EngineUI::_renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value data, int x, int xIndent, int baseY, int y) {
         static std::stringstream ss;
         for (auto iter = data.begin();
              iter != data.end();
              iter++) {
-            
-            if (this->_profilerX++ % 2) {
-                renderGL->SetColor(60 / 255.0f, 60 / 255.0f, 60 / 255.0f, 0.9f);
-            } else {
-                renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+            if (y - this->_currentProfilerScroll >= baseY) {
+                if (this->_profilerX++ % 2) {
+                    renderGL->SetColor(60 / 255.0f, 60 / 255.0f, 60 / 255.0f, 0.9f);
+                } else {
+                    renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+                }
+                this->_draw->Rect(0, y - this->_currentProfilerScroll, windowSize.x, 18);
+                
+                std::string key = iter.key().asString();
+                
+                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+                renderGL->Print(xIndent + 20, y - this->_currentProfilerScroll + 4, key.c_str());
+                
+                ss.str("");
+                ss << (*iter)["count"].asDouble();
+                
+                renderGL->Print(680, y - this->_currentProfilerScroll + 4, ss.str().c_str());
+                
+                ss.str("");
+                ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
+                
+                renderGL->Print(750, y - this->_currentProfilerScroll + 4, ss.str().c_str());
+                
+                ss.str("");
+                ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
+                
+                renderGL->Print(850, y - this->_currentProfilerScroll + 4, ss.str().c_str());
+                
+                ss.str("");
+                ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
+                
+                renderGL->Print(950, y - this->_currentProfilerScroll + 4, ss.str().c_str());
             }
-            this->_draw->Rect(0, y, windowSize.x, 18);
-            
-            std::string key = iter.key().asString();
-            
-            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
-            renderGL->Print(xIndent + 20, y + 4, key.c_str());
-            
-            ss.str("");
-            ss << (*iter)["count"].asDouble();
-            
-            renderGL->Print(680, y + 4, ss.str().c_str());
-            
-            ss.str("");
-            ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
-            
-            renderGL->Print(750, y + 4, ss.str().c_str());
-            
-            ss.str("");
-            ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
-            
-            renderGL->Print(850, y + 4, ss.str().c_str());
-            
-            ss.str("");
-            ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
-            
-            renderGL->Print(950, y + 4, ss.str().c_str());
             
             y += 18;
-            if (y > windowSize.y) {
+            if (y - this->_currentProfilerScroll > windowSize.y) {
                 break;
             }
             
-            y = this->_renderProfileZone(renderGL, windowSize, (*iter)["children"], x, xIndent + 25, y);
+            y = this->_renderProfileZone(renderGL, windowSize, (*iter)["children"], x, xIndent + 25, baseY, y);
         }
         return y;
     }
@@ -495,13 +496,13 @@ namespace Engine {
                 if (this->_profilerDrawTimeScale < 40000) {
                     this->_profilerDrawTimeScale += 500;
                 }
-            } else if (key == '<' && (press == Key_Press || press == Key_Repeat)) {
+            } else if (key == '-' && (press == Key_Press || press == Key_Repeat)) {
                 if (this->_currentProfilerScroll > 0) {
-                    this->_currentProfilerScroll += 10;
-                }
-            } else if (key == '>' && (press == Key_Press || press == Key_Repeat)) {
-                if (this->_currentProfilerScroll > 6000) {
                     this->_currentProfilerScroll -= 10;
+                }
+            } else if (key == '=' && (press == Key_Press || press == Key_Repeat)) {
+                if (this->_currentProfilerScroll < 6000) {
+                    this->_currentProfilerScroll += 10;
                 }
             }
         }

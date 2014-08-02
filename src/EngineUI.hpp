@@ -50,7 +50,7 @@ namespace Engine {
         
         bool ConsoleActive();
     private:
-        int _renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value data, int x, int xIndent, int y);
+        int _renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value data, int x, int xIndent, int baseY, int y);
         
         ApplicationPtr _app;
         Draw2DPtr _draw;
