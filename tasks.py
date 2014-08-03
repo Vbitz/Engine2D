@@ -213,6 +213,7 @@ def test():
 	run_engine_test([]);
 	run_engine_test(["-Ccore.render.openGL=2.0"]);
 	run_engine_test(["-Ccore.test.testFrames=100"]);
+	run_engine_test(["-Ccore.render.openGL=2.0", "-Ccore.test.testFrames=100"]);
 
 @command(requires=["build_env"], usage="Runs 1 test of the engine in Test Mode")
 def test_once():
