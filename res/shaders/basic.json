@@ -2,8 +2,13 @@
 	"shader": [
 		{
 			"type": "glsl_150",
-			"vertex": "basic.vert",
-			"fragment": "basic.frag"
+			"vertex": "basic_v150.vert",
+			"fragment": "basic_v150.frag"
+		},
+		{
+			"type": "glsl_120",
+			"vertex": "basic_v120.vert",
+			"fragment": "basic_v120.frag"
 		}
 	],
 	"textures": 1,
