@@ -27,7 +27,6 @@
 #include <SDL.h>
 
 #include "RenderGL3.hpp"
-#include "RenderGL2.hpp"
 
 #include "Events.hpp"
 #include "Logger.hpp"
@@ -132,6 +131,10 @@ namespace Engine {
         
         bool GetMouseButtonPressed(MouseButton b) override {
             return SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(b);
+        }
+        
+        void SetCaptureMouse(bool capture) override {
+            SDL_SetRelativeMouseMode(capture ? SDL_TRUE : SDL_FALSE);
         }
         
         KeyStatus GetKeyStatus(int key) override {
@@ -246,7 +249,7 @@ namespace Engine {
         void _destroy() override {
             SDL_GL_DeleteContext(this->_context);
             SDL_DestroyWindow(this->_window);
-            Events::GetEvent("destroyWindow")->Emit();
+            GetEventsSingilton()->GetEvent("destroyWindow")->Emit();
         }
         
         void _resizeCallback(int width, int height) {
@@ -259,7 +262,7 @@ namespace Engine {
             
             glViewport(0, 0, width, height);
             
-            Events::GetEvent("rawResize")->Emit(val);
+            GetEventsSingilton()->GetEvent("rawResize")->Emit(val);
         }
         
         void _keypressCallback(SDL_KeyboardEvent k) {
@@ -277,7 +280,7 @@ namespace Engine {
             
             val["shift"] = k.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT);
             
-            Events::GetEvent("rawInput")->Emit(val);
+            GetEventsSingilton()->GetEvent("rawInput")->Emit(val);
         }
         
         void _mouseButtonCallback(SDL_MouseButtonEvent b) {
@@ -290,7 +293,7 @@ namespace Engine {
             val["x"] = b.x;
             val["y"] = b.y;
             
-            Events::GetEvent("mouseButton")->Emit(val);
+            GetEventsSingilton()->GetEvent("mouseButton")->Emit(val);
         }
         
         void _handleWindowEvent(SDL_WindowEvent e) {
@@ -381,14 +384,12 @@ namespace Engine {
             
             switch (this->_version) {
                 case GraphicsVersion::OpenGL_Modern:
-                    this->_render = CreateRenderGL3();
-                    break;
                 case GraphicsVersion::OpenGL_Legacy:
-                    this->_render = CreateRenderGL2();
+                    this->_render = CreateRenderGL3();
                     break;
             }
             
-            Events::GetEvent("postCreateContext")->Emit();
+            GetEventsSingilton()->GetEvent("postCreateContext")->Emit();
         }
         
         RenderDriver* _render = NULL;
