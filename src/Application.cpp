@@ -742,9 +742,9 @@ namespace Engine {
                 }
             }
             
+            Profiler_New::BeginProfileFrame();
             FramePerfMonitor::BeginFrame();
             Profiler::StartProfileFrame();
-            Profiler_New::BeginProfileFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
             GetEventsSingilton()->PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
             this->_processScripts();

@@ -80,6 +80,8 @@ namespace Engine {
             return;
         }
         
+        ENGINE_PROFILER_SCOPE;
+        
         RenderDriverPtr renderGL = this->_draw->GetRender();
         WindowPtr window = this->_app->GetWindow();
         glm::vec2 windowSize = window->GetWindowSize();
