@@ -82,7 +82,31 @@ namespace Engine {
         }
         
         EffectShaderType GetBestEffectShaderType() override {
-            return EffectShaderType::GLSL_150;
+            OpenGLVersion v = this->GetOpenGLVersion();
+            if (v.major == 2 && v.minor == 0)
+                return EffectShaderType::GLSL_110;
+            else if (v.major == 2 && v.minor == 1)
+                return EffectShaderType::GLSL_120;
+            else if (v.major == 3 && v.minor == 0)
+                return EffectShaderType::GLSL_130;
+            else if (v.major == 3 && v.minor == 1)
+                return EffectShaderType::GLSL_140;
+            else if (v.major == 3 && v.minor == 2)
+                return EffectShaderType::GLSL_150;
+            else if (v.major == 3 && v.minor == 3)
+                return EffectShaderType::GLSL_330;
+            else if (v.major == 4 && v.minor == 0)
+                return EffectShaderType::GLSL_400;
+            else if (v.major == 4 && v.minor == 1)
+                return EffectShaderType::GLSL_410;
+            else if (v.major == 4 && v.minor == 2)
+                return EffectShaderType::GLSL_420;
+            else if (v.major == 4 && v.minor == 3)
+                return EffectShaderType::GLSL_430;
+            else if (v.major == 4 && v.minor == 4)
+                return EffectShaderType::GLSL_440;
+            else
+                return EffectShaderType::Unknown;
         }
         
         bool CheckError(const char* source) override {

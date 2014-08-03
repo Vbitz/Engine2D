@@ -76,7 +76,9 @@ namespace Engine {
     
     void GL3Buffer::_init() {
         this->_renderGL->CheckError("GL3Buffer::_init::Pre");
-        glGenVertexArrays(1, &this->_vertexArrayPointer);
+        if (this->_renderGL->GetOpenGLVersion().major >= 3) {
+            glGenVertexArrays(1, &this->_vertexArrayPointer);
+        }
         glGenBuffers(1, &this->_elementBufferPointer);
         glGenBuffers(1, &this->_vertexBufferPointer);
         this->_renderGL->CheckError("GL3Buffer::_init::Post");
@@ -86,7 +88,9 @@ namespace Engine {
         this->_renderGL->CheckError("GL3Buffer::_shutdown::Pre");
         glDeleteBuffers(1, &this->_vertexBufferPointer);
         glDeleteBuffers(1, &this->_elementBufferPointer);
-        glDeleteVertexArrays(1, &this->_vertexArrayPointer);
+        if (this->_renderGL->GetOpenGLVersion().major >= 3) {
+            glDeleteVertexArrays(1, &this->_vertexArrayPointer);
+        }
         this->_renderGL->CheckError("GL3Buffer::_shutdown::Post");
     }
     
@@ -117,8 +121,10 @@ namespace Engine {
             glDeleteBuffers(1, &this->_vertexBufferPointer);
         }
         
-        if (glIsVertexArray(this->_vertexArrayPointer)) {
-            glDeleteBuffers(1, &this->_vertexArrayPointer);
+        if (this->_renderGL->GetOpenGLVersion().major >= 3) {
+            if (glIsVertexArray(this->_vertexArrayPointer)) {
+                glDeleteBuffers(1, &this->_vertexArrayPointer);
+            }
         }
         
         this->Invalidate();
@@ -273,7 +279,9 @@ namespace Engine {
     }
     
     void GL3Buffer::_begin() {
-        glBindVertexArray(this->_vertexArrayPointer);
+        if (this->_renderGL->GetOpenGLVersion().major >= 3) {
+            glBindVertexArray(this->_vertexArrayPointer);
+        }
         glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferPointer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->_elementBufferPointer);
     }
@@ -281,7 +289,9 @@ namespace Engine {
     void GL3Buffer::_end() {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        if (this->_renderGL->GetOpenGLVersion().major >= 3) {
+            glBindVertexArray(0);
+        }
     }
     
     Shader* GL3Buffer::_getShader() {

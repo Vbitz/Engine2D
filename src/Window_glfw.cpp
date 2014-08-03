@@ -455,10 +455,8 @@ namespace Engine {
             
             switch (this->_version) {
                 case GraphicsVersion::OpenGL_Modern:
-                    this->_render = CreateRenderGL3();
-                    break;
                 case GraphicsVersion::OpenGL_Legacy:
-                    this->_render = CreateRenderGL2();
+                    this->_render = CreateRenderGL3();
                     break;
             }
             
