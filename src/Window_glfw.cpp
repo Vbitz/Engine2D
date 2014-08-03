@@ -27,7 +27,6 @@
 #include <GLFW/glfw3.h>
 
 #include "RenderGL3.hpp"
-#include "RenderGL2.hpp"
 
 #include "Events.hpp"
 #include "Logger.hpp"
