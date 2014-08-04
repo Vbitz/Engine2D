@@ -140,16 +140,6 @@ def fetch_glfw3():
 	# copy src/libglfw3.a to third_party/lib
 	pass;
 
-@command(requires=["fetch_cmake"], usage="Fetch and build physfs using cmake")
-def fetch_physfs():
-	# both platforms need https://icculus.org/physfs/downloads/physfs-2.0.2.tar.gz (671,700 bytes)
-	# extracts to physfs-2.0.2
-	# run cmake . in physfs-2.0.2
-	# run make (takes no time at all)
-	# copy physfs.h to third_party/include
-	# copy libphysfs.a to third_party/lib
-	pass;
-
 @command(requires=["fetch_svn"], usage="Fetch and build V8 using GYP")
 def fetch_v8():
 	# both platforms need https://github.com/v8/v8/archive/3.21.17.zip (16,949,393 bytes)
@@ -159,8 +149,8 @@ def fetch_v8():
 
 	if sys.platform == "win32": # windows
 		# svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@231940 third_party/cygwin
-		# python build\gyp_v8
-		# "c:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.com" /build Release build\All.sln
+		# python build\gyp_v8 -Dv8_enable_i18n_support=0
+		# msbuild /p:Configuration=Release build\All.sln
 		# copy the relevent files to third_party/lib and third_party/include
 		pass
 	elif sys.platform == "darwin": #osx
