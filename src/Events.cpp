@@ -232,6 +232,9 @@ namespace Engine {
         this->_deferedMessages.push(e);
     }
     
+    int EventClass::ListenerCount() {
+        return this->_events.size();
+    }
     
     EventMagic EventEmitter::_debug(Json::Value args) {
         Logger::begin("Events", Logger::LogLevel_Log) << " == EVENT DEBUG ==" << Logger::end();

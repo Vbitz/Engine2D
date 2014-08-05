@@ -97,6 +97,8 @@ namespace Engine {
         EventClassPtr SetNoScript(bool noScript);
         void PollDeferedMessages();
         void AddDeferedMessage(Json::Value e);
+        
+        int ListenerCount();
             
         std::string TargetName;
         EventClassSecurity Security;
