@@ -731,7 +731,7 @@ namespace Engine {
                 }
             }
             
-            Profiler_New::BeginProfileFrame();
+            Profiler::BeginProfileFrame();
             FramePerfMonitor::BeginFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
             GetEventsSingilton()->PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
@@ -797,7 +797,7 @@ namespace Engine {
             }
             
             FramePerfMonitor::EndFrame();
-            Profiler_New::EndProfileFrame();
+            Profiler::EndProfileFrame();
         }
     }
     

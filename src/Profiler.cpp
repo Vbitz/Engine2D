@@ -36,7 +36,7 @@
 #include "Platform.hpp"
 
 namespace Engine {
-    namespace Profiler_New {
+    namespace Profiler {
         
         ProfileZoneMetadata *rootZone, *currentZone;
         

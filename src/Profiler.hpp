@@ -30,13 +30,13 @@
 #define PROFILER
 
 #ifdef PROFILER
-#define ENGINE_PROFILER_SCOPE Engine::Profiler_New::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__)
+#define ENGINE_PROFILER_SCOPE Engine::Profiler::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__)
 #else
 #define ENGINE_PROFILER_SCOPE
 #endif
 
 namespace Engine {
-    namespace Profiler_New {
+    namespace Profiler {
         struct ProfileZoneMetadata {
             ProfileZoneMetadata *parent = NULL;
             std::string name;
@@ -47,6 +47,8 @@ namespace Engine {
             double maxTime = std::numeric_limits<double>::min();
             std::unordered_map<std::string, ProfileZoneMetadata*> children;
         };
+        
+        typedef ProfileZoneMetadata* ProfileZoneMetadataPtr;
         
         ENGINE_CLASS(Scope);
         
