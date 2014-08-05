@@ -86,27 +86,24 @@ namespace Engine {
             delete zone;
         }
         
-        Json::Value _buildJSONFromZone(ProfileZoneMetadata* zone) {
-            Json::Value ret(Json::objectValue);
+        void _buildJSONFromZone(ProfileZoneMetadata* zone, Json::Value& ret) {
             ret["name"] = zone->name;
             ret["count"] = zone->callCount;
             ret["total"] = zone->totalTime;
             ret["avg"] = zone->avgTime;
             ret["min"] = zone->minTime;
             ret["max"] = zone->maxTime;
-            Json::Value children(Json::objectValue);
+            Json::Value& children = ret["children"] = Json::objectValue;
             for (auto iter = zone->children.begin(); iter != zone->children.end(); iter++) {
-                children[iter->first] = _buildJSONFromZone(iter->second);
+                _buildJSONFromZone(iter->second, children[iter->first]);
             }
-            ret["children"] = children;
-            return ret;
         }
         
         void EndProfileFrame() {
             assert(currentZone == rootZone);
             if (GetEventsSingilton()->GetEvent("onProfileEnd")->ListenerCount() > 0) {
                 Json::Value args(Json::objectValue);
-                args["results"] = _buildJSONFromZone(rootZone);
+                _buildJSONFromZone(rootZone, args["results"]);
                 GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(args);
             }
             _freeZone(rootZone);

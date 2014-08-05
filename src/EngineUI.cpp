@@ -120,7 +120,7 @@ namespace Engine {
             
             double lineGraphScale = Config::GetFloat("core.debug.engineUI.profilerScale");
             
-            this->_draw->LineGraph(windowSize.x - 440, 14, 0.5, lineGraphScale, this->_lastDrawTimes, timingResolution);
+            this->_draw->LineGraph(windowSize.x - 440, 14, 0.2, lineGraphScale, this->_lastDrawTimes, timingResolution);
             
             renderGL->EnableSmooth();
             
@@ -376,7 +376,7 @@ namespace Engine {
         renderGL->Print(250, 24, "Profiler (F3)");
     }
     
-    int EngineUI::_renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value data, int x, int xIndent, int baseY, int y) {
+    int EngineUI::_renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value& data, int x, int xIndent, int baseY, int y) {
         static std::stringstream ss;
         for (auto iter = data.begin();
              iter != data.end();

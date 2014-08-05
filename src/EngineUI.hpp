@@ -50,7 +50,7 @@ namespace Engine {
         
         bool ConsoleActive();
     private:
-        int _renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value data, int x, int xIndent, int baseY, int y);
+        int _renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value& data, int x, int xIndent, int baseY, int y);
         
         ApplicationPtr _app;
         Draw2DPtr _draw;
@@ -64,7 +64,7 @@ namespace Engine {
         bool _active = true;
         bool _showConsole = false;
         
-        static const int timingResolution = 400;
+        static const int timingResolution = 1000;
         
         double _lastDrawTimes[timingResolution];
         double _lastHeapUsages[timingResolution];
