@@ -89,7 +89,6 @@ namespace Engine {
         void DumpScripts();
         
         // Public debug functions
-        void DetailProfile(int frames, std::string filename);
         bool IsDebugMode();
         bool IsDeveloperMode();
         void Assert(bool value, std::string reason, std::string line, int lineNumber);
@@ -118,7 +117,6 @@ namespace Engine {
         void _processScripts();
         
         // System Events
-        static EventMagic _dumpProfile(Json::Value args);
         static EventMagic _saveScreenshot(Json::Value args);
         static EventMagic _toggleFullscreen(Json::Value args);
         static EventMagic _restartRenderer(Json::Value args);

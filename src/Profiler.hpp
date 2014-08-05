@@ -37,6 +37,17 @@
 
 namespace Engine {
     namespace Profiler_New {
+        struct ProfileZoneMetadata {
+            ProfileZoneMetadata *parent = NULL;
+            std::string name;
+            unsigned int callCount = 0;
+            double totalTime = 0;
+            double avgTime = -1; // Using a CMA (Cumulative Moving Average)
+            double minTime = std::numeric_limits<double>::max();
+            double maxTime = std::numeric_limits<double>::min();
+            std::unordered_map<std::string, ProfileZoneMetadata*> children;
+        };
+        
         ENGINE_CLASS(Scope);
         
         void BeginProfile(ScopePtr scope);
@@ -78,29 +89,5 @@ namespace Engine {
         
         void BeginProfileFrame();
         void EndProfileFrame();
-    }
-    
-    namespace Profiler {
-        void Begin(std::string zone);
-        void Begin(std::string zone, double maxTime);
-        void End(std::string zone);
-        
-        void DumpProfile();
-        
-        void ResetDetail();
-        void CaptureDetail();
-        std::string GetDetailProfile();
-        
-        void StartProfileFrame();
-        
-        bool GetEndedThisFrame(std::string zone);
-        double GetTime(std::string zone);
-        
-        std::vector<std::string> GetZones();
-        std::vector<std::string> GetZones(bool prettyName);
-        
-        void SetMaxTime(std::string zone, double time);
-        void EnableMaxTime(std::string zone, double time);
-        void DisableMaxTime(std::string zone);
     }
 }

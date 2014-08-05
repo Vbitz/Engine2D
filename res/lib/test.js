@@ -166,9 +166,7 @@ var failedTests = 0;
 for (var i in tests) {
 	try {
 		console.log("Running JS Test : " + i);
-		sys.perf(i + "_test", function () {
-			testResults[i] = tests[i]();
-		});
+		testResults[i] = tests[i]();
 		if (testResults[i]) {
 			console.log("Test passed : " + i);
 			passedTests++;

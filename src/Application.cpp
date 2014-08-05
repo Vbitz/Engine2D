@@ -258,7 +258,6 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", EventEmitter::MakeTarget(_toggleFullscreen))->SetDefered(true);
         GetEventsSingilton()->GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", EventEmitter::MakeTarget(_restartRenderer))->SetDefered(true);
         GetEventsSingilton()->GetEvent("screenshot")->AddListener("Application::_saveScreenshot", EventEmitter::MakeTarget(_saveScreenshot))->SetDefered(true);
-        GetEventsSingilton()->GetEvent("dumpProfile")->AddListener("Application::_dumpProfile", EventEmitter::MakeTarget(_dumpProfile))->SetDefered(true);
         GetEventsSingilton()->GetEvent("dumpLog")->AddListener("Application::_dumpLog", EventEmitter::MakeTarget(_dumpLog));
         
         GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary));
@@ -560,10 +559,6 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("onSaveScreenshot")->Emit(saveArgs);
     }
     
-    EventMagic Application::_dumpProfile(Json::Value args) {
-        Profiler::DumpProfile();
-    }
-    
     EventMagic Application::_dumpLog(Json::Value args) {
         std::string targetFilename = args["filename"].asString();
         std::string log = Logger::DumpAllEvents();
@@ -603,12 +598,6 @@ namespace Engine {
         } else {
             return EM_OK;
         }
-    }
-    
-    void Application::DetailProfile(int frames, std::string filename) {
-        Profiler::ResetDetail();
-        _detailFrames = frames;
-        _detailFilename = filename;
     }
     
     bool Application::GetKeyPressed(int key) {
@@ -744,33 +733,28 @@ namespace Engine {
             
             Profiler_New::BeginProfileFrame();
             FramePerfMonitor::BeginFrame();
-            Profiler::StartProfileFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
             GetEventsSingilton()->PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
             this->_processScripts();
             
             this->_scripting->CheckUpdate();
             
-            Profiler::Begin("Frame", Config::GetFloat("core.render.targetFrameTime"));
-            
             this->_updateFrameTime();
             
             this->_updateMousePos();
-            
-            Profiler::Begin("Draw");
             
             this->GetRender()->CheckError("startOfRendering");
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             
+            FramePerfMonitor::BeginDraw();
+            
             this->GetRender()->Begin2d();
             
-            Profiler::Begin("EventDraw", Config::GetFloat("core.render.targetFrameTime") / 3 * 2);
             v8::Handle<v8::Value> args[1] = {
                 v8::Number::New(v8::Isolate::GetCurrent(), FramePerfMonitor::GetFrameTime())
             };
             GetEventsSingilton()->GetEvent("draw")->Emit(Json::nullValue, 1, args); // this is when most Javascript runs
-            Profiler::End("EventDraw");
             
             this->GetRender()->End2d();
             
@@ -778,19 +762,13 @@ namespace Engine {
             
             //this->_cubeTest->Draw();
             
-            Profiler::Begin("EngineUI", Config::GetFloat("core.render.targetFrameTime") / 3);
             this->_engineUI->Draw();
-            Profiler::End("EngineUI");
             
             this->GetRender()->End2d();
             
-            Profiler::End("Draw");
+            FramePerfMonitor::EndDraw();
             
-            Profiler::Begin("SwapBuffers");
             this->_window->Present();
-            Profiler::End("SwapBuffers");
-            
-            Profiler::End("Frame");
             
 			if (this->_window->ShouldClose()) {
 				Logger::begin("Window", Logger::LogLevel_Log) << "Exiting" << Logger::end();
@@ -801,26 +779,13 @@ namespace Engine {
             this->GetRender()->CheckError("endOfRendering");
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
-                Profiler::Begin("ScriptGC");
-                // v8::V8::IdleNotification(); Causes EXC_BAD_INSTRUCTION
-                Profiler::End("ScriptGC");
+                v8::V8::IdleNotification();
             }
             
             GetEventsSingilton()->PollDeferedMessages("toggleFullscreen");
             GetEventsSingilton()->PollDeferedMessages("restartRenderer");
             GetEventsSingilton()->PollDeferedMessages("screenshot");
             GetEventsSingilton()->PollDeferedMessages("dumpProfile");
-            
-            if (this->_detailFrames > 0) {
-                Profiler::CaptureDetail();
-                this->_detailFrames--;
-                if (this->_detailFrames <= 0) {
-                    std::string detailData = Profiler::GetDetailProfile();
-                    Filesystem::WriteFile(_detailFilename, (char*) detailData.c_str(), sizeof(char) * detailData.length());
-                    Logger::begin("Profiler", Logger::LogLevel_Log)
-                    << "Saved Profiler Report as: " << Filesystem::GetRealPath(_detailFilename) << Logger::end();
-                }
-            }
             
             if (this->_frames == 0) {
                 this->_updateAddonLoad(LoadOrder::FirstFrame);
@@ -881,9 +846,7 @@ namespace Engine {
         
         this->_updateAddonLoad(LoadOrder::PreGraphics);
         
-        Profiler::Begin("InitOpenGL");
         this->_initOpenGL();
-        Profiler::End("InitOpenGL");
         
         this->_engineUI = new EngineUI(this);
         

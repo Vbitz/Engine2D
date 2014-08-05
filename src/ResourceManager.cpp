@@ -194,11 +194,8 @@ namespace Engine {
                 "Force Loading Resource: " << this->GetName() << " on First Use, this will incur a preformance penatily" <<
                 Logger::end();
             
-            std::string profilerZoneName = "ResourceManager_Force_" + this->GetName();
-            Profiler::Begin(profilerZoneName); // tell the scripter/coder how long this loading really took
             this->_load();
             this->_loaded = true;
-            Profiler::End(profilerZoneName);
         }
         
         void Resource::_load() { }

@@ -29,7 +29,9 @@ namespace Engine {
         double  _startTime = -1.0,
                 _rawFrameTime = -1.0,
                 _fpsTimer = 0.0,
-                _currentFPS = 0.0;
+                _currentFPS = 0.0,
+                _rawDrawTime = 0.0,
+                _startDrawTime = 0.0;
         
         void BeginFrame() {
             _startTime = Platform::GetTime();
@@ -47,9 +49,21 @@ namespace Engine {
                 _fpsTimer = 0;
             }
         }
+        
+        void BeginDraw() {
+            _startDrawTime = Platform::GetTime();
+        }
+        
+        void EndDraw() {
+            _rawDrawTime = Platform::GetTime() - _startDrawTime;
+        }
 
 		double GetFrameTime() {
             return _rawFrameTime;
+        }
+        
+        double GetDrawTime() {
+            return _rawDrawTime;
         }
         
         double GetFPS() {

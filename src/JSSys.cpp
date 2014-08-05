@@ -325,65 +325,6 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(PerfZone) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(2);
-            
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the name of the Profile Zone");
-            ENGINE_CHECK_ARG_FUNCTION(1, "Arg1 is the function to profile");
-            
-            Profiler::Begin(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            v8::Context::Scope ctx_scope(args.GetIsolate()->GetCurrentContext());
-            
-            v8::Handle<v8::Function> real_func = v8::Handle<v8::Function>::Cast(args[1]);
-            
-            v8::TryCatch tryCatch;
-            
-            real_func->Call(args.GetIsolate()->GetCurrentContext()->Global(), 0, NULL);
-            
-            if (!tryCatch.Exception().IsEmpty()) {
-                args.GetIsolate()->ThrowException(tryCatch.Exception());
-            }
-            
-            Profiler::End(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
-        ENGINE_JS_METHOD(GetProfilerTime) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(1);
-            
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Profiler time to get");
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Number::New(args.GetIsolate(), Profiler::GetTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0))));
-        }
-        
-        ENGINE_JS_METHOD(GetProfileZones) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            v8::Isolate* isolate = args.GetIsolate();
-            
-            v8::Handle<v8::Array> arr = v8::Array::New(isolate);
-            
-            std::vector<std::string> zones;
-            
-            if (args.Length() == 1) {
-                zones = Profiler::GetZones(ENGINE_GET_ARG_BOOLEAN_VALUE(0));
-            } else {
-                zones = Profiler::GetZones(false);
-            }
-            
-            for (int i = 0; i < zones.size(); i++) {
-                arr->Set(i, v8::String::NewFromUtf8(isolate, zones.at(i).c_str()));
-            }
-            
-            ENGINE_JS_SCOPE_CLOSE(arr);
-        }
-        
         ENGINE_JS_METHOD(TimeZone) {
             ENGINE_JS_SCOPE_OPEN;
             
@@ -463,46 +404,6 @@ namespace Engine {
             v8::V8::IdleNotification(67); // recomend a full GC (the internals which I've gone through
                 // say that at the moment this will recomend a full GC but the value is just a hint.)
             
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
-        ENGINE_JS_METHOD(Profile) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(2);
-            
-            ENGINE_CHECK_ARG_NUMBER(0, "Number of franes to profiler for");
-            ENGINE_CHECK_ARG_STRING(1, "Filename to save report to");
-            
-            if (!Filesystem::HasSetUserDir()) {
-                ENGINE_THROW_ARGERROR("You need to call fs.configDir before you can call sys.profile");
-                ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-            }
-            
-            GetAppSingilton()->DetailProfile(ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_CPPSTRING_VALUE(1));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
-        ENGINE_JS_METHOD(ProfileSet) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_CHECK_ARGS_LENGTH(2);
-            
-            ENGINE_CHECK_ARG_STRING(0, "Zone to set profile info on");
-            
-            if (args[1]->IsBoolean()) {
-                if (ENGINE_GET_ARG_BOOLEAN_VALUE(1)) {
-                    ENGINE_THROW_ARGERROR("Arg1 needs to be a number to enable MaxTime");
-                } else {
-                    Profiler::DisableMaxTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
-                }
-            } else if (args[1]->IsNumber()) {
-                Profiler::EnableMaxTime(ENGINE_GET_ARG_CPPSTRING_VALUE(0),
-                                        ENGINE_GET_ARG_NUMBER_VALUE(1));
-            } else {
-                ENGINE_THROW_ARGERROR("sys.profileSet accepts a boolean or a number for the second arg");
-            }
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
@@ -695,18 +596,11 @@ namespace Engine {
             
             addItem(sysTable, "resizeWindow", ResizeWindow);
             
-            addItem(sysTable, "getProfilerTime", GetProfilerTime);
-            addItem(sysTable, "getProfilerZones", GetProfileZones);
-            
-            addItem(sysTable, "perf", PerfZone);
             addItem(sysTable, "time", TimeZone);
             
             addItem(sysTable, "config", ConfigOptions);
             
             addItem(sysTable, "gc", GC);
-            addItem(sysTable, "profile", Profile);
-            
-            addItem(sysTable, "profileSet", ProfileSet);
             
             addItem(sysTable, "reloadRootScript", ReloadRootScript);
             addItem(sysTable, "forceReload", ForceReload);

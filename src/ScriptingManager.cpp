@@ -221,9 +221,7 @@ namespace Engine {
         Context::Context() : _isolate(v8::Isolate::New()), _scope(this->_isolate) {
             this->_isolate->Enter();
             
-            Profiler::Begin("InitScripting");
             v8::Handle<v8::Context> ctx = this->_initScripting();
-            Profiler::End("InitScripting");
             
             ctx->Enter();
         }

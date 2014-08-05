@@ -25,8 +25,12 @@ namespace Engine {
 	namespace FramePerfMonitor {
         void BeginFrame();
 		void EndFrame();
+        
+        void BeginDraw();
+        void EndDraw();
 
 		double GetFrameTime();
+        double GetDrawTime();
         double GetFPS();
 	}
 }

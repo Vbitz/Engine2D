@@ -106,7 +106,7 @@ namespace Engine {
         renderGL->Print(10, 4, "-- Engine2D --");
         
         if (Config::GetBoolean("core.debug.profiler")) {
-            double drawTime = Profiler::GetTime("Draw");
+            double drawTime = FramePerfMonitor::GetDrawTime();
             this->_lastHeapUsages[this->_currentLastDrawTimePos] = _getHeapUsage();
             this->_lastDrawTimes[this->_currentLastDrawTimePos++] = drawTime;
             
