@@ -383,15 +383,26 @@ namespace Engine {
              iter++) {
             if (y - this->_currentProfilerScroll >= baseY) {
                 if (this->_profilerX++ % 2) {
-                    renderGL->SetColor(60 / 255.0f, 60 / 255.0f, 60 / 255.0f, 0.9f);
-                } else {
                     renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+                } else {
+                    renderGL->SetColor(15 / 255.0f, 15 / 255.0f, 15 / 255.0f, 0.9f);
                 }
                 this->_draw->Rect(0, y - this->_currentProfilerScroll, windowSize.x, 18);
                 
                 std::string key = iter.key().asString();
                 
-                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+                double avgTime = (*iter)["avg"].asDouble() * SEC_TO_NSEC;
+                if (avgTime > 50000) {
+                    renderGL->SetColor("skyBlue");
+                } else if (avgTime > 10000) {
+                    renderGL->SetColor("aliceBlue");
+                } else if (avgTime > 5000) {
+                    renderGL->SetColor("orangeRed");
+                } else if (avgTime > 1000) {
+                    renderGL->SetColor("darkOrange");
+                } else {
+                    renderGL->SetColor("yellow");
+                }
                 renderGL->Print(xIndent + 20, y - this->_currentProfilerScroll + 4, key.c_str());
                 
                 ss.str("");
@@ -400,7 +411,7 @@ namespace Engine {
                 renderGL->Print(680, y - this->_currentProfilerScroll + 4, ss.str().c_str());
                 
                 ss.str("");
-                ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
+                ss << avgTime;
                 
                 renderGL->Print(750, y - this->_currentProfilerScroll + 4, ss.str().c_str());
                 
