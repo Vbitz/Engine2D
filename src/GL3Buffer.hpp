@@ -60,6 +60,11 @@ namespace Engine {
     typedef VertexBuffer& VertexBufferRef;
     typedef IndexBuffer& IndexBufferRef;
     
+    // Very temporory until I have a better API to do it.
+    struct Camera {
+        
+    };
+    
     ENGINE_CLASS(GL3Buffer);
     
 	class GL3Buffer {

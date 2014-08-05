@@ -30,22 +30,6 @@ namespace Engine {
         this->_render->_cleanupDrawable(this);
     }
     
-    void RenderDriver::AddVert(float x, float y, float z) {
-        this->AddVert(x, y, z, _currentColor, 0.0, 0.0);
-    }
-    
-    void RenderDriver::AddVert(float x, float y, float z, Color4f col) {
-        this->AddVert(x, y, z, col, 0.0, 0.0);
-    }
-    
-    void RenderDriver::AddVert(float x, float y, float z, float s, float t) {
-        this->AddVert(x, y, z, _currentColor, s, t);
-    }
-    
-    void RenderDriver::AddVert(float x, float y, float z, Color4f col, float s, float t) {
-        this->_addVert(x, y, z, col, s, t);
-    }
-    
     void RenderDriver::Print(float x, float y, const char* string) {
         const char* realStirng = strdup(string);
         ENGINE_PROFILER_SCOPE;

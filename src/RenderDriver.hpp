@@ -30,6 +30,8 @@
 #include "Config.hpp"
 #include "FontSheet.hpp"
 
+#include "vendor/glm/glm.hpp"
+
 namespace Engine {
     ENGINE_CLASS(Texture);
     ENGINE_CLASS(FontSheet);
@@ -53,6 +55,8 @@ namespace Engine {
     typedef Drawable* DrawablePtr;
     
     class RenderDriver {
+    private:
+        Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
     public:
         class RenderDriverError {
         public:
@@ -77,10 +81,21 @@ namespace Engine {
         
         virtual void EndRendering() = 0;
         
-        void AddVert(float x, float y, float z);
-        void AddVert(float x, float y, float z, Color4f col);
-        void AddVert(float x, float y, float z, float s, float t);
-        void AddVert(float x, float y, float z, Color4f col, float s, float t);
+        inline void AddVert(float x, float y, float z) {
+            this->AddVert(x, y, z, this->_currentColor, 0.0, 0.0);
+        }
+        inline void AddVert(float x, float y, float z, Color4f col) {
+            this->AddVert(x, y, z, col, 0.0, 0.0);
+        }
+        inline void AddVert(float x, float y, float z, float s, float t) {
+            this->AddVert(x, y, z, _currentColor, s, t);
+        }
+        inline void AddVert(float x, float y, float z, Color4f col, float s, float t) {
+            this->_addVert(glm::vec3(x, y, z), col, glm::vec2(s, t), glm::vec3());
+        };
+        inline void AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv, glm::vec3 normal) {
+            this->_addVert(pos, col, uv, normal);
+        }
         
         virtual void EnableTexture(TexturePtr texId) = 0;
         virtual void DisableTexture() = 0;
@@ -117,6 +132,8 @@ namespace Engine {
         void SetColor(float r, float g, float b);
         void SetColor(float r, float g, float b, float a);
         
+        virtual void SetDepthTest(bool value) = 0;
+        
         virtual void SetCenter(float x, float y) = 0;
         virtual void CameraPan(float x, float y) = 0;
         virtual void CameraZoom(float f) = 0;
@@ -133,9 +150,7 @@ namespace Engine {
         void _cleanupDrawable(DrawablePtr drawable);
         
         virtual void _clearColor(Color4f col) = 0;
-        virtual void _addVert(float x, float y, float z, Color4f col, float s, float t) = 0;
-        
-		Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+        virtual void _addVert(glm::vec3 pos, Color4f col, glm::vec2 uv, glm::vec3 normal) = 0;
         
         FontSheetPtr _getSheet(std::string fontName);
         

@@ -30,6 +30,7 @@
 				"src/Shader.cpp",
 				"src/EngineUI.cpp",
 				"src/Draw2D.cpp",
+				"src/Draw3D.cpp",
 				"src/RenderDriver.cpp",
 				"src/RenderGL3.cpp",
 				"src/Logger.cpp",

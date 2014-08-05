@@ -266,9 +266,12 @@ namespace Engine {
             Begin2d();
         }
         
+        void SetDepthTest(bool value) override {
+            value ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+        }
+        
         void SetCenter(float x, float y) override {
-            this->_centerX = x;
-            this->_centerY = y;
+            this->_center = glm::vec3(x, y, 0);
         }
         
         void CameraPan(float x, float y) override {
@@ -292,10 +295,9 @@ namespace Engine {
             glClearColor(col.r, col.g, col.b, col.a);
         }
         
-        void _addVert(float x, float y, float z, Color4f col, float s, float t) override {
-            this->_gl3Buffer->AddVert(glm::vec3(x - this->_centerX,
-                                                y - this->_centerY, z),
-                                      col, glm::vec2(s, t));
+        void _addVert(glm::vec3 pos, Color4f col, glm::vec2 uv, glm::vec3 normal) override {
+            this->_gl3Buffer->AddVert(pos - this->_center,
+                                      col, uv);
         }
         
     private:
@@ -312,8 +314,7 @@ namespace Engine {
             }
         }
         
-        int _centerX = 0;
-        int _centerY = 0;
+        glm::vec3 _center = glm::vec3(0, 0, 0);
         
         PolygonMode _currentMode = PolygonMode::Invalid;
         
