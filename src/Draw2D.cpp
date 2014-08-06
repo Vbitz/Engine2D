@@ -23,11 +23,7 @@
 
 #include "RenderDriver.hpp"
 
-#include "GL3Buffer.hpp"
-#include "EffectParameters.hpp"
 #include "Profiler.hpp"
-
-#include <OpenGL/gl3.h>
 
 namespace Engine {
     void Draw2D::Rect(float x, float y, float w, float h) {

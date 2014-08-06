@@ -22,7 +22,6 @@
 #pragma once
 
 #include "Shader.hpp"
-#include "EffectParameters.hpp"
 #include "RenderDriver.hpp"
 
 namespace Engine {

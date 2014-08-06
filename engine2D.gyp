@@ -49,7 +49,6 @@
 				"src/ScriptingTests.cpp",
 				"src/StdLibTests.cpp",
 				"src/PackageTests.cpp",
-				"src/EffectParameters.cpp",
 				"src/SpriteSheet.cpp",
 				"src/FontSheet.cpp",
 				"src/TextureLoader.cpp",

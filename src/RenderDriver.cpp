@@ -23,6 +23,7 @@
 
 #include "Application.hpp"
 #include "Profiler.hpp"
+#include "Config.hpp"
 
 namespace Engine {
     Drawable::~Drawable() {

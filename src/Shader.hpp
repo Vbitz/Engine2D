@@ -29,13 +29,51 @@
 #include "RenderDriver.hpp"
 
 namespace Engine {
+    ENGINE_CLASS(Shader);
+    
     enum class ShaderType {
         All,
         VertexShader,
         FragmentShader
     };
     
-    ENGINE_CLASS(Shader);
+    typedef struct {
+        EffectShaderType type;
+        std::string vertexShaderPath;
+        std::string fragmentShaderPath;
+    } ShaderSpec;
+    
+    typedef struct {
+        std::string vertexParam, colorParam, texCoardParam,
+        modelMatrixParam, viewMatrixParam, projectionMatrixParam;
+    } ShaderSettings;
+    
+    ENGINE_CLASS(EffectParameters);
+    
+    class EffectParameters {
+    public:
+        EffectParameters();
+        EffectParameters(std::string basePath, Json::Value root);
+        
+        ShaderPtr CreateShader();
+        ShaderSettings GetShaderSettings();
+        
+        bool NeedsUpdate();
+        
+    private:
+        void _read(std::string basePath, Json::Value root);
+        ShaderSpec _getBestShaderSpec();
+        
+        std::vector<ShaderSpec> _shaders;
+        int _textureCount;
+        ShaderSettings _shaderSettings;
+        
+        Json::Value _userParams;
+    };
+    
+    namespace EffectReader {
+        EffectParametersPtr GetEffectFromFile(std::string filename);
+    }
     
     class Shader {
     public:

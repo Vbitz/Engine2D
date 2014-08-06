@@ -26,8 +26,6 @@
 #include "stdlib.hpp"
 
 #include "RenderTypes.hpp"
-#include "Platform.hpp"
-#include "Config.hpp"
 #include "FontSheet.hpp"
 
 #include "vendor/glm/glm.hpp"
