@@ -39,9 +39,9 @@
 	- Effective addon loading system
 		- Resolve dependancys
 		- Fix circlur depends
-		- Cache Loading
-	- Basic .dll/.so/.dylib loading support
-	- Engine2D.hpp common API header file
+		- **DONE** Cache Loading
+	- **DONE** Basic .dll/.so/.dylib loading support
+	- **DONE** Engine2D.hpp common API header file
 - Audio Support
 	- Add OpenAL Depend (maybe another libary, something to really look into)
 	- Write C++ Clases
