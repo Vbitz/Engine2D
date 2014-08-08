@@ -87,8 +87,11 @@ def shell_command(cmd, throw=True):
 def run_engine(args):
 	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name())] + args);
 
-def run_engine_test(args):
-	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name()), "-test", "-Ccore.log.levels.onlyHighlight=true"] + args);
+def run_engine_test(args, onlyHighlight=True):
+	cmdArgs = [resolve_path(PROJECT_BUILD_PATH, get_exe_name()), "-test"];
+	if onlyHighlight:
+		cmdArgs += "-Ccore.log.levels.onlyHighlight=true";
+	shell_command(cmdArgs + args);
 
 def get_git_hash():
 	# check for .git folder
@@ -207,7 +210,7 @@ def test():
 
 @command(requires=["build_env"], usage="Runs 1 test of the engine in Test Mode")
 def test_once():
-	run_engine_test([]);
+	run_engine_test([], onlyHighlight=False);
 
 @command(requires=["add_version_info", "fetch_gyp"], usage="Tests both GLFW and SDL")
 def test_full():
