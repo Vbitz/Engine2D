@@ -11,7 +11,7 @@ import uuid
 import sys
 import argparse
 
-def compile(sources, outputFilename, link_v8, addedArgs):
+def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 	if outputFilename == None:
 		outputFilename = "addon.dylib"
 	if addedArgs == None:
@@ -27,12 +27,16 @@ def compile(sources, outputFilename, link_v8, addedArgs):
 	shell_command(["install_name_tool", "-change", "/usr/local/lib/libengine2D.dylib",
 		"@executable_path/libengine2D.dylib", outputFilename])
 
-parser = argparse.ArgumentParser(description='Build script for Engine2D addons')
-parser.add_argument("sources", nargs='+', help='C++ source files to compile into a library')
-parser.add_argument("-o", help='Output filename', metavar='filename')
-parser.add_argument("-a", nargs='+', help='Add additional arguments to the build command-line', metavar='arg')
-parser.add_argument("--link-v8", default=False, help='Links V8', action='store_true')
+def main(args):
+	parser = argparse.ArgumentParser(description='Build script for Engine2D addons')
+	parser.add_argument("sources", nargs='+', help='C++ source files to compile into a library')
+	parser.add_argument("-o", help='Output filename', metavar='filename')
+	parser.add_argument("-a", nargs='+', help='Add additional arguments to the build command-line', metavar='arg')
+	parser.add_argument("--link-v8", default=False, help='Links V8', action='store_true')
 
-args = parser.parse_args()
+	args = parser.parse_args()
 
-compile(args.sources, args.o, args.link_v8, args.a)
+	compile(args.sources, args.o, args.link_v8, args.a)
+
+if __name__ == '__main__':
+  main(sys.argv);
