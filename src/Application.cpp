@@ -817,6 +817,7 @@ namespace Engine {
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
         
         Config::EnableConfigEvents();
+        Logger::EnableLoggerEvents();
         this->_hookEvents();
         // The events system is now ready
         

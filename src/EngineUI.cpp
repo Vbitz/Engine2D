@@ -73,6 +73,7 @@ namespace Engine {
         
         GetEventsSingilton()->GetEvent("onProfileEnd")->AddListener("EngineUI::_profilerHook", EventEmitter::MakeTarget(_profilerHook));
         GetEventsSingilton()->GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", EventEmitter::MakeTarget(_captureLastDrawTimes));
+        GetEventsSingilton()->GetEvent("logEvent")->AddListener("EngineUI::_createToast", EventEmitter::MakeTarget(_createToast));
     }
     
     void EngineUI::Draw() {
@@ -147,6 +148,24 @@ namespace Engine {
         }
         
         if (!_showConsole) {
+            // Update Toasts
+            double dt = FramePerfMonitor::GetFrameTime();
+            int y = 30;
+            
+            for (auto iter = this->_toasts.begin(); iter != this->_toasts.end(); iter++) {
+                iter->timeOnScreen += dt;
+                if (iter->timeOnScreen < 5.0) {
+                    renderGL->SetColor(0.9, 0.9, 0.9, 0.8);
+                    this->_draw->Rect(windowSize.x - 260, y, 250, 16);
+                    renderGL->SetColor(0.1, 0.1, 0.1, 1.0);
+                    this->_draw->Rect(windowSize.x - 260 + 1, y + 1, 14, 14);
+                    renderGL->Print(windowSize.x - 260 + 16, y + 2, iter->domain.c_str());
+                    renderGL->SetColor(0.3, 0.3, 0.3, 1.0);
+                    renderGL->Print(windowSize.x - 260 + 16 + 80, y + 2, iter->info.c_str());
+                    y += 18;
+                }
+            }
+            
             return;
         }
         
@@ -169,7 +188,7 @@ namespace Engine {
                         this->_draw->Rect(0, i + 2, windowSize.x, 2);
                     } else {
                         i -= 22;
-                        if (iterator->Level == Logger::LogLevel_Highlight) {
+                        if (iterator->Level == Logger::LogLevel_Highlight || iterator->Level == Logger::LogLevel_Toast) {
                             renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
                             this->_draw->Rect(0, i + 1, windowSize.x, 20);
                         } else {
@@ -199,6 +218,7 @@ namespace Engine {
                         renderGL->SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
                         break;
                     case Logger::LogLevel_Highlight:
+                    case Logger::LogLevel_Toast:
                         renderGL->SetColor(0.1f, 0.1f, 0.1f);
                         break;
                     case Logger::LogLevel_TestLog:
@@ -521,6 +541,13 @@ namespace Engine {
         }
     }
     
+    void EngineUI::_pushToast(std::string domain, std::string info) {
+        ToastInfomation newToast;
+        newToast.domain = domain;
+        newToast.info = info;
+        this->_toasts.push_back(newToast);
+    }
+    
     void EngineUI::SetActive(bool active) {
         this->_active = active;
     }
@@ -556,5 +583,15 @@ namespace Engine {
         eArgs["values"] = eArray;
         
         GetEventsSingilton()->GetEvent("captureLastDrawTimes_callback")->Emit(eArgs);
+    }
+    
+    EventMagic EngineUI::_createToast(Json::Value args) {
+        EngineUIPtr eui = GetAppSingilton()->GetEngineUI();
+        
+        if (!args["isToast"].asBool()) return EM_OK;
+        
+        eui->_pushToast(args["domain"].asString(), args["str"].asString());
+        
+        return EM_OK;
     }
 }

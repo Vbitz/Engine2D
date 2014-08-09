@@ -107,6 +107,7 @@ namespace Engine {
                 GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(args);
             }
             _freeZone(rootZone);
+            currentZone = rootZone = NULL;
         }
     }
 }

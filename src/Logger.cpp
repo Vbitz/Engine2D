@@ -23,6 +23,7 @@
 
 #include "Config.hpp"
 #include "Platform.hpp"
+#include "Events.hpp"
 
 namespace Engine {
     namespace Logger {
@@ -38,6 +39,8 @@ namespace Engine {
         double _startTime = -1;
         
         Platform::MutexPtr _logMutex;
+        
+        bool _enableEvents = false;
         
         std::ostream& operator<<(std::ostream& os, const StreamFlusher& rhs) {
 			LogText(_currentDomain, _currentLogLevel, _ss.str());
@@ -60,7 +63,8 @@ namespace Engine {
                 case LogLevel_Log:          return getEscapeCode(7, false);
                 case LogLevel_Warning:      return getEscapeCode(3, false);
                 case LogLevel_Error:        return getEscapeCode(1, true);
-                case LogLevel_Highlight:    return "\x1b[0;47m\x1b[1;30m";
+                case LogLevel_Highlight:
+                case LogLevel_Toast:        return "\x1b[0;47m\x1b[1;30m";
                 case LogLevel_TestLog:      return "\x1b[0;47m\x1b[1;30m";
                 case LogLevel_TestError:    return "\x1b[0;41m\x1b[1;37m";
 				default:					return "";
@@ -72,6 +76,10 @@ namespace Engine {
         
         void Init() {
             _logMutex = Platform::CreateMutex();
+        }
+        
+        void EnableLoggerEvents() {
+            _enableEvents = true;
         }
         
         std::string GetLevelString(LogLevel level) {
@@ -90,6 +98,8 @@ namespace Engine {
                     return "Error";
                 case LogLevel_Highlight:
                     return "Highlight";
+                case LogLevel_Toast:
+                    return "Toast";
                 case LogLevel_TestLog:
                     return "TestLog";
                 case LogLevel_TestError:
@@ -131,7 +141,8 @@ namespace Engine {
             bool logConsole = Config::GetBoolean("core.log.enableConsole")
                 && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
             if (logConsole && Config::GetBoolean("core.log.levels.onlyHighlight")) {
-                if (level == LogLevel_Highlight || level == LogLevel_TestError || level == LogLevel_TestLog) {
+                if (level == LogLevel_Highlight || level == LogLevel_Toast ||
+                    level == LogLevel_TestError || level == LogLevel_TestLog) {
                     logConsole = true;
                 } else {
                     logConsole = false;
@@ -140,6 +151,15 @@ namespace Engine {
             std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
             
             _logMutex->Enter();
+            
+            if (_enableEvents) {
+                Json::Value args(Json::objectValue);
+                args["domain"] = domain;
+                args["level"] = GetLevelString(level);
+                args["str"] = str;
+                args["isToast"] = (level == LogLevel_Toast);
+                GetEventsSingilton()->GetEvent("logEvent")->Emit(args);
+            }
             
             if (str.find('\n') == -1) {
                 std::string newStr = cleanString(str);

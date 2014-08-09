@@ -50,7 +50,13 @@ namespace Engine {
         
         bool ConsoleActive();
     private:
+        struct ToastInfomation {
+            std::string domain, info;
+            double timeOnScreen = 0.0;
+        };
+        
         int _renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value& data, int x, int xIndent, int baseY, int y);
+        void _pushToast(std::string domain, std::string info);
         
         ApplicationPtr _app;
         Draw2DPtr _draw;
@@ -74,10 +80,14 @@ namespace Engine {
         std::vector<std::string> _commandHistory;
         size_t _currentHistoryLine = 0;
         
+        std::vector<ToastInfomation> _toasts;
+        
         Json::Value _cachedProfilerDetails, _currentProfilerDetails;
         double _currentProfilerScroll = 0;
         int _profilerX = 0;
+        
         static EventMagic _profilerHook(Json::Value args);
         static EventMagic _captureLastDrawTimes(Json::Value args);
+        static EventMagic _createToast(Json::Value args);
     };
 }

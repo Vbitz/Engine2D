@@ -42,6 +42,7 @@ namespace Engine {
             LogLevel_Verbose,
             LogLevel_ConsoleInput,
             LogLevel_Highlight,
+            LogLevel_Toast,
             LogLevel_TestLog,
             LogLevel_TestError
         };
@@ -86,6 +87,7 @@ namespace Engine {
         };
         
         void Init();
+        void EnableLoggerEvents();
         
         std::string GetLevelString(LogLevel level);
         
