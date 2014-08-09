@@ -152,7 +152,7 @@ namespace Engine {
             double dt = FramePerfMonitor::GetFrameTime();
             int y = 30;
             
-            for (auto iter = this->_toasts.begin(); iter != this->_toasts.end(); iter++) {
+            for (auto iter = this->_toasts.rbegin(); iter != this->_toasts.rend(); iter++) {
                 iter->timeOnScreen += dt;
                 if (iter->timeOnScreen < 5.0) {
                     renderGL->SetColor(0.9, 0.9, 0.9, 0.8);
