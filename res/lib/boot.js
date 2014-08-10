@@ -32,6 +32,7 @@
 	global.console.error = makeLog("error");
 	global.console.verbose = makeLog("verbose");
 	global.console.highlight = makeLog("highlight");
+	global.console.toast = makeLog("toast");
 	global.console.writeRaw = makeLog("raw");
 
 	global.sys.drawFunc = function (func) {

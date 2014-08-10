@@ -36,11 +36,12 @@ namespace Engine {
 	namespace JsSys {
         
         Logger::LogLevel _getLevelFromStr(std::string str) {
-            if (str == "warning") return Logger::LogLevel_Warning;
-            if (str == "verbose") return Logger::LogLevel_Verbose;
-            if (str == "error") return Logger::LogLevel_Error;
-            if (str == "highlight") return Logger::LogLevel_Highlight;
-            return Logger::LogLevel_User;
+                 if (str == "warning")      return Logger::LogLevel_Warning;
+            else if (str == "verbose")      return Logger::LogLevel_Verbose;
+            else if (str == "error")        return Logger::LogLevel_Error;
+            else if (str == "highlight")    return Logger::LogLevel_Highlight;
+            else if (str == "toast")        return Logger::LogLevel_Toast;
+            else                            return Logger::LogLevel_User;
         }
         
         ApplicationPtr GetApp(v8::Local<v8::Object> thisValue) {
