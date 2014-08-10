@@ -30,7 +30,7 @@ namespace Engine {
     
     static int adder = 0;
     
-    EventMagic AdderTest1(Json::Value val) {
+    EventMagic AdderTest1(Json::Value val, void* userPointer) {
         if ((adder % 50000) == 0) {
 			Logger::begin("Script", Logger::LogLevel_Log) << "[1] adder = " << adder << Logger::end();
 		}
@@ -38,7 +38,7 @@ namespace Engine {
         return EM_OK;
     }
     
-    EventMagic AdderTest2(Json::Value val) {
+    EventMagic AdderTest2(Json::Value val, void* userPointer) {
         if ((adder % 50000) == 0) {
 			Logger::begin("Script", Logger::LogLevel_Log) << "[2] adder = " << adder << Logger::end();
 		}

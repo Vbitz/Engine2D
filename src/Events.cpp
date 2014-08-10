@@ -34,14 +34,14 @@ namespace Engine {
         
     class CPPEventTarget : public EventTarget {
     public:
-        CPPEventTarget(EventTargetFunc func)
-            : _func(func) { }
+        CPPEventTarget(EventTargetFunc func, void* userPointer)
+            : _func(func), _userPointer(userPointer) { }
     
         EventMagic Run(Json::Value& e) override {
             if (e.isNull()) {
-                return this->_func(Json::nullValue);
+                return this->_func(Json::nullValue, this->_userPointer);
             } else {
-                return this->_func(e);
+                return this->_func(e, this->_userPointer);
             }
         }
             
@@ -50,6 +50,7 @@ namespace Engine {
             
     private:
         EventTargetFunc _func;
+        void* _userPointer;
     };
         
     inline EventMagic GetScriptingReturnType(v8::Local<v8::Value> ret) {
@@ -236,13 +237,15 @@ namespace Engine {
         return this->_events.size();
     }
     
-    EventMagic EventEmitter::_debug(Json::Value args) {
+    EventMagic EventEmitter::_debug(Json::Value args, void* userPointer) {
         Logger::begin("Events", Logger::LogLevel_Log) << " == EVENT DEBUG ==" << Logger::end();
         
-        for (auto iter = GetEventsSingilton()->_events.begin();
-             iter != GetEventsSingilton()->_events.end();
+        EventEmitterPtr events = static_cast<EventEmitterPtr>(userPointer);
+        
+        for (auto iter = events->_events.begin();
+             iter != events->_events.end();
              iter++) {
-            EventClass* cls = iter->second;
+            EventClassPtr cls = iter->second;
             Logger::begin("Events", Logger::LogLevel_Log)
                 << "    ==========================="
                 << Logger::end();
@@ -264,7 +267,7 @@ namespace Engine {
     
     EventEmitter::EventEmitter() {
         this->_eventMutex = Platform::CreateMutex();
-        this->GetEvent("eventDebug")->AddListener("Events::_debug", MakeTarget(_debug));
+        this->GetEvent("eventDebug")->AddListener("Events::_debug", MakeTarget(_debug, this));
     }
     
     EventClassPtrRef EventEmitter::GetEvent(std::string eventName) {
@@ -278,10 +281,14 @@ namespace Engine {
     }
     
     EventTarget* EventEmitter::MakeTarget(EventTargetFunc target) {
-        return new CPPEventTarget(target);
+        return new CPPEventTarget(target, NULL);
     }
     
-    EventTarget* EventEmitter::MakeTarget(v8::Handle<v8::Function> target) {
+    EventTargetPtr EventEmitter::MakeTarget(EventTargetFunc target, void* userPointer) {
+        return new CPPEventTarget(target, userPointer);
+    }
+    
+    EventTargetPtr EventEmitter::MakeTarget(v8::Handle<v8::Function> target) {
         return new JSEventTarget(target);
     }
     

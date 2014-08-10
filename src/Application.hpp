@@ -117,28 +117,28 @@ namespace Engine {
         void _processScripts();
         
         // System Events
-        static EventMagic _saveScreenshot(Json::Value args);
-        static EventMagic _toggleFullscreen(Json::Value args);
-        static EventMagic _restartRenderer(Json::Value args);
-        static EventMagic _dumpLog(Json::Value args);
-        static EventMagic _appEvent_Exit(Json::Value v);
-        static EventMagic _appEvent_DumpScripts(Json::Value v);
+        static EventMagic _saveScreenshot(Json::Value args, void* userPointer);
+        static EventMagic _toggleFullscreen(Json::Value args, void* userPointer);
+        static EventMagic _restartRenderer(Json::Value args, void* userPointer);
+        static EventMagic _dumpLog(Json::Value args, void* userPointer);
+        static EventMagic _appEvent_Exit(Json::Value v, void* userPointer);
+        static EventMagic _appEvent_DumpScripts(Json::Value v, void* userPointer);
         
         // Require Events
-        static EventMagic _requireDynamicLibary(Json::Value v);
-        static EventMagic _requireConfigFile(Json::Value v);
+        static EventMagic _requireDynamicLibary(Json::Value v, void* userPointer);
+        static EventMagic _requireConfigFile(Json::Value v, void* userPointer);
         
         // Window Events
-        static EventMagic _rawInputHandler(Json::Value v);
-        static EventMagic _rendererKillHandler(Json::Value v);
-        static EventMagic _postCreateContext(Json::Value v);
-        static EventMagic _rawResizeHandler(Json::Value v);
+        static EventMagic _rawInputHandler(Json::Value v, void* userPointer);
+        static EventMagic _rendererKillHandler(Json::Value v, void* userPointer);
+        static EventMagic _postCreateContext(Json::Value v, void* userPointer);
+        static EventMagic _rawResizeHandler(Json::Value v, void* userPointer);
         
         // Config Events
-        static EventMagic _config_CoreRenderAA(Json::Value args);
-        static EventMagic _config_CoreWindowVSync(Json::Value args);
-        static EventMagic _config_CoreWindowSize(Json::Value args);
-        static EventMagic _config_CoreWindowTitle(Json::Value args);
+        static EventMagic _config_CoreRenderAA(Json::Value args, void* userPointer);
+        static EventMagic _config_CoreWindowVSync(Json::Value args, void* userPointer);
+        static EventMagic _config_CoreWindowSize(Json::Value args, void* userPointer);
+        static EventMagic _config_CoreWindowTitle(Json::Value args, void* userPointer);
         
         // Testing
         void _loadTests();

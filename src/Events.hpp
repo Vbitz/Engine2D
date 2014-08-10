@@ -40,7 +40,7 @@ namespace Engine {
         ENGINE_CLASS(Mutex);
     }
     
-    typedef EventMagic (*EventTargetFunc)(Json::Value e);
+    typedef EventMagic (*EventTargetFunc)(Json::Value e, void* userPointer);
     
     ENGINE_CLASS(EventTarget);
     
@@ -125,10 +125,11 @@ namespace Engine {
         void EmitThread(std::string threadID, std::string evnt, Json::Value e);
         
         static EventTargetPtr MakeTarget(EventTargetFunc target);
+        static EventTargetPtr MakeTarget(EventTargetFunc target, void* userPointer);
         static EventTargetPtr MakeTarget(v8::Handle<v8::Function> target);
         
     private:
-        static EventMagic _debug(Json::Value args);
+        static EventMagic _debug(Json::Value args, void* userPointer);
         
         Platform::MutexPtr _eventMutex;
         std::unordered_map<std::string, EventClassPtr> _events;

@@ -71,9 +71,9 @@ namespace Engine {
             this->_lastHeapUsages[i] = 0.0f;
         }
         
-        GetEventsSingilton()->GetEvent("onProfileEnd")->AddListener("EngineUI::_profilerHook", EventEmitter::MakeTarget(_profilerHook));
-        GetEventsSingilton()->GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", EventEmitter::MakeTarget(_captureLastDrawTimes));
-        GetEventsSingilton()->GetEvent("logEvent")->AddListener("EngineUI::_createToast", EventEmitter::MakeTarget(_createToast));
+        GetEventsSingilton()->GetEvent("onProfileEnd")->AddListener("EngineUI::_profilerHook", EventEmitter::MakeTarget(_profilerHook, this));
+        GetEventsSingilton()->GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", EventEmitter::MakeTarget(_captureLastDrawTimes, this));
+        GetEventsSingilton()->GetEvent("logEvent")->AddListener("EngineUI::_createToast", EventEmitter::MakeTarget(_createToast, this));
     }
     
     void EngineUI::Draw() {
@@ -564,14 +564,14 @@ namespace Engine {
         return this->_showConsole;
     }
     
-    EventMagic EngineUI::_profilerHook(Json::Value args) {
-        EngineUIPtr eui = GetAppSingilton()->GetEngineUI();
+    EventMagic EngineUI::_profilerHook(Json::Value args, void* userPointer) {
+        EngineUIPtr eui = static_cast<EngineUIPtr>(userPointer);
         
         eui->_currentProfilerDetails = args["results"];
     }
     
-    EventMagic EngineUI::_captureLastDrawTimes(Json::Value args) {
-        EngineUIPtr eui = GetAppSingilton()->GetEngineUI();
+    EventMagic EngineUI::_captureLastDrawTimes(Json::Value args, void* userPointer) {
+        EngineUIPtr eui = static_cast<EngineUIPtr>(userPointer);
         
         Json::Value eArgs(Json::objectValue);
         Json::Value eArray(Json::arrayValue);
@@ -585,8 +585,8 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("captureLastDrawTimes_callback")->Emit(eArgs);
     }
     
-    EventMagic EngineUI::_createToast(Json::Value args) {
-        EngineUIPtr eui = GetAppSingilton()->GetEngineUI();
+    EventMagic EngineUI::_createToast(Json::Value args, void* userPointer) {
+        EngineUIPtr eui = static_cast<EngineUIPtr>(userPointer);
         
         if (!args["isToast"].asBool()) return EM_OK;
         

@@ -86,8 +86,8 @@ namespace Engine {
         double _currentProfilerScroll = 0;
         int _profilerX = 0;
         
-        static EventMagic _profilerHook(Json::Value args);
-        static EventMagic _captureLastDrawTimes(Json::Value args);
-        static EventMagic _createToast(Json::Value args);
+        static EventMagic _profilerHook(Json::Value args, void* userPointer);
+        static EventMagic _captureLastDrawTimes(Json::Value args, void* userPointer);
+        static EventMagic _createToast(Json::Value args, void* userPointer);
     };
 }

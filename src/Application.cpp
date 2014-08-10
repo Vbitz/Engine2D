@@ -174,32 +174,32 @@ namespace Engine {
         Config::SetNumber(  "core.test.screenshotTime",             0);
     }
     
-    EventMagic Application::_config_CoreRenderAA(Json::Value args) {
-        GetAppSingilton()->GetWindow()->SetAntiAlias(Config::GetInt("core.render.aa"));
+    EventMagic Application::_config_CoreRenderAA(Json::Value args, void* userPointer) {
+        static_cast<ApplicationPtr>(userPointer)->GetWindow()->SetAntiAlias(Config::GetInt("core.render.aa"));
         return EM_OK;
     }
     
-    EventMagic Application::_config_CoreWindowVSync(Json::Value args) {
-        GetAppSingilton()->GetWindow()->SetVSync(Config::GetBoolean("core.window.vsync"));
+    EventMagic Application::_config_CoreWindowVSync(Json::Value args, void* userPointer) {
+        static_cast<ApplicationPtr>(userPointer)->GetWindow()->SetVSync(Config::GetBoolean("core.window.vsync"));
         return EM_OK;
     }
     
-    EventMagic Application::_config_CoreWindowSize(Json::Value args) {
-        GetAppSingilton()->GetWindow()->SetWindowSize(glm::vec2(Config::GetInt("core.window.width"), Config::GetInt("core.window.height")));
+    EventMagic Application::_config_CoreWindowSize(Json::Value args, void* userPointer) {
+        static_cast<ApplicationPtr>(userPointer)->GetWindow()->SetWindowSize(glm::vec2(Config::GetInt("core.window.width"), Config::GetInt("core.window.height")));
         return EM_OK;
     }
     
-    EventMagic Application::_config_CoreWindowTitle(Json::Value args) {
-        GetAppSingilton()->GetWindow()->SetTitle(Config::GetString("core.window.title"));
+    EventMagic Application::_config_CoreWindowTitle(Json::Value args, void* userPointer) {
+        static_cast<ApplicationPtr>(userPointer)->GetWindow()->SetTitle(Config::GetString("core.window.title"));
         return EM_OK;
     }
     
     void Application::_hookConfigs() {
-        GetEventsSingilton()->GetEvent("config:core.render.aa")->AddListener("Application::Config_CoreRenderAA", EventEmitter::MakeTarget(_config_CoreRenderAA));
-        GetEventsSingilton()->GetEvent("config:core.window.vsync")->AddListener("Application::Config_CoreWindowVSync", EventEmitter::MakeTarget(_config_CoreWindowVSync));
-        GetEventsSingilton()->GetEvent("config:core.window.width")->AddListener("Application::ConfigWindowSize_Width", EventEmitter::MakeTarget(_config_CoreWindowSize));
-        GetEventsSingilton()->GetEvent("config:core.window.height")-> AddListener("Application::ConfigWindowSize_Height", EventEmitter::MakeTarget(_config_CoreWindowSize));
-        GetEventsSingilton()->GetEvent("config:core.window.title")->AddListener("Application::Config_CoreWindowTitle", EventEmitter::MakeTarget(_config_CoreWindowTitle));
+        GetEventsSingilton()->GetEvent("config:core.render.aa")->AddListener("Application::Config_CoreRenderAA", EventEmitter::MakeTarget(_config_CoreRenderAA, this));
+        GetEventsSingilton()->GetEvent("config:core.window.vsync")->AddListener("Application::Config_CoreWindowVSync", EventEmitter::MakeTarget(_config_CoreWindowVSync, this));
+        GetEventsSingilton()->GetEvent("config:core.window.width")->AddListener("Application::ConfigWindowSize_Width", EventEmitter::MakeTarget(_config_CoreWindowSize, this));
+        GetEventsSingilton()->GetEvent("config:core.window.height")-> AddListener("Application::ConfigWindowSize_Height", EventEmitter::MakeTarget(_config_CoreWindowSize, this));
+        GetEventsSingilton()->GetEvent("config:core.window.title")->AddListener("Application::Config_CoreWindowTitle", EventEmitter::MakeTarget(_config_CoreWindowTitle, this));
     }
     
     void Application::_loadConfigFile(std::string configPath) {
@@ -241,37 +241,27 @@ namespace Engine {
         }
     }
     
-    EventMagic Application::_appEvent_Exit(Json::Value val) {
-        GetAppSingilton()->Exit();
+    EventMagic Application::_appEvent_Exit(Json::Value val, void* userPointer) {
+        static_cast<ApplicationPtr>(userPointer)->Exit();
         return EM_OK;
     }
     
-    EventMagic Application::_appEvent_DumpScripts(Json::Value args) {
-        GetAppSingilton()->DumpScripts();
+    EventMagic Application::_appEvent_DumpScripts(Json::Value args, void* userPointer) {
+        static_cast<ApplicationPtr>(userPointer)->DumpScripts();
         return EM_OK;
     }
     
     void Application::_hookEvents() {
-        GetEventsSingilton()->GetEvent("exit")->AddListener("Application::_appEvent_Exit", EventEmitter::MakeTarget(_appEvent_Exit));
-        GetEventsSingilton()->GetEvent("dumpScripts")->AddListener("Applicaton::_appEvent_DumpScripts", EventEmitter::MakeTarget(_appEvent_DumpScripts));
+        GetEventsSingilton()->GetEvent("exit")->AddListener("Application::_appEvent_Exit", EventEmitter::MakeTarget(_appEvent_Exit, this));
+        GetEventsSingilton()->GetEvent("dumpScripts")->AddListener("Applicaton::_appEvent_DumpScripts", EventEmitter::MakeTarget(_appEvent_DumpScripts, this));
         
-        GetEventsSingilton()->GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", EventEmitter::MakeTarget(_toggleFullscreen))->SetDefered(true);
-        GetEventsSingilton()->GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", EventEmitter::MakeTarget(_restartRenderer))->SetDefered(true);
-        GetEventsSingilton()->GetEvent("screenshot")->AddListener("Application::_saveScreenshot", EventEmitter::MakeTarget(_saveScreenshot))->SetDefered(true);
-        GetEventsSingilton()->GetEvent("dumpLog")->AddListener("Application::_dumpLog", EventEmitter::MakeTarget(_dumpLog));
+        GetEventsSingilton()->GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", EventEmitter::MakeTarget(_toggleFullscreen, this))->SetDefered(true);
+        GetEventsSingilton()->GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", EventEmitter::MakeTarget(_restartRenderer, this))->SetDefered(true);
+        GetEventsSingilton()->GetEvent("screenshot")->AddListener("Application::_saveScreenshot", EventEmitter::MakeTarget(_saveScreenshot, this))->SetDefered(true);
+        GetEventsSingilton()->GetEvent("dumpLog")->AddListener("Application::_dumpLog", EventEmitter::MakeTarget(_dumpLog, this));
         
-        GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary));
-        GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireConfigFile", EventEmitter::MakeTarget(_requireConfigFile));
-    }
-	
-    void _resizeWindow(Json::Value val) {
-        int w = val["width"].asInt(),
-            h = val["height"].asInt();
-        ApplicationPtr app = GetAppSingilton();
-        Logger::begin("Window", Logger::LogLevel_Verbose) << "Resizing Window to " << w << "x" << h << Logger::end();
-		app->UpdateScreen();
-        glViewport(0, 0, w, h);
-        app->GetRender()->CheckError("Post Viewpoint");
+        GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary, this));
+        GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireConfigFile", EventEmitter::MakeTarget(_requireConfigFile, this));
     }
     
     void Application::_initGLContext(GraphicsVersion v) {
@@ -329,8 +319,8 @@ namespace Engine {
         this->_window = NULL;
     }
     
-    EventMagic Application::_rawInputHandler(Json::Value val) {
-        ApplicationPtr app = GetAppSingilton();
+    EventMagic Application::_rawInputHandler(Json::Value val, void* userPointer) {
+        ApplicationPtr app = static_cast<ApplicationPtr>(userPointer);
         
         app->_engineUI->OnKeyPress(val["rawKey"].asInt(), val["rawPress"].asInt(), val["shift"].asBool());
         
@@ -346,30 +336,30 @@ namespace Engine {
         return EM_OK;
     }
     
-    EventMagic Application::_rendererKillHandler(Json::Value val) {
+    EventMagic Application::_rendererKillHandler(Json::Value val, void* userPointer) {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Window Destroyed" << Logger::end();
         ResourceManager::UnloadAll();
         return EM_OK;
     }
     
-    EventMagic Application::_postCreateContext(Json::Value val) {
-        ApplicationPtr app = GetAppSingilton();
+    EventMagic Application::_postCreateContext(Json::Value val, void* userPointer) {
+        ApplicationPtr app = static_cast<ApplicationPtr>(userPointer);
         app->_initGLContext(app->_window->GetGraphicsVersion());
         return EM_OK;
     }
     
-    EventMagic Application::_rawResizeHandler(Json::Value val) {
-        GetAppSingilton()->UpdateScreen();
+    EventMagic Application::_rawResizeHandler(Json::Value val, void* userPointer) {
+        static_cast<ApplicationPtr>(userPointer)->UpdateScreen();
         return EM_OK;
     }
 	
 	void Application::_initOpenGL() {
         Logger::begin("Window", Logger::LogLevel_Verbose) << "Loading OpenGL : Init Window" << Logger::end();
         
-        GetEventsSingilton()->GetEvent("destroyWindow")->AddListener("Application::RendererKillHandler", EventEmitter::MakeTarget(_rendererKillHandler));
-        GetEventsSingilton()->GetEvent("rawInput")->AddListener("Application::RawInputHandler", EventEmitter::MakeTarget(_rawInputHandler));
-        GetEventsSingilton()->GetEvent("postCreateContext")->AddListener("Application::_postCreateContext", EventEmitter::MakeTarget(_postCreateContext));
-        GetEventsSingilton()->GetEvent("rawResize")->AddListener("Application::RawResizeHandler", EventEmitter::MakeTarget(_rawResizeHandler));
+        GetEventsSingilton()->GetEvent("destroyWindow")->AddListener("Application::RendererKillHandler", EventEmitter::MakeTarget(_rendererKillHandler, this));
+        GetEventsSingilton()->GetEvent("rawInput")->AddListener("Application::RawInputHandler", EventEmitter::MakeTarget(_rawInputHandler, this));
+        GetEventsSingilton()->GetEvent("postCreateContext")->AddListener("Application::_postCreateContext", EventEmitter::MakeTarget(_postCreateContext, this));
+        GetEventsSingilton()->GetEvent("rawResize")->AddListener("Application::RawResizeHandler", EventEmitter::MakeTarget(_rawResizeHandler, this));
         
         Window::StaticInit();
         
@@ -523,22 +513,22 @@ namespace Engine {
         this->_running = false;
     }
     
-    EventMagic Application::_restartRenderer(Json::Value args) {
-        ApplicationPtr app = GetAppSingilton();
+    EventMagic Application::_restartRenderer(Json::Value args, void* userPointer) {
+        ApplicationPtr app = static_cast<ApplicationPtr>(userPointer);
         Logger::begin("Window", Logger::LogLevel_Log) << "Restarting renderer" << Logger::end();
         app->_window->Reset();
         app->_initGLContext(app->_window->GetGraphicsVersion());
         app->UpdateScreen();
     }
     
-    EventMagic Application::_toggleFullscreen(Json::Value args) {
-        ApplicationPtr app = GetAppSingilton();
+    EventMagic Application::_toggleFullscreen(Json::Value args, void* userPointer) {
+        ApplicationPtr app = static_cast<ApplicationPtr>(userPointer);
         app->_window->SetFullscreen(!app->_window->GetFullscreen());
         app->UpdateScreen();
     }
     
-    EventMagic Application::_saveScreenshot(Json::Value args) {
-        ApplicationPtr app = GetAppSingilton();
+    EventMagic Application::_saveScreenshot(Json::Value args, void* userPointer) {
+        ApplicationPtr app = static_cast<ApplicationPtr>(userPointer);
         std::string targetFilename = args["filename"].asString();
         
         int width, height;
@@ -559,7 +549,7 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("onSaveScreenshot")->Emit(saveArgs);
     }
     
-    EventMagic Application::_dumpLog(Json::Value args) {
+    EventMagic Application::_dumpLog(Json::Value args, void* userPointer) {
         std::string targetFilename = args["filename"].asString();
         std::string log = Logger::DumpAllEvents();
         
@@ -574,7 +564,7 @@ namespace Engine {
         GetEventsSingilton()->GetEvent("onSaveLog")->Emit(saveArgs);
     }
     
-    EventMagic Application::_requireDynamicLibary(Json::Value args) {
+    EventMagic Application::_requireDynamicLibary(Json::Value args, void* userPointer) {
         static size_t endingLength = strlen(_PLATFORM_DYLINK);
         std::string filename = args["path"].asString();
         if (0 == filename.compare(filename.length() - endingLength, endingLength, _PLATFORM_DYLINK)) {
@@ -589,11 +579,11 @@ namespace Engine {
         }
     }
     
-    EventMagic Application::_requireConfigFile(Json::Value args) {
+    EventMagic Application::_requireConfigFile(Json::Value args, void* userPointer) {
         static size_t endingLength = strlen(".json");
         std::string filename = args["path"].asString();
         if (0 == filename.compare(filename.length() - endingLength, endingLength, ".json")) {
-            GetAppSingilton()->_loadConfigFile(filename);
+            static_cast<ApplicationPtr>(userPointer)->_loadConfigFile(filename);
             return EM_CANCEL;
         } else {
             return EM_OK;
