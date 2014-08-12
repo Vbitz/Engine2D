@@ -209,7 +209,7 @@ namespace Engine {
         
         glGetIntegerv(GL_VIEWPORT, viewpoint);
         
-        glm::mat4 proj = glm::ortho(0.0f, (float) viewpoint[2], (float) viewpoint[3], 0.0f, 1.0f, -1.0f);
+        glm::mat4 proj = glm::ortho(0.0f, (float) viewpoint[2], (float) viewpoint[3], 0.0f, 1000.0f, -1000.0f);
         
         ShaderSettings settings = this->_currentEffect->GetShaderSettings();
         
@@ -266,6 +266,11 @@ namespace Engine {
         unsigned char* buff = (unsigned char*) Filesystem::GetFileContent(filename, fileLength);
         
         VertexBufferDiskFormat* header = (VertexBufferDiskFormat*) buff;
+        
+        assert(header->magic[0] == 'E' &&
+               header->magic[1] == 'G' &&
+               header->magic[2] == 'L' &&
+               header->magic[3] == 'B');
         
         this->_vertexBuffer.insert(this->_vertexBuffer.end(),
             (BufferFormat*) &buff[header->vertexOffset],
