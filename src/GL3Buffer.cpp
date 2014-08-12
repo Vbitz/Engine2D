@@ -1,7 +1,7 @@
 /*
-   Filename: GL3Buffer.cpp
-   Purpose:  VBO manager for OpenGL 3.x
-
+   Filename: VertexBuffer.cpp
+   Purpose:  VBO manager
+ 
    Part of Engine2D
 
    Copyright (C) 2014 Vbitz
@@ -49,32 +49,32 @@ namespace Engine {
         }
     }
     
-    GL3Buffer::GL3Buffer() : _shaderBound(false) {
+    VertexBuffer::VertexBuffer() : _shaderBound(false) {
         
     }
     
-    GL3Buffer::GL3Buffer(RenderDriverPtr render, EffectParametersPtr params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
+    VertexBuffer::VertexBuffer(RenderDriverPtr render, EffectParametersPtr params) : _currentEffect(params), _shaderBound(false), _renderGL(render) {
         this->_init();
     }
     
-    GL3Buffer::~GL3Buffer() {
+    VertexBuffer::~VertexBuffer() {
         this->_shutdown();
     }
     
-    bool GL3Buffer::IsValid() {
+    bool VertexBuffer::IsValid() {
         if (this->_currentEffect == NULL) return false;
         if (this->_renderGL == NULL) return false;
         return true;
     }
     
-    void GL3Buffer::Init(RenderDriverPtr render, EffectParametersPtr params) {
+    void VertexBuffer::Init(RenderDriverPtr render, EffectParametersPtr params) {
         this->_currentEffect = params;
         this->_shaderBound = false;
         this->_renderGL = render;
         this->_init();
     }
     
-    void GL3Buffer::_init() {
+    void VertexBuffer::_init() {
         this->_renderGL->CheckError("GL3Buffer::_init::Pre");
         if (this->_renderGL->GetOpenGLVersion().major >= 3) {
             glGenVertexArrays(1, &this->_vertexArrayPointer);
@@ -84,7 +84,7 @@ namespace Engine {
         this->_renderGL->CheckError("GL3Buffer::_init::Post");
     }
     
-    void GL3Buffer::_shutdown() {
+    void VertexBuffer::_shutdown() {
         this->_renderGL->CheckError("GL3Buffer::_shutdown::Pre");
         glDeleteBuffers(1, &this->_vertexBufferPointer);
         glDeleteBuffers(1, &this->_elementBufferPointer);
@@ -94,7 +94,7 @@ namespace Engine {
         this->_renderGL->CheckError("GL3Buffer::_shutdown::Post");
     }
     
-    bool GL3Buffer::NeedsUpdate() {
+    bool VertexBuffer::NeedsUpdate() {
         if (this->_getShader()->NeedsUpdate()) {
             Logger::begin("GL3Buffer", Logger::LogLevel_Verbose) << "GL3Buffer reloaded due to Shader" << Logger::end();
             return true;
@@ -108,7 +108,7 @@ namespace Engine {
         return false;
     }
     
-    bool GL3Buffer::Update() {
+    bool VertexBuffer::Update() {
         assert(this->_renderGL != NULL);
         if (!this->NeedsUpdate()) {
             return false;
@@ -140,15 +140,15 @@ namespace Engine {
         return true;
     }
 
-    void GL3Buffer::AddVert(glm::vec3 pos) {
+    void VertexBuffer::AddVert(glm::vec3 pos) {
         this->AddVert(pos, Color4f("white"), glm::vec2(0, 0));
     }
     
-    void GL3Buffer::AddVert(glm::vec3 pos, Color4f col) {
+    void VertexBuffer::AddVert(glm::vec3 pos, Color4f col) {
         this->AddVert(pos, col, glm::vec2(0, 0));
     }
     
-    void GL3Buffer::AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv) {
+    void VertexBuffer::AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv) {
         this->_vertexBuffer.push_back(BufferFormat({
             .pos = pos,
             .col = col,
@@ -159,14 +159,14 @@ namespace Engine {
         this->_dirty = true;
     }
     
-    void GL3Buffer::Reset() {
+    void VertexBuffer::Reset() {
         this->_vertexCount = 0;
         this->_vertexBuffer.clear();
         this->_indexBuffer.clear();
         this->_dirty = true;
     }
     
-    void GL3Buffer::_upload() {
+    void VertexBuffer::_upload() {
         ENGINE_PROFILER_SCOPE;
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PreUploadBufferData");
@@ -187,7 +187,7 @@ namespace Engine {
         this->_getRender()->CheckError("GL3Buffer::Upload::Post");
     }
     
-    void GL3Buffer::Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view) {
+    void VertexBuffer::Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view) {
         if (this->_vertexCount == 0) {
             return; // nothing to draw
         }
@@ -217,24 +217,24 @@ namespace Engine {
         this->_getShader()->UploadUniform(settings.viewMatrixParam, view);
         this->_getShader()->UploadUniform(settings.projectionMatrixParam, proj);
         
-        this->_getRender()->CheckError("GL3Buffer::Draw::PostUploadUniform");
+        this->_getRender()->CheckError("VertexBuffer::Draw::PostUploadUniform");
         
         glDrawElements(_polygonModeToGLMode(mode), this->_vertexCount, GL_UNSIGNED_SHORT, 0);
         
-        this->_getRender()->CheckError("GL3Buffer::Draw::PostDraw");
+        this->_getRender()->CheckError("VertexBuffer::Draw::PostDraw");
         
         this->_getShader()->End();
         
         this->_end();
     }
     
-    void GL3Buffer::Save(std::string filename) {
+    void VertexBuffer::Save(std::string filename) {
         unsigned char* buff = NULL;
         long fileLength = 0;
         
-        GL3BufferDiskFormat header;
+        VertexBufferDiskFormat header;
         
-        fileLength += sizeof(GL3BufferDiskFormat);
+        fileLength += sizeof(VertexBufferDiskFormat);
         
         header.vertexOffset = fileLength;
         header.vertexCount = this->_vertexBuffer.size();
@@ -252,20 +252,20 @@ namespace Engine {
                     this->_vertexBuffer.size() * sizeof(BufferFormat));
         std::memcpy(&buff[header.indexOffset], &this->_indexBuffer[0],
                     this->_indexBuffer.size() * sizeof(ushort));
-        std::memcpy(&buff[0], &header, sizeof(GL3BufferDiskFormat));
+        std::memcpy(&buff[0], &header, sizeof(VertexBufferDiskFormat));
         
         Filesystem::WriteFile(filename, (const char*) buff, fileLength);
         
         std::free(buff);
     }
     
-    void GL3Buffer::Load(std::string filename) {
+    void VertexBuffer::Load(std::string filename) {
         this->Reset();
         
         long fileLength;
         unsigned char* buff = (unsigned char*) Filesystem::GetFileContent(filename, fileLength);
         
-        GL3BufferDiskFormat* header = (GL3BufferDiskFormat*) buff;
+        VertexBufferDiskFormat* header = (VertexBufferDiskFormat*) buff;
         
         this->_vertexBuffer.insert(this->_vertexBuffer.end(),
             (BufferFormat*) &buff[header->vertexOffset],
@@ -278,7 +278,7 @@ namespace Engine {
         this->_vertexCount = header->indexCount;
     }
     
-    void GL3Buffer::_begin() {
+    void VertexBuffer::_begin() {
         if (this->_renderGL->GetOpenGLVersion().major >= 3) {
             glBindVertexArray(this->_vertexArrayPointer);
         }
@@ -286,7 +286,7 @@ namespace Engine {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->_elementBufferPointer);
     }
     
-    void GL3Buffer::_end() {
+    void VertexBuffer::_end() {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         if (this->_renderGL->GetOpenGLVersion().major >= 3) {
@@ -294,19 +294,19 @@ namespace Engine {
         }
     }
     
-    Shader* GL3Buffer::_getShader() {
+    Shader* VertexBuffer::_getShader() {
         if (this->_currentShader == NULL) {
             this->_currentShader = this->_currentEffect->CreateShader();
         }
         return this->_currentShader;
     }
     
-    void GL3Buffer::bindShader() {
+    void VertexBuffer::bindShader() {
         ENGINE_PROFILER_SCOPE;
         
         this->_getShader()->Begin();
         
-        this->_getRender()->CheckError("GL3Buffer::Upload::PostBeginShader");
+        this->_getRender()->CheckError("VertexBuffer::Upload::PostBeginShader");
         
         ShaderSettings settings = this->_currentEffect->GetShaderSettings();
         
@@ -314,13 +314,13 @@ namespace Engine {
         this->_getShader()->BindUniform(settings.viewMatrixParam);
         this->_getShader()->BindUniform(settings.projectionMatrixParam);
         
-        this->_getRender()->CheckError("GL3Buffer::Upload::PostBindViewpointSize");
+        this->_getRender()->CheckError("VertexBuffer::Upload::PostBindViewpointSize");
         
         this->_getShader()->BindVertexAttrib(settings.vertexParam, 3, 9, 0);
         this->_getShader()->BindVertexAttrib(settings.colorParam, 4, 9, 3);
         this->_getShader()->BindVertexAttrib(settings.texCoardParam, 2, 9, 7);
         
-        this->_getRender()->CheckError("GL3Buffer::Upload::PostBindVertexAttributes");
+        this->_getRender()->CheckError("VertexBuffer::Upload::PostBindVertexAttributes");
         
         this->_getShader()->End();
     }

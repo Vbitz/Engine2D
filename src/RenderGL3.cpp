@@ -228,7 +228,7 @@ namespace Engine {
             std::string gl3Effect = Config::GetString("core.render.basicEffect");
             this->_currentEffect = EffectReader::GetEffectFromFile(gl3Effect);
             this->_currentEffect->CreateShader();
-            this->_gl3Buffer = new GL3Buffer(this, this->_currentEffect);
+            this->_gl3Buffer = new VertexBuffer(this, this->_currentEffect);
             if (this->_defaultTexture == NULL || !this->_defaultTexture->IsValid()) {
                 Logger::begin("RenderGL3", Logger::LogLevel_Verbose) << "Creating Default Texture" << Logger::end();
                 this->_defaultTexture = GenerateDefaultTexture();
@@ -325,7 +325,7 @@ namespace Engine {
         
         TexturePtr _currentTexture = NULL;
         
-        GL3BufferPtr _gl3Buffer = NULL;
+        VertexBufferPtr _gl3Buffer = NULL;
         
         glm::mat4 _currentModelMatrix;;
     };

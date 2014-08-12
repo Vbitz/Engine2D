@@ -1,6 +1,6 @@
 /*
-   Filename: GL3Buffer.hpp
-   Purpose:  VBO manager for OpenGL 3.x
+   Filename: VertexBuffer.hpp
+   Purpose:  VBO manager
 
    Part of Engine2D
 
@@ -43,7 +43,7 @@ namespace Engine {
     };
     
     // .eglb format
-    struct GL3BufferDiskFormat {
+    struct VertexBufferDiskFormat {
         unsigned char magic[4] = {'E', 'G', 'L', 'B'};
         
         unsigned int vertexOffset;
@@ -53,24 +53,24 @@ namespace Engine {
         unsigned int indexCount;
     };
     
-    typedef std::vector<BufferFormat> VertexBuffer;
-    typedef std::vector<ushort> IndexBuffer;
+    typedef std::vector<BufferFormat> VertexStore;
+    typedef std::vector<ushort> IndexStore;
     
-    typedef VertexBuffer& VertexBufferRef;
-    typedef IndexBuffer& IndexBufferRef;
+    typedef VertexStore& VertexStoreRef;
+    typedef IndexStore& IndexStoreRef;
     
     // Very temporory until I have a better API to do it.
     struct Camera {
         
     };
     
-    ENGINE_CLASS(GL3Buffer);
+    ENGINE_CLASS(VertexBuffer);
     
-	class GL3Buffer {
+	class VertexBuffer {
 	public:
-        GL3Buffer();
-		GL3Buffer(RenderDriverPtr render, EffectParametersPtr params);
-		~GL3Buffer();
+        VertexBuffer();
+		VertexBuffer(RenderDriverPtr render, EffectParametersPtr params);
+		~VertexBuffer();
 
         bool IsValid();
         void Init(RenderDriverPtr render, EffectParametersPtr params);
@@ -111,8 +111,8 @@ namespace Engine {
         
         uint _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
         
-        VertexBuffer _vertexBuffer;
-        IndexBuffer _indexBuffer;
+        VertexStore _vertexBuffer;
+        IndexStore _indexBuffer;
         
         ushort _vertexCount = 0;
         

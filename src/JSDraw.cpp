@@ -182,7 +182,7 @@ namespace Engine {
             drawTable->Set(isolate, "Color", newColor);
         }
         
-        class JS_VertexBuffer2D : public GL3Buffer, public ScriptingManager::ObjectWrap {
+        class JS_VertexBuffer2D : public VertexBuffer, public ScriptingManager::ObjectWrap {
         public:
         
             static void Create(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -201,7 +201,7 @@ namespace Engine {
                 if (render->GetRendererType() == RendererType::OpenGL3) {
                     EffectParametersPtr effect = EffectReader::GetEffectFromFile(args.StringValue(0));
                     effect->CreateShader();
-                    JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::Init(render, effect);
+                    JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::Init(render, effect);
                 }
             }
             
@@ -226,13 +226,13 @@ namespace Engine {
                                    args.NumberValue(4));
                 }
                 
-                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::AddVert(pos, col, uv);
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::AddVert(pos, col, uv);
             }
             
             static void Draw(const v8::FunctionCallbackInfo<v8::Value>& _args) {
                 ScriptingManager::Arguments args(_args);
                 
-                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::Draw(PolygonMode::Triangles, glm::mat4(), glm::mat4());
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::Draw(PolygonMode::Triangles, glm::mat4(), glm::mat4());
             }
             
             static void Save(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -242,7 +242,7 @@ namespace Engine {
                 
                 if (args.Assert(args[0]->IsString(), "Arg0 is the filename to save to")) return;
                 
-                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::Save(args.StringValue(0));
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::Save(args.StringValue(0));
             }
             
             static void Load(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -252,7 +252,7 @@ namespace Engine {
                 
                 if (args.Assert(args[0]->IsString(), "Arg0 is the filename to load from")) return;
                 
-                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->GL3Buffer::Load(args.StringValue(0));
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::Load(args.StringValue(0));
             }
             
             static void Init(v8::Handle<v8::ObjectTemplate> drawTable) {
