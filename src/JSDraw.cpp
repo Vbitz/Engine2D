@@ -232,7 +232,7 @@ namespace Engine {
             static void Draw(const v8::FunctionCallbackInfo<v8::Value>& _args) {
                 ScriptingManager::Arguments args(_args);
                 
-                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::Draw(PolygonMode::Triangles, glm::mat4(), glm::mat4());
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::Draw(PolygonMode::Triangles, glm::mat4());
             }
             
             static void Save(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -265,6 +265,22 @@ namespace Engine {
                 JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::SetProjectionType(args.BooleanValue(0) ? ProjectionType::Perspective : ProjectionType::Orthographic);
             }
             
+            static void SetLookAtView(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+            
+                if (args.AssertCount(6)) return;
+                
+                glm::vec3 source = glm::vec3(args.NumberValue(0),
+                                             args.NumberValue(1),
+                                             args.NumberValue(2));
+                
+                glm::vec3 target = glm::vec3(args.NumberValue(3),
+                                             args.NumberValue(4),
+                                             args.NumberValue(5));
+                
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::SetLookAtView(source, target);
+            }
+            
             static void Init(v8::Handle<v8::ObjectTemplate> drawTable) {
                 ScriptingManager::Factory f(v8::Isolate::GetCurrent());
                 v8::HandleScope scope(f.GetIsolate());
@@ -278,7 +294,8 @@ namespace Engine {
                     {FTT_Prototype, "draw", f.NewFunctionTemplate(Draw)},
                     {FTT_Prototype, "save", f.NewFunctionTemplate(Save)},
                     {FTT_Prototype, "load", f.NewFunctionTemplate(Load)},
-                    {FTT_Prototype, "setProjectionPerspective", f.NewFunctionTemplate(SetProjectionPerspective)}
+                    {FTT_Prototype, "setProjectionPerspective", f.NewFunctionTemplate(SetProjectionPerspective)},
+                    {FTT_Prototype, "setLookAtView", f.NewFunctionTemplate(SetLookAtView)}
                 });
                 
                 newVertexBuffer->InstanceTemplate()->SetInternalFieldCount(1);

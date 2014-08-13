@@ -95,6 +95,8 @@ namespace Engine {
         
         glm::vec2 size = this->_window->GetWindowSize();
         
+        glViewport(0, 0, size.x, size.y);
+        
 		sys_table->Set(v8::String::NewFromUtf8(isolate, "screenWidth"), v8::Number::New(isolate, size.x));
 		sys_table->Set(v8::String::NewFromUtf8(isolate, "screenHeight"), v8::Number::New(isolate, size.y));
 	}

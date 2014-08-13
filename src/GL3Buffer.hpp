@@ -86,7 +86,7 @@ namespace Engine {
         
         void Reset();
         
-		void Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view);
+		void Draw(PolygonMode mode, glm::mat4 model);
         
         bool NeedsUpdate();
         bool Update();
@@ -99,6 +99,7 @@ namespace Engine {
         void Load(std::string filename);
 
         void SetProjectionType(ProjectionType t);
+        void SetLookAtView(glm::vec3 source, glm::vec3 target);
         
 	private:
         void _init();
@@ -112,6 +113,8 @@ namespace Engine {
         
 		void _upload();
         
+        glm::vec4 _getCameraView();
+        
         RenderDriverPtr _getRender() {
             return this->_renderGL;
         }
@@ -119,6 +122,8 @@ namespace Engine {
         uint _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
         
         ProjectionType _projectionType = ProjectionType::Orthographic;
+        
+        glm::mat4 _view;
         
         VertexStore _vertexBuffer;
         IndexStore _indexBuffer;

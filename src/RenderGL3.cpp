@@ -211,7 +211,7 @@ namespace Engine {
                 Logger::begin("RenderGL3", Logger::LogLevel_Log) << "Render Buffer Reloaded" << Logger::end();
             }
             
-            this->_gl3Buffer->Draw(_currentMode, _currentModelMatrix, glm::mat4());
+            this->_gl3Buffer->Draw(this->_currentMode, this->_currentModelMatrix);
             
             this->CheckError("RenderGL3::FlushAll::PostDraw");
             

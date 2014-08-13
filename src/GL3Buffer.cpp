@@ -189,7 +189,7 @@ namespace Engine {
         this->_getRender()->CheckError("GL3Buffer::Upload::Post");
     }
     
-    void VertexBuffer::Draw(PolygonMode mode, glm::mat4 model, glm::mat4 view) {
+    void VertexBuffer::Draw(PolygonMode mode, glm::mat4 model) {
         if (this->_vertexCount == 0) {
             return; // nothing to draw
         }
@@ -216,12 +216,12 @@ namespace Engine {
                 break;
             case ProjectionType::Perspective:
                 glm::vec2 windowSize = GetAppSingilton()->GetWindow()->GetWindowSize();
-                proj = glm::perspectiveFov(Config::GetFloat("core.render.fovy"), windowSize.x, windowSize.y, -10.0f, 1000.0f);
+                proj = glm::perspective(Config::GetFloat("core.render.fovy"), windowSize.x / windowSize.y, 1.0f, 1000.0f);
                 break;
         }
         
         this->_getShader()->UploadUniform(settings.modelMatrixParam, model);
-        this->_getShader()->UploadUniform(settings.viewMatrixParam, view);
+        this->_getShader()->UploadUniform(settings.viewMatrixParam, this->_view);
         this->_getShader()->UploadUniform(settings.projectionMatrixParam, proj);
         
         this->_getRender()->CheckError("VertexBuffer::Draw::PostUploadUniform");
@@ -292,6 +292,10 @@ namespace Engine {
     
     void VertexBuffer::SetProjectionType(ProjectionType t) {
         this->_projectionType = t;
+    }
+    
+    void VertexBuffer::SetLookAtView(glm::vec3 source, glm::vec3 target) {
+        this->_view = glm::lookAt(source, target, glm::vec3(0.0f, 0.0f, 1.0f));
     }
     
     void VertexBuffer::_begin() {
