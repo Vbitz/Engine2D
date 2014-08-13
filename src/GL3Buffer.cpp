@@ -27,6 +27,8 @@
 #include "Logger.hpp"
 #include "Filesystem.hpp"
 #include "Profiler.hpp"
+#include "Application.hpp"
+#include "Config.hpp"
 
 // TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
 #include "vendor/glm/glm.hpp"
@@ -205,13 +207,18 @@ namespace Engine {
         
         this->_getRender()->CheckError("GL3Buffer::Draw::PostBindShader");
         
-        GLint viewpoint[4];
-        
-        glGetIntegerv(GL_VIEWPORT, viewpoint);
-        
-        glm::mat4 proj = glm::ortho(0.0f, (float) viewpoint[2], (float) viewpoint[3], 0.0f, 1000.0f, -1000.0f);
-        
         ShaderSettings settings = this->_currentEffect->GetShaderSettings();
+        
+        glm::mat4 proj;
+        switch (this->_projectionType) {
+            case ProjectionType::Orthographic:
+                proj = GetAppSingilton()->GetWindow()->GetOrthoProjection();
+                break;
+            case ProjectionType::Perspective:
+                glm::vec2 windowSize = GetAppSingilton()->GetWindow()->GetWindowSize();
+                proj = glm::perspectiveFov(Config::GetFloat("core.render.fovy"), windowSize.x, windowSize.y, -10.0f, 1000.0f);
+                break;
+        }
         
         this->_getShader()->UploadUniform(settings.modelMatrixParam, model);
         this->_getShader()->UploadUniform(settings.viewMatrixParam, view);
@@ -281,6 +288,10 @@ namespace Engine {
             (ushort*) &buff[header->indexOffset + (header->indexCount * sizeof(ushort))]);
         
         this->_vertexCount = header->indexCount;
+    }
+    
+    void VertexBuffer::SetProjectionType(ProjectionType t) {
+        this->_projectionType = t;
     }
     
     void VertexBuffer::_begin() {

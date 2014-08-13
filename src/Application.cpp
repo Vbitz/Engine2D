@@ -147,6 +147,7 @@ namespace Engine {
         
         Config::SetBoolean( "core.render.clampTexture",             true);
         Config::SetBoolean( "core.render.forceMipmaps",             true);
+        Config::SetNumber(  "core.render.fovy",                     45.0f);
         
         Config::SetBoolean( "core.script.autoReload",               this->_developerMode);
         Config::SetBoolean( "core.script.gcOnFrame",                this->_developerMode);

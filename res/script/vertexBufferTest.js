@@ -2,8 +2,6 @@ fs.configDir("vbTest");
 
 var buff = new draw.VertexBuffer2D("shaders/basic.json");
 
-var saved = false;
-
 // add a triangle
 buff.addVert(25, 50, new draw.Color("purple"));
 buff.addVert(250, 50, new draw.Color("green"));

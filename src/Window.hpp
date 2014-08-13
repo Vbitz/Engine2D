@@ -80,6 +80,7 @@ namespace Engine {
         virtual std::string GetWindowVersion() = 0;
         
         virtual int GetMaxTextureSize() = 0;
+        virtual glm::mat4 GetOrthoProjection() = 0;
         
         virtual RenderDriverPtr GetRender() = 0;
         

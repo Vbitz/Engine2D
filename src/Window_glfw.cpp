@@ -31,6 +31,8 @@
 #include "Events.hpp"
 #include "Logger.hpp"
 
+#include "vendor/glm/gtc/matrix_transform.hpp"
+
 namespace Engine {
     // from https://github.com/glfw/glfw/blob/master/tests/events.c
     static std::string glfwGetKeyName(int key)
@@ -321,6 +323,11 @@ namespace Engine {
             glGetIntegerv(GL_MAX_TEXTURE_SIZE, &result);
             
             return result;
+        }
+        
+        glm::mat4 GetOrthoProjection() override {
+            glm::vec2 window = this->GetWindowSize();
+            return glm::ortho(0.0f, window.x, window.y, 0.0f, 1000.0f, -1000.0f);
         }
         
         RenderDriver* GetRender() override {

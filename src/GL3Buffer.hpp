@@ -68,6 +68,11 @@ namespace Engine {
     
 	class VertexBuffer {
 	public:
+        enum class ProjectionType {
+            Orthographic,
+            Perspective
+        };
+        
         VertexBuffer();
 		VertexBuffer(RenderDriverPtr render, EffectParametersPtr params);
 		~VertexBuffer();
@@ -93,6 +98,8 @@ namespace Engine {
         void Save(std::string filename);
         void Load(std::string filename);
 
+        void SetProjectionType(ProjectionType t);
+        
 	private:
         void _init();
         void _shutdown();
@@ -110,6 +117,8 @@ namespace Engine {
         }
         
         uint _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
+        
+        ProjectionType _projectionType = ProjectionType::Orthographic;
         
         VertexStore _vertexBuffer;
         IndexStore _indexBuffer;

@@ -255,6 +255,16 @@ namespace Engine {
                 JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::Load(args.StringValue(0));
             }
             
+            static void SetProjectionPerspective(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(args[0]->IsBoolean(), "Set Arg0 to true to use a perspective and false to use orthographic")) return;
+                
+                JS_VertexBuffer2D::Unwarp<JS_VertexBuffer2D>(args.This())->VertexBuffer::SetProjectionType(args.BooleanValue(0) ? ProjectionType::Perspective : ProjectionType::Orthographic);
+            }
+            
             static void Init(v8::Handle<v8::ObjectTemplate> drawTable) {
                 ScriptingManager::Factory f(v8::Isolate::GetCurrent());
                 v8::HandleScope scope(f.GetIsolate());
@@ -267,7 +277,8 @@ namespace Engine {
                     {FTT_Prototype, "addVert", f.NewFunctionTemplate(AddVert)},
                     {FTT_Prototype, "draw", f.NewFunctionTemplate(Draw)},
                     {FTT_Prototype, "save", f.NewFunctionTemplate(Save)},
-                    {FTT_Prototype, "load", f.NewFunctionTemplate(Load)}
+                    {FTT_Prototype, "load", f.NewFunctionTemplate(Load)},
+                    {FTT_Prototype, "setProjectionPerspective", f.NewFunctionTemplate(SetProjectionPerspective)}
                 });
                 
                 newVertexBuffer->InstanceTemplate()->SetInternalFieldCount(1);
