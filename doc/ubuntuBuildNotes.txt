@@ -1,0 +1,28 @@
+# Very inital start to finish instructions for building Engine2D on Ubuntu 14.04
+
+$ uname -a
+Linux ubuntu 3.13.0-34-generic #60-Ubuntu SMP Wed Aug 13 15:45:27 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+$ cat /etc/issue
+Ubuntu 14.04.1 LTS \n \l
+$ sudo apt-get install -y git subversion build-essential clang libglu1-mesa-dev libsdl2-dev uuid-dev
+$ git clone https://github.com/Vbitz/Engine2D
+$ cd Engine2D
+$ mkdir tmp
+$ ./tasks.py env
+==== Running: env ====
+sys.platform = linux2
+sys.version = 2.7.6 (default, Mar 22 2014, 22:59:56) 
+[GCC 4.8.2]
+resolve_path(PROJECT_ROOT, "tasks.py") = tasks.py
+$ svn co http://gyp.googlecode.com/svn/trunk third_party/gyp
+$ cd third_party
+$ wget https://github.com/v8/v8/archive/3.28.28.2.tar.gz
+$ tar xf 3.28.28.2.tar.gz
+$ cd v8-3.28.28.2/
+$ cp -R ../gyp build/gyp
+$ make native library=shared snapshot=on console=readline i18nsupport=off
+$ ENGINE_WINDOW_SYSTEM ./tasks.py gyp
+$ cd 0
+$ CC=clang CXX=clang++ CXXFLAGS=-std=gnu++11 LD_LIBRARY_PATH=../third_party/lib/ make
+$ cd ..
+$ LD_LIBRARY_PATH=third_party/lib/ 0/out/Default/engine2D -Ccore.render.openGL=2.0 script/basic
