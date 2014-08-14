@@ -38,3 +38,8 @@ tags
 screenshot.bmp
 
 tmp/
+
+*~
+*.mk
+0/
+*.Makefile

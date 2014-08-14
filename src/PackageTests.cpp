@@ -22,6 +22,9 @@
 #include "Package.hpp"
 #include "TestSuiteAPI.hpp"
 
+#include <cstdlib>
+#include <cstring>
+
 namespace Engine {
     
     class BasicPackageTest : public Test {

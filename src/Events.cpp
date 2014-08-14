@@ -184,7 +184,7 @@ namespace Engine {
             if (iter->second.Label == name) {
                 delete iter->second.Target;
                 iter->second.Target = target;
-                return;
+                return this;
             }
         }
         this->_events.insert(std::pair<size_t, Event>(priority, Event(name, target)));

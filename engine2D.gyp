@@ -41,6 +41,7 @@
 				"src/Util.cpp",
 				"src/Platform_mac.cpp",
 				"src/Platform_win.cpp",
+				"src/Platform_linux.cpp",
 				"src/Events.cpp",
 				"src/TestSuite.cpp",
 				"src/Application.cpp",
@@ -108,6 +109,12 @@
 						"src/Platform_mac.cpp",
 					]
 				}],
+				['OS != "linux"', {
+					'sources!': [
+						# Mac-only; exclude on other platforms.
+						"src/Platform_linux.cpp",
+					]
+				}],
 				["OS == \"mac\"", {
 					"xcode_settings": {
 						"OTHER_CPLUSPLUSFLAGS": [
@@ -133,6 +140,46 @@
 							"$(SDKROOT)/System/Library/Frameworks/IOKit.framework"
 						]
 					}
+				}],
+				["OS == \"linux\"", {
+					"cflags": [
+						"-fPIC"
+					],
+					"cppflags": [
+						"-D_FORTIFY_SOURCE=2",
+						"-std=gnu++11",
+						"-stdlib=libc++",
+						"-pthread",
+						"-fPIC"
+					],
+					"ldflags": [
+						"-lv8",
+						"-lGL",
+						"-luuid",
+						"-L../third_party/v8-3.28.28.2/out/native/lib.target",
+						"-Wl,-rpath,../third_party/v8-3.28.28.2/out/native/lib.target"
+					],
+					"include_dirs": [
+						"third_party/v8-3.28.28.2/include"
+					],
+					"library_dirs": [
+						"third_party/v8-3.28.28.2/out/native/lib.target"	
+					]
+				}],
+				['("<(WINDOW)" == "sdl") & (OS == "linux")', {
+					'sources': [
+						"src/Window_sdl.cpp"
+					],
+					"cppflags": [
+						"-D_THREAD_SAFE",
+						"-D_REENTRANT"
+					],
+					"ldflags": [
+						"-lSDL2"
+					],
+					"include_dirs": [
+						"/usr/include/SDL2"
+					]
 				}],
 				['("<(WINDOW)" == "glfw") & (OS == "mac")', {
 					'sources': [

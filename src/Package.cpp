@@ -1,5 +1,7 @@
 #include "Package.hpp"
 
+#include <cstring>
+
 #include "vendor/zlib123/zlib.h"
 
 namespace Engine {

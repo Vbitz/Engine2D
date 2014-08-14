@@ -7,7 +7,7 @@
  */
 
 #define __PHYSICSFS_INTERNAL__
-#include "physfs_platforms.h"
+#include "../physfs_platforms.h"
 
 #ifdef PHYSFS_PLATFORM_MACOSX
 
@@ -22,7 +22,7 @@
 #undef Free
 #endif
 
-#include "physfs_internal.h"
+#include "../physfs_internal.h"
 
 
 /* Wrap PHYSFS_Allocator in a CFAllocator... */

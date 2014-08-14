@@ -21,6 +21,8 @@
 
 #include "JSInput.hpp"
 
+#include <string.h>
+
 #include "Application.hpp"
 #include "Scripting.hpp"
 #include "Util.hpp"

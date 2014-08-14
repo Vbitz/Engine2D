@@ -18,11 +18,11 @@
 #include <errno.h>
 #include <time.h>
 #endif
-#include "physfs.h"
-#include "zlib.h"
+#include "../physfs.h"
+#include "../../zlib123/zlib.h"
 
 #define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "../physfs_internal.h"
 
 /*
  * A buffer of ZIP_READBUFSIZE is allocated for each compressed file opened,

@@ -7,7 +7,7 @@
  */
 
 #define __PHYSICSFS_INTERNAL__
-#include "physfs_platforms.h"
+#include "../physfs_platforms.h"
 
 #ifdef PHYSFS_PLATFORM_POSIX
 
@@ -27,7 +27,7 @@
 #include <linux/unistd.h>
 #endif
 
-#include "physfs_internal.h"
+#include "../physfs_internal.h"
 
 
 const char *__PHYSFS_platformDirSeparator = "/";

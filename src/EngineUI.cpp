@@ -21,7 +21,11 @@
 
 #include "EngineUI.hpp"
 
+#ifdef _PLATFORM_OSX
 #include <OpenGL/gl3.h>
+#else
+#include <GL/gl.h>
+#endif
 
 #include "FramePerfMonitor.hpp"
 #include "Config.hpp"

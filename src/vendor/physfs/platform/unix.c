@@ -7,7 +7,7 @@
  */
 
 #define __PHYSICSFS_INTERNAL__
-#include "physfs_platforms.h"
+#include "../physfs_platforms.h"
 
 #ifdef PHYSFS_PLATFORM_UNIX
 
@@ -40,7 +40,7 @@
 #include <mntent.h>
 #endif
 
-#include "physfs_internal.h"
+#include "../physfs_internal.h"
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024

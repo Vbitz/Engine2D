@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <limits.h>
+
 #include "ResourceManager.hpp"
 #include "RenderDriver.hpp"
 

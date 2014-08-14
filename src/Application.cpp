@@ -87,7 +87,7 @@ namespace Engine {
 	
 	void Application::UpdateScreen() {
         if (!this->_running) {
-            return false;
+            return;
         }
         
         v8::Isolate* isolate = this->_scripting->GetIsolate();
@@ -328,7 +328,7 @@ namespace Engine {
         app->_engineUI->OnKeyPress(val["rawKey"].asInt(), val["rawPress"].asInt(), val["shift"].asBool());
         
         if (app->_engineUI->ConsoleActive()) {
-            return;
+            return EM_OK;
         }
         
         std::string key = val["key"].asString();

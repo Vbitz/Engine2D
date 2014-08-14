@@ -21,6 +21,8 @@
 
 #include "ScriptingManager.hpp"
 
+#include <cstring>
+
 // Scripting Includes
 #include "JSSys.hpp"
 #include "JSDraw.hpp"

@@ -24,6 +24,8 @@
 
 #include "GL3Buffer.hpp"
 
+#include <cstring>
+
 #include "Logger.hpp"
 #include "Filesystem.hpp"
 #include "Profiler.hpp"

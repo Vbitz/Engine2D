@@ -9,10 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "physfs.h"
+#include "../physfs.h"
 
 #define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "../physfs_internal.h"
 
 static PHYSFS_sint64 DIR_read(fvoid *opaque, void *buffer,
                               PHYSFS_uint32 objSize, PHYSFS_uint32 objCount)

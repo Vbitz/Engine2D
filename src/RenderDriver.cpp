@@ -21,6 +21,8 @@
 
 #include "RenderDriver.hpp"
 
+#include <cstring>
+
 #include "Application.hpp"
 #include "Profiler.hpp"
 #include "Config.hpp"
