@@ -26,13 +26,15 @@
 	- Fix linking issues and install library's
 	- Implement Platform_win.cpp
 	- **DONE** Update engine2D.gyp
+	- Fix Runtime Bugs
 	- Commit back to upstream
 - Port to Linux
 	- **DONE** Stub Out Platform_linux.cpp
 	- **DONE** Use GYP to generate a Makefile
-	- Fix linking issues and record package details
+	- **DONE** Fix linking issues and record package details
 	- **DONE** Implement Platform_linux.cpp
 	- **DONE** Update engine2D.gyp
+	- Fix Runtime Bugs
 	- Commit back to upstream
 - **Unfreeze Feature Additions**
 - Add new Scripting Features
