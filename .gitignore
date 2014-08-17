@@ -24,7 +24,9 @@ Internal*
 *.dot
 *.ps
 
-third_party/
+!third_party/
+third_party/*
+!third_party/v8
 build/
 
 .taskStatus

@@ -26,6 +26,7 @@ import re;
 import shutil;
 import hashlib;
 import ConfigParser;
+import multiprocessing;
 
 import inspect;
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())));
@@ -118,6 +119,12 @@ def ensure_dir(path):
 	if not os.path.exists(path):
 		os.makedirs(path);
 
+def get_arch():
+	return "x64";
+
+def get_max_jobs():
+	return multiprocessing.cpu_count();
+
 config = ConfigParser.RawConfigParser();
 try:
 	config.read(resolve_path(PROJECT_TMP_PATH, "tasks.cfg"));
@@ -178,6 +185,12 @@ def gyp(args):
 			"--depth=0",
 			"-DWINDOW=" + WINDOW_SYSTEM,
 			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
+			# for V8
+			"-Dtarget_arch=" + get_arch(),
+			"-Dhost_arch=" + get_arch(),
+			"-Dcomponent=static_library",
+			"-Dv8_optimized_debug=1",
+			"-Dv8_enable_i18n_support=0",
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
 		]);
 
@@ -233,7 +246,7 @@ def clean(args):
 
 def _build_bin(output=True):
 	if sys.platform == "darwin": # OSX
-		shell_command(["xcodebuild"]);
+		shell_command(["xcodebuild", "-jobs", str(get_max_jobs())]);
 		shell_command(["install_name_tool", "-change",
 			"/usr/local/lib/libengine2D.dylib",
 			"@executable_path/libengine2D.dylib",
