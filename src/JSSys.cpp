@@ -48,8 +48,8 @@ namespace Engine {
             return (ApplicationPtr) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_app")).As<v8::External>()->Value();
         }
         
-		ENGINE_JS_METHOD(Println) {
-			ENGINE_JS_SCOPE_OPEN;
+        void Println(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
             std::string logStr = "";
             
@@ -65,21 +65,17 @@ namespace Engine {
 				logStr += cstr;
 			}
             
-            if (ENGINE_GET_ARG_CPPSTRING_VALUE(0) == "raw") {
+            if (args.StringValue(0) == "raw") {
                 printf("%s", logStr.c_str());
             } else {
-                Logger::LogText("Script", _getLevelFromStr(ENGINE_GET_ARG_CPPSTRING_VALUE(0)), logStr);
+                Logger::LogText("Script", _getLevelFromStr(args.StringValue(0)), logStr);
             }
-                
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
 		}
         
-        ENGINE_JS_METHOD(ArgV) {
-            ENGINE_JS_SCOPE_OPEN;
+        void ArgV(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(0);
-            
-            v8::Local<v8::Array> argvArray = v8::Array::New(args.GetIsolate());
+            v8::Local<v8::Array> argvArray = args.NewArray();
             
             std::vector<std::string> cArgs = GetAppSingilton()->GetCommandLineArgs();
             
@@ -87,61 +83,53 @@ namespace Engine {
                 argvArray->Set(i, v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), cArgs[i].c_str()));
             }
             
-            ENGINE_JS_SCOPE_CLOSE(argvArray);
+            args.SetReturnValue(argvArray);
         }
 
-        ENGINE_JS_METHOD(RunFile) {
-            ENGINE_JS_SCOPE_OPEN;
+        void RunFile(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
+            if (args.AssertCount(2)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the filename of the script to load");
-            ENGINE_CHECK_ARG_BOOLEAN(1, "Arg1 is set to automaticly reload Arg0 when it's changed");
-            
-            std::string scriptFilename = ENGINE_GET_ARG_CPPSTRING_VALUE(0);
+            if (args.Assert(args[0]->IsString(), "Arg0 is the filename of the script to load") ||
+                args.Assert(args[1]->IsBoolean(), "Arg1 is set to automaticly reload Arg0 when it's changed")) return;
 			
-            ENGINE_JS_SCOPE_CLOSE(v8::Boolean::New(args.GetIsolate(), GetAppSingilton()->GetScriptingContext()->RunFile(scriptFilename, ENGINE_GET_ARG_BOOLEAN_VALUE(1))));
+            args.SetReturnValue(args.NewBoolean(GetAppSingilton()->GetScriptingContext()->RunFile(args.StringValue(0), args.BooleanValue(1))));
 		}
         
-        ENGINE_JS_METHOD(EventsOn) {
-            ENGINE_JS_SCOPE_OPEN;
+        void EventsOn(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
             if (args.Length() == 3) {
-                GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->AddListener(ENGINE_GET_ARG_CPPSTRING_VALUE(1), EventEmitter::MakeTarget(args[2].As<v8::Function>()));
+                GetEventsSingilton()->GetEvent(args.StringValue(0))->AddListener(args.StringValue(1), EventEmitter::MakeTarget(args[2].As<v8::Function>()));
             } else {
                 
             }
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(EventsEmit) {
-            ENGINE_JS_SCOPE_OPEN;
+        void EventsEmit(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to Emit");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the Event name to Emit")) return;
             
             if (args.Length() == 2) {
-                GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->Emit(ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(args[1].As<v8::Object>())));
+                GetEventsSingilton()->GetEvent(args.StringValue(0))->Emit(ScriptingManager::ObjectToJson(v8::Handle<v8::Object>(args[1].As<v8::Object>())));
             } else if (args.Length() == 1) {
-                GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->Emit();
+                GetEventsSingilton()->GetEvent(args.StringValue(0))->Emit();
             } else {
-                ENGINE_THROW_ARGERROR("sys.emit takes 1 or 2 args");
+                args.ThrowArgError("sys.emit takes 1 or 2 args");
             }
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(EventsSetDefered) {
-            ENGINE_JS_SCOPE_OPEN;
+        void EventsSetDefered(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            ENGINE_CHECK_ARGS_LENGTH(2);
+            if (args.AssertCount(2)) return;
             
-            ENGINE_CHECK_ARG_STRING(0, "Arg0 is the Event name to target");
-            ENGINE_CHECK_ARG_BOOLEAN(1, "Arg1 is set to defer messages sent to the event");
+            if (args.Assert(args[0]->IsString(), "Arg0 is the Event name to target") ||
+                args.Assert(args[1]->IsBoolean(), "Arg1 is set to defer messages sent to the event")) return;
             
-            GetEventsSingilton()->GetEvent(ENGINE_GET_ARG_CPPSTRING_VALUE(0))->SetDefered(ENGINE_GET_ARG_BOOLEAN_VALUE(1));
-            
-            ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
+            GetEventsSingilton()->GetEvent(args.StringValue(0))->SetDefered(args.BooleanValue(1));
         }
         
         ENGINE_JS_METHOD(EventsPollDeferedMessages) {

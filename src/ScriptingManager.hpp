@@ -48,6 +48,12 @@ namespace Engine {
             v8::Handle<v8::Data> value;
         };
         
+        struct ObjectValues {
+            FunctionTemplateTemplates location;
+            const char* key;
+            v8::Handle<v8::Value> value;
+        };
+        
         ENGINE_CLASS(Factory);
         
         class Factory {
@@ -120,6 +126,17 @@ namespace Engine {
                 return this->_isolate;
             }
 
+            SCRIPTINGMANAGER_INLINE void FillObject(v8::Handle<v8::Object> handle, std::vector<ObjectValues> values) {
+                for (auto iter = values.begin(); iter != values.end(); iter++) {
+                    switch (iter->location) {
+                        case FTT_Static:
+                            handle->Set(this->NewString(iter->key), iter->value);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
             
             SCRIPTINGMANAGER_INLINE void FillTemplate(v8::Handle<v8::ObjectTemplate> handle, std::vector<FunctionTemplateValues> values) {
                 for (auto iter = values.begin(); iter != values.end(); iter++) {
