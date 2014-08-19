@@ -116,9 +116,9 @@ namespace Engine {
         bool _loaded;
         
         std::vector<std::string> _vertexMacros, _fragMacros;
-        std::map<std::string, uint> _uniforms;
+        std::map<std::string, unsigned int> _uniforms;
         std::unordered_map<std::string, glm::mat4> _matrix_uniform_cache;
-        std::map<std::string, uint> _attribs;
+        std::map<std::string, unsigned int> _attribs;
         
         unsigned int _programPointer, _vertPointer, _fragPointer;
         std::string _vertFilename, _fragFilename;

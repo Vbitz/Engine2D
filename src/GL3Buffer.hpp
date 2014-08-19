@@ -54,7 +54,7 @@ namespace Engine {
     };
     
     typedef std::vector<BufferFormat> VertexStore;
-    typedef std::vector<ushort> IndexStore;
+    typedef std::vector<unsigned short> IndexStore;
     
     typedef VertexStore& VertexStoreRef;
     typedef IndexStore& IndexStoreRef;
@@ -119,7 +119,7 @@ namespace Engine {
             return this->_renderGL;
         }
         
-        uint _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
+        unsigned int _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
         
         ProjectionType _projectionType = ProjectionType::Orthographic;
         
@@ -128,7 +128,7 @@ namespace Engine {
         VertexStore _vertexBuffer;
         IndexStore _indexBuffer;
         
-        ushort _vertexCount = 0;
+        unsigned short _vertexCount = 0;
         
         bool _dirty = false;
         

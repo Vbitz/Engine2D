@@ -421,10 +421,12 @@ namespace Engine {
             glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
             
             if (this->_version == GraphicsVersion::OpenGL_Modern) {
+#ifdef _PLATFORM_OSX
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
                 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
                 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
             } else if (this->_version == GraphicsVersion::OpenGL_Legacy) {
                 
             }

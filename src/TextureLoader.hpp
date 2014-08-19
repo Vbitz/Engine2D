@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <limits.h>
+#include <limits>
 
 #include "ResourceManager.hpp"
 #include "RenderDriver.hpp"
@@ -38,7 +38,7 @@ namespace Engine {
     class Texture {
     public:
         Texture();
-        Texture(RenderDriverPtr render, uint textureID);
+        Texture(RenderDriverPtr render, unsigned int textureID);
         ~Texture();
         
         void Invalidate();
@@ -54,11 +54,11 @@ namespace Engine {
         int GetHeight();
         
     private:
-        void _setTextureID(uint textureID);
-        void _setTextureID(uint textureID, bool deleteOld);
+        void _setTextureID(unsigned int textureID);
+        void _setTextureID(unsigned int textureID, bool deleteOld);
         
         RenderDriverPtr _render;
-        uint _textureID = UINT_MAX;
+        unsigned int _textureID = std::numeric_limits<unsigned int>::max();
         int _width, _height;
     };
     
@@ -66,10 +66,10 @@ namespace Engine {
         TexturePtr TextureFromFileBuffer(unsigned char* texture, long bufferLength);
         
         TexturePtr TextureFromBuffer(unsigned char* texture, int width, int height);
-        TexturePtr TextureFromBuffer(uint textureID, unsigned char* texture, int width, int height);
+        TexturePtr TextureFromBuffer(unsigned int textureID, unsigned char* texture, int width, int height);
 
         TexturePtr TextureFromBuffer(float* texture, int width, int height);
-        TexturePtr TextureFromBuffer(uint textureID, float* texture, int width, int height);
+        TexturePtr TextureFromBuffer(unsigned int textureID, float* texture, int width, int height);
         
         ResourceManager::ImageResourcePtr TextureFromFile(std::string filename);
     }

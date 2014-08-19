@@ -46,7 +46,7 @@ namespace Engine {
     void Texture::Invalidate() {
         if (this->IsValid())
             glDeleteTextures(1, &this->_textureID);
-        this->_textureID = UINT_MAX;
+        this->_textureID = std::numeric_limits<unsigned int>::max();
     }
     
     void Texture::Save(std::string filename) {
@@ -122,7 +122,7 @@ namespace Engine {
         }
         
         TexturePtr TextureFromBuffer(unsigned char *texture, int width, int heigth) {
-            return TextureFromBuffer(UINT_MAX, texture, width, heigth);
+            return TextureFromBuffer(std::numeric_limits<unsigned int>::max(), texture, width, heigth);
         }
         
         TexturePtr TextureFromBuffer(GLuint textureID, unsigned char *texture, int width, int height) {
@@ -154,7 +154,7 @@ namespace Engine {
         }
         
         TexturePtr TextureFromBuffer(float* texture, int width, int height) {
-            return TextureFromBuffer(UINT_MAX, texture, width, height);
+            return TextureFromBuffer(std::numeric_limits<unsigned int>::max(), texture, width, height);
         }
         
         TexturePtr TextureFromBuffer(GLuint textureID, float* texture, int width, int height) {

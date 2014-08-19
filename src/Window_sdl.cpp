@@ -31,6 +31,8 @@
 #include "Events.hpp"
 #include "Logger.hpp"
 
+#include "Platform.hpp"
+
 namespace Engine {
     std::string _getMouseButtonString(char index) {
         switch (index) {
@@ -343,9 +345,11 @@ namespace Engine {
         
         void _create() {
             if (this->_version == GraphicsVersion::OpenGL_Modern) {
+#ifdef _PLATFORM_OSX
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#endif
             } else if (this->_version == GraphicsVersion::OpenGL_Legacy) {
                 
             }

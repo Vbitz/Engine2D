@@ -179,7 +179,7 @@ namespace Engine {
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadBufferData");
         
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ushort) * this->_vertexCount, &this->_indexBuffer[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * this->_vertexCount, &this->_indexBuffer[0], GL_STATIC_DRAW);
         
         this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadIndexData");
         
@@ -253,19 +253,19 @@ namespace Engine {
         header.indexOffset = fileLength;
         header.indexCount = this->_indexBuffer.size();
         
-        fileLength += this->_indexBuffer.size() * sizeof(ushort);
+        fileLength += this->_indexBuffer.size() * sizeof(unsigned short);
         
-        buff = (unsigned char*) std::malloc(fileLength);
+        buff = new unsigned char[fileLength];
         
         std::memcpy(&buff[header.vertexOffset], &this->_vertexBuffer[0],
                     this->_vertexBuffer.size() * sizeof(BufferFormat));
         std::memcpy(&buff[header.indexOffset], &this->_indexBuffer[0],
-                    this->_indexBuffer.size() * sizeof(ushort));
+                    this->_indexBuffer.size() * sizeof(unsigned short));
         std::memcpy(&buff[0], &header, sizeof(VertexBufferDiskFormat));
         
         Filesystem::WriteFile(filename, (const char*) buff, fileLength);
         
-        std::free(buff);
+        delete [] buff;
     }
     
     void VertexBuffer::Load(std::string filename) {
@@ -286,8 +286,8 @@ namespace Engine {
             (BufferFormat*) &buff[header->vertexOffset + (header->vertexCount * sizeof(BufferFormat))]);
         
         this->_indexBuffer.insert(this->_indexBuffer.end(),
-            (ushort*) &buff[header->indexOffset],
-            (ushort*) &buff[header->indexOffset + (header->indexCount * sizeof(ushort))]);
+            (unsigned short*) &buff[header->indexOffset],
+            (unsigned short*) &buff[header->indexOffset + (header->indexCount * sizeof(unsigned short))]);
         
         this->_vertexCount = header->indexCount;
     }
