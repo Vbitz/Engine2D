@@ -47,35 +47,37 @@ namespace Engine {
             static FilePtr Open(std::string path, FileMode mode);
         };
         
-		bool						IsLoaded();
+		bool IsLoaded();
 
-		void						Init(const char* argv0);
-		void						Destroy();
+		void Init(const char* argv0);
+		void Destroy();
 
-        bool                        Mount(std::string path, std::string fsPath);
-        bool                        Mount(std::string path);
-        void                        SetupUserDir(std::string path);
+        bool Mount(std::string path, std::string fsPath);
+        bool Mount(std::string path);
+        void SetupUserDir(std::string path);
         
-		bool						FileExists(std::string path);
+		bool FileExists(std::string path);
         
-		bool						FolderExists(std::string path);
+		bool FolderExists(std::string path);
         
-        void                        Mkdir(std::string path);
+        void Mkdir(std::string path);
         
-		std::vector<std::string>	GetDirectoryContent(std::string path);
+		std::vector<std::string> GetDirectoryContent(std::string path);
 
-		long						FileSize(std::string path);
+		long FileSize(std::string path);
         
-        char*                       GetFileContent(std::string path);
-        char*                       GetFileContent(std::string path, long& fileSize);
+        char* GetFileContent(std::string path);
+        char* GetFileContent(std::string path, long& fileSize);
         
-        void                        WriteFile(std::string path, const char* content, long length);
-        void                        TouchFile(std::string path);
-        void                        DeleteFile(std::string path);
+        std::string GetFileHexDigest(Hash::DigestType type, std::string path);
+        
+        void WriteFile(std::string path, const char* content, long length);
+        void TouchFile(std::string path);
+        void DeleteFile(std::string path);
 
-		std::string					GetRealPath(std::string path);
-		long						GetFileModifyTime(std::string path);
+		std::string GetRealPath(std::string path);
+		long GetFileModifyTime(std::string path);
         
-        bool                        HasSetUserDir();
+        bool HasSetUserDir();
 	}
 }

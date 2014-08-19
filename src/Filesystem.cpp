@@ -187,6 +187,14 @@ namespace Engine {
 			return fBuffer;
 		}
         
+        std::string GetFileHexDigest(Hash::DigestType type, std::string path) {
+            long fileSize = 0;
+            char* fileContent = GetFileContent(path);
+            std::string hexDigest = Hash::HexDigest(type, (uint8_t*) fileContent, (size_t) fileSize);
+            delete [] fileContent;
+            return hexDigest;
+        }
+        
         void WriteFile(std::string path, const char* content, long length) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();

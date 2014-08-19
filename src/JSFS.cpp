@@ -144,6 +144,16 @@ namespace Engine {
             args.SetReturnValue(ret);
         }
         
+        void HashFile(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            
+            if (args.AssertCount(1)) return;
+            
+            if (args.Assert(args[0]->IsString(), "Arg0 is the path to the file")) return;
+            
+            args.SetReturnValue(args.NewString(Filesystem::GetFileHexDigest(Hash::DigestType::SHA512, args.StringValue(0))));
+        }
+        
         void InitFS(v8::Handle<v8::ObjectTemplate> fsTable) {
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             
@@ -155,7 +165,8 @@ namespace Engine {
                 {FTT_Static, "mountFile", f.NewFunctionTemplate(MountFile)},
                 {FTT_Static, "configDir", f.NewFunctionTemplate(ConfigDir)},
                 {FTT_Static, "mkdir", f.NewFunctionTemplate(Mkdir)},
-                {FTT_Static, "lsdir", f.NewFunctionTemplate(Lsdir)}
+                {FTT_Static, "lsdir", f.NewFunctionTemplate(Lsdir)},
+                {FTT_Static, "hashFile", f.NewFunctionTemplate(HashFile)}
             });
             
             fsTable->SetAccessor(f.NewString("hasSetConfigDir"), HasSetConfigDir);
