@@ -1,0 +1,16 @@
+language: cpp
+compiler:
+  - clang
+before_install:
+  - sudo apt-get update
+install:
+  - sudo apt-get install -y git build-essential clang libglu1-mesa-dev libsdl2-dev uuid-dev
+  - cd third_party/v8
+  - cp -R ../gyp build/gyp
+  - make native library=shared snapshot=on i18nsupport=off
+  - cd ..
+  - cp v8/out/native/lib.target/libv8.so lib/libv8.so
+  - cd ..
+script:
+  - ./tasks.py env
+  - ENGINE_WINDOW_SYSTEM=sdl ./tasks.py build_bin
