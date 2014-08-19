@@ -35,6 +35,7 @@
 #include <sys/sysctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 
 #include <execinfo.h>
 #include <cxxabi.h>
@@ -262,6 +263,14 @@ namespace Engine {
         
         ThreadPtr GetCurrentThread() {
             return new LinuxThread(pthread_self());
+        }
+
+        bool IsMainThread() {
+            static int mainThreadID = 0;
+            if (mainThreadID == 0) {
+                mainThreadID = syscall(SYS_gettid);
+            }
+            return mainThreadID == syscall(SYS_gettid);
         }
         
         MutexPtr CreateMutex() {

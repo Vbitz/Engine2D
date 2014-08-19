@@ -20,9 +20,10 @@ $ wget https://github.com/v8/v8/archive/3.28.28.2.tar.gz
 $ tar xf 3.28.28.2.tar.gz
 $ cd v8-3.28.28.2/
 $ cp -R ../gyp build/gyp
-$ make native library=shared snapshot=on console=readline i18nsupport=off
-$ ENGINE_WINDOW_SYSTEM ./tasks.py gyp
-$ cd 0
-$ CC=clang CXX=clang++ CXXFLAGS=-std=gnu++11 LD_LIBRARY_PATH=../third_party/lib/ make
+$ make native library=shared snapshot=on i18nsupport=off
 $ cd ..
+$ mkdir lib
+$ cp v8-3.28.28.2/out/native/lib.target/libv8.so lib/libv8.so
+$ cd ..
+$ ENGINE_WINDOW_SYSTEM=sdl ./tasks.py build_bin
 $ LD_LIBRARY_PATH=third_party/lib/ 0/out/Default/engine2D -Ccore.render.openGL=2.0 script/basic
