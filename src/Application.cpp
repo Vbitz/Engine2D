@@ -807,6 +807,9 @@ namespace Engine {
             Logger::begin("Application", Logger::LogLevel_Warning) << "=== Developer Mode Active ===" << Logger::end();
         }
         
+        // std::cout << Hash::HexDigest(Hash::DigestType::SHA256, "Hello, World") << std::endl;
+        // std::cout << Hash::HexDigest(Hash::DigestType::SHA512, "Hello, World") << std::endl;
+        
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
         
         Config::EnableConfigEvents();
@@ -895,6 +898,7 @@ namespace Engine {
 	int Application::Start(int argc, char const *argv[]) {
         // At this point Logger is not avalible
         Logger::Init();
+        Platform::IsMainThread(); // Make sure we know which is the main thread
         Config::SetBoolean("core.log.enableConsole", true); // make sure we can log to the console right from the start
         
         Platform::SetRawCommandLine(argc, argv);

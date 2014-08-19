@@ -42,6 +42,7 @@ namespace Engine {
         
         void BeginProfile(ScopePtr scope) {
             if (currentZone == NULL) return;
+            if (!Platform::IsMainThread()) return;
             std::string scopeName = scope->GetName();
             if (currentZone->children.count(scopeName) == 0) {
                 ProfileZoneMetadata* newZone = new ProfileZoneMetadata();
@@ -56,6 +57,7 @@ namespace Engine {
         
         void SubmitProfile(ScopePtr scope) {
             if (currentZone == NULL) return;
+            if (!Platform::IsMainThread()) return;
             assert(currentZone->parent != NULL);
             double time = scope->GetElapsedTime();
             currentZone->callCount++;
@@ -75,11 +77,13 @@ namespace Engine {
         }
         
         void BeginProfileFrame() {
+            if (!Platform::IsMainThread()) return;
             rootZone = currentZone = new ProfileZoneMetadata();
             currentZone->name = "Root";
         }
         
         void _freeZone(ProfileZoneMetadata* zone) {
+            if (!Platform::IsMainThread()) return;
             for (auto iter = zone->children.begin(); iter != zone->children.end(); iter++) {
                 _freeZone(iter->second);
             }
@@ -100,6 +104,7 @@ namespace Engine {
         }
         
         void EndProfileFrame() {
+            if (!Platform::IsMainThread()) return;
             assert(currentZone == rootZone);
             if (GetEventsSingilton()->GetEvent("onProfileEnd")->ListenerCount() > 0) {
                 Json::Value args(Json::objectValue);

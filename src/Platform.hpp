@@ -179,6 +179,8 @@ namespace Engine {
         ThreadPtr CreateThread(ThreadMethod entry, void* threadArgs);
         ThreadPtr GetCurrentThread();
         
+        bool IsMainThread();
+        
         MutexPtr CreateMutex();
         
         MemoryMappedFilePtr OpenMemoryMappedFile(std::string filename, FileMode mode);

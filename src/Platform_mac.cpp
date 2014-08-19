@@ -318,6 +318,14 @@ namespace Engine {
             return new OSXThread(pthread_self());
         }
         
+        bool IsMainThread() {
+            static mach_port_t mainThreadID = 0;
+            if (mainThreadID == 0) {
+                mainThreadID = pthread_mach_thread_np(pthread_self());
+            }
+            return mainThreadID == pthread_mach_thread_np(pthread_self());
+        }
+        
         MutexPtr CreateMutex() {
             return new OSXMutex();
         }
