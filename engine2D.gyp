@@ -160,14 +160,14 @@
 						"-lv8",
 						"-lGL",
 						"-luuid",
-						"-L../third_party/v8-3.28.28.2/out/native/lib.target",
-						"-Wl,-rpath,../third_party/v8-3.28.28.2/out/native/lib.target"
+						"-L../third_party/v8/out/native/lib.target",
+						"-Wl,-rpath,../third_party/v8/out/native/lib.target"
 					],
 					"include_dirs": [
 						"third_party/v8-3.28.28.2/include"
 					],
 					"library_dirs": [
-						"third_party/v8-3.28.28.2/out/native/lib.target"	
+						"third_party/v8/out/native/lib.target"	
 					]
 				}],
 				['("<(WINDOW)" == "sdl") & (OS == "linux")', {
