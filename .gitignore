@@ -28,6 +28,9 @@ Internal*
 third_party/*
 !third_party/v8
 !third_party/gyp
+!third_party/lib
+third_party/lib/*
+!third_party/lib/.gitkeep
 build/
 
 .taskStatus
@@ -40,7 +43,8 @@ tags
 
 screenshot.bmp
 
-tmp/
+tmp/*
+!tmp/.gitkeep
 
 *~
 *.mk
