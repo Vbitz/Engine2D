@@ -239,6 +239,11 @@ namespace Engine {
             return result;
         }
         
+        glm::mat4 GetOrthoProjection() override {
+            glm::vec2 window = this->GetWindowSize();
+            return glm::ortho(0.0f, window.x, window.y, 0.0f, 1000.0f, -1000.0f);
+        }
+        
         RenderDriver* GetRender() override {
             return this->_render;
         }
