@@ -38,6 +38,8 @@
 
 #define ENGINE_ASSERT(value, msg) GetAppSingilton()->Assert(value, msg, __FILE__, __LINE__)
 
+extern "C" int EngineMain(int argc, char const *argv[]);
+
 namespace Engine {
     bool HasGLContext();
     
@@ -50,8 +52,6 @@ namespace Engine {
     ENGINE_CLASS(Application);
     
     ApplicationPtr GetAppSingilton();
-    
-    int EngineMain(int argc, char const *argv[]);
     
     class Application {
     public:

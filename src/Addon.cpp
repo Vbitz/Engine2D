@@ -32,7 +32,9 @@ namespace Engine {
     void Addon::DoStartup() {
         assert(!this->_loaded);
         Logger::begin("Addon", Logger::LogLevel_Verbose) << "Loading Addon \"" << this->_spec.name << "\" by \"" << this->_spec.author << "\"" << Logger::end();
-        this->_spec.startup();
+        if (this->_spec.startup != NULL) {
+            this->_spec.startup();
+        }
         this->_loaded = true;
     }
     
@@ -89,4 +91,10 @@ namespace Engine {
     }
     
     ENGINE_ADDON("BasicAddon", "Engine2D", BasicAddon_Startup, NULL, LoadOrder::PreScript);
+}
+
+extern "C" {
+    void RegisterCAddon(Engine::AddonSpec spec) {
+        Engine::Addon::Register(spec);
+    }
 }

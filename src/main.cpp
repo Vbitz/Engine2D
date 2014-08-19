@@ -19,11 +19,9 @@
    limitations under the License.
 */
 
-namespace Engine {
-    extern int EngineMain(int argc, char const *argv[]);
-}
+extern "C" int EngineMain(int argc, char const *argv[]);
 
 int main(int argc, char const *argv[])
 {
-	return Engine::EngineMain(argc, argv);
+	return EngineMain(argc, argv);
 }

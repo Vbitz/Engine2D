@@ -50,6 +50,10 @@ namespace Engine {
     
     void RegisterAddon(AddonSpec spec);
 }
+    
+extern "C" {
+    __attribute__ ((visibility("default"))) void RegisterCAddon(Engine::AddonSpec spec);
+}
 
 #define ENGINE_ADDON(Name, Author, Startup, Shutdown, LoadOrder) \
 namespace { \

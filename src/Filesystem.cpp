@@ -171,7 +171,7 @@ namespace Engine {
                 return (char*) "";
             }
 			if (!PHYSFS_exists(path.c_str())) {
-				Logger::begin("Filesystem", Logger::LogLevel_Error) << "File does not exist" << Logger::end();
+				Logger::begin("Filesystem", Logger::LogLevel_Error) << "File does not exist : " << path << Logger::end();
 				return (char*) "";
 			}
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());

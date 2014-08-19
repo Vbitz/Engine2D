@@ -922,10 +922,6 @@ namespace Engine {
         }
     }
     
-    int EngineMain(int argc, char const *argv[]) {
-        return GetAppSingilton()->Start(argc, argv);
-    }
-    
     ApplicationPtr _singilton = NULL;
     
     ApplicationPtr GetAppSingilton() {
@@ -936,3 +932,7 @@ namespace Engine {
     }
 	
 } // namespace Engine
+
+extern "C" int EngineMain(int argc, char const *argv[]) {
+    return Engine::GetAppSingilton()->Start(argc, argv);
+}
