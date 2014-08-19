@@ -168,6 +168,8 @@ namespace Engine {
         const char** GetRawCommandLineArgV();
         std::string GetExecutablePath();
         
+        const char* GetInitalDirectory();
+        
         engine_memory_info GetMemoryInfo();
         double GetMemoryUsage();
         

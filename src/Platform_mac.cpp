@@ -220,10 +220,12 @@ namespace Engine {
         
         int _argc;
         const char** _argv;
+        const char* _initalPath;
         
         void SetRawCommandLine(int argc, const char** argv) {
             _argc = argc;
             _argv = argv;
+            _initalPath = getwd(NULL);
         }
         
         int GetRawCommandLineArgC() {
@@ -232,6 +234,10 @@ namespace Engine {
         
         const char** GetRawCommandLineArgV() {
             return _argv;
+        }
+        
+        const char* GetInitalDirectory() {
+            return _initalPath;
         }
         
         std::string GetExecutablePath() {

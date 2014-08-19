@@ -31,7 +31,15 @@
 #include "Events.hpp"
 #include "Logger.hpp"
 
+#include <cstdio>
+
 #include "vendor/glm/gtc/matrix_transform.hpp"
+
+#include "Platform.hpp"
+
+#ifdef _PLATFORM_OSX
+#include <unistd.h>
+#endif
 
 namespace Engine {
     // from https://github.com/glfw/glfw/blob/master/tests/events.c
@@ -489,6 +497,10 @@ namespace Engine {
     void Window::StaticInit() {
         glfwSetErrorCallback(OnGLFWError);
         glfwInit();
+#ifdef _PLATFORM_OSX
+        // As it turns out GLFW will normaly change the current directory to the Application bundle's resources path when inited on OSX, this screws up PhysFS since if the engine is hosted inside another application like python it will jump to that application's resources path
+        chdir(Platform::GetInitalDirectory());
+#endif
     }
     
     void Window::StaticDestroy() {
