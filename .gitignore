@@ -27,6 +27,7 @@ Internal*
 !third_party/
 third_party/*
 !third_party/v8
+!third_party/gyp
 build/
 
 .taskStatus
