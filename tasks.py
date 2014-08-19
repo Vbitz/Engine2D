@@ -69,7 +69,7 @@ class command(object):
 		return func;
 
 def get_exe_name():
-	if sys.platform == "darwin":
+	if sys.platform == "darwin" or sys.platform == "linux2":
 		return "engine2D";
 
 def resolve_path(base, path=""):
@@ -78,7 +78,10 @@ def resolve_path(base, path=""):
 	elif base == PROJECT_SOURCE:
 		return os.path.join(resolve_path(PROJECT_ROOT, "src"), path);
 	elif base == PROJECT_BUILD_PATH:
-		return os.path.join(resolve_path(PROJECT_ROOT, "build/Default"), path);
+		if sys.platform == "darwin":
+			return os.path.join(resolve_path(PROJECT_ROOT, "build/Default"), path);
+		elif sys.platform == "linux2":
+			return os.path.join(resolve_path(PROJECT_ROOT, "0/build/Default"), path);
 	elif base == PROJECT_TMP_PATH:
 		return os.path.join(resolve_path(PROJECT_ROOT, "tmp"), path);
 	else:
@@ -243,6 +246,8 @@ def add_version_info(args):
 def clean(args):
 	if sys.platform == "darwin": # OSX
 		shell_command(["xcodebuild", "clean"]);
+	elif sys.platform == "linux2": # Linux
+		pass
 
 def _build_bin(output=True):
 	if sys.platform == "darwin": # OSX
@@ -251,6 +256,15 @@ def _build_bin(output=True):
 			"/usr/local/lib/libengine2D.dylib",
 			"@executable_path/libengine2D.dylib",
 			resolve_path(PROJECT_BUILD_PATH, get_exe_name())]);
+	elif sys.platform == "linux2":
+		os.chdir(resolve_path(PROJECT_ROOT, "0"));
+		# CC=clang CXX=clang++ CXXFLAGS=-std=gnu++11 LD_LIBRARY_PATH=../third_party/lib/ make
+		os.environ["CC"] = "clang";
+		os.environ["CXX"] = "clang++";
+		os.environ["CXXFLAGS"] = "-std=gnu++11";
+		os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/"
+		shell_command("make")
+		os.chdir("..")
 
 
 @command(requires=["gyp", "add_version_info"], usage="Builds executables")
