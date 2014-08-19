@@ -87,14 +87,18 @@
 
 				# PHYSFS
 				"src/vendor/physfs/physfs.c",
-    			"src/vendor/physfs/physfs_byteorder.c",
-    			"src/vendor/physfs/physfs_unicode.c",
-    			"src/vendor/physfs/platform/posix.c",
-    			"src/vendor/physfs/platform/unix.c",
-    			"src/vendor/physfs/platform/macosx.c",
-    			"src/vendor/physfs/platform/windows.c",
-    			"src/vendor/physfs/archivers/dir.c",
-    			"src/vendor/physfs/archivers/zip.c"
+				"src/vendor/physfs/physfs_byteorder.c",
+				"src/vendor/physfs/physfs_unicode.c",
+				"src/vendor/physfs/platform/posix.c",
+				"src/vendor/physfs/platform/unix.c",
+				"src/vendor/physfs/platform/macosx.c",
+				"src/vendor/physfs/platform/windows.c",
+				"src/vendor/physfs/archivers/dir.c",
+				"src/vendor/physfs/archivers/zip.c",
+
+				# SHA1
+				"src/vendor/sha512.cpp",
+				"src/vendor/sha256.cpp"
 			],
 			"conditions": [
 				['OS != "win"', {

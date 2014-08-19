@@ -23,10 +23,14 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sstream>
 
 #include <iostream>
 
 #include <assert.h>
+
+#include "vendor/sha256.hpp"
+#include "vendor/sha512.hpp"
 
 #define STDLIB_ASSERT(val) assert(val)
 
@@ -396,5 +400,65 @@ namespace Engine {
     double BasicRandom::NextNormal(double mean, double sd) {
         return std::normal_distribution<>(mean, sd)(this->_gen);
     }
-
+    
+    uint8_t* _digest256(const uint8_t* data, const size_t len) {
+        sha256_state state;
+        uint8_t* digest = new uint8_t[32];
+        
+        sha_init(state);
+        sha_process(state, data, (uint32_t) len);
+        sha_done(state, (uint8_t*) digest);
+        
+        return digest;
+    }
+    
+    uint8_t* _digest512(const uint8_t* data, const size_t len) {
+        sha512_state state;
+        uint8_t* digest = new uint8_t[64];
+        
+        sha_init(state);
+        sha_process(state, data, (uint32_t) len);
+        sha_done(state, (uint8_t*) digest);
+        
+        return digest;
+    }
+    
+    uint8_t* Hash::Digest(DigestType type, const uint8_t* data, const size_t len) {
+        switch (type) {
+            case DigestType::SHA256:
+                return _digest256(data, len);
+            case DigestType::SHA512:
+                return _digest512(data, len);
+            default:
+                break;
+        }
+    }
+    
+    uint8_t* Hash::Digest(DigestType type, const std::string data) {
+        const uint8_t* s_data = (const uint8_t*)data.c_str();
+        return Hash::Digest(type, s_data, data.length());
+    }
+    
+    std::string Hash::HexDigest(DigestType type, const uint8_t* data, const size_t len) {
+        uint8_t* digest = Hash::Digest(type, data, len);
+        int digestLength = 0;
+             if (type == DigestType::SHA256) digestLength = 32;
+        else if (type == DigestType::SHA512) digestLength = 64;
+        
+        char* hexstring = new char[digestLength * 2];
+        
+        for (int i = 0; i < digestLength; i++) {
+            std::sprintf(&hexstring[i * 2], "%02x", digest[i]);
+        }
+        
+        delete [] digest;
+        std::string ret = std::string(hexstring, digestLength * 2);
+        delete [] hexstring;
+        return ret;
+    }
+    
+    std::string Hash::HexDigest(DigestType type, const std::string data) {
+        const uint8_t* s_data = (const uint8_t*)data.c_str();
+        return Hash::HexDigest(type, s_data, data.length());
+    }
 }

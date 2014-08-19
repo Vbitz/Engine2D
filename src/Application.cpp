@@ -807,9 +807,6 @@ namespace Engine {
             Logger::begin("Application", Logger::LogLevel_Warning) << "=== Developer Mode Active ===" << Logger::end();
         }
         
-        // std::cout << Hash::HexDigest(Hash::DigestType::SHA256, "Hello, World") << std::endl;
-        // std::cout << Hash::HexDigest(Hash::DigestType::SHA512, "Hello, World") << std::endl;
-        
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
         
         Config::EnableConfigEvents();

@@ -198,4 +198,18 @@ namespace Engine {
     private:
         std::mt19937 _gen;
     };
+    
+    class Hash {
+    public:
+        enum class DigestType {
+            SHA256,
+            SHA512
+        };
+        
+        static uint8_t* Digest(DigestType type, const uint8_t* data, const size_t len);
+        static uint8_t* Digest(DigestType type, const std::string data);
+        
+        static std::string HexDigest(DigestType type, const uint8_t* data, const size_t len);
+        static std::string HexDigest(DigestType type, const std::string data);
+    };
 }
