@@ -522,12 +522,14 @@ namespace Engine {
         app->_window->Reset();
         app->_initGLContext(app->_window->GetGraphicsVersion());
         app->UpdateScreen();
+        return EM_OK;
     }
     
     EventMagic Application::_toggleFullscreen(Json::Value args, void* userPointer) {
         ApplicationPtr app = static_cast<ApplicationPtr>(userPointer);
         app->_window->SetFullscreen(!app->_window->GetFullscreen());
         app->UpdateScreen();
+        return EM_OK;
     }
     
     EventMagic Application::_saveScreenshot(Json::Value args, void* userPointer) {
@@ -550,6 +552,8 @@ namespace Engine {
         saveArgs["filename"] = Filesystem::GetRealPath(targetFilename);
         
         GetEventsSingilton()->GetEvent("onSaveScreenshot")->Emit(saveArgs);
+        
+        return EM_OK;
     }
     
     EventMagic Application::_dumpLog(Json::Value args, void* userPointer) {
@@ -565,6 +569,8 @@ namespace Engine {
         saveArgs["filename"] = Filesystem::GetRealPath(targetFilename);
         
         GetEventsSingilton()->GetEvent("onSaveLog")->Emit(saveArgs);
+        
+        return EM_OK;
     }
     
     EventMagic Application::_requireDynamicLibary(Json::Value args, void* userPointer) {

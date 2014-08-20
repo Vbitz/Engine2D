@@ -572,6 +572,8 @@ namespace Engine {
         EngineUIPtr eui = static_cast<EngineUIPtr>(userPointer);
         
         eui->_currentProfilerDetails = args["results"];
+        
+        return EM_OK;
     }
     
     EventMagic EngineUI::_captureLastDrawTimes(Json::Value args, void* userPointer) {
@@ -587,6 +589,8 @@ namespace Engine {
         eArgs["values"] = eArray;
         
         GetEventsSingilton()->GetEvent("captureLastDrawTimes_callback")->Emit(eArgs);
+        
+        return EM_OK;
     }
     
     EventMagic EngineUI::_createToast(Json::Value args, void* userPointer) {

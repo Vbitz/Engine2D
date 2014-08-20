@@ -207,6 +207,8 @@ namespace Engine {
                 // TODO: Dispatch events
                 Platform::Sleep(1000);
             }
+            
+            return NULL;
         }
         
         void CreateScriptWorker(std::string scriptSource) {

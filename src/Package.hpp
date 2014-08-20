@@ -73,8 +73,8 @@ namespace Engine {
             PackageFileEncryptionType::NoEncryption;
         uint8_t padding1[2] = {0x00, 0x00};
         
-        uint32_t latestRevisonOffset = NULL;
-        uint32_t nextFileOffset = NULL;
+        uint32_t latestRevisonOffset = 0;
+        uint32_t nextFileOffset = 0;
         uint8_t padding2[4] = {0x00, 0x00, 0x00, 0x00};
         
         unsigned char name[96] = { 0x00 };

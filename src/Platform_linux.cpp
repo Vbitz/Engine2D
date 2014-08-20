@@ -344,13 +344,13 @@ namespace Engine {
                     int status = 0;
                     realname = abi::__cxa_demangle(info.dli_sname, 0, 0, &status);
                     if (status == 0) {
-                        printf("  %i | 0x%016llx | %-50s | %s\n", i, (uint64_t) callstack[i], info.dli_fname, realname);
+                        printf("  %i | 0x%016lx | %-50s | %s\n", i, (uint64_t) callstack[i], info.dli_fname, realname);
                     } else {
-                        printf("  %i | 0x%016llx | %-50s | %s\n", i, (uint64_t) callstack[i], info.dli_fname, info.dli_sname);
+                        printf("  %i | 0x%016lx | %-50s | %s\n", i, (uint64_t) callstack[i], info.dli_fname, info.dli_sname);
                     }
                     free(realname);
                 } else {
-                    printf("  %i | 0x%016llx | [unknown symbol]\n", i, (uint64_t) callstack[i]);
+                    printf("  %i | 0x%016lx | [unknown symbol]\n", i, (uint64_t) callstack[i]);
                 }
             }
         }

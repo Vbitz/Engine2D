@@ -304,7 +304,7 @@ namespace Engine {
     }
     
     bool String::contains(String search, size_t startIndex) const {
-        
+        return false;
     }
     
     bool String::startsWith(String search) const {
@@ -312,7 +312,7 @@ namespace Engine {
     }
     
     bool String::startsWith(String search, size_t startIndex) const {
-        
+        return false;
     }
     
     bool String::endsWith(String search) const {
@@ -320,7 +320,7 @@ namespace Engine {
     }
     
     bool String::endsWith(String search, size_t startIndex) const {
-        
+        return false;
     }
     
     size_t String::indexOf(String search) const {
@@ -336,7 +336,7 @@ namespace Engine {
     }
     
     size_t String::lastIndexOf(String search, size_t fromIndex) const {
-        
+        return -1;
     }
     
     Array<MatchResult> String::match(Regexp regexp) const {
@@ -359,10 +359,11 @@ namespace Engine {
     
     std::ostream& operator<< (std::ostream& stream, const String& str) {
         stream << std::string(str._str, str._len);
+        return stream;
     }
     
     CString String::toCString() const {
-        
+        return CString();
     }
     
     BasicRandom::BasicRandom() {

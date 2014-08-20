@@ -109,7 +109,7 @@ namespace Engine {
         }
             
         EventMagic Run(Json::Value& e) override {
-            this->Run(e, 0, {});
+            return this->Run(e, 0, {});
         }
             
         Type GetType() override { return Type::Javascript; }

@@ -104,6 +104,14 @@ namespace Engine {
                 }
             }
         }
+        
+        // Otherwise return the first
+        for (auto iter : this->_sizes) {
+            return this->_sizes[iter.first];
+        }
+        
+        // Unreachable
+        assert(false);
     }
     
     void FontSheet::_loadSize(int size, int charCount, Json::Value sizeRoot) {

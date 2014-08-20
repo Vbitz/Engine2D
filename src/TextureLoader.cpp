@@ -195,7 +195,7 @@ namespace Engine {
     
     namespace ImageWriter {
         bool SaveBufferToFile(std::string filename, unsigned char* pixels, int width, int height) {
-            SaveBufferToFile(filename, pixels, width, height, false);
+            return SaveBufferToFile(filename, pixels, width, height, false);
         }
         
         bool SaveBufferToFile(std::string filename, unsigned char* pixels, int width, int height, bool topDown) {
@@ -205,6 +205,8 @@ namespace Engine {
             const char* filepath = Filesystem::GetRealPath(filename).c_str();
             
             SOIL_save_image(filepath, SOIL_SAVE_TYPE_BMP, width, height, 4, pixels);
+            
+            return true;
         }
 
     }

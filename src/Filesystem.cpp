@@ -43,7 +43,7 @@ namespace Engine {
             }
             
             FileMode GetMode() override {
-                
+                return this->_mode;
             }
             
         private:
