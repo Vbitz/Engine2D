@@ -28,6 +28,7 @@ Internal*
 third_party/*
 !third_party/v8
 !third_party/gyp
+!third_party/glfw
 !third_party/lib
 third_party/lib/*
 !third_party/lib/.gitkeep

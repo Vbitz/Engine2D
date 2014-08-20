@@ -160,14 +160,25 @@
 						"-lv8",
 						"-lGL",
 						"-luuid",
-						"-L../third_party/v8/out/native/lib.target",
-						"-Wl,-rpath,../third_party/v8/out/native/lib.target"
+						"-L../third_party/lib",
+						"-Wl,-rpath,../third_party/third_party/lib"
 					],
 					"include_dirs": [
-						"third_party/v8-3.28.28.2/include"
+						"third_party/v8/include"
 					],
 					"library_dirs": [
-						"third_party/v8/out/native/lib.target"	
+						"third_party/lib"	
+					]
+				}],
+				['("<(WINDOW)" == "glfw") & (OS == "mac")', {
+					'sources': [
+						"src/Window_glfw.cpp"
+					],
+					"ldflags": [
+						"-lglfw"
+					],
+					"include_dirs": [
+						"third_party/glfw/include"
 					]
 				}],
 				['("<(WINDOW)" == "sdl") & (OS == "linux")', {

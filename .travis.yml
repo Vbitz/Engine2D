@@ -2,15 +2,20 @@ language: cpp
 compiler:
   - clang
 before_install:
+  - uname -a
+  - ./tasks.py env
   - sudo apt-get update
 install:
-  - sudo apt-get install -y git build-essential clang libglu1-mesa-dev libsdl2-dev uuid-dev
-  - cd third_party/v8
+  - sudo apt-get install -y git build-essential clang libglu1-mesa-dev xorg-dev uuid-dev cmake
+  - cd third_party/glfw
+  - cmake -DGLFW_BUILD_EXAMPLES:BOOL=OFF -DGLFW_BUILD_TESTS:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=ON .
+  - cd ..
+  - cp glfw/src/libglfw.so lib/libglfw.so
+  - cd v8
   - cp -R ../gyp build/gyp
   - make native library=shared snapshot=on i18nsupport=off
   - cd ..
   - cp v8/out/native/lib.target/libv8.so lib/libv8.so
   - cd ..
 script:
-  - ./tasks.py env
-  - ENGINE_WINDOW_SYSTEM=sdl ./tasks.py build_bin
+  - ENGINE_WINDOW_SYSTEM=glfw ./tasks.py build_bin

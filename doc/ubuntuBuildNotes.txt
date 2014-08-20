@@ -5,7 +5,7 @@ Linux ubuntu 3.13.0-34-generic #60-Ubuntu SMP Wed Aug 13 15:45:27 UTC 2014 x86_6
 $ cat /etc/issue
 Ubuntu 14.04.1 LTS \n \l
 $ sudo apt-get update
-$ sudo apt-get install -y git build-essential clang libglu1-mesa-dev libsdl2-dev uuid-dev
+$ sudo apt-get install -y git build-essential clang libglu1-mesa-dev uuid-dev
 $ git clone https://github.com/Vbitz/Engine2D
 $ cd Engine2D
 $ git submodule update --init
@@ -15,7 +15,11 @@ sys.platform = linux2
 sys.version = 2.7.6 (default, Mar 22 2014, 22:59:56) 
 [GCC 4.8.2]
 resolve_path(PROJECT_ROOT, "tasks.py") = tasks.py
-$ cd third_party/v8
+$ cd third_party/glfw
+$ cmake -DGLFW_BUILD_EXAMPLES:BOOL=OFF -DGLFW_BUILD_TESTS:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=ON .
+$ cd ..
+$ cp glfw/src/libglfw.so lib/libglfw.so
+$ cd v8
 $ cp -R ../gyp build/gyp
 $ make native library=shared snapshot=on i18nsupport=off
 $ cd ..
