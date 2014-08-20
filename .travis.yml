@@ -11,7 +11,7 @@ install:
   - cmake -DGLFW_BUILD_EXAMPLES:BOOL=OFF -DGLFW_BUILD_TESTS:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=ON .
   - make
   - cd ..
-  - cp glfw/src/libglfw.so lib/libglfw.so
+  - cp glfw/src/libglfw.so* lib/
   - cd v8
   - cp -R ../gyp build/gyp
   - make native library=shared snapshot=on i18nsupport=off
