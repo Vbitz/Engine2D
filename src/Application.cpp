@@ -75,14 +75,15 @@ namespace Engine {
 	void Application::_updateMousePos() {
         glm::vec2 mouse = _window->GetCursorPos();
         
-        v8::Isolate* isolate = this->_scripting->GetIsolate();
-        v8::Local<v8::Object> input_table = this->_scripting->GetScriptTable("input");
+        ScriptingManager::Factory f(this->_scripting->GetIsolate());
         
-		input_table->Set(v8::String::NewFromUtf8(isolate, "mouseX"), v8::Number::New(isolate, mouse.x));
-		input_table->Set(v8::String::NewFromUtf8(isolate, "mouseY"), v8::Number::New(isolate, mouse.y));
-		input_table->Set(v8::String::NewFromUtf8(isolate, "leftMouseButton"), v8::Boolean::New(isolate, this->_window->GetMouseButtonPressed(MouseButton_Left)));
-		input_table->Set(v8::String::NewFromUtf8(isolate, "middleMouseButton"), v8::Boolean::New(isolate, this->_window->GetMouseButtonPressed(MouseButton_Middle)));
-		input_table->Set(v8::String::NewFromUtf8(isolate, "rightMouseButton"), v8::Boolean::New(isolate, this->_window->GetMouseButtonPressed(MouseButton_Right)));
+        f.FillObject(this->_scripting->GetScriptTable("input"), {
+            {FTT_Static, "mouseX", f.NewNumber(mouse.x)},
+            {FTT_Static, "mouseY", f.NewNumber(mouse.y)},
+            {FTT_Static, "leftMouseButton", f.NewBoolean(this->_window->GetMouseButtonPressed(MouseButton_Left))},
+            {FTT_Static, "middleMouseButton", f.NewBoolean(this->_window->GetMouseButtonPressed(MouseButton_Middle))},
+            {FTT_Static, "rightMouseButton", f.NewBoolean(this->_window->GetMouseButtonPressed(MouseButton_Right))},
+        });
 	}
 	
 	void Application::UpdateScreen() {
@@ -90,33 +91,34 @@ namespace Engine {
             return;
         }
         
-        v8::Isolate* isolate = this->_scripting->GetIsolate();
-        v8::Local<v8::Object> sys_table = this->_scripting->GetScriptTable("sys");
+        ScriptingManager::Factory f(this->_scripting->GetIsolate());
         
         glm::vec2 size = this->_window->GetWindowSize();
         
         glViewport(0, 0, size.x, size.y);
         
-		sys_table->Set(v8::String::NewFromUtf8(isolate, "screenWidth"), v8::Number::New(isolate, size.x));
-		sys_table->Set(v8::String::NewFromUtf8(isolate, "screenHeight"), v8::Number::New(isolate, size.y));
+        f.FillObject(this->_scripting->GetScriptTable("sys"), {
+            {FTT_Static, "screenWidth", f.NewNumber(size.x)},
+            {FTT_Static, "screenHeight", f.NewNumber(size.y)}
+        });
 	}
     
     void Application::_updateFrameTime() {
-        v8::Isolate* isolate = this->_scripting->GetIsolate();
-		v8::Local<v8::Object> sys_table = this->_scripting->GetScriptTable("sys");
+        ScriptingManager::Factory f(this->_scripting->GetIsolate());
         
-        sys_table->Set(v8::String::NewFromUtf8(isolate, "deltaTime"), v8::Number::New(isolate, FramePerfMonitor::GetFrameTime()));
+        f.FillObject(this->_scripting->GetScriptTable("sys"), {
+            {FTT_Static, "deltaTime", f.NewNumber(FramePerfMonitor::GetFrameTime())}
+        });
     }
     
     void Application::_disablePreload() {
-        v8::Isolate* isolate = this->_scripting->GetIsolate();
-        v8::HandleScope scope(isolate);
+        ScriptingManager::Factory f(this->_scripting->GetIsolate());
         
-        this->_scripting->GetScriptTable("draw")->SetHiddenValue(v8::String::NewFromUtf8(isolate, "_draw"), v8::External::New(isolate, new Draw2D(GetRender())));
+        this->_scripting->GetScriptTable("draw")->SetHiddenValue(f.NewString("_draw"), f.NewExternal(new Draw2D(GetRender())));
         
-        this->_scripting->GetScriptTable("sys")->SetHiddenValue(v8::String::NewFromUtf8(isolate, "_app"), v8::External::New(isolate, this));
+        this->_scripting->GetScriptTable("sys")->SetHiddenValue(f.NewString("_app"), f.NewExternal(this));
         
-        this->_scripting->GetScriptTable("sys")->Set(v8::String::NewFromUtf8(isolate, "preload"), v8::Boolean::New(isolate, false));
+        this->_scripting->GetScriptTable("sys")->Set(f.NewString("preload"), f.NewBoolean(false));
     }
     
     void Application::_loadBasicConfigs() {
@@ -778,7 +780,7 @@ namespace Engine {
             this->GetRender()->CheckError("endOfRendering");
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
-                v8::V8::IdleNotification();
+                ScriptingManager::Context::TriggerGC();
             }
             
             GetEventsSingilton()->PollDeferedMessages("toggleFullscreen");

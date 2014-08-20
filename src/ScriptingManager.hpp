@@ -308,8 +308,9 @@ namespace Engine {
                 return this->_isolate;
             }
             
-            static void RunHelpCommand();
             static void SetFlag(std::string flag);
+            static void RunHelpCommand();
+            static void TriggerGC();
         private:
             v8::Isolate* _isolate = NULL;
             v8::HandleScope _scope;

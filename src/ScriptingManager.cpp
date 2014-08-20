@@ -482,6 +482,10 @@ namespace Engine {
             v8::V8::SetFlagsFromString("--help", 6);
         }
         
+        void Context::TriggerGC() {
+            v8::V8::IdleNotification();
+        }
+        
         // Globals
         
         Json::Value _getValueFromV8Object(v8::Local<v8::Value> val) {
