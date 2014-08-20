@@ -94,7 +94,6 @@ namespace Engine {
         }
         
         const char* filename_c = filename.c_str();
-        uint32_t filename_len = filename.length();
         
         PackageDiskHeader* header = this->_headerRegion->Data<PackageDiskHeader>();
         

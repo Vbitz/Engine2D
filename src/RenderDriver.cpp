@@ -21,6 +21,7 @@
 
 #include "RenderDriver.hpp"
 
+#include <cstdlib>
 #include <cstring>
 
 #include "Application.hpp"
@@ -34,10 +35,12 @@ namespace Engine {
     }
     
     void RenderDriver::Print(float x, float y, const char* string) {
-        const char* realStirng = strdup(string);
+        char* realString = strdup(string);
         ENGINE_PROFILER_SCOPE;
         
-        this->_getSheet(this->_currentFontName)->DrawText(this, x, y, this->_currentFontSize, realStirng);
+        this->_getSheet(this->_currentFontName)->DrawText(this, x, y, this->_currentFontSize, realString);
+        
+        std::free(realString);
     }
     
     float RenderDriver::CalcStringWidth(std::string str) {
