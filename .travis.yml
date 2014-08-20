@@ -19,4 +19,4 @@ install:
   - cp v8/out/native/lib.target/libv8.so lib/libv8.so
   - cd ..
 script:
-  - ENGINE_WINDOW_SYSTEM=glfw ./tasks.py build_bin
+  - ./tasks.py build_bin

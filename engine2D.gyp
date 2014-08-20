@@ -170,7 +170,7 @@
 						"third_party/lib"	
 					]
 				}],
-				['("<(WINDOW)" == "glfw") & (OS == "mac")', {
+				['("<(WINDOW)" == "glfw") & (OS == "linux")', {
 					'sources': [
 						"src/Window_glfw.cpp"
 					],
