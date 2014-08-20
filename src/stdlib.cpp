@@ -256,8 +256,9 @@ namespace Engine {
         return "";
     }
     
-    StringBuilderRef StringBuilder::operator<<(const Engine::String value) {
+    StringBuilderPtr StringBuilder::operator<<(const Engine::String value) {
         
+        return this;
     }
     
     StringBuilder::operator String() {

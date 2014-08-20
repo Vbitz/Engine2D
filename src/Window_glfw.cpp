@@ -33,6 +33,7 @@
 
 #include <cstdio>
 
+#define GLM_FORCE_RADIANS
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
 #include "Platform.hpp"

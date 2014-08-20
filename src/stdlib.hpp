@@ -88,7 +88,7 @@ namespace Engine {
     public:
         String toString();
         
-        StringBuilderRef operator<<(const String value);
+        StringBuilderPtr operator<<(const String value);
         
         operator String();
     private:

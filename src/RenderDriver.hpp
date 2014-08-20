@@ -28,6 +28,7 @@
 #include "RenderTypes.hpp"
 #include "FontSheet.hpp"
 
+#define GLM_FORCE_RADIANS
 #include "vendor/glm/glm.hpp"
 
 namespace Engine {

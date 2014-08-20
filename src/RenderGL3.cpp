@@ -32,7 +32,7 @@
 #include "Application.hpp"
 #include "Profiler.hpp"
 
-// TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
+#define GLM_FORCE_RADIANS
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
@@ -287,6 +287,7 @@ namespace Engine {
         
         void CameraRotate(float r) override {
             FlushAll();
+            r = glm::radians(r);
             this->_currentModelMatrix =
             glm::rotate(this->_currentModelMatrix, r, glm::vec3(0, 0, 1));
         }

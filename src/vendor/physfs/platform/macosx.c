@@ -25,6 +25,9 @@
 #include "../physfs_internal.h"
 
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 /* Wrap PHYSFS_Allocator in a CFAllocator... */
 static CFAllocatorRef cfallocator = NULL;
 
@@ -391,6 +394,8 @@ void __PHYSFS_platformReleaseMutex(void *mutex)
 } /* __PHYSFS_platformReleaseMutex */
 
 #endif /* PHYSFS_PLATFORM_MACOSX */
+
+#pragma clang diagnostic pop
 
 /* end of macosx.c ... */
 

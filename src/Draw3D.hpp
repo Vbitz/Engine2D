@@ -23,6 +23,9 @@
 
 #include "stdlib.hpp"
 #include "RenderDriver.hpp"
+
+   
+#define GLM_FORCE_RADIANS
 #include "vendor/glm/glm.hpp"
 
 namespace Engine {

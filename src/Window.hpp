@@ -23,6 +23,7 @@
 
 #include <string>
 
+#define GLM_FORCE_RADIANS
 #include "vendor/glm/glm.hpp"
 
 #include "RenderTypes.hpp"
@@ -36,7 +37,7 @@ namespace Engine {
     class Window {
     public:
         Window(GraphicsVersion v) : _version(v) { this->_init(); }
-        ~Window() { this->_destroy(); }
+        virtual ~Window() { this->_destroy(); }
         
         virtual void Show() = 0;
         virtual void Hide() = 0;

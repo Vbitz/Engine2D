@@ -118,16 +118,16 @@ namespace Engine {
         
         class MemoryMappedFile {
         public:
-            ~MemoryMappedFile() {
+            virtual bool IsValid() { return false; }
+            
+            virtual void Close() { }
+            
+            virtual ~MemoryMappedFile() {
                 if (this->IsValid()) this->Close();
             }
             
             virtual MemoryMappedRegionPtr MapRegion(unsigned long offset, size_t size) = 0;
             virtual void UnmapRegion(MemoryMappedRegionPtr r) = 0;
-            
-            virtual bool IsValid() = 0;
-            
-            virtual void Close() = 0;
         };
         
         class MemoryMappedRegion {

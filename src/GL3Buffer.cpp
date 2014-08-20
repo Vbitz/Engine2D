@@ -32,7 +32,7 @@
 #include "Application.hpp"
 #include "Config.hpp"
 
-// TODO: define GLM_FORCE_RADIANS, I need to make sure that Draw2D.rotateCamera does this
+#define GLM_FORCE_RADIANS
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
@@ -218,7 +218,7 @@ namespace Engine {
                 break;
             case ProjectionType::Perspective:
                 glm::vec2 windowSize = GetAppSingilton()->GetWindow()->GetWindowSize();
-                proj = glm::perspective(Config::GetFloat("core.render.fovy"), windowSize.x / windowSize.y, 1.0f, 1000.0f);
+                proj = glm::perspective(glm::radians(Config::GetFloat("core.render.fovy")), windowSize.x / windowSize.y, 1.0f, 1000.0f);
                 break;
         }
         

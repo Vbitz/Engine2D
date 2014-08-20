@@ -23,6 +23,7 @@
 
 #include "RenderDriver.hpp"
 
+#define GLM_FORCE_RADIANS
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
