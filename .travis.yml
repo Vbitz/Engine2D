@@ -9,6 +9,7 @@ install:
   - sudo apt-get install -y git build-essential clang libglu1-mesa-dev xorg-dev uuid-dev cmake
   - cd third_party/glfw
   - cmake -DGLFW_BUILD_EXAMPLES:BOOL=OFF -DGLFW_BUILD_TESTS:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=ON .
+  - make
   - cd ..
   - cp glfw/src/libglfw.so lib/libglfw.so
   - cd v8
