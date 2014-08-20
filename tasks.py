@@ -189,7 +189,7 @@ def fetch_glfw3(args):
 
 	glfw_glob = ""
 	if sys.platform == "linux2":
-		glfw_glob = "src/libglfw3.so*"
+		glfw_glob = "src/libglfw.so*"
 	elif sys.platform == "darwin":
 		glfw_glob = "src/libglfw.*dylib"
 
