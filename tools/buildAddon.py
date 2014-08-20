@@ -20,12 +20,15 @@ def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 		"-stdlib=libc++", "-lengine2D", "-Lbuild/Default", "-o", outputFilename]
 	args += ["-D_BUILD_UUID=\"" + str(uuid.uuid4()) + "\""]
 	if link_v8:
-		args += ["-lv8"]
+		args += ["-lv8", "-Ithird_party/v8/include"]
 	args += addedArgs
 	args += sources
 	shell_command(args)
 	shell_command(["install_name_tool", "-change", "/usr/local/lib/libengine2D.dylib",
 		"@executable_path/libengine2D.dylib", outputFilename])
+	if link_v8:
+		shell_command(["install_name_tool", "-change", "/usr/local/lib/libv8.dylib",
+			"@executable_path/libv8.dylib", outputFilename])
 
 def main(args):
 	parser = argparse.ArgumentParser(description='Build script for Engine2D addons')

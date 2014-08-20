@@ -73,6 +73,12 @@ def get_exe_name():
 	if sys.platform == "darwin" or sys.platform == "linux2":
 		return "engine2D";
 
+def get_lib_name():
+	if sys.platform == "darwin":
+		return "libengine2D.dylib"
+	elif sys.platform == "linux2":
+		return "libengine2D.so"
+
 def resolve_path(base, path=""):
 	if base == PROJECT_ROOT:
 		return os.path.relpath(path);
@@ -94,7 +100,7 @@ def require_in_path(arr):
 	return True;
 
 def shell_command(cmd, throw=True):
-	print(bcolors.HEADER + "shell : %s" % (cmd) + bcolors.ENDC);
+	print(bcolors.HEADER + "shell in %s : %s" % (os.getcwd(), cmd) + bcolors.ENDC);
 	if throw:
 		subprocess.check_call(cmd);
 	else:
@@ -164,44 +170,36 @@ def fetch_cmake(args):
 	if sys.platform == "linux2":
 		# Some of these commands need sudo
 		# just run "sudo apt-get install -y cmake"
-	pass;
-
-@command(usage="Builds platform project files")
-def gyp(args):
-	# run GYP
-	shell_command([
-			resolve_path(PROJECT_ROOT, "third_party/gyp/gyp"),
-			"--depth=0",
-			"-DWINDOW=" + WINDOW_SYSTEM,
-			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
-			# for V8
-			"-Dtarget_arch=" + get_arch(),
-			"-Dhost_arch=" + get_arch(),
-			"-Dcomponent=static_library",
-			"-Dv8_optimized_debug=1",
-			"-Dv8_enable_i18n_support=0",
-			resolve_path(PROJECT_ROOT, "engine2D.gyp")
-		]);
-
-# def check_depends():
-# 	return True;
+		pass;
 
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def fetch_glfw3(args):
 	os.chdir(resolve_path(PROJECT_ROOT, "third_party/glfw"));
+	
 	shell_command([
 			"cmake",
+			"-Wno-dev",
 			"-DGLFW_BUILD_EXAMPLES:BOOL=OFF",
 			"-DGLFW_BUILD_TESTS:BOOL=OFF",
 			"-DBUILD_SHARED_LIBS:BOOL=ON",
 			"."
 		]);
+	
 	shell_command(["make"]);
-	for f in glob.glob("src/libglfw3.so*"):
-		shutil.copy(f, "../lib"));
+
+	glfw_glob = ""
+	if sys.platform == "linux2":
+		glfw_glob = "src/libglfw3.so*"
+	elif sys.platform == "darwin":
+		glfw_glob = "src/libglfw.*dylib"
+
+	for f in glob.glob(glfw_glob):
+		print "Copying " + f + " to " + "../lib"
+		shutil.copy(f, "../lib");
+	
 	os.chdir("../..");
 
-@command(requires=["fetch_svn"], usage="Fetch and build V8 using GYP")
+@command(usage="Fetch and build V8 using GYP")
 def fetch_v8(args):
 	if sys.platform == "win32": # windows
 		# svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@231940 third_party/cygwin
@@ -209,11 +207,10 @@ def fetch_v8(args):
 		# msbuild /p:Configuration=Release build\All.sln
 		# copy the relevent files to third_party/lib and third_party/include
 		pass
-	elif sys.platform == "darwin": # osx
-		# make native i18nsupport=off (takes bloody ages)
-		pass
-	elif sys.platform == "linux2": # linux
-		os.chdir(resolve_path(PROJECT_ROOT, "third_party/glfw"));
+	elif sys.platform == "linux2" or sys.platform == "darwin": # linux
+		os.chdir(resolve_path(PROJECT_ROOT, "third_party/v8"));
+		if not os.path.exists("build/gyp"):
+			shutil.copytree("../gyp", "build/gyp")
 		shell_command([
 				"make",
 				"native",
@@ -221,12 +218,26 @@ def fetch_v8(args):
 				"snapshot=on",
 				"i18nsupport=off"
 			]);
-		shutil.copy("out/native/lib.target/libv8.so", "../lib/libv8.so");
+		if sys.platform == "linux2":
+			shutil.copy("out/native/lib.target/libv8.so", "../lib/libv8.so");
+		elif sys.platform == "darwin":
+			shutil.copy("out/native/libv8.dylib", "../lib/libv8.dylib");
 		os.chdir("../..");
 
 @command(requires=["fetch_glfw3", "fetch_v8"], usage="Fetches Build Dependancys")
 def fetch_build_deps(args):
 	pass;
+
+@command(requires=["fetch_build_deps"], usage="Builds platform project files")
+def gyp(args):
+	# run GYP
+	shell_command([
+			resolve_path(PROJECT_ROOT, "third_party/gyp/gyp"),
+			"--depth=0",
+			"-DWINDOW=" + WINDOW_SYSTEM,
+			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
+			resolve_path(PROJECT_ROOT, "engine2D.gyp")
+		]);
 
 @command(requires=["gyp"], usage="Open's the platform specfic IDE")
 def ide(args):
@@ -248,11 +259,21 @@ def clean(args):
 
 def _build_bin(output=True):
 	if sys.platform == "darwin": # OSX
+		shutil.copy("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"));
+		shutil.copy("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"));
 		shell_command(["xcodebuild", "-jobs", str(get_max_jobs())]);
 		shell_command(["install_name_tool", "-change",
 			"/usr/local/lib/libengine2D.dylib",
 			"@executable_path/libengine2D.dylib",
-			resolve_path(PROJECT_BUILD_PATH, get_exe_name())]);
+			resolve_path(PROJECT_BUILD_PATH, get_exe_name())]); # libengine2D.dylib
+		shell_command(["install_name_tool", "-change",
+			"/usr/local/lib/libglfw.dylib",
+			"@executable_path/libglfw.dylib",
+			resolve_path(PROJECT_BUILD_PATH, get_lib_name())]); # libglfw3.dylib
+		shell_command(["install_name_tool", "-change",
+			"/usr/local/lib/libv8.dylib",
+			"@executable_path/libv8.dylib",
+			resolve_path(PROJECT_BUILD_PATH, get_lib_name())]); # libv8.dylib 
 	elif sys.platform == "linux2":
 		os.chdir(resolve_path(PROJECT_ROOT, "0"));
 		os.environ["CC"] = "clang";
@@ -269,9 +290,10 @@ def build_bin(args):
 
 @command(requires=[], usage="Builds addons")
 def build_addons(args):
-	if not ensure_file_hash(["src/Modules/JSUnsafe.cpp"]):
-		store_file_hash(["src/Modules/JSUnsafe.cpp"]);
-		buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe.dylib", link_v8=True);
+	if sys.platform == "darwin":
+		if not ensure_file_hash(["src/Modules/JSUnsafe.cpp"]):
+			store_file_hash(["src/Modules/JSUnsafe.cpp"]);
+			buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe.dylib", link_v8=True);
 
 @command(requires=["build_bin", "build_addons"], usage="Copys support files to the build path")
 def build_env(args):

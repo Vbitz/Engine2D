@@ -132,10 +132,10 @@
 						]
 					},
 					"include_dirs": [
-						"/usr/local/include",
+						"third_party/v8/include"
 					],
 					"library_dirs": [
-						"/usr/local/lib/"
+						"third_party/lib"	
 					],
 					"link_settings": {
 						"libraries": [
@@ -200,9 +200,12 @@
 					'sources': [
 						"src/Window_glfw.cpp"
 					],
+					"include_dirs": [
+						"third_party/glfw/include"
+					],
 					"xcode_settings": {
 						"OTHER_LDFLAGS": [
-							"-lglfw3"
+							"-lglfw"
 						]
 					}
 				}],
