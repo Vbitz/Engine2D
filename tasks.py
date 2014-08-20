@@ -27,6 +27,7 @@ import shutil;
 import hashlib;
 import ConfigParser;
 import multiprocessing;
+import glob;
 
 import inspect;
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())));
@@ -158,29 +159,14 @@ def store_file_hash(filenames):
 	for filename in filenames:
 		config.set("StoredHashes", filename, get_filename_hash(filename));
 
-@command(usage="Downloads a local copy of SVN if we can't find one")
-def fetch_svn(args):
-	try:
-		require_in_path(["svn"]);
-	except Exception, e:
-		# check for SVN in path, if we can find it then put it in the path
-		print(bcolors.FAIL + "SVN not found: " + str(e));
-		# download a standalone copy of SVN and put it in third_party/svn then put it in the path
-		raise e
-	# at this point we have SVN in the path and can download GYP
-	pass;
-
 @command(usage="Downloads a local copy of CMake if we can't find one")
 def fetch_cmake(args):
+	if sys.platform == "linux2":
+		# Some of these commands need sudo
+		# just run "sudo apt-get install -y cmake"
 	pass;
 
-@command(requires=["fetch_svn"], usage="Downloads the latest version of GYP using SVN")
-def fetch_gyp(args):
-	# check for GYP in third_party first
-	# if it's not there then download it using SVN
-	pass;
-
-@command(requires=["fetch_gyp"], usage="Builds platform project files")
+@command(usage="Builds platform project files")
 def gyp(args):
 	# run GYP
 	shell_command([
@@ -197,37 +183,48 @@ def gyp(args):
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
 		]);
 
-def check_depends():
-	return True;
+# def check_depends():
+# 	return True;
 
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def fetch_glfw3(args):
-	# both platforms need https://github.com/glfw/glfw/archive/3.0.3.zip (400,137 bytes)
-	# extracts to glfw-3.0.3
-	# run cmake -DGLFW_BUILD_TESTS=false . in glfw-3.0.3
-	# run make 
-	# copy include/GLFW to third_party/include
-	# copy src/libglfw3.a to third_party/lib
-	pass;
+	os.chdir(resolve_path(PROJECT_ROOT, "third_party/glfw"));
+	shell_command([
+			"cmake",
+			"-DGLFW_BUILD_EXAMPLES:BOOL=OFF",
+			"-DGLFW_BUILD_TESTS:BOOL=OFF",
+			"-DBUILD_SHARED_LIBS:BOOL=ON",
+			"."
+		]);
+	shell_command(["make"]);
+	for f in glob.glob("src/libglfw3.so*"):
+		shutil.copy(f, "../lib"));
+	os.chdir("../..");
 
 @command(requires=["fetch_svn"], usage="Fetch and build V8 using GYP")
 def fetch_v8(args):
-	# both platforms need https://github.com/v8/v8/archive/3.21.17.zip (16,949,393 bytes)
-	# the zip file extracts to v8-3.21.17
-	# change directory to third_party/depend_src/v8-3.21.17
-	# svn co http://gyp.googlecode.com/svn/trunk build/gyp (pretty small)
-
 	if sys.platform == "win32": # windows
 		# svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@231940 third_party/cygwin
 		# python build\gyp_v8 -Dv8_enable_i18n_support=0
 		# msbuild /p:Configuration=Release build\All.sln
 		# copy the relevent files to third_party/lib and third_party/include
 		pass
-	elif sys.platform == "darwin": #osx
+	elif sys.platform == "darwin": # osx
 		# make native i18nsupport=off (takes bloody ages)
 		pass
+	elif sys.platform == "linux2": # linux
+		os.chdir(resolve_path(PROJECT_ROOT, "third_party/glfw"));
+		shell_command([
+				"make",
+				"native",
+				"library=shared",
+				"snapshot=on",
+				"i18nsupport=off"
+			]);
+		shutil.copy("out/native/lib.target/libv8.so", "../lib/libv8.so");
+		os.chdir("../..");
 
-@command(requires=["fetch_glfw3", "fetch_physfs", "fetch_v8"], usage="Fetches Build Dependancys", check=check_depends)
+@command(requires=["fetch_glfw3", "fetch_v8"], usage="Fetches Build Dependancys")
 def fetch_build_deps(args):
 	pass;
 
@@ -258,11 +255,10 @@ def _build_bin(output=True):
 			resolve_path(PROJECT_BUILD_PATH, get_exe_name())]);
 	elif sys.platform == "linux2":
 		os.chdir(resolve_path(PROJECT_ROOT, "0"));
-		# CC=clang CXX=clang++ CXXFLAGS=-std=gnu++11 LD_LIBRARY_PATH=../third_party/lib/ make
 		os.environ["CC"] = "clang";
 		os.environ["CXX"] = "clang++";
 		os.environ["CXXFLAGS"] = "-std=gnu++11";
-		os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/"
+		os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/" # use resolve_path
 		shell_command("make")
 		os.chdir("..")
 

@@ -393,9 +393,9 @@ void __PHYSFS_platformReleaseMutex(void *mutex)
     MPExitCriticalRegion(m);
 } /* __PHYSFS_platformReleaseMutex */
 
-#endif /* PHYSFS_PLATFORM_MACOSX */
-
 #pragma clang diagnostic pop
+
+#endif /* PHYSFS_PLATFORM_MACOSX */
 
 /* end of macosx.c ... */
 
