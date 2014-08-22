@@ -21,6 +21,8 @@
 
 #include "Filesystem.hpp"
 
+#include <assert.h>
+
 #include "vendor/physfs/physfs.h"
 
 namespace Engine {
@@ -85,6 +87,7 @@ namespace Engine {
         bool Mount(std::string path, std::string fsPath) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                assert(false);
                 return false;
             }
             int result = PHYSFS_mount(path.c_str(), fsPath.c_str(), 1);
@@ -102,6 +105,7 @@ namespace Engine {
             if (HasSetUserDir()) return; // Don't call PHYSFS_setSaneConfig twice
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                assert(false);
                 return;
             }
             PHYSFS_setSaneConfig("Engine2D", path.c_str(), NULL, 0, 0);
@@ -111,6 +115,7 @@ namespace Engine {
 		bool FileExists(std::string path) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                assert(false);
                 return false;
             }
 			const char* pathC = path.c_str();
@@ -120,6 +125,7 @@ namespace Engine {
 		bool FolderExists(std::string path) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                assert(false);
                 return false;
             }
 			const char* pathC = path.c_str();
@@ -129,6 +135,7 @@ namespace Engine {
         void Mkdir(std::string path) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                assert(false);
                 return;
             }
             PHYSFS_mkdir(path.c_str());
@@ -138,6 +145,7 @@ namespace Engine {
 			std::vector<std::string> ret;
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                assert(false);
                 return ret;
             }
 			char** list = PHYSFS_enumerateFiles(path.c_str());
@@ -152,6 +160,7 @@ namespace Engine {
 		long FileSize(std::string path) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                assert(false);
                 return -1;
             }
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
@@ -168,10 +177,12 @@ namespace Engine {
 		char* GetFileContent(std::string path, long &fileSize) {
             if (!IsLoaded()) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "FS not loaded" << Logger::end();
+                assert(false);
                 return (char*) "";
             }
 			if (!PHYSFS_exists(path.c_str())) {
-				Logger::begin("Filesystem", Logger::LogLevel_Error) << "File does not exist : " << path << Logger::end();
+                Logger::begin("Filesystem", Logger::LogLevel_Error) << "File does not exist : " << path << Logger::end();
+                assert(false);
 				return (char*) "";
 			}
 			PHYSFS_File* f = PHYSFS_openRead(path.c_str());
@@ -179,6 +190,7 @@ namespace Engine {
 			char* fBuffer = new char[len + 1];
             if (PHYSFS_read(f, fBuffer, sizeof(char), (PHYSFS_uint32) len) != len) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "File Read Failed" << Logger::end();
+                assert(false);
                 return (char*) "";
             }
 			PHYSFS_close(f);
@@ -193,6 +205,20 @@ namespace Engine {
             std::string hexDigest = Hash::HexDigest(type, (uint8_t*) fileContent, (size_t) fileSize);
             delete [] fileContent;
             return hexDigest;
+        }
+        
+        Json::Value LoadJsonFile(std::string path) {
+            long fileLength;
+            char* fileContent = Filesystem::GetFileContent(path, fileLength);
+            
+            Json::Reader reader;
+            Json::Value root;
+            
+            reader.parse(fileContent, root);
+            
+            delete [] fileContent;
+            
+            return root;
         }
         
         void WriteFile(std::string path, const char* content, long length) {

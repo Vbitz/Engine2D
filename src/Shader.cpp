@@ -127,14 +127,7 @@ namespace Engine {
         }
         
         EffectParametersPtr GetEffectFromFile(std::string filename) {
-            std::string fileContent = std::string(Filesystem::GetFileContent(filename));
-            
-            Json::Reader reader;
-            Json::Value root;
-            
-            reader.parse(fileContent, root);
-            
-            return new EffectParameters(getBasePath(filename), root);
+            return new EffectParameters(getBasePath(filename), Filesystem::LoadJsonFile(filename));
         }
     }
 

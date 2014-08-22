@@ -149,14 +149,7 @@ namespace Engine {
     
     namespace FontSheetReader {
         FontSheetPtr LoadFont(std::string filename) {
-            std::string fileContent = std::string(Filesystem::GetFileContent(filename));
-            
-            Json::Reader reader;
-            Json::Value root;
-            
-            reader.parse(fileContent, root);
-            
-            return new FontSheet(root, filename.substr(0, filename.find_last_of('/') + 1));
+            return new FontSheet(Filesystem::LoadJsonFile(filename), filename.substr(0, filename.find_last_of('/') + 1));
         }
     }
 }

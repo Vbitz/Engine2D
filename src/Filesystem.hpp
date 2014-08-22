@@ -23,6 +23,8 @@
 
 #include "Logger.hpp"
 
+#include "vendor/json/json.h"
+
 #include <string>
 #include <vector>
 
@@ -70,6 +72,7 @@ namespace Engine {
         char* GetFileContent(std::string path, long& fileSize);
         
         std::string GetFileHexDigest(Hash::DigestType type, std::string path);
+        Json::Value LoadJsonFile(std::string path);
         
         void WriteFile(std::string path, const char* content, long length);
         void TouchFile(std::string path);
