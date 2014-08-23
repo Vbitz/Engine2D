@@ -112,7 +112,7 @@ def run_engine(args):
 def run_engine_test(args, onlyHighlight=True):
 	cmdArgs = [resolve_path(PROJECT_BUILD_PATH, get_exe_name()), "-test"];
 	if onlyHighlight:
-		cmdArgs += "-Ccore.log.levels.onlyHighlight=true";
+		cmdArgs += ["-Ccore.log.levels.onlyHighlight=true"];
 	shell_command(cmdArgs + args);
 
 def get_git_hash():
