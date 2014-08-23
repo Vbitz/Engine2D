@@ -199,7 +199,7 @@ namespace Engine {
             }
             
             template<class T>
-            static inline auto Unwarp(v8::Handle<v8::Object> handle) -> T* {
+            static inline auto Unwrap(v8::Handle<v8::Object> handle) -> T* {
                 assert(!handle.IsEmpty());
                 void* ptr = handle->GetAlignedPointerFromInternalField(0);
                 ObjectWrapPtr wrap = static_cast<ObjectWrapPtr>(ptr);

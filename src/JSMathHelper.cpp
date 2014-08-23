@@ -55,24 +55,24 @@ namespace Engine {
                 ScriptingManager::Arguments args(_args);
                 
                 if (args.Length() == 0) {
-                    args.SetReturnValue(args.NewNumber(Unwarp<JS_BasicRandom>(args.This())->BasicRandom::Next()));
+                    args.SetReturnValue(args.NewNumber(Unwrap<JS_BasicRandom>(args.This())->BasicRandom::Next()));
                 } else if (args.Length() == 1) {
-                    args.SetReturnValue(args.NewNumber(Unwarp<JS_BasicRandom>(args.This())->BasicRandom::Next(args.NumberValue(0))));
+                    args.SetReturnValue(args.NewNumber(Unwrap<JS_BasicRandom>(args.This())->BasicRandom::Next(args.NumberValue(0))));
                 } else if (args.Length() == 2) {
-                    args.SetReturnValue(args.NewNumber(Unwarp<JS_BasicRandom>(args.This())->BasicRandom::Next(args.NumberValue(0), args.NumberValue(1))));
+                    args.SetReturnValue(args.NewNumber(Unwrap<JS_BasicRandom>(args.This())->BasicRandom::Next(args.NumberValue(0), args.NumberValue(1))));
                 }
             }
             
             static void NextDouble(const v8::FunctionCallbackInfo<v8::Value>& _args) {
                 ScriptingManager::Arguments args(_args);
                 
-                args.SetReturnValue(args.NewNumber(Unwarp<JS_BasicRandom>(args.This())->BasicRandom::NextDouble()));
+                args.SetReturnValue(args.NewNumber(Unwrap<JS_BasicRandom>(args.This())->BasicRandom::NextDouble()));
             }
             
             static void NextNormal(const v8::FunctionCallbackInfo<v8::Value>& _args) {
                 ScriptingManager::Arguments args(_args);
                 
-                args.SetReturnValue(args.NewNumber(Unwarp<JS_BasicRandom>(args.This())->BasicRandom::NextNormal(args.NumberValue(0), args.NumberValue(1))));
+                args.SetReturnValue(args.NewNumber(Unwrap<JS_BasicRandom>(args.This())->BasicRandom::NextNormal(args.NumberValue(0), args.NumberValue(1))));
             }
             
             static void CreateInterface(v8::Isolate* isolate, v8::Handle<v8::Object> math_table) {
