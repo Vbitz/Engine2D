@@ -96,8 +96,41 @@ namespace Engine {
         
         class JS_Vector : public ScriptingManager::ObjectWrap {
         public:
-            glm::vec4 FromJSVector(v8::Handle<v8::Object> thisValue) {
+            static glm::vec4 FromJSVector(ScriptingManager::Factory& fac, v8::Handle<v8::Value> thisValue) {
+                v8::Handle<v8::Object> obj = v8::Handle<v8::Object>::Cast(thisValue);
+                return glm::vec4(
+                                 obj->Get(fac.NewString("x"))->NumberValue(),
+                                 obj->Get(fac.NewString("y"))->NumberValue(),
+                                 obj->Get(fac.NewString("z"))->NumberValue(),
+                                 obj->Get(fac.NewString("a"))->NumberValue()
+                                );
+            }
+            
+            static v8::Handle<v8::Object> ToJSVector(ScriptingManager::Factory& fac,
+                                                     v8::Handle<v8::Object> thisVec,
+                                                     glm::vec4 vec) {
+                v8::Handle<v8::Value> ctor = thisVec->GetConstructor();
+                v8::Handle<v8::Function> ctorFunc = v8::Handle<v8::Function>::Cast(ctor);
+                v8::Handle<v8::Value> instance = ctorFunc->NewInstance(0, NULL);
+                assert(instance->IsObject());
+                v8::Handle<v8::Object> instanceValue = instance->ToObject();
                 
+                instanceValue->Set(fac.NewString("x"), fac.NewNumber(vec.x));
+                instanceValue->Set(fac.NewString("y"), fac.NewNumber(vec.y));
+                instanceValue->Set(fac.NewString("z"), fac.NewNumber(vec.z));
+                instanceValue->Set(fac.NewString("a"), fac.NewNumber(vec.a));
+                
+                return instanceValue;
+            }
+            
+            static bool IsJSVector(ScriptingManager::Factory& fac, v8::Handle<v8::Value> value) {
+                if (!value->IsObject()) return false;
+                v8::Handle<v8::Object> obj = value->ToObject();
+                
+                return obj->Get(fac.NewString("x"))->IsNumber() &&
+                        obj->Get(fac.NewString("y"))->IsNumber() &&
+                        obj->Get(fac.NewString("z"))->IsNumber() &&
+                        obj->Get(fac.NewString("a"))->IsNumber();
             }
             
             static void New(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -126,6 +159,34 @@ namespace Engine {
                 }
             }
             
+            static void Add(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(IsJSVector(args, args[0]), "Arg1 is a Vector4")) return;
+                
+                args.SetReturnValue(ToJSVector(args, args.This(),
+                                  FromJSVector(args, args.This()) +
+                                  FromJSVector(args, args[0])));
+            }
+            
+            static void Sub(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(IsJSVector(args, args[0]), "Arg1 is a Vector4")) return;
+                
+                args.SetReturnValue(ToJSVector(args, args.This(),
+                                               FromJSVector(args, args.This()) -
+                                               FromJSVector(args, args[0])));
+            }
+            
+            static void Dot(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+            }
+            
             static void ToString(const v8::FunctionCallbackInfo<v8::Value>& _args) {
                 ScriptingManager::Arguments args(_args);
                 std::stringstream ss;
@@ -150,12 +211,11 @@ namespace Engine {
                 vector_template->SetCallHandler(JS_Vector::New);
                 
                 f.FillTemplate(vector_template, {
-                    {FTT_Prototype, "toString", f.NewFunctionTemplate(ToString)}
-                    // TODO: add
-                    // TODO: sub
-                    // TODO: mul
-                    // TODO: div
-                    // TODO: dot
+                    {FTT_Prototype, "toString", f.NewFunctionTemplate(ToString)},
+                    {FTT_Prototype, "add", f.NewFunctionTemplate(Add)},
+                    {FTT_Prototype, "sub", f.NewFunctionTemplate(Sub)}
+                    // TODO: dot()
+                    // TODO: cross()
                 });
                 
                 vector_template->InstanceTemplate()->SetInternalFieldCount(1);

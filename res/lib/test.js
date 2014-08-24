@@ -156,6 +156,13 @@ var tests = {
 		if (rand.nextDouble() !== 0.15868397722033079) return false;
 
 		return true;
+	},
+	"Vector": function () {
+		var v = new Math.Vector(1, 2, 3);
+		
+		var result = v.add(new Math.Vector(1, 2, 3));
+
+		return result.x == 2;
 	}
 };
 
