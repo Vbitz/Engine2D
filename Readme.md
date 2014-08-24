@@ -1,5 +1,7 @@
 # "Engine2D" 2D Game Engine
 
+[![Build Status](https://travis-ci.org/Vbitz/Engine2D.svg?branch=master)](https://travis-ci.org/Vbitz/Engine2D)
+
 ## Auto-Generated Screenshot
 ![Screenshot](screenshot.png)
 
@@ -7,20 +9,16 @@
 Engine2D is a 2D Game Engine written in C++ with mature scripting support implemented using Chromium's V8 Javascript engine and graphics using OpenGL. Above is a screen shot of the interactive test suite testing Filesystem, Event dispatch among other core engine services.
 
 ## Building
-Right now the engine **only** builds out of the box on Mac OSX. To build it for other platforms you need...
+Right now the engine builds out of the box on Mac OSX and Linux. To build it for other platforms you need...
 
 - A modern C++ compiler supporting C++11. It's built using [clang](http://clang.llvm.org/) right now
 - [Python](http://www.python.org/) v2.7.x (For GYP and tasks.py)
-- [Subversion](https://subversion.apache.org/) (For GYP)
+- [CMake](http://www.cmake.org/) (For GLFW)
 - [GYP](https://code.google.com/p/gyp/)
-- [GLFW](http://www.glfw.org/) v3.0.x or [SDL](http://www.libsdl.org/) v2.0.3
-- [V8](https://code.google.com/p/v8/) v3.28.28.2
 
 On a source level you will need to fill in or stub out `Platform_{x}.cpp`.
 
-Once you have the dependences installed you can run `./tasks.py gyp` and then build the project using XCode on OSX, Visual Studio on Windows or make on Linux.
-
-Since Engine2D uses a in development version of V8 you will need to build it from source. There are good instructions [Here](https://code.google.com/p/v8/wiki/BuildingWithGYP).
+Once you have the dependences installed you can run `./tasks.py build_bin` and you will hopefully find a executable has been built.
 
 ##Sample Code
 
