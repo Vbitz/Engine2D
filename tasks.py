@@ -349,6 +349,7 @@ def help(args):
 def env(args):
 	print("sys.platform = %s" % (sys.platform));
 	print("sys.version = %s" % (sys.version));
+	print("sys.version_info = %s" % (sys.version_info));
 	print("resolve_path(PROJECT_ROOT, \"tasks.py\") = %s" % (resolve_path(PROJECT_ROOT, "tasks.py")));
 
 @command(usage="Runs CTags on the source directory")
@@ -386,7 +387,7 @@ def run_command(cmdName, rawArgs):
 
 def main(args):
 	# require python version 2.7
-	if sys.version_info < (2, 7) and sys.version_info < (3):
+	if sys.version_info < (2, 7) or sys.version_info > (3, 0):
 		print("tasks.py requires Python 2.7 or Greater");
 
 	# get the command and run it
