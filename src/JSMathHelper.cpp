@@ -27,7 +27,9 @@
 #include "ScriptingManager.hpp"
 #include "stdlib.hpp"
 
+#define GLM_FORCE_RADIANS
 #include "vendor/glm/glm.hpp"
+#include "vendor/glm/gtc/matrix_transform.hpp"
 
 #include <random>
 #include <iostream>
@@ -239,12 +241,91 @@ namespace Engine {
             static void CreateLookAt(const v8::FunctionCallbackInfo<v8::Value>& _args) {
                 ScriptingManager::Arguments args(_args);
                 
-                v8::Handle<v8::Function> thisCtor = v8::Handle<v8::Function>::Cast(args.This());
+                v8::Handle<v8::Value> ctor = args.This();
+                v8::Handle<v8::Function> ctorFunc = v8::Handle<v8::Function>::Cast(ctor);
+                v8::Handle<v8::Value> instance = ctorFunc->NewInstance(0, NULL);
                 
-                //v8::Handle<v8::Object> newInstance = thisCtor->Call(args.This(), 0, NULL);
+                v8::Handle<v8::Object> instanceValue = v8::Handle<v8::Object>::Cast(instance);
                 
-                //JS_Matrix* newInstanceValue = Unwarp<JS_Matrix>(newInstance);
+                JS_Matrix* newInstanceValue = Unwrap<JS_Matrix>(instanceValue);
                 
+                glm::vec3 lookAt = glm::vec3(0, 1, 0);
+                
+                newInstanceValue->_value = glm::lookAt(glm::vec3(JS_Vector::FromJSVector(args, args[0])), glm::vec3(JS_Vector::FromJSVector(args, args[1])), lookAt);
+                
+                args.SetReturnValue(instanceValue);
+            }
+            
+            static void Translate(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(JS_Vector::IsJSVector(args, args[0]), "Arg0 is the vector to translate by")) return;
+                
+                JS_Matrix* jsMat = Unwrap<JS_Matrix>(args.This());
+                
+                glm::vec4 argValue = JS_Vector::FromJSVector(args, args[0]);
+                
+                glm::mat4 ret = glm::translate(jsMat->_value, glm::vec3(argValue));
+                
+                jsMat->_value = ret;
+                
+                args.SetReturnValue(args.This());
+            }
+            
+            static void Scale(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(JS_Vector::IsJSVector(args, args[0]), "Arg0 is the vector to scale by")) return;
+                
+                JS_Matrix* jsMat = Unwrap<JS_Matrix>(args.This());
+                
+                glm::vec4 argValue = JS_Vector::FromJSVector(args, args[0]);
+                
+                glm::mat4 ret = glm::scale(jsMat->_value, glm::vec3(argValue));
+                
+                jsMat->_value = ret;
+                
+                args.SetReturnValue(args.This());
+            }
+            
+            static void Rotate(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(2)) return;
+                
+                if (args.Assert(args[0]->IsNumber(), "Arg0 is the angle in radians to rotate by") ||
+                    args.Assert(JS_Vector::IsJSVector(args, args[1]), "Arg1 is the vector to rotate by")) return;
+                
+                JS_Matrix* jsMat = Unwrap<JS_Matrix>(args.This());
+                
+                glm::vec4 argValue = JS_Vector::FromJSVector(args, args[1]);
+                
+                glm::mat4 ret = glm::rotate(jsMat->_value, (float) args.NumberValue(0), glm::vec3(argValue));
+                
+                jsMat->_value = ret;
+                
+                args.SetReturnValue(args.This());
+            }
+            
+            static void ToString(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                std::stringstream ss;
+                
+                glm::mat4 value = Unwrap<JS_Matrix>(args.This())->_value;
+                
+                ss << "[Matrix4x4 (" << std::endl;
+                ss << " " << value[0][0] << ", " << value[0][1] << ", " << value[0][2] << ", " << value[0][3] << "," << std::endl;
+                ss << " " << value[1][0] << ", " << value[1][1] << ", " << value[1][2] << ", " << value[1][3] << "," << std::endl;
+                ss << " " << value[2][0] << ", " << value[2][1] << ", " << value[2][2] << ", " << value[2][3] << "," << std::endl;
+                ss << " " << value[3][0] << ", " << value[3][1] << ", " << value[3][2] << ", " << value[3][3] << "," << std::endl;
+                ss << ")]";
+                
+                args.SetReturnValue(args.NewString(ss.str()));
             }
                                      
             static void CreateInterface(v8::Isolate* isolate, v8::Handle<v8::Object>math_table) {
@@ -255,14 +336,17 @@ namespace Engine {
                 matrix_template->SetCallHandler(JS_Matrix::New);
                 
                 f.FillTemplate(matrix_template, {
-                    // TODO: createLookAt
+                    {FTT_Static, "createLookAt", f.NewFunctionTemplate(CreateLookAt)},
+                    // TODO: copy
+                    // TODO: reset
                     // TODO: add
                     // TODO: sub
                     // TODO: mul
                     // TODO: div
-                    // TODO: translate
-                    // TODO: scale
-                    // TODO: rotate
+                    {FTT_Prototype, "translate", f.NewFunctionTemplate(Translate)},
+                    {FTT_Prototype, "scale", f.NewFunctionTemplate(Scale)},
+                    {FTT_Prototype, "rotate", f.NewFunctionTemplate(Rotate)},
+                    {FTT_Prototype, "toString", f.NewFunctionTemplate(ToString)}
                 });
                 
                 matrix_template->InstanceTemplate()->SetInternalFieldCount(1);
@@ -276,6 +360,16 @@ namespace Engine {
             glm::mat4 _value;
         };
         
+        void DegToRad(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            
+            if (args.AssertCount(1)) return;
+            
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the number in degrees to convert to radians")) return;
+            
+            args.SetReturnValue(args.NewNumber(glm::radians(args.NumberValue(0))));
+        }
+        
         void InitMathHelper() {
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             v8::Local<v8::Context> ctx = f.GetIsolate()->GetCurrentContext();
@@ -285,9 +379,12 @@ namespace Engine {
             
             v8::Local<v8::Object> math_table = obj->Get(f.NewString("Math")).As<v8::Object>();
             
-            math_table->Set(f.NewString("PI"), f.NewNumber(M_PI));
-            math_table->Set(f.NewString("PI_2"), f.NewNumber(M_PI_2));
-            math_table->Set(f.NewString("PI_4"), f.NewNumber(M_PI_4));
+            f.FillObject(math_table, {
+                {FTT_Static, "PI", f.NewNumber(M_PI)},
+                {FTT_Static, "PI_2", f.NewNumber(M_PI_2)},
+                {FTT_Static, "PI_4", f.NewNumber(M_PI_4)},
+                {FTT_Static, "degToRad", f.NewFunctionTemplate(DegToRad)->GetFunction()}
+            });
             
             JS_BasicRandom::CreateInterface(f.GetIsolate(), math_table);
             JS_Vector::CreateInterface(f.GetIsolate(), math_table);

@@ -163,6 +163,21 @@ var tests = {
 		var result = v.add(new Math.Vector(1, 2, 3));
 
 		return result.x == 2;
+	},
+	"Matrix": function () {
+		var m1 = new Math.Matrix();
+
+		m1.translate(new Math.Vector(0, 5, 0));
+
+		m1.scale(new Math.Vector(0, 5, 0));
+		
+		m1.rotate(Math.degToRad(45), new Math.Vector(0, 5, 0));
+
+		var m2 = Math.Matrix.createLookAt(
+			new Math.Vector(5, 5, 5),
+			new Math.Vector(10, 10, 10));
+			
+		return true;
 	}
 };
 
