@@ -96,137 +96,134 @@ namespace Engine {
             }
         };
         
-        class JS_Vector : public ScriptingManager::ObjectWrap {
-        public:
-            static glm::vec4 FromJSVector(ScriptingManager::Factory& fac, v8::Handle<v8::Value> thisValue) {
-                v8::Handle<v8::Object> obj = v8::Handle<v8::Object>::Cast(thisValue);
-                return glm::vec4(
-                                 obj->Get(fac.NewString("x"))->NumberValue(),
-                                 obj->Get(fac.NewString("y"))->NumberValue(),
-                                 obj->Get(fac.NewString("z"))->NumberValue(),
-                                 obj->Get(fac.NewString("a"))->NumberValue()
-                                );
-            }
+        glm::vec4 JS_Vector::FromJSVector(ScriptingManager::Factory& fac, v8::Handle<v8::Value> thisValue) {
+            v8::Handle<v8::Object> obj = v8::Handle<v8::Object>::Cast(thisValue);
+            return glm::vec4(
+                             obj->Get(fac.NewString("x"))->NumberValue(),
+                             obj->Get(fac.NewString("y"))->NumberValue(),
+                             obj->Get(fac.NewString("z"))->NumberValue(),
+                             obj->Get(fac.NewString("a"))->NumberValue()
+                             );
+        }
+        
+        v8::Handle<v8::Object> JS_Vector::ToJSVector(ScriptingManager::Factory& fac,
+                                          v8::Handle<v8::Object> thisVec,
+                                          glm::vec4 vec) {
+            v8::Handle<v8::Value> ctor = thisVec->GetConstructor();
+            v8::Handle<v8::Function> ctorFunc = v8::Handle<v8::Function>::Cast(ctor);
+            v8::Handle<v8::Value> instance = ctorFunc->NewInstance(0, NULL);
+            assert(instance->IsObject());
+            v8::Handle<v8::Object> instanceValue = instance->ToObject();
             
-            static v8::Handle<v8::Object> ToJSVector(ScriptingManager::Factory& fac,
-                                                     v8::Handle<v8::Object> thisVec,
-                                                     glm::vec4 vec) {
-                v8::Handle<v8::Value> ctor = thisVec->GetConstructor();
-                v8::Handle<v8::Function> ctorFunc = v8::Handle<v8::Function>::Cast(ctor);
-                v8::Handle<v8::Value> instance = ctorFunc->NewInstance(0, NULL);
-                assert(instance->IsObject());
-                v8::Handle<v8::Object> instanceValue = instance->ToObject();
-                
-                instanceValue->Set(fac.NewString("x"), fac.NewNumber(vec.x));
-                instanceValue->Set(fac.NewString("y"), fac.NewNumber(vec.y));
-                instanceValue->Set(fac.NewString("z"), fac.NewNumber(vec.z));
-                instanceValue->Set(fac.NewString("a"), fac.NewNumber(vec.a));
-                
-                return instanceValue;
-            }
+            instanceValue->Set(fac.NewString("x"), fac.NewNumber(vec.x));
+            instanceValue->Set(fac.NewString("y"), fac.NewNumber(vec.y));
+            instanceValue->Set(fac.NewString("z"), fac.NewNumber(vec.z));
+            instanceValue->Set(fac.NewString("a"), fac.NewNumber(vec.a));
             
-            static bool IsJSVector(ScriptingManager::Factory& fac, v8::Handle<v8::Value> value) {
-                if (!value->IsObject()) return false;
-                v8::Handle<v8::Object> obj = value->ToObject();
-                
-                return obj->Get(fac.NewString("x"))->IsNumber() &&
-                        obj->Get(fac.NewString("y"))->IsNumber() &&
-                        obj->Get(fac.NewString("z"))->IsNumber() &&
-                        obj->Get(fac.NewString("a"))->IsNumber();
-            }
+            return instanceValue;
+        }
+        
+        bool JS_Vector::IsJSVector(ScriptingManager::Factory& fac, v8::Handle<v8::Value> value){
+            if (!value->IsObject()) return false;
+            v8::Handle<v8::Object> obj = value->ToObject();
             
-            static void New(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-                ScriptingManager::Arguments args(_args);
-                
-                if (args.RecallAsConstructor()) return;
-                
-                JS_Vector* vec = Wrap<JS_Vector>(args.GetIsolate(), args.This());
-                
-                if (args.Length() > 1) {
-                    args.This()->Set(args.NewString("x"), args[0]->ToNumber());
-                    args.This()->Set(args.NewString("y"), args[1]->ToNumber());
-                } else {
-                    args.This()->Set(args.NewString("x"), args.NewNumber(0.0));
-                    args.This()->Set(args.NewString("y"), args.NewNumber(0.0));
-                }
-                if (args.Length() > 2) {
-                    args.This()->Set(args.NewString("z"), args[2]->ToNumber());
-                } else {
-                    args.This()->Set(args.NewString("z"), args.NewNumber(0.0));
-                }
-                if (args.Length() > 3) {
-                    args.This()->Set(args.NewString("a"), args[3]->ToNumber());
-                } else {
-                    args.This()->Set(args.NewString("a"), args.NewNumber(0.0));
-                }
-            }
+            return obj->Get(fac.NewString("x"))->IsNumber() &&
+            obj->Get(fac.NewString("y"))->IsNumber() &&
+            obj->Get(fac.NewString("z"))->IsNumber() &&
+            obj->Get(fac.NewString("a"))->IsNumber();
+        }
+        
+        void JS_Vector::New(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            static void Add(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-                ScriptingManager::Arguments args(_args);
-                
-                if (args.AssertCount(1)) return;
-                
-                if (args.Assert(IsJSVector(args, args[0]), "Arg1 is a Vector4")) return;
-                
-                args.SetReturnValue(ToJSVector(args, args.This(),
-                                  FromJSVector(args, args.This()) +
-                                  FromJSVector(args, args[0])));
-            }
+            if (args.RecallAsConstructor()) return;
             
-            static void Sub(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-                ScriptingManager::Arguments args(_args);
-                
-                if (args.AssertCount(1)) return;
-                
-                if (args.Assert(IsJSVector(args, args[0]), "Arg1 is a Vector4")) return;
-                
-                args.SetReturnValue(ToJSVector(args, args.This(),
-                                               FromJSVector(args, args.This()) -
-                                               FromJSVector(args, args[0])));
-            }
+            JS_Vector* vec = Wrap<JS_Vector>(args.GetIsolate(), args.This());
             
-            static void Dot(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-                ScriptingManager::Arguments args(_args);
+            if (args.Length() > 1) {
+                args.This()->Set(args.NewString("x"), args[0]->ToNumber());
+                args.This()->Set(args.NewString("y"), args[1]->ToNumber());
+            } else {
+                args.This()->Set(args.NewString("x"), args.NewNumber(0.0));
+                args.This()->Set(args.NewString("y"), args.NewNumber(0.0));
             }
+            if (args.Length() > 2) {
+                args.This()->Set(args.NewString("z"), args[2]->ToNumber());
+            } else {
+                args.This()->Set(args.NewString("z"), args.NewNumber(0.0));
+            }
+            if (args.Length() > 3) {
+                args.This()->Set(args.NewString("a"), args[3]->ToNumber());
+            } else {
+                args.This()->Set(args.NewString("a"), args.NewNumber(0.0));
+            }
+        }
+        
+        void JS_Vector::Add(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            static void ToString(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-                ScriptingManager::Arguments args(_args);
-                std::stringstream ss;
-                
-                ss << "[Vector (";
-                
-                ss << args.This()->Get(args.NewString("x"))->NumberValue() << ", ";
-                ss << args.This()->Get(args.NewString("y"))->NumberValue() << ", ";
-                ss << args.This()->Get(args.NewString("z"))->NumberValue() << ", ";
-                ss << args.This()->Get(args.NewString("a"))->NumberValue();
-                
-                ss << ")]";
-                
-                args.SetReturnValue(args.NewString(ss.str()));
-            }
+            if (args.AssertCount(1)) return;
             
-            static void CreateInterface(v8::Isolate* isolate, v8::Handle<v8::Object>math_table) {
-                ScriptingManager::Factory f(isolate);
-                
-                v8::Handle<v8::FunctionTemplate> vector_template = v8::FunctionTemplate::New(f.GetIsolate());
-                
-                vector_template->SetCallHandler(JS_Vector::New);
-                
-                f.FillTemplate(vector_template, {
-                    {FTT_Prototype, "toString", f.NewFunctionTemplate(ToString)},
-                    {FTT_Prototype, "add", f.NewFunctionTemplate(Add)},
-                    {FTT_Prototype, "sub", f.NewFunctionTemplate(Sub)}
-                    // TODO: dot()
-                    // TODO: cross()
-                });
-                
-                vector_template->InstanceTemplate()->SetInternalFieldCount(1);
-                
-                vector_template->SetClassName(f.NewString("Vector"));
-                
-                math_table->Set(f.NewString("Vector"), vector_template->GetFunction());
-            }
-        };
+            if (args.Assert(IsJSVector(args, args[0]), "Arg1 is a Vector4")) return;
+            
+            args.SetReturnValue(ToJSVector(args, args.This(),
+                                           FromJSVector(args, args.This()) +
+                                           FromJSVector(args, args[0])));
+        }
+        
+        void JS_Vector::Sub(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            
+            if (args.AssertCount(1)) return;
+            
+            if (args.Assert(IsJSVector(args, args[0]), "Arg1 is a Vector4")) return;
+            
+            args.SetReturnValue(ToJSVector(args, args.This(),
+                                           FromJSVector(args, args.This()) -
+                                           FromJSVector(args, args[0])));
+        }
+        
+        void JS_Vector::Dot(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+        }
+        
+        void JS_Vector::ToString(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            std::stringstream ss;
+            
+            ss << "[Vector (";
+            
+            ss << args.This()->Get(args.NewString("x"))->NumberValue() << ", ";
+            ss << args.This()->Get(args.NewString("y"))->NumberValue() << ", ";
+            ss << args.This()->Get(args.NewString("z"))->NumberValue() << ", ";
+            ss << args.This()->Get(args.NewString("a"))->NumberValue();
+            
+            ss << ")]";
+            
+            args.SetReturnValue(args.NewString(ss.str()));
+        }
+        
+        void JS_Vector::CreateInterface(v8::Isolate* isolate, v8::Handle<v8::Object>math_table) {
+            ScriptingManager::Factory f(isolate);
+            
+            v8::Handle<v8::FunctionTemplate> vector_template = v8::FunctionTemplate::New(f.GetIsolate());
+            
+            vector_template->SetCallHandler(JS_Vector::New);
+            
+            f.FillTemplate(vector_template, {
+                {FTT_Prototype, "toString", f.NewFunctionTemplate(ToString)},
+                {FTT_Prototype, "add", f.NewFunctionTemplate(Add)},
+                {FTT_Prototype, "sub", f.NewFunctionTemplate(Sub)}
+                // TODO: dot()
+                // TODO: cross()
+            });
+            
+            vector_template->InstanceTemplate()->SetInternalFieldCount(1);
+            
+            vector_template->SetClassName(f.NewString("Vector"));
+            
+            math_table->Set(f.NewString("Vector"), vector_template->GetFunction());
+        }
         
         class JS_Matrix : public ScriptingManager::ObjectWrap {
         public:
@@ -254,6 +251,32 @@ namespace Engine {
                 newInstanceValue->_value = glm::lookAt(glm::vec3(JS_Vector::FromJSVector(args, args[0])), glm::vec3(JS_Vector::FromJSVector(args, args[1])), lookAt);
                 
                 args.SetReturnValue(instanceValue);
+            }
+            
+            static void Copy(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                v8::Handle<v8::Value> ctor = args.This()->GetConstructor();
+                v8::Handle<v8::Function> ctorFunc = v8::Handle<v8::Function>::Cast(ctor);
+                v8::Handle<v8::Value> instance = ctorFunc->NewInstance(0, NULL);
+                
+                v8::Handle<v8::Object> instanceValue = v8::Handle<v8::Object>::Cast(instance);
+                
+                JS_Matrix* newInstanceValue = Unwrap<JS_Matrix>(instanceValue);
+                
+                newInstanceValue->_value = Unwrap<JS_Matrix>(args.This())->_value;
+                
+                args.SetReturnValue(instanceValue);
+            }
+            
+            static void Reset(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                JS_Matrix* jsMat = Unwrap<JS_Matrix>(args.This());
+                
+                jsMat->_value = glm::mat4(); // reset to identify matrix
+                
+                args.SetReturnValue(args.This());
             }
             
             static void Translate(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -337,8 +360,8 @@ namespace Engine {
                 
                 f.FillTemplate(matrix_template, {
                     {FTT_Static, "createLookAt", f.NewFunctionTemplate(CreateLookAt)},
-                    // TODO: copy
-                    // TODO: reset
+                    {FTT_Prototype, "copy", f.NewFunctionTemplate(Copy)},
+                    {FTT_Prototype, "reset", f.NewFunctionTemplate(Reset)},
                     // TODO: add
                     // TODO: sub
                     // TODO: mul
