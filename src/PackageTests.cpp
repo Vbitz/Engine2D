@@ -55,8 +55,6 @@ namespace Engine {
             
             p->GetIndex()["hello"] = "World";
             
-            p->SaveIndex();
-            
             p->Close();
             
             PackagePtr p2 = Package::FromFile("testing.epkg");

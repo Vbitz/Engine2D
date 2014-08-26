@@ -10,6 +10,7 @@
 #define PACKAGE_FILES_PER_CHUNK 32
 #define PACKAGE_REGION_SIZE 4096
 #define PACKAGE_FILE_MAGIC 0xDEADBEEF
+#define PACKAGE_FILE_VERSION 0x0002
 
 namespace Engine {
     
@@ -19,9 +20,7 @@ namespace Engine {
      Package Format on Disk
      -------------------------------------------- Start
      PackageDiskHeader - 64 bytes length
-     PADDING - 448 bytes length
-     StringChunk - Index - 512 bytes length 502 bytes usable
-     PADDING - 3072 bytes length
+     PADDING - 4032 bytes length
      PackageDiskFile Chunk - 4096 bytes length, 32 files per chunk
      -------------------------------------------- End of Header
      File Content - variable length
@@ -33,7 +32,7 @@ namespace Engine {
 #pragma pack(0)
     struct PackageDiskHeader {
         uint8_t magic[4] = {'E', 'P', 'K', 'G'};
-        uint16_t version = 0x0001;
+        uint16_t version = PACKAGE_FILE_VERSION;
         uint32_t firstFileOffset;
         
         Platform::UUID thisUUID;
@@ -105,6 +104,7 @@ namespace Engine {
     public:
         ~Package();
         
+        bool FileExists(std::string filename);
         void WriteFile(std::string filename, uint8_t* content, uint32_t contentLength);
         uint8_t* ReadFile(std::string filename, uint32_t& contentLength);
         
@@ -115,17 +115,21 @@ namespace Engine {
         
         void Close();
         
+        const char* INDEX_FILENAME = "__INDEX__";
+        
         static PackagePtr FromFile(std::string filename);
     private:
         Package(Platform::MemoryMappedFilePtr f);
         
         void _writeHeader();
+        uint32_t _getFileHeaderOffset(std::string filename);
         
         Platform::MemoryMappedFilePtr _file;
         
         std::unordered_map<std::string, uint32_t> _fastFileLookup;
         
         bool _writenHeader = false;
+        bool _savedIndex = false;
         Platform::MemoryMappedRegionPtr _headerRegion;
         
         Json::Value _index = Json::Value(Json::objectValue);
