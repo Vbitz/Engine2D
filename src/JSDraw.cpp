@@ -21,6 +21,8 @@
 
 #include "JSDraw.hpp"
 
+#include "JSMathHelper.hpp"
+
 #include "vendor/soil/SOIL.h"
 
 #include "Filesystem.hpp"
@@ -198,6 +200,8 @@ namespace Engine {
                 
                 JS_VertexBuffer2D::Wrap<JS_VertexBuffer2D>(args.GetIsolate(), args.This());
                 
+                args.This()->Set(args.NewString("model"), JsMathHelper::JS_Matrix::NewInstance(args, glm::mat4()));
+                
                 if (render->GetRendererType() == RendererType::OpenGL3) {
                     EffectParametersPtr effect = EffectReader::GetEffectFromFile(args.StringValue(0));
                     effect->CreateShader();
@@ -232,7 +236,9 @@ namespace Engine {
             static void Draw(const v8::FunctionCallbackInfo<v8::Value>& _args) {
                 ScriptingManager::Arguments args(_args);
                 
-                JS_VertexBuffer2D::Unwrap<JS_VertexBuffer2D>(args.This())->VertexBuffer::Draw(PolygonMode::Triangles, glm::mat4());
+                JS_VertexBuffer2D* thisValue = Unwrap<JS_VertexBuffer2D>(args.This());
+                
+                thisValue->VertexBuffer::Draw(PolygonMode::Triangles, JsMathHelper::JS_Matrix::GetValue(args, args.This()->Get(args.NewString("model"))));
             }
             
             static void Save(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -281,6 +287,16 @@ namespace Engine {
                 JS_VertexBuffer2D::Unwrap<JS_VertexBuffer2D>(args.This())->VertexBuffer::SetLookAtView(source, target);
             }
             
+            static void SetDepthTest(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(args[0]->IsBoolean(), "Arg0 is set to enable depth testing on the model, bad for 2D but very important for 3D")) return;
+                
+                JS_VertexBuffer2D::Unwrap<JS_VertexBuffer2D>(args.This())->VertexBuffer::SetDepthTest(args.BooleanValue(0));
+            }
+            
             static void Init(v8::Handle<v8::ObjectTemplate> drawTable) {
                 ScriptingManager::Factory f(v8::Isolate::GetCurrent());
                 v8::HandleScope scope(f.GetIsolate());
@@ -295,7 +311,8 @@ namespace Engine {
                     {FTT_Prototype, "save", f.NewFunctionTemplate(Save)},
                     {FTT_Prototype, "load", f.NewFunctionTemplate(Load)},
                     {FTT_Prototype, "setProjectionPerspective", f.NewFunctionTemplate(SetProjectionPerspective)},
-                    {FTT_Prototype, "setLookAtView", f.NewFunctionTemplate(SetLookAtView)}
+                    {FTT_Prototype, "setLookAtView", f.NewFunctionTemplate(SetLookAtView)},
+                    {FTT_Prototype, "setDepthTest", f.NewFunctionTemplate(SetDepthTest)}
                 });
                 
                 newVertexBuffer->InstanceTemplate()->SetInternalFieldCount(1);

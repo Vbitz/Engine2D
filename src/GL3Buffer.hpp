@@ -98,6 +98,9 @@ namespace Engine {
         void Save(std::string filename);
         void Load(std::string filename);
 
+        void SetDepthTest(bool depthTest) {
+            this->_depthTest = depthTest;
+        }
         void SetProjectionType(ProjectionType t);
         void SetLookAtView(glm::vec3 source, glm::vec3 target);
         
@@ -131,6 +134,7 @@ namespace Engine {
         unsigned short _vertexCount = 0;
         
         bool _dirty = false;
+        bool _depthTest = false;
         
         RenderDriverPtr _renderGL = NULL;
         ShaderPtr _currentShader = NULL;

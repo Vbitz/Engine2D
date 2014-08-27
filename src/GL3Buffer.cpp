@@ -228,7 +228,13 @@ namespace Engine {
         
         this->_getRender()->CheckError("VertexBuffer::Draw::PostUploadUniform");
         
+        if (this->_depthTest) {
+            glEnable(GL_DEPTH_TEST);
+        }
+        
         glDrawElements(_polygonModeToGLMode(mode), this->_vertexCount, GL_UNSIGNED_SHORT, 0);
+        
+        glDisable(GL_DEPTH_TEST);
         
         this->_getRender()->CheckError("VertexBuffer::Draw::PostDraw");
         
