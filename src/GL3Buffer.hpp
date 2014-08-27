@@ -101,6 +101,9 @@ namespace Engine {
         void SetDepthTest(bool depthTest) {
             this->_depthTest = depthTest;
         }
+        void SetWireframe(bool wireframe) {
+            this->_wireframe = wireframe;
+        }
         void SetProjectionType(ProjectionType t);
         void SetLookAtView(glm::vec3 source, glm::vec3 target);
         
@@ -135,6 +138,7 @@ namespace Engine {
         
         bool _dirty = false;
         bool _depthTest = false;
+        bool _wireframe = false;
         
         RenderDriverPtr _renderGL = NULL;
         ShaderPtr _currentShader = NULL;

@@ -232,9 +232,19 @@ namespace Engine {
             glEnable(GL_DEPTH_TEST);
         }
         
+        if (this->_wireframe) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+            
         glDrawElements(_polygonModeToGLMode(mode), this->_vertexCount, GL_UNSIGNED_SHORT, 0);
         
-        glDisable(GL_DEPTH_TEST);
+        if (this->_wireframe) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+            
+        if (this->_depthTest) {
+            glDisable(GL_DEPTH_TEST);
+        }
         
         this->_getRender()->CheckError("VertexBuffer::Draw::PostDraw");
         

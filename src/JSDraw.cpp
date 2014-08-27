@@ -297,6 +297,16 @@ namespace Engine {
                 JS_VertexBuffer2D::Unwrap<JS_VertexBuffer2D>(args.This())->VertexBuffer::SetDepthTest(args.BooleanValue(0));
             }
             
+            static void SetWireframe(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(args[0]->IsBoolean(), "Arg0 is set to enable wireframe on the model")) return;
+                
+                JS_VertexBuffer2D::Unwrap<JS_VertexBuffer2D>(args.This())->VertexBuffer::SetWireframe(args.BooleanValue(0));
+            }
+            
             static void Init(v8::Handle<v8::ObjectTemplate> drawTable) {
                 ScriptingManager::Factory f(v8::Isolate::GetCurrent());
                 v8::HandleScope scope(f.GetIsolate());
@@ -312,7 +322,8 @@ namespace Engine {
                     {FTT_Prototype, "load", f.NewFunctionTemplate(Load)},
                     {FTT_Prototype, "setProjectionPerspective", f.NewFunctionTemplate(SetProjectionPerspective)},
                     {FTT_Prototype, "setLookAtView", f.NewFunctionTemplate(SetLookAtView)},
-                    {FTT_Prototype, "setDepthTest", f.NewFunctionTemplate(SetDepthTest)}
+                    {FTT_Prototype, "setDepthTest", f.NewFunctionTemplate(SetDepthTest)},
+                    {FTT_Prototype, "setWireframe", f.NewFunctionTemplate(SetWireframe)}
                 });
                 
                 newVertexBuffer->InstanceTemplate()->SetInternalFieldCount(1);
