@@ -432,36 +432,29 @@ namespace Engine {
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
-        ENGINE_JS_METHOD(Version) {
-            ENGINE_JS_SCOPE_OPEN;
+        void Version(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
             
-            v8::Isolate* isolate = args.GetIsolate();
+            if (args.Assert(HasGLContext(), "This function requies a OpemGL context")) return;
             
-            ENGINE_CHECK_GL;
-            
-            v8::Handle<v8::Object> ret = v8::Object::New(isolate);
+            v8::Handle<v8::Object> ret = args.NewObject();
             
             ApplicationPtr app = GetAppSingilton();
             
             OpenGLVersion glVersion = app->GetWindow()->GetGlVersion();
             
-            ret->Set(v8::String::NewFromUtf8(isolate, "openGL"),
-                     v8::String::NewFromUtf8(isolate, glVersion.fullGLVersion.c_str()));
-            ret->Set(v8::String::NewFromUtf8(isolate, "glew"),
-                     v8::String::NewFromUtf8(isolate, glVersion.glewVersion.c_str()));
-            ret->Set(v8::String::NewFromUtf8(isolate, "v8"),
-                     v8::String::NewFromUtf8(isolate, v8::V8::GetVersion()));
-            ret->Set(v8::String::NewFromUtf8(isolate, "engine"), v8::String::NewFromUtf8(isolate, Application::GetEngineVersion().c_str()));
-            ret->Set(v8::String::NewFromUtf8(isolate, "window"),
-                     v8::String::NewFromUtf8(isolate, app->GetWindow()->GetWindowVersion().c_str()));
-            ret->Set(v8::String::NewFromUtf8(isolate, "glsl"),
-                     v8::String::NewFromUtf8(isolate, glVersion.glslVersion.c_str()));
-            ret->Set(v8::String::NewFromUtf8(isolate, "glVendor"),
-                     v8::String::NewFromUtf8(isolate, glVersion.glVendor.c_str()));
-            ret->Set(v8::String::NewFromUtf8(isolate, "glRenderer"),
-                     v8::String::NewFromUtf8(isolate, glVersion.glRenderer.c_str()));
+            args.FillObject(ret, {
+                {FTT_Static, "openGL", args.NewString(glVersion.fullGLVersion)},
+                {FTT_Static, "glew", args.NewString(glVersion.glewVersion)},
+                {FTT_Static, "v8", args.NewString(v8::V8::GetVersion())},
+                {FTT_Static, "engine", args.NewString(Application::GetEngineVersion())},
+                {FTT_Static, "window", args.NewString(app->GetWindow()->GetWindowVersion())},
+                {FTT_Static, "glsl", args.NewString(glVersion.glslVersion)},
+                {FTT_Static, "glVendor", args.NewString(glVersion.glVendor)},
+                {FTT_Static, "glRenderer", args.NewString(glVersion.glRenderer)}
+            });
             
-            ENGINE_JS_SCOPE_CLOSE(ret);
+            args.SetReturnValue(ret);
         }
         
         ENGINE_JS_METHOD(MsgBox) {
@@ -527,12 +520,6 @@ namespace Engine {
             WorkerThreadPool::CreateScriptWorker(std::string(*v8::String::Utf8Value(args[0]->ToString())));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
-        }
-        
-        ENGINE_JS_METHOD(TestAccess) {
-            ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_JS_SCOPE_CLOSE(args.Data());
         }
         
         ENGINE_JS_METHOD(Assert) {
@@ -603,8 +590,6 @@ namespace Engine {
             addItem(sysTable, "dumpLog", DumpLog);
             
             addItem(sysTable, "createWorker", CreateWorker);
-            
-            //addItem(sysTable, "testAccess", TestAccess);
         }
         
 #undef addItem
