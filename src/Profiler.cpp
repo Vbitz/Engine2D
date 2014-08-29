@@ -38,7 +38,7 @@
 namespace Engine {
     namespace Profiler {
         
-        ProfileZoneMetadata *rootZone, *currentZone;
+        ProfileZoneMetadata *lastRootZone, *rootZone, *currentZone;
         
         void BeginProfile(ScopePtr scope) {
             if (currentZone == NULL) return;
@@ -105,14 +105,21 @@ namespace Engine {
         
         void EndProfileFrame() {
             if (!Platform::IsMainThread()) return;
-            assert(currentZone == rootZone);
-            if (GetEventsSingilton()->GetEvent("onProfileEnd")->ListenerCount() > 0) {
-                Json::Value args(Json::objectValue);
-                _buildJSONFromZone(rootZone, args["results"]);
-                GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(args);
+            assert(currentZone == rootZone);            
+            if (lastRootZone != NULL) {
+                _freeZone(lastRootZone);
             }
-            _freeZone(rootZone);
+            lastRootZone = currentZone;
+            if (GetEventsSingilton()->GetEvent("onProfileEnd")->ListenerCount() > 0) {
+                GetEventsSingilton()->GetEvent("onProfileEnd")->Emit();
+            }
             currentZone = rootZone = NULL;
+        }
+        
+        Json::Value GetLastFrame() {
+            Json::Value args(Json::objectValue);
+            _buildJSONFromZone(lastRootZone, args);
+            return args;
         }
     }
 }

@@ -82,7 +82,7 @@ namespace Engine {
         
         std::vector<ToastInfomation> _toasts;
         
-        Json::Value _cachedProfilerDetails, _currentProfilerDetails;
+        Json::Value _cachedProfilerDetails;
         double _currentProfilerScroll = 0;
         int _profilerX = 0;
         

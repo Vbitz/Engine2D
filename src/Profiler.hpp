@@ -27,6 +27,7 @@
 
 #include "stdlib.hpp"
 #include "Platform.hpp"
+#include "vendor/json/json.h"
 
 #define PROFILER
 
@@ -101,5 +102,7 @@ namespace Engine {
         
         void BeginProfileFrame();
         void EndProfileFrame();
+        
+        Json::Value GetLastFrame();
     }
 }

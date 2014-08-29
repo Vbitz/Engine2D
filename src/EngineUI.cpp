@@ -524,7 +524,7 @@ namespace Engine {
             }
         } else if (this->_currentView == CurrentView::Profiler) {
             if (key == 'R' && press == Key_Press) {
-                this->_cachedProfilerDetails = this->_currentProfilerDetails;
+                this->_cachedProfilerDetails = Profiler::GetLastFrame();
             } else if (key == '[' && (press == Key_Press || press == Key_Repeat)) {
                 if (this->_profilerDrawTimeScale > 500) {
                     this->_profilerDrawTimeScale -= 500;
@@ -570,9 +570,6 @@ namespace Engine {
     
     EventMagic EngineUI::_profilerHook(Json::Value args, void* userPointer) {
         EngineUIPtr eui = static_cast<EngineUIPtr>(userPointer);
-        
-        // HACK: This is really slow
-        eui->_currentProfilerDetails = args["results"];
         
         return EM_OK;
     }

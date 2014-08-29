@@ -196,7 +196,13 @@ namespace Engine {
             return; // nothing to draw
         }
         
-        ENGINE_PROFILER_SCOPE;
+        char* addedData = new char[128];
+        
+        sprintf(addedData, "_vertexCount=%d", this->_vertexCount);
+        
+        ENGINE_PROFILER_SCOPE_EX(addedData);
+        
+        delete [] addedData;
         
         this->_begin();
         
