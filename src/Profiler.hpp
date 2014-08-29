@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 #include "stdlib.hpp"
 #include "Platform.hpp"
@@ -31,6 +32,7 @@
 
 #ifdef PROFILER
 #define ENGINE_PROFILER_SCOPE Engine::Profiler::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__)
+#define ENGINE_PROFILER_SCOPE_EX(str) Engine::Profiler::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__, str)
 #else
 #define ENGINE_PROFILER_SCOPE
 #endif
@@ -60,6 +62,14 @@ namespace Engine {
             Scope(const char* functionName) {
                 this->_startTime = Platform::GetTime();
                 this->_name = functionName;
+                BeginProfile(this);
+            }
+            
+            Scope(const char* functionName, const char* exName) {
+                std::stringstream ss;
+                ss << functionName << " : " << exName;
+                this->_startTime = Platform::GetTime();
+                this->_name = ss.str().c_str();
                 BeginProfile(this);
             }
             

@@ -133,7 +133,7 @@ namespace Engine {
     }
         
     EventMagic EventClass::Emit(Json::Value args, int jsArgC, v8::Handle<v8::Value> jsArgV[]) {
-        ENGINE_PROFILER_SCOPE;
+        ENGINE_PROFILER_SCOPE_EX(this->TargetName.c_str());
         static std::vector<int> deleteTargets;
         if (this->_alwaysDefered) {
             this->_deferedMessages.push(args);

@@ -365,9 +365,10 @@ namespace Engine {
             
             renderGL->Print(20,  y - 15, "Name");
             renderGL->Print(680, y - 15, "Count");
-            renderGL->Print(750, y - 15, "Avg (ns)");
-            renderGL->Print(850, y - 15, "Min (ns)");
-            renderGL->Print(950, y - 15, "Max (ns)");
+            renderGL->Print(750, y - 15, "Total (ns)");
+            renderGL->Print(850, y - 15, "Avg   (ns)");
+            renderGL->Print(950, y - 15, "Min   (ns)");
+            renderGL->Print(1050, y - 15, "Max   (ns)");
             
             y = (windowSize.y / 2) - 50;
             
@@ -415,14 +416,14 @@ namespace Engine {
                 
                 std::string key = iter.key().asString();
                 
-                double avgTime = (*iter)["avg"].asDouble() * SEC_TO_NSEC;
-                if (avgTime > 50000) {
+                double totalTime = (*iter)["total"].asDouble() * SEC_TO_NSEC;
+                if (totalTime > 50000) {
                     renderGL->SetColor("skyBlue");
-                } else if (avgTime > 10000) {
+                } else if (totalTime > 10000) {
                     renderGL->SetColor("aliceBlue");
-                } else if (avgTime > 5000) {
+                } else if (totalTime > 5000) {
                     renderGL->SetColor("orangeRed");
-                } else if (avgTime > 1000) {
+                } else if (totalTime > 1000) {
                     renderGL->SetColor("darkOrange");
                 } else {
                     renderGL->SetColor("yellow");
@@ -435,19 +436,24 @@ namespace Engine {
                 renderGL->Print(680, y - this->_currentProfilerScroll + 4, ss.str().c_str());
                 
                 ss.str("");
-                ss << avgTime;
+                ss << totalTime;
                 
                 renderGL->Print(750, y - this->_currentProfilerScroll + 4, ss.str().c_str());
                 
                 ss.str("");
-                ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
+                ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
                 
                 renderGL->Print(850, y - this->_currentProfilerScroll + 4, ss.str().c_str());
                 
                 ss.str("");
-                ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
+                ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
                 
                 renderGL->Print(950, y - this->_currentProfilerScroll + 4, ss.str().c_str());
+                
+                ss.str("");
+                ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
+                
+                renderGL->Print(1050, y - this->_currentProfilerScroll + 4, ss.str().c_str());
             }
             
             y += 18;
