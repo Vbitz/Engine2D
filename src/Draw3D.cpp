@@ -24,11 +24,9 @@
 namespace Engine {
     
     void Draw3D::Begin() {
-        this->renderGL->SetDepthTest(true);
     }
     
     void Draw3D::End() {
-        this->renderGL->SetDepthTest(false);
     }
     
     void Draw3D::Cube(glm::vec3 p1, glm::vec3 p2) {

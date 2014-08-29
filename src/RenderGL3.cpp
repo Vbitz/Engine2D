@@ -18,6 +18,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include <unordered_map>
 
 #define GLEW_STATIC
 #include "vendor/GL/glew.h"
@@ -266,8 +267,16 @@ namespace Engine {
             Begin2d();
         }
         
-        void SetDepthTest(bool value) override {
-            value ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+        void Set(RenderStateFlag flag, bool enable) override {
+            if (this->_flagStates[flag] == enable) return; // noop
+            GLenum glFlag;
+            switch (flag) {
+                case RenderStateFlag::DepthTest: glFlag = GL_DEPTH_TEST; break;
+                case RenderStateFlag::Blend: glFlag = GL_BLEND; break;
+                case RenderStateFlag::Lighting: glFlag = GL_LIGHTING; break;
+            }
+            enable ? glEnable(glFlag) : glDisable(glFlag);
+            this->_flagStates[flag] = enable;
         }
         
         void SetCenter(float x, float y) override {
@@ -328,7 +337,22 @@ namespace Engine {
         
         VertexBufferPtr _gl3Buffer = NULL;
         
-        glm::mat4 _currentModelMatrix;;
+        glm::mat4 _currentModelMatrix;
+        
+        // From https://stackoverflow.com/questions/9646297/c11-hash-function-for-any-enum-type
+        
+        struct enum_hash
+        {
+            template <typename T>
+            inline
+            typename std::enable_if<std::is_enum<T>::value, std::size_t>::type
+            operator ()(T const value) const
+            {
+                return static_cast<std::size_t>(value);
+            }
+        };
+        
+        std::unordered_map<RenderStateFlag, bool, enum_hash> _flagStates;
     };
     
     RenderDriverPtr CreateRenderGL3() {

@@ -228,9 +228,7 @@ namespace Engine {
         
         this->_getRender()->CheckError("VertexBuffer::Draw::PostUploadUniform");
         
-        if (this->_depthTest) {
-            glEnable(GL_DEPTH_TEST);
-        }
+        this->_getRender()->Set(RenderStateFlag::DepthTest, this->_depthTest);
         
         if (this->_wireframe) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -240,10 +238,6 @@ namespace Engine {
         
         if (this->_wireframe) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-            
-        if (this->_depthTest) {
-            glDisable(GL_DEPTH_TEST);
         }
         
         this->_getRender()->CheckError("VertexBuffer::Draw::PostDraw");

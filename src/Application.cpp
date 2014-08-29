@@ -272,11 +272,11 @@ namespace Engine {
     void Application::_initGLContext(GraphicsVersion v) {
         this->_renderGL = this->_window->GetRender();
         
-        glEnable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST);
+        this->_renderGL->Set(RenderStateFlag::Blend, true);
+        this->_renderGL->Set(RenderStateFlag::DepthTest, true);
         
         if (v == GraphicsVersion::OpenGL_Legacy) {
-            glDisable(GL_LIGHTING);
+            this->_renderGL->Set(RenderStateFlag::Lighting, false);
         }
         
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

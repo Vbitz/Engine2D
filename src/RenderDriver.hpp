@@ -131,7 +131,7 @@ namespace Engine {
         void SetColor(float r, float g, float b);
         void SetColor(float r, float g, float b, float a);
         
-        virtual void SetDepthTest(bool value) = 0;
+        virtual void Set(RenderStateFlag flag, bool enable) = 0;
         
         virtual void SetCenter(float x, float y) = 0;
         virtual void CameraPan(float x, float y) = 0;

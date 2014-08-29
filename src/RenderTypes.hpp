@@ -131,5 +131,11 @@ namespace Engine {
         EM_BADFILTER,
         EM_BADTARGET
     };
+    
+    enum class RenderStateFlag : unsigned short {
+        DepthTest,
+        Blend,
+        Lighting
+    };
 }
 
