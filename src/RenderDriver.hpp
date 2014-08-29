@@ -102,6 +102,8 @@ namespace Engine {
         virtual void EnableSmooth() = 0;
         virtual void DisableSmooth() = 0;
         
+        virtual void SetLineWidth(float value) = 0;
+        
         void Print(float x, float y, const char* string);
         
         float CalcStringWidth(std::string str);
@@ -112,6 +114,8 @@ namespace Engine {
         virtual void FlushAll() = 0;
         
         virtual void Init2d() = 0;
+        
+        virtual void Clear() = 0;
         
 		virtual void Begin2d() = 0;
 		virtual void End2d() = 0;

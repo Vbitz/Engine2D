@@ -21,12 +21,6 @@
 
 #include "EngineUI.hpp"
 
-#ifdef _PLATFORM_OSX
-#include <OpenGL/gl3.h>
-#else
-#include <GL/gl.h>
-#endif
-
 #include "FramePerfMonitor.hpp"
 #include "Config.hpp"
 #include "Profiler.hpp"
@@ -121,7 +115,7 @@ namespace Engine {
             
             renderGL->DisableSmooth();
             
-            glLineWidth(0.1); // HACK: Until this is exposed by RenderGL
+            renderGL->SetLineWidth(0.1);
             
             double lineGraphScale = Config::GetFloat("core.debug.engineUI.profilerScale");
             
@@ -577,6 +571,7 @@ namespace Engine {
     EventMagic EngineUI::_profilerHook(Json::Value args, void* userPointer) {
         EngineUIPtr eui = static_cast<EngineUIPtr>(userPointer);
         
+        // HACK: This is really slow
         eui->_currentProfilerDetails = args["results"];
         
         return EM_OK;

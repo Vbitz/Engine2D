@@ -70,6 +70,11 @@ namespace Engine {
         return ImageReader::TextureFromBuffer(new float[4] {1.0f, 1.0f, 1.0f, 1.0f}, 1, 1);
     }
     
+    void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, void* userParam) {
+        Logger::begin("OpenGL", Logger::LogLevel_Error) << source << " : " << type << " : " <<
+        id << " : " << severity << " : " << message << Logger::end();
+    }
+    
     ENGINE_CLASS(RenderGL3);
     
     class RenderGL3 : public RenderDriver {
@@ -203,6 +208,10 @@ namespace Engine {
             glDisable(GL_POLYGON_SMOOTH);
         }
         
+        void SetLineWidth(float value) override {
+            glLineWidth(value);
+        }
+        
         void FlushAll() override {
             ENGINE_PROFILER_SCOPE;
             
@@ -226,6 +235,10 @@ namespace Engine {
         void Init2d() override {
             ENGINE_PROFILER_SCOPE;
             
+            if (Config::GetBoolean("core.debug.debugRenderer") && glDebugMessageCallback != NULL) {
+                glDebugMessageCallback(DebugMessageCallback, NULL);
+            }
+            
             std::string gl3Effect = Config::GetString("core.render.basicEffect");
             this->_currentEffect = EffectReader::GetEffectFromFile(gl3Effect);
             this->_currentEffect->CreateShader();
@@ -235,6 +248,12 @@ namespace Engine {
                 this->_defaultTexture = GenerateDefaultTexture();
             }
             this->_currentTexture = this->_defaultTexture;
+            
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+        
+        void Clear() {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         }
         
 		void Begin2d() override {

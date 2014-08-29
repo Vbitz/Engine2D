@@ -19,9 +19,6 @@
    limitations under the License.
 */
 
-#define GLEW_STATIC
-#include "vendor/GL/glew.h"
-
 #include "Application.hpp"
 
 #include <cstring>
@@ -66,11 +63,6 @@ namespace Engine {
     void DisableGLContext() {
         _hasGLContext = false;
     }
-    
-    void DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, void* userParam) {
-        Logger::begin("OpenGL", Logger::LogLevel_Error) << source << " : " << type << " : " <<
-        id << " : " << severity << " : " << message << Logger::end();
-    }
 	
 	void Application::_updateMousePos() {
         glm::vec2 mouse = _window->GetCursorPos();
@@ -94,8 +86,6 @@ namespace Engine {
         ScriptingManager::Factory f(this->_scripting->GetIsolate());
         
         glm::vec2 size = this->_window->GetWindowSize();
-        
-        glViewport(0, 0, size.x, size.y);
         
         f.FillObject(this->_scripting->GetScriptTable("sys"), {
             {FTT_Static, "screenWidth", f.NewNumber(size.x)},
@@ -277,12 +267,6 @@ namespace Engine {
         
         if (v == GraphicsVersion::OpenGL_Legacy) {
             this->_renderGL->Set(RenderStateFlag::Lighting, false);
-        }
-        
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        
-        if (Config::GetBoolean("core.debug.debugRenderer") && glDebugMessageCallback != NULL) {
-            glDebugMessageCallback(DebugMessageCallback, NULL);
         }
         
         this->GetRender()->CheckError("PostSetupContext");
@@ -732,6 +716,8 @@ namespace Engine {
                 }
             }
             
+            RenderDriverPtr render = this->GetRender();
+            
             Profiler::BeginProfileFrame();
             FramePerfMonitor::BeginFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
@@ -744,28 +730,28 @@ namespace Engine {
             
             this->_updateMousePos();
             
-            this->GetRender()->CheckError("startOfRendering");
+            render->CheckError("startOfRendering");
             
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            render->Clear();
             
             FramePerfMonitor::BeginDraw();
             
-            this->GetRender()->Begin2d();
+            render->Begin2d();
             
             v8::Handle<v8::Value> args[1] = {
                 v8::Number::New(v8::Isolate::GetCurrent(), FramePerfMonitor::GetFrameTime())
             };
             GetEventsSingilton()->GetEvent("draw")->Emit(Json::nullValue, 1, args); // this is when most Javascript runs
             
-            this->GetRender()->End2d();
+            render->End2d();
             
-            this->GetRender()->Begin2d();
+            render->Begin2d();
             
             //this->_cubeTest->Draw();
             
             this->_engineUI->Draw();
             
-            this->GetRender()->End2d();
+            render->End2d();
             
             FramePerfMonitor::EndDraw();
             
@@ -777,7 +763,7 @@ namespace Engine {
 				break;
 			}
             
-            this->GetRender()->CheckError("endOfRendering");
+            render->CheckError("endOfRendering");
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
                 ScriptingManager::Context::TriggerGC();
