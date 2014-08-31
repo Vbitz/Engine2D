@@ -7,6 +7,9 @@
 namespace Engine {
     // For performance reasons right now Package does not use PHYSFS and insteed uses memory mapped io
     
+    const PackageFileFlags Package::DefaultFileFlags = PackageFileFlags();
+    const PackageFileFlags Package::CompressedFileFlags = PackageFileFlags(PackageFileCompressionType::DeflateCompression);
+    
     uint32_t localOffsetToRegion(uint32_t localOffset) {
         uint32_t rem = abs(localOffset) % PACKAGE_REGION_SIZE;
         if (rem == 0) return localOffset;
@@ -31,11 +34,27 @@ namespace Engine {
         return this->_getFileHeaderOffset(filename) != 0;
     }
     
-    void Package::WriteFile(std::string filename, uint8_t *content, uint32_t contentLength) {
+    void Package::WriteFile(std::string filename, uint8_t *content, uint32_t contentLength, PackageFileFlags flags) {
         if (!this->_writenHeader) {
             this->_writeHeader();
         }
         assert(filename.length() < 96);
+        
+        uint8_t *compressedContent = content;
+        uint32_t compressedContentLength = contentLength;
+        
+        // Compress the data if we need to
+        if (flags.compression == PackageFileCompressionType::DeflateCompression) {
+            size_t destLength = compressBound(contentLength);
+            uint8_t *dest = new uint8_t[destLength];
+            int err = compress(dest, &destLength, compressedContent, compressedContentLength);
+            if (err != Z_OK) {
+                // compress failed
+                throw "Compress Failed";
+            }
+            compressedContent = dest;
+            compressedContentLength = destLength;
+        }
         
         PackageDiskHeader* header = this->_headerRegion->Data<PackageDiskHeader>();
         
@@ -55,16 +74,19 @@ namespace Engine {
         
         std::memcpy(&file->name, filename.c_str(), filename.length());
         file->offset = fileOffset;
-        file->size = file->decompressedSize = contentLength;
+        file->size = compressedContentLength;
+        file->decompressedSize = contentLength;
+        file->flags = flags;
+        
         file->nextFileOffset = header->nextFileHeaderOffset += sizeof(PackageDiskFile);
         
         // Write the file to the next region
         Platform::MemoryMappedRegionPtr contentRegion = this->_file->MapRegion(header->nextRegionOffset, roundSizeToRegionSize(contentLength));
         char* contentData = contentRegion->Data<char>();
         
-        std::memcpy(contentData, content, contentLength);
+        std::memcpy(contentData, compressedContent, compressedContentLength);
         
-        header->nextRegionOffset += roundSizeToRegionSize(contentLength);
+        header->nextRegionOffset += roundSizeToRegionSize(compressedContentLength);
         header->numOfFiles++;
         
         // Check to see if we've exceaded the current file header region
@@ -90,6 +112,11 @@ namespace Engine {
         // Close regions
         this->_file->UnmapRegion(fileRegion);
         this->_file->UnmapRegion(contentRegion);
+        
+        // Free Compressed Data
+        if (flags.compression != PackageFileCompressionType::NoCompression) {
+            delete [] compressedContent;
+        }
     }
     
     uint8_t* Package::ReadFile(std::string filename, uint32_t& contentLength) {
@@ -113,14 +140,20 @@ namespace Engine {
         std::memcpy(fileData, dataPtr->Data<uint8_t>(), fileHeader->size);
         
         // decompress the file if needed
-        if (fileHeader->compression == PackageFileCompressionType::NoCompression) {
+        if (fileHeader->flags.compression == PackageFileCompressionType::NoCompression) {
             assert(fileHeader->size == fileHeader->decompressedSize);
         } else {
-            assert(false);
+            size_t decompressedFileSize = fileHeader->decompressedSize;
+            uint8_t* decompressedFileData = new uint8_t[decompressedFileSize];
+            int err = uncompress(decompressedFileData, &decompressedFileSize, fileData, fileHeader->size);
+            assert(decompressedFileSize == fileHeader->decompressedSize);
+            delete [] fileData;
+            contentLength = decompressedFileSize;
+            fileData = decompressedFileData;
         }
         
         // decrypt the file if needed
-        if (fileHeader->encryption == PackageFileEncryptionType::NoEncryption) {
+        if (fileHeader->flags.encryption == PackageFileEncryptionType::NoEncryption) {
             // no need to do anything to the data
         } else {
             assert(false);
@@ -152,7 +185,7 @@ namespace Engine {
         
         std::string indexContent = ss.str();
         
-        this->WriteFile(INDEX_FILENAME, (uint8_t*) indexContent.c_str(), indexContent.length());
+        this->WriteFile(INDEX_FILENAME, (uint8_t*) indexContent.c_str(), indexContent.length(), DefaultFileFlags);
         
         this->_savedIndex = true;
     }

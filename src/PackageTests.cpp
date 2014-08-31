@@ -43,14 +43,14 @@ namespace Engine {
             unsigned char* fileData1 = (unsigned char*) content.c_str();
             uint32_t fileLength1 = strlen((char*) fileData1);
             
-            p->WriteFile("testing.txt", fileData1, fileLength1);
+            p->WriteFile("testing.txt", fileData1, fileLength1, Package::DefaultFileFlags);
+            
+            uint8_t* randomBytes = new uint8_t[21341];
+            std::memset(randomBytes, 0xFEEDFACE, 21341);
             
             for (int i = 0; i < 64; i++) {
                 std::string filename = std::to_string(i) + ".test";
-                uint8_t* randomBytes = new uint8_t[21341];
-                std::memset(randomBytes, 0xFEEDFACE, 21341);
-                p->WriteFile(filename, randomBytes, 21341);
-                delete [] randomBytes;
+                p->WriteFile(filename, randomBytes, 21341, Package::CompressedFileFlags);
             }
             
             p->GetIndex()["hello"] = "World";
@@ -60,9 +60,15 @@ namespace Engine {
             PackagePtr p2 = Package::FromFile("testing.epkg");
             
             uint32_t fileLength2 = 0;
-            unsigned char* fileData2 = p2->ReadFile("testing.txt", fileLength2);
+            uint8_t* fileData2 = p2->ReadFile("testing.txt", fileLength2);
             this->Assert("Check File Length", fileLength2 == fileLength1);
             this->Assert("Check File Content", content == std::string((char*) fileData2, fileLength2));
+            
+            uint32_t fileLength3 = 0;
+            uint8_t* fileData3 = p2->ReadFile("1.test", fileLength3);
+            this->Assert("Check Compressed File Length", fileLength3 == 21341);
+            this->Assert("Check Compressed File Content", fileData3[0] == randomBytes[0]);
+            
             this->Assert("Check File Index Content", p2->GetIndex()["hello"].asString() == "World");
             
             double endTime = Platform::GetTime();

@@ -10,7 +10,7 @@
 #define PACKAGE_FILES_PER_CHUNK 32
 #define PACKAGE_REGION_SIZE 4096
 #define PACKAGE_FILE_MAGIC 0xDEADBEEF
-#define PACKAGE_FILE_VERSION 0x0002
+#define PACKAGE_FILE_VERSION 0x0003
 
 namespace Engine {
     
@@ -57,6 +57,19 @@ namespace Engine {
     enum class PackageFileEncryptionType : uint8_t {
         NoEncryption = 0x00
     };
+    
+#pragma pack(0)
+    struct PackageFileFlags {
+        PackageFileCompressionType compression = PackageFileCompressionType::NoCompression;
+        PackageFileEncryptionType encryption = PackageFileEncryptionType::NoEncryption;
+        uint8_t padding1[2] = {0x00, 0x00};
+        uint8_t padding2[4] = {0x00, 0x00, 0x00, 0x00};
+        
+        PackageFileFlags() { }
+        PackageFileFlags(PackageFileCompressionType c) : compression(c) { }
+    };
+    
+    static_assert(sizeof(PackageFileFlags) == 8, "For alignment the size of PackageFileFlags must equal 8");
 
 #pragma pack(0)
     struct PackageDiskFile {
@@ -66,15 +79,10 @@ namespace Engine {
         uint32_t size = 0;
         uint32_t decompressedSize = 0;
         
-        PackageFileCompressionType compression =
-            PackageFileCompressionType::NoCompression;
-        PackageFileEncryptionType encryption =
-            PackageFileEncryptionType::NoEncryption;
-        uint8_t padding1[2] = {0x00, 0x00};
+        PackageFileFlags flags;
         
         uint32_t latestRevisonOffset = 0;
         uint32_t nextFileOffset = 0;
-        uint8_t padding2[4] = {0x00, 0x00, 0x00, 0x00};
         
         unsigned char name[96] = { 0x00 };
     }; // length = 128 bytes
@@ -105,7 +113,7 @@ namespace Engine {
         ~Package();
         
         bool FileExists(std::string filename);
-        void WriteFile(std::string filename, uint8_t* content, uint32_t contentLength);
+        void WriteFile(std::string filename, uint8_t* content, uint32_t contentLength, PackageFileFlags flags);
         uint8_t* ReadFile(std::string filename, uint32_t& contentLength);
         
         Json::Value& GetIndex();
@@ -118,6 +126,9 @@ namespace Engine {
         const char* INDEX_FILENAME = "__INDEX__";
         
         static PackagePtr FromFile(std::string filename);
+        
+        static const PackageFileFlags DefaultFileFlags;
+        static const PackageFileFlags CompressedFileFlags;
     private:
         Package(Platform::MemoryMappedFilePtr f);
         
