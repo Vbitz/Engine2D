@@ -228,7 +228,7 @@ def build_v8(args):
 def build_deps(args):
 	pass;
 
-@command(requires=["fetch_build_deps"], usage="Builds platform project files")
+@command(requires=["build_deps"], usage="Builds platform project files")
 def gyp(args):
 	# run GYP
 	shell_command([
