@@ -173,7 +173,7 @@ def fetch_cmake(args):
 		pass;
 
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
-def fetch_glfw3(args):
+def build_glfw3(args):
 	os.chdir(resolve_path(PROJECT_ROOT, "third_party/glfw"));
 	
 	shell_command([
@@ -200,7 +200,7 @@ def fetch_glfw3(args):
 	os.chdir("../..");
 
 @command(usage="Fetch and build V8 using GYP")
-def fetch_v8(args):
+def build_v8(args):
 	if sys.platform == "win32": # windows
 		# svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@231940 third_party/cygwin
 		# python build\gyp_v8 -Dv8_enable_i18n_support=0
@@ -224,8 +224,8 @@ def fetch_v8(args):
 			shutil.copy("out/native/libv8.dylib", "../lib/libv8.dylib");
 		os.chdir("../..");
 
-@command(requires=["fetch_glfw3", "fetch_v8"], usage="Fetches Build Dependancys")
-def fetch_build_deps(args):
+@command(requires=["build_glfw3", "build_v8"], usage="Fetches Build Dependancys")
+def build_deps(args):
 	pass;
 
 @command(requires=["fetch_build_deps"], usage="Builds platform project files")
