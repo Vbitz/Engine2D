@@ -160,14 +160,12 @@ namespace Engine {
     
     void Shader::Begin() {
         if (this->checkProgramPointer()) {
-            ENGINE_PROFILER_SCOPE;
-            glUseProgram(this->_programPointer);
+            this->_render->SetShader(this);
         }
     }
     
     void Shader::End() {
-        ENGINE_PROFILER_SCOPE;
-        glUseProgram(0);
+        // noop
     }
     
     bool Shader::Update() {

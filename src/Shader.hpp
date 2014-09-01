@@ -24,12 +24,15 @@
 #include <vector>
 #include <map>
 
+#include "vendor/json/json.h"
+
 #include "Window.hpp"
 
 #include "RenderDriver.hpp"
 
 namespace Engine {
     ENGINE_CLASS(Shader);
+    ENGINE_CLASS(RenderDriver);
     
     enum class ShaderType {
         All,
@@ -102,6 +105,10 @@ namespace Engine {
         
         bool IsLoaded() {
             return this->_loaded;
+        }
+        
+        unsigned int GetId() {
+            return this->_programPointer;
         }
         
     private:

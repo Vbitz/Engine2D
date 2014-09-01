@@ -27,6 +27,7 @@
 
 #include "RenderTypes.hpp"
 #include "FontSheet.hpp"
+#include "Shader.hpp"
 
 #define GLM_FORCE_RADIANS
 #include "vendor/glm/glm.hpp"
@@ -35,6 +36,7 @@ namespace Engine {
     ENGINE_CLASS(Texture);
     ENGINE_CLASS(FontSheet);
     ENGINE_CLASS(RenderDriver);
+    ENGINE_CLASS(Shader);
     
     class Drawable {
     public:
@@ -101,6 +103,8 @@ namespace Engine {
         
         virtual void EnableSmooth() = 0;
         virtual void DisableSmooth() = 0;
+        
+        virtual void SetShader(ShaderPtr shader) = 0;
         
         virtual void SetLineWidth(float value) = 0;
         

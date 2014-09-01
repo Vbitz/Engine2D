@@ -31,6 +31,7 @@
 #include "RenderDriver.hpp"
 
 namespace Engine {
+    ENGINE_CLASS(RenderDriver);
     
     ENGINE_CLASS(Window);
     

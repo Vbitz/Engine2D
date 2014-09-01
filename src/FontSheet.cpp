@@ -24,8 +24,7 @@
 #include "Filesystem.hpp"
 #include "RenderDriver.hpp"
 
-#define GLEW_STATIC
-#include "vendor/GL/glew.h"
+#include "Profiler.hpp"
 
 namespace Engine {
     std::string fontResolvePath(std::string basePath, std::string path) {
@@ -48,6 +47,8 @@ namespace Engine {
             Logger::begin("FontSheet", Logger::LogLevel_Verbose) << "FontSheet Texture reloaded" << Logger::end();
             this->_texture = ImageReader::TextureFromFile(this->_texturePath)->GetTexture();
         }
+        
+        ENGINE_PROFILER_SCOPE;
         render->EnableTexture(this->_texture);
         render->BeginRendering(PolygonMode::Triangles); // I would rather render quads but OGL 3.x does'nt support them
         FontSizeRef size = this->_getBestSize(charSize);
@@ -55,7 +56,7 @@ namespace Engine {
         float chrWidth = charSize / size.size;
         float chrHeight = charSize;
         for (int i = 0; i < text.length(); i++) {
-            FontRectangle rect = size.chars[text[i]];
+            FontRectangle& rect = size.chars[text[i]];
             render->AddVert(currentX, y, 0.0f, rect.x1, rect.y1);
             render->AddVert(currentX + (chrWidth * rect.width), y, 0.0f, rect.x2, rect.y1);
             render->AddVert(currentX + (chrWidth * rect.width), y + chrHeight, 0.0f, rect.x2, rect.y2);

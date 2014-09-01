@@ -113,6 +113,7 @@ namespace Engine {
     }
     
     bool VertexBuffer::Update() {
+        assert(this != NULL);
         assert(this->_renderGL != NULL);
         if (!this->NeedsUpdate()) {
             return false;

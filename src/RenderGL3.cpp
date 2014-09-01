@@ -208,6 +208,17 @@ namespace Engine {
             glDisable(GL_POLYGON_SMOOTH);
         }
         
+        void SetShader(ShaderPtr shader) override {
+            unsigned int id = shader->GetId();
+            if (this->_currentShader == id) {
+                ENGINE_PROFILER_SCOPE;
+                
+                glUseProgram(id);
+                
+                this->_currentShader = id;
+            }
+        }
+        
         void SetLineWidth(float value) override {
             glLineWidth(value);
         }
@@ -357,6 +368,8 @@ namespace Engine {
         VertexBufferPtr _gl3Buffer = NULL;
         
         glm::mat4 _currentModelMatrix;
+        
+        unsigned int _currentShader = std::numeric_limits<unsigned int>::max();
         
         // From https://stackoverflow.com/questions/9646297/c11-hash-function-for-any-enum-type
         
