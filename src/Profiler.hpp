@@ -45,6 +45,7 @@ namespace Engine {
             std::string name;
             unsigned int callCount = 0;
             double totalTime = 0;
+            double totalSelfTime = 0;
             double avgTime = -1; // Using a CMA (Cumulative Moving Average)
             double minTime = std::numeric_limits<double>::max();
             double maxTime = std::numeric_limits<double>::min();
@@ -61,17 +62,17 @@ namespace Engine {
         class Scope {
         public:
             Scope(const char* functionName) {
-                this->_startTime = Platform::GetTime();
                 this->_name = functionName;
                 BeginProfile(this);
+                this->_startTime = Platform::GetTime();
             }
             
             Scope(const char* functionName, const char* exName) {
                 std::stringstream ss;
                 ss << functionName << " : " << exName;
-                this->_startTime = Platform::GetTime();
                 this->_name = ss.str().c_str();
                 BeginProfile(this);
+                this->_startTime = Platform::GetTime();
             }
             
             void Close() {

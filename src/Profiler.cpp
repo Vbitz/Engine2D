@@ -62,6 +62,7 @@ namespace Engine {
             double time = scope->GetElapsedTime();
             currentZone->callCount++;
             currentZone->totalTime += time;
+            currentZone->totalSelfTime += time;
             if (currentZone->avgTime == -1) {
                 currentZone->avgTime = time;
             } else {
@@ -73,6 +74,7 @@ namespace Engine {
             if (time < currentZone->minTime) {
                 currentZone->minTime = time;
             }
+            currentZone->parent->totalSelfTime -= time;
             currentZone = currentZone->parent;
         }
         
@@ -94,6 +96,7 @@ namespace Engine {
             ret["name"] = zone->name;
             ret["count"] = zone->callCount;
             ret["total"] = zone->totalTime;
+            ret["self"] = zone->totalSelfTime;
             ret["avg"] = zone->avgTime;
             ret["min"] = zone->minTime;
             ret["max"] = zone->maxTime;

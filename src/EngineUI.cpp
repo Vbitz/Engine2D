@@ -360,9 +360,10 @@ namespace Engine {
             renderGL->Print(20,  y - 15, "Name");
             renderGL->Print(680, y - 15, "Count");
             renderGL->Print(750, y - 15, "Total (ns)");
-            renderGL->Print(850, y - 15, "Avg   (ns)");
-            renderGL->Print(950, y - 15, "Min   (ns)");
-            renderGL->Print(1050, y - 15, "Max   (ns)");
+            renderGL->Print(850, y - 15, "Self  (ns)");
+            renderGL->Print(950, y - 15, "Avg   (ns)");
+            renderGL->Print(1050, y - 15, "Min   (ns)");
+            renderGL->Print(1150, y - 15, "Max   (ns)");
             
             y = (windowSize.y / 2) - 50;
             
@@ -435,19 +436,24 @@ namespace Engine {
                 renderGL->Print(750, y - this->_currentProfilerScroll + 4, ss.str().c_str());
                 
                 ss.str("");
-                ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
+                ss << (*iter)["self"].asDouble() * SEC_TO_NSEC;
                 
                 renderGL->Print(850, y - this->_currentProfilerScroll + 4, ss.str().c_str());
                 
                 ss.str("");
-                ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
+                ss << (*iter)["avg"].asDouble() * SEC_TO_NSEC;
                 
                 renderGL->Print(950, y - this->_currentProfilerScroll + 4, ss.str().c_str());
                 
                 ss.str("");
-                ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
+                ss << (*iter)["min"].asDouble() * SEC_TO_NSEC;
                 
                 renderGL->Print(1050, y - this->_currentProfilerScroll + 4, ss.str().c_str());
+                
+                ss.str("");
+                ss << (*iter)["max"].asDouble() * SEC_TO_NSEC;
+                
+                renderGL->Print(1150, y - this->_currentProfilerScroll + 4, ss.str().c_str());
             }
             
             y += 18;
