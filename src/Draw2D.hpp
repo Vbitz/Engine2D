@@ -69,7 +69,9 @@ namespace Engine {
         
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4);
         void BezierCurve(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int segments);
-        void BezierCurve(glm::vec3 vec1, glm::vec3 vec2, glm::vec3 vec3, glm::vec3 vec4, int segments);
+        void BezierCurve(const glm::vec2 &vec1, const glm::vec2 &vec2,
+                         const glm::vec2 &vec3, const glm::vec2 &vec4,
+                         int segments);
     private:
         RenderDriverPtr renderGL;
     };
