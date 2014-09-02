@@ -205,6 +205,9 @@ namespace Engine {
         
         delete [] addedData;
         
+        this->_renderGL->TrackStat(RenderStatistic::DrawCall, 1);
+        this->_renderGL->TrackStat(RenderStatistic::Verts, this->_vertexCount);
+        
         this->_begin();
         
         if (this->_dirty) {

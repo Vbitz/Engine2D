@@ -182,7 +182,9 @@ namespace Engine {
             }
         }
         
-        void EndRendering() override { }
+        void EndRendering() override {
+            this->TrackStat(RenderStatistic::PrimitiveEnd, 1);
+        }
         
         void EnableTexture(Texture* texId) override {
             this->_currentTexture = texId;
@@ -372,17 +374,6 @@ namespace Engine {
         unsigned int _currentShader = std::numeric_limits<unsigned int>::max();
         
         // From https://stackoverflow.com/questions/9646297/c11-hash-function-for-any-enum-type
-        
-        struct enum_hash
-        {
-            template <typename T>
-            inline
-            typename std::enable_if<std::is_enum<T>::value, std::size_t>::type
-            operator ()(T const value) const
-            {
-                return static_cast<std::size_t>(value);
-            }
-        };
         
         std::unordered_map<RenderStateFlag, bool, enum_hash> _flagStates;
     };

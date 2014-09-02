@@ -783,6 +783,7 @@ namespace Engine {
                 this->Exit();
             }
             
+            this->GetRender()->EndFrame();
             FramePerfMonitor::EndFrame();
             Profiler::EndProfileFrame();
         }

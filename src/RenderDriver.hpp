@@ -55,6 +55,17 @@ namespace Engine {
     };
     typedef Drawable* DrawablePtr;
     
+    struct enum_hash
+    {
+        template <typename T>
+        inline
+        typename std::enable_if<std::is_enum<T>::value, std::size_t>::type
+        operator ()(T const value) const
+        {
+            return static_cast<std::size_t>(value);
+        }
+    };
+    
     class RenderDriver {
     private:
         Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -75,6 +86,18 @@ namespace Engine {
         
         virtual bool HasExtention(std::string extentionName)= 0;
         virtual std::vector<std::string> GetExtentions() = 0;
+        
+        void EndFrame() {
+            this->_stats.clear();
+        }
+        
+        inline void TrackStat(RenderStatistic stat, size_t count) {
+            this->_stats[stat] += count;
+        }
+        
+        inline size_t GetStatistic(RenderStatistic stat) {
+            return this->_stats[stat];
+        }
         
         virtual void ResetMatrix() = 0;
         
@@ -169,6 +192,8 @@ namespace Engine {
     private:
         std::unordered_map<std::string, FontSheetPtr> _sheets;
         FontSheetPtr _sheet = NULL;
+        
+        std::unordered_map<RenderStatistic, size_t, enum_hash> _stats;
         
         friend class Drawable;
         friend class RenderDriverDrawProfiler;

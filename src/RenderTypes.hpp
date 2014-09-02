@@ -137,5 +137,11 @@ namespace Engine {
         Blend,
         Lighting
     };
+    
+    enum class RenderStatistic {
+        PrimitiveEnd,
+        Verts,
+        DrawCall
+    };
 }
 

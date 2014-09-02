@@ -104,47 +104,6 @@ namespace Engine {
         
         renderGL->Print(10, 4, "-- Engine2D --");
         
-        if (Config::GetBoolean("core.debug.profiler")) {
-            double drawTime = FramePerfMonitor::GetDrawTime();
-            this->_lastHeapUsages[this->_currentLastDrawTimePos] = _getHeapUsage();
-            this->_lastDrawTimes[this->_currentLastDrawTimePos++] = drawTime;
-            
-            if (this->_currentLastDrawTimePos >= timingResolution) {
-                this->_currentLastDrawTimePos = 0;
-            }
-            
-            renderGL->DisableSmooth();
-            
-            renderGL->SetLineWidth(0.1);
-            
-            double lineGraphScale = Config::GetFloat("core.debug.engineUI.profilerScale");
-            
-            this->_draw->LineGraph(windowSize.x - 440, 14, 0.2, lineGraphScale, this->_lastDrawTimes, timingResolution);
-            
-            renderGL->EnableSmooth();
-            
-            this->_ss.str("");
-            this->_ss << "FPS: " << FramePerfMonitor::GetFPS();
-            this->_ss << " | DrawTime (ms): ";
-            
-            renderGL->Print(windowSize.x - 230, 4, this->_ss.str().c_str());
-            
-            this->_ss.precision(6);
-            this->_ss.str("");
-            
-            double drawTimeMS = (drawTime * 1000);
-            
-            this->_ss << (drawTimeMS);
-            
-            if (drawTimeMS > (1000 / 60)) {
-                renderGL->SetColor("red");
-            } else {
-                renderGL->SetColor("green");
-            }
-            
-            renderGL->Print(windowSize.x - 60, 4, this->_ss.str().c_str());
-        }
-        
         if (!_showConsole) {
             // Update Toasts
             double dt = FramePerfMonitor::GetFrameTime();
@@ -163,237 +122,280 @@ namespace Engine {
                     y += 18;
                 }
             }
-            
-            return;
-        }
-        
-        if (this->_currentView == CurrentView::Console) {
-            std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
-            
-            bool showVerbose = Config::GetBoolean("core.debug.engineUI.showVerboseLog"); // pretty cheap
-            
-            int i = windowSize.y - 40;
-            
-            for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
-                if (iterator->Hidden) {
-                    continue; // don't show it if it's hidden
-                }
+        } else {
+            if (this->_currentView == CurrentView::Console) {
+                std::vector<Logger::LogEvent>* logEvents = Logger::GetEvents();
                 
-                if (iterator->Type == Logger::LogType_Text) {
-                    if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
-                        i -= 6; // add some padding to show that a message is there, just hidden
-                        renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
-                        this->_draw->Rect(0, i + 2, windowSize.x, 2);
-                    } else {
-                        i -= 22;
-                        if (iterator->Level == Logger::LogLevel_Highlight || iterator->Level == Logger::LogLevel_Toast) {
-                            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
-                            this->_draw->Rect(0, i + 1, windowSize.x, 20);
-                        } else {
-                            renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
-                            this->_draw->Rect(60, i + 1, windowSize.x - 60, 20);
-                        }
+                bool showVerbose = Config::GetBoolean("core.debug.engineUI.showVerboseLog"); // pretty cheap
+                
+                int i = windowSize.y - 40;
+                
+                for (auto iterator = logEvents->rbegin(); iterator < logEvents->rend(); iterator++) {
+                    if (iterator->Hidden) {
+                        continue; // don't show it if it's hidden
                     }
-                }
-                
-                switch (iterator->Level) {
-                    case Logger::LogLevel_Verbose:
-                        renderGL->SetColor(205 / 255.0f, 205 / 255.0f, 205 / 255.0f);
-                        break;
-                    case Logger::LogLevel_User:
-                        renderGL->SetColor(255 / 255.0f, 0 / 255.0f, 255 / 255.0f);
-                        break;
-                    case Logger::LogLevel_ConsoleInput:
-                        renderGL->SetColor(0 / 255.0f, 191 / 255.0f, 255 / 255.0f);
-                        break;
-                    case Logger::LogLevel_Log:
-                        renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
-                        break;
-                    case Logger::LogLevel_Warning:
-                        renderGL->SetColor(255 / 255.0f, 165 / 255.0f, 0 / 255.0f);
-                        break;
-                    case Logger::LogLevel_Error:
-                        renderGL->SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
-                        break;
-                    case Logger::LogLevel_Highlight:
-                    case Logger::LogLevel_Toast:
-                        renderGL->SetColor(0.1f, 0.1f, 0.1f);
-                        break;
-                    case Logger::LogLevel_TestLog:
-                        renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
-                        break;
-                    case Logger::LogLevel_TestError:
-                        renderGL->SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
-                        break;
-                }
-                
-                std::string time = std::to_string(iterator->time);
-                time.resize(6, '0');
-                
-                if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
-                    renderGL->Print(5, i + 7, (time + "s").c_str());
-                }
-                
-                if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
-                    if (iterator->Type == Logger::LogType_Text) {
-                        renderGL->Print(65, i + 7, iterator->Event.c_str());
-                    } else if (iterator->Type == Logger::LogType_Graphical) {
-                        i -= (*iterator->GraphEvent)(65, i);
-                    }
-                }
-                
-                if (i < 35) {
-                    break;
-                }
-            }
-            
-            renderGL->SetColor(0.0f, 0.0f, 0.0f, 0.85f);
-            this->_draw->Rect(5, windowSize.y - 30, windowSize.x - 10, 25);
-            
-            renderGL->SetColor(1.0f, 1.0f, 1.0f);
-            renderGL->SetFont("basic", 12);
-            renderGL->Print(10, windowSize.y - 22, (this->_currentConsoleInput.str() + "_").c_str());
-        } else if (this->_currentView == CurrentView::Settings) {
-            int i = 50;
-            Config::UIConfigCollection configItems = Config::GetAllUI();
-            
-            for (auto iter = configItems.begin(); iter != configItems.end(); iter++) {
-                
-                auto renderConfigItem = [&](int x) {
-                    // render key value
-                    renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
-                    renderGL->Print(x + 37, i + 2, iter->first.c_str());
                     
-                    float textOffset = (x > 0 ? windowSize.x : (windowSize.x / 2)) - 55;
-                    if (iter->second.type == Config::ConfigType_Bool) {
-                        // render boolean checkbox
-                        if (iter->second.value == "true") {
-                            renderGL->SetColor(20 / 255.0f, 160 / 255.0f, 20 / 255.0f);
+                    if (iterator->Type == Logger::LogType_Text) {
+                        if (iterator->Level == Logger::LogLevel_Verbose && !showVerbose) {
+                            i -= 6; // add some padding to show that a message is there, just hidden
+                            renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f);
+                            this->_draw->Rect(0, i + 2, windowSize.x, 2);
                         } else {
-                            renderGL->SetColor(160 / 255.0f, 20 / 255.0f, 20 / 255.0f);
+                            i -= 22;
+                            if (iterator->Level == Logger::LogLevel_Highlight || iterator->Level == Logger::LogLevel_Toast) {
+                                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f, 0.9f);
+                                this->_draw->Rect(0, i + 1, windowSize.x, 20);
+                            } else {
+                                renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+                                this->_draw->Rect(60, i + 1, windowSize.x - 60, 20);
+                            }
                         }
-                        this->_draw->Rect(textOffset - 20, i + 2, 15, 15);
-                    } else {
-                        float valueLength = renderGL->CalcStringWidth(iter->second.value);
-                        renderGL->SetColor(160 / 255.0f, 160 / 255.0f, 160 / 255.0f);
-                        renderGL->Print(textOffset - valueLength, i + 2, iter->second.value.c_str());
                     }
-                };
-                
-                renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
-                this->_draw->Rect(30, i, (windowSize.x / 2) - 70, 20);
-                this->_draw->Rect((windowSize.x / 2) + 30, i, (windowSize.x / 2) - 70, 20);
-                
-                renderConfigItem(0);
-                
-                iter++;
-                if (iter == configItems.end()) break;
-                
-                renderConfigItem((windowSize.x / 2));
-                
-                i+= 22;
-                if (i > (windowSize.y - 20)) {
-                    break;
+                    
+                    switch (iterator->Level) {
+                        case Logger::LogLevel_Verbose:
+                            renderGL->SetColor(205 / 255.0f, 205 / 255.0f, 205 / 255.0f);
+                            break;
+                        case Logger::LogLevel_User:
+                            renderGL->SetColor(255 / 255.0f, 0 / 255.0f, 255 / 255.0f);
+                            break;
+                        case Logger::LogLevel_ConsoleInput:
+                            renderGL->SetColor(0 / 255.0f, 191 / 255.0f, 255 / 255.0f);
+                            break;
+                        case Logger::LogLevel_Log:
+                            renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                            break;
+                        case Logger::LogLevel_Warning:
+                            renderGL->SetColor(255 / 255.0f, 165 / 255.0f, 0 / 255.0f);
+                            break;
+                        case Logger::LogLevel_Error:
+                            renderGL->SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
+                            break;
+                        case Logger::LogLevel_Highlight:
+                        case Logger::LogLevel_Toast:
+                            renderGL->SetColor(0.1f, 0.1f, 0.1f);
+                            break;
+                        case Logger::LogLevel_TestLog:
+                            renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                            break;
+                        case Logger::LogLevel_TestError:
+                            renderGL->SetColor(178 / 255.0f, 34 / 255.0f, 34 / 255.0f);
+                            break;
+                    }
+                    
+                    std::string time = std::to_string(iterator->time);
+                    time.resize(6, '0');
+                    
+                    if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
+                        renderGL->Print(5, i + 7, (time + "s").c_str());
+                    }
+                    
+                    if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
+                        if (iterator->Type == Logger::LogType_Text) {
+                            renderGL->Print(65, i + 7, iterator->Event.c_str());
+                        } else if (iterator->Type == Logger::LogType_Graphical) {
+                            i -= (*iterator->GraphEvent)(65, i);
+                        }
+                    }
+                    
+                    if (i < 35) {
+                        break;
+                    }
                 }
-            }
-        } else if (this->_currentView == CurrentView::Profiler) {
-            int y = (windowSize.y / 2) - 50;
-            
-            std::stringstream ss;
-            
-            // DrawTime Graph
-            renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f, 0.8f);
-            this->_draw->Rect(0, 50, windowSize.x, 25);
-            
-            ss << "Current Scale : " << this->_profilerDrawTimeScale << " : Press [/] to increase and decrease";
-            
-            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
-            renderGL->SetFont("basic", 16);
-            renderGL->Print(20, 55, "DrawTime Graph");
-            renderGL->Print(windowSize.x - 480, 55, ss.str().c_str());
-            
-            renderGL->SetColor("white");
-            
-            this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), this->_profilerDrawTimeScale, this->_lastDrawTimes, timingResolution);
-            
-            renderGL->SetColor("red");
-            
-            this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), y - 70 - 95, this->_lastHeapUsages, timingResolution);
-            
-            renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
-            
-            this->_draw->Line(80, y - 70, windowSize.x - 40, y - 70);
-            this->_draw->Line(80, 95, 80, y - 70);
-            
-            renderGL->SetFont("basic", 10);
-            
-            int graphHeight = y - 70 - 95;
-            double gsYinc = 0;
-            
-            for (int gsY = y - 70; gsY > 95; gsY -= ((y - 70 - 95) / 10)) {
+                
+                renderGL->SetColor(0.0f, 0.0f, 0.0f, 0.85f);
+                this->_draw->Rect(5, windowSize.y - 30, windowSize.x - 10, 25);
+                
+                renderGL->SetColor(1.0f, 1.0f, 1.0f);
+                renderGL->SetFont("basic", 12);
+                renderGL->Print(10, windowSize.y - 22, (this->_currentConsoleInput.str() + "_").c_str());
+            } else if (this->_currentView == CurrentView::Settings) {
+                int i = 50;
+                Config::UIConfigCollection configItems = Config::GetAllUI();
+                
+                for (auto iter = configItems.begin(); iter != configItems.end(); iter++) {
+                    
+                    auto renderConfigItem = [&](int x) {
+                        // render key value
+                        renderGL->SetColor(250 / 255.0f, 250 / 255.0f, 250 / 255.0f);
+                        renderGL->Print(x + 37, i + 2, iter->first.c_str());
+                        
+                        float textOffset = (x > 0 ? windowSize.x : (windowSize.x / 2)) - 55;
+                        if (iter->second.type == Config::ConfigType_Bool) {
+                            // render boolean checkbox
+                            if (iter->second.value == "true") {
+                                renderGL->SetColor(20 / 255.0f, 160 / 255.0f, 20 / 255.0f);
+                            } else {
+                                renderGL->SetColor(160 / 255.0f, 20 / 255.0f, 20 / 255.0f);
+                            }
+                            this->_draw->Rect(textOffset - 20, i + 2, 15, 15);
+                        } else {
+                            float valueLength = renderGL->CalcStringWidth(iter->second.value);
+                            renderGL->SetColor(160 / 255.0f, 160 / 255.0f, 160 / 255.0f);
+                            renderGL->Print(textOffset - valueLength, i + 2, iter->second.value.c_str());
+                        }
+                    };
+                    
+                    renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.9f);
+                    this->_draw->Rect(30, i, (windowSize.x / 2) - 70, 20);
+                    this->_draw->Rect((windowSize.x / 2) + 30, i, (windowSize.x / 2) - 70, 20);
+                    
+                    renderConfigItem(0);
+                    
+                    iter++;
+                    if (iter == configItems.end()) break;
+                    
+                    renderConfigItem((windowSize.x / 2));
+                    
+                    i+= 22;
+                    if (i > (windowSize.y - 20)) {
+                        break;
+                    }
+                }
+            } else if (this->_currentView == CurrentView::Profiler) {
+                int y = (windowSize.y / 2) - 50;
+                
+                std::stringstream ss;
+                
+                // DrawTime Graph
+                renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f, 0.8f);
+                this->_draw->Rect(0, 50, windowSize.x, 25);
+                
+                ss << "Current Scale : " << this->_profilerDrawTimeScale << " : Press [/] to increase and decrease";
+                
+                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+                renderGL->SetFont("basic", 16);
+                renderGL->Print(20, 55, "DrawTime Graph");
+                renderGL->Print(windowSize.x - 480, 55, ss.str().c_str());
+                
+                renderGL->SetColor("white");
+                
+                this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), this->_profilerDrawTimeScale, this->_lastDrawTimes, timingResolution);
+                
+                renderGL->SetColor("red");
+                
+                this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), y - 70 - 95, this->_lastHeapUsages, timingResolution);
+                
+                renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
+                
+                this->_draw->Line(80, y - 70, windowSize.x - 40, y - 70);
+                this->_draw->Line(80, 95, 80, y - 70);
+                
+                renderGL->SetFont("basic", 10);
+                
+                int graphHeight = y - 70 - 95;
+                double gsYinc = 0;
+                
+                for (int gsY = y - 70; gsY > 95; gsY -= ((y - 70 - 95) / 10)) {
+                    ss.str("");
+                    ss << (gsYinc * 1000) << "ms";
+                    //renderGL->Print(10, gsY - 5, ss.str().c_str());
+                    gsYinc += 0;
+                }
+                
+                // RenderDriver Profiler
+                
+                int x = 0;
+                
                 ss.str("");
-                ss << (gsYinc * 1000) << "ms";
-                renderGL->Print(10, gsY - 5, ss.str().c_str());
-                gsYinc += 0;
+                
+                renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f, 0.8f);
+                this->_draw->Rect(0, y - 50, windowSize.x, 25);
+                
+                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+                renderGL->SetFont("basic", 16);
+                renderGL->Print(20, y - 45, "RenderDriver Profiler");
+                renderGL->Print(windowSize.x - 280, y - 45, "Press R to Refresh | -/= to Scroll");
+                
+                renderGL->SetFont("basic", 10);
+                
+                this->_draw->Rect(0, y - 20, windowSize.x, 18);
+                
+                renderGL->SetColor(0.1f, 0.1f, 0.1f);
+                
+                renderGL->Print(20,  y - 15, "Name");
+                renderGL->Print(830, y - 15, "Count");
+                renderGL->Print(900, y - 15, "Total (ns)");
+                renderGL->Print(1000, y - 15, "Self  (ns)");
+                renderGL->Print(1100, y - 15, "Avg   (ns)");
+                renderGL->Print(1200, y - 15, "Min   (ns)");
+                renderGL->Print(1300, y - 15, "Max   (ns)");
+                
+                y = (windowSize.y / 2) - 50;
+                
+                this->_profilerX = 0;
+                
+                y = this->_renderProfileZone(renderGL, windowSize, this->_cachedProfilerDetails["children"], x, 0, y, y);
             }
-            
-            // RenderDriver Profiler
-            
-            int x = 0;
-            
-            ss.str("");
-            
-            renderGL->SetColor(80 / 255.0f, 80 / 255.0f, 80 / 255.0f, 0.8f);
-            this->_draw->Rect(0, y - 50, windowSize.x, 25);
-            
-            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
-            renderGL->SetFont("basic", 16);
-            renderGL->Print(20, y - 45, "RenderDriver Profiler");
-            renderGL->Print(windowSize.x - 280, y - 45, "Press R to Refresh | -/= to Scroll");
             
             renderGL->SetFont("basic", 10);
             
-            this->_draw->Rect(0, y - 20, windowSize.x, 18);
+            renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.95f);
+            this->_draw->Rect(0, 20, windowSize.x, 20);
             
-            renderGL->SetColor(0.1f, 0.1f, 0.1f);
+            if (this->_currentView == CurrentView::Console)
+                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+            else
+                renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
+            renderGL->Print(10, 24, "Console (F1)");
             
-            renderGL->Print(20,  y - 15, "Name");
-            renderGL->Print(830, y - 15, "Count");
-            renderGL->Print(900, y - 15, "Total (ns)");
-            renderGL->Print(1000, y - 15, "Self  (ns)");
-            renderGL->Print(1100, y - 15, "Avg   (ns)");
-            renderGL->Print(1200, y - 15, "Min   (ns)");
-            renderGL->Print(1300, y - 15, "Max   (ns)");
+            if (this->_currentView == CurrentView::Settings)
+                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+            else
+                renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
+            renderGL->Print(130, 24, "Settings (F2)");
             
-            y = (windowSize.y / 2) - 50;
-            
-            this->_profilerX = 0;
-            
-            y = this->_renderProfileZone(renderGL, windowSize, this->_cachedProfilerDetails["children"], x, 0, y, y);
+            if (this->_currentView == CurrentView::Profiler)
+                renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
+            else
+                renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
+            renderGL->Print(250, 24, "Profiler (F3)");
         }
         
-        renderGL->SetFont("basic", 10);
+        if (Config::GetBoolean("core.debug.profiler")) {
+            double drawTime = FramePerfMonitor::GetDrawTime();
+            this->_lastHeapUsages[this->_currentLastDrawTimePos] = _getHeapUsage();
+            this->_lastDrawTimes[this->_currentLastDrawTimePos++] = drawTime;
+            
+            if (this->_currentLastDrawTimePos >= timingResolution) {
+                this->_currentLastDrawTimePos = 0;
+            }
+            
+            renderGL->DisableSmooth();
+            
+            renderGL->SetLineWidth(0.1);
+            
+            double lineGraphScale = Config::GetFloat("core.debug.engineUI.profilerScale");
+            
+            this->_draw->LineGraph(windowSize.x - 600, 14, 0.2, lineGraphScale, this->_lastDrawTimes, timingResolution);
+            
+            renderGL->EnableSmooth();
+            
+            // This needs to be printed last because of the stats
+            
+            this->_ss.str("");
+            this->_ss << "Draws: " << renderGL->GetStatistic(RenderStatistic::DrawCall) << "/" << renderGL->GetStatistic(RenderStatistic::PrimitiveEnd);
+            this->_ss << " | Verts: " << renderGL->GetStatistic(RenderStatistic::Verts);
         
-        renderGL->SetColor(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.95f);
-        this->_draw->Rect(0, 20, windowSize.x, 20);
-        
-        if (this->_currentView == CurrentView::Console)
-            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
-        else
-            renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
-        renderGL->Print(10, 24, "Console (F1)");
-        
-        if (this->_currentView == CurrentView::Settings)
-            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
-        else
-            renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
-        renderGL->Print(130, 24, "Settings (F2)");
-        
-        if (this->_currentView == CurrentView::Profiler)
-            renderGL->SetColor(200 / 255.0f, 200 / 255.0f, 200 / 255.0f);
-        else
-            renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
-        renderGL->Print(250, 24, "Profiler (F3)");
+            renderGL->Print(windowSize.x - 390, 4, this->_ss.str().c_str());
+            
+            this->_ss.precision(6);
+            this->_ss.str("");
+            
+            double drawTimeMS = (drawTime * 1000);
+            
+            this->_ss << " | DrawTime (ms): ";
+            
+            this->_ss << (drawTimeMS);
+            
+            if (drawTimeMS > (1000 / 60)) {
+                renderGL->SetColor("red");
+            } else {
+                renderGL->SetColor("green");
+            }
+            
+            renderGL->Print(windowSize.x - 190, 4, this->_ss.str().c_str());
+        }
     }
     
     int EngineUI::_renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value& data, int x, int xIndent, int baseY, int y) {
