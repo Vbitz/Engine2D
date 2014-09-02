@@ -144,6 +144,7 @@ namespace Engine {
             for (auto iter = this->_events.begin(); iter != this->_events.end(); iter++) {
                 if (iter->second.Target != NULL && iter->second.Active) {
                     if (!(this->Security.NoScript && iter->second.Target->IsScript())) {
+                        ENGINE_PROFILER_SCOPE_EX(iter->second.Label.c_str());
                         EventMagic ret = EM_BADTARGET;
                         if (jsArgC > 0 && iter->second.Target->GetType() == EventTarget::Type::Javascript) {
                             JSEventTarget* target = (JSEventTarget*) iter->second.Target;
