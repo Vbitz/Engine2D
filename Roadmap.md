@@ -56,4 +56,8 @@
 	- Abstract out messaging to work with entity's
 - UI System
 - 3D Support
+	- **DONE** 3D Projections
+	- **DONE** 3D Matrix Support
+	- Lighting
+	- Draw3D
 - ???
