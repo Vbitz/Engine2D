@@ -338,6 +338,18 @@ namespace Engine {
             return (Draw2DPtr) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_draw")).As<v8::External>()->Value();
         }
         
+        /***
+         {
+            "path": "global.draw.rect",
+            "flags": ["requiresGraphicsContext"],
+            "args": [
+                ["number", "x", "Arg0 has to be X of a rect"],
+                ["number", "y", "Arg0 has to be Y of a rect"],
+                ["number", "width", "Arg0 has to be Width of a rect"],
+                ["number", "height", "Arg0 has to be Height of a rect"]
+            ]
+         }
+         */
 		void Rect(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
             
@@ -355,7 +367,19 @@ namespace Engine {
                                          args.NumberValue(2),
                                          args.NumberValue(3));
 		}
-		
+        
+        /***
+         {
+            "path": "global.draw.grid",
+            "flags": ["requiresGraphicsContext"],
+            "args": [
+                ["number", "x", "Arg0 has to be X of a grid"],
+                ["number", "y", "Arg0 has to be Y of a grid"],
+                ["number", "width", "Arg0 has to be Width of a grid"],
+                ["number", "height", "Arg0 has to be Height of a grid"]
+            ]
+         }
+         */
 		void Grid(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
             
