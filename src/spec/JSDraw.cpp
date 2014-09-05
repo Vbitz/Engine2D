@@ -19,24 +19,24 @@
    limitations under the License.
  */
 
-#include "JSDraw.hpp"
+#include "../JSDraw.hpp"
 
-#include "JSMathHelper.hpp"
+#include "../JSMathHelper.hpp"
 
 #include "../vendor/soil/SOIL.h"
 
-#include "Filesystem.hpp"
-#include "Draw2D.hpp"
+#include "../Filesystem.hpp"
+#include "../Draw2D.hpp"
 
-#include "ResourceManager.hpp"
+#include "../ResourceManager.hpp"
 
-#include "Application.hpp"
+#include "../Application.hpp"
 
-#include "Scripting.hpp"
-#include "Util.hpp"
-#include "Config.hpp"
-#include "FontSheet.hpp"
-#include "GL3Buffer.hpp"
+#include "../Scripting.hpp"
+#include "../Util.hpp"
+#include "../Config.hpp"
+#include "../FontSheet.hpp"
+#include "../GL3Buffer.hpp"
 
 namespace Engine {
     
