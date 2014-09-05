@@ -371,36 +371,35 @@ namespace Engine {
 		void Grid(ScriptingManager::Arguments& args, double x, double y, double width, double height) {
             GetDraw2D(args.This())->Grid(x, y, width, height);
         }
-		
-		void Grad(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
-            
-            if (args.AssertCount(7)) return;
-            
-            if (args.Assert(args[0]->IsNumber(), "Arg0 has to be X of a gradient") ||
-                args.Assert(args[1]->IsNumber(), "Arg1 has to be Y of a gradient") ||
-                args.Assert(args[2]->IsNumber(), "Arg2 has to be Width of a gradient") ||
-                args.Assert(args[3]->IsNumber(), "Arg3 has to be Height of a gradient") ||
-                args.Assert(args[4]->IsInt32(), "Arg4 is Color1 of the gradient") ||
-                args.Assert(args[5]->IsInt32(), "Arg5 is Color2 of the gradient") ||
-                args.Assert(args[6]->IsBoolean(), "Arg6 set's orientation of the gradient")) return;
-            
-            GetDraw2D(args.This())->Grad(args.NumberValue(0),
-                                         args.NumberValue(1),
-                                         args.NumberValue(2),
-                                         args.NumberValue(3),
-                                         args.Int32Value(4),
-                                         args.Int32Value(5),
-                                         args.BooleanValue(6));
-		}
+
+        /***
+         {
+            "path": "global.draw.grad",
+            "flags": ["requiresGraphicsContext"],
+            "args": [
+                ["number", "x", "Arg0 has to be X of a gradient"],
+                ["number", "y", "Arg0 has to be Y of a gradient"],
+                ["number", "width", "Arg0 has to be Width of a gradient"],
+                ["number", "height", "Arg0 has to be Height of a gradient"],
+                ["int", "color1", "Arg4 is Color1 of the gradient"],
+                ["int", "color2", "Arg5 is Color2 of the gradient"],
+                ["bool", "vert", "Arg6 set's orientation of the gradient"]
+            ]
+         }
+        */
+        ENGINE_SCRIPT_METHOD(Grad);
+        void Grad(ScriptingManager::Arguments& args, double x, double y, double width, double height,
+                    int color1, int color2, bool vert) {
+            GetDraw2D(args.This())->Grad(x, y, width, height, color1, color2, vert);
+        }
         
         void Circle(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
             
             if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
+            // Binding TODO: Default arg support
+
             if (args.Assert(args[0]->IsNumber(), "Arg0 is the X center of the circle") ||
                 args.Assert(args[1]->IsNumber(), "Arg1 is the Y center of the circle") ||
                 args.Assert(args[2]->IsNumber(), "Arg2 is the radius of the circle")) return;
@@ -449,27 +448,28 @@ namespace Engine {
                 args.ThrowError("Wrong number of Arguments");
             }
         }
-        
-        void Line(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
-            
-            if (args.AssertCount(4)) return;
-            
-            if (args.Assert(args[0]->IsNumber(), "Arg0 has to be the first X point of the line") ||
-                args.Assert(args[1]->IsNumber(), "Arg1 has to be the first Y point of the line") ||
-                args.Assert(args[2]->IsNumber(), "Arg2 has to be the second X point of the line") ||
-                args.Assert(args[3]->IsNumber(), "Arg3 has to be the second Y point of the line")) return;
-            
-            GetDraw2D(args.This())->Line(args.NumberValue(0),
-                                         args.NumberValue(1),
-                                         args.NumberValue(2),
-                                         args.NumberValue(3));
+
+        /***
+         {
+            "path": "global.draw.line",
+            "flags": ["requiresGraphicsContext"],
+            "args": [
+                ["number", "x1", "Arg0 has to be the first X point of the line"],
+                ["number", "y1", "Arg1 has to be the first Y point of the line"],
+                ["number", "x2", "Arg2 has to be the second X point of the line"],
+                ["number", "y2", "Arg3 has to be the second Y point of the line"]
+            ]
+         }
+        */
+        ENGINE_SCRIPT_METHOD(Line);
+        void Line(ScriptingManager::Arguments& args, double x1, double y1, double x2, double y2) {
+            GetDraw2D(args.This())->Line(x1, y1, x2, y2);
         }
         
         void Polygon(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
+
+            // Binding TODO: Array support (It would be nice if they were C arrays)
             
             if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             
@@ -1169,10 +1169,10 @@ namespace Engine {
             f.FillTemplate(drawTable, {
                 {FTT_Static, "rect", f.NewFunctionTemplate(E_SCRIPT_SIGNATURE(Rect))},
                 {FTT_Static, "grid", f.NewFunctionTemplate(E_SCRIPT_SIGNATURE(Grid))},
-                {FTT_Static, "grad", f.NewFunctionTemplate(Grad)},
+                {FTT_Static, "grad", f.NewFunctionTemplate(E_SCRIPT_SIGNATURE(Grad))},
                 {FTT_Static, "circle", f.NewFunctionTemplate(Circle)},
                 {FTT_Static, "curve", f.NewFunctionTemplate(Curve)},
-                {FTT_Static, "line", f.NewFunctionTemplate(Line)},
+                {FTT_Static, "line", f.NewFunctionTemplate(E_SCRIPT_SIGNATURE(Line))},
                 {FTT_Static, "polygon", f.NewFunctionTemplate(Polygon)},
                 
                 {FTT_Static, "colorPalette", f.NewFunctionTemplate(ColorPalette)},
