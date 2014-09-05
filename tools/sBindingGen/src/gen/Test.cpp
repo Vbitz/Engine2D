@@ -12,9 +12,9 @@ namespace Engine {
             if (args.AssertCount(2)) return;
             if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
             if (args.Assert(args[0].IsInt32(), "Testing Arg1")) return;
-            int arg1 = args.Int32Value(0);;
+            int arg1 = args.Int32Value(0);
             if (args.Assert(args[1].IsString(), "Testing Arg2")) return;
-            std::string arg2 = args.StringValue(1);;
+            std::string arg2 = args.StringValue(1);
             args.SetReturnValue(Testing(args, arg1, arg2));
         }
 

@@ -23,13 +23,13 @@ def stypeToCPPType(typeName):
 
 def marshalSTypeToCPPValue(typeName, argPosition):
 	if typeName == "string":
-		return "args.StringValue(" + str(argPosition) + ");"
+		return "args.StringValue(" + str(argPosition) + ")"
 	elif typeName == "int":
-		return "args.Int32Value(" + str(argPosition) + ");"
+		return "args.Int32Value(" + str(argPosition) + ")"
 	elif typeName == "number":
-		return "args.NumberValue(" + str(argPosition) + ");"
+		return "args.NumberValue(" + str(argPosition) + ")"
 	elif typeName == "bool":
-		return "args.BooleanValue(" + str(argPosition) + ");"
+		return "args.BooleanValue(" + str(argPosition) + ")"
 	else:
 		raise "Bad typeName"
 
