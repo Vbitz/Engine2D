@@ -18,12 +18,6 @@
 			"dependencies": [],
 			"sources": [
 				"src/stdlib.cpp",
-				"src/JSInput.cpp",
-				"src/JSDraw.cpp",
-				"src/JSSys.cpp",
-				"src/JSFS.cpp",
-				"src/JSDatabase.cpp",
-				"src/JSMathHelper.cpp",
 				"src/Database.cpp",
 				"src/Filesystem.cpp",
 				"src/GL3Buffer.cpp",
@@ -59,8 +53,18 @@
 				"src/Package.cpp",
 				"src/Addon.cpp",
 
+				# Script bindings
+				"src/JSInput.cpp",
+				"src/gen/JSDraw.cpp",
+				"src/JSSys.cpp",
+				"src/JSFS.cpp",
+				"src/JSDatabase.cpp",
+				"src/JSMathHelper.cpp",
+
+				# Drawables
 				"src/Drawables/CubeDrawableTest.cpp",
 
+				# Misc vendor items
 				"src/vendor/jsoncpp.cpp",
 				"src/vendor/sqlite3.c",
 				"src/vendor/glew.c",

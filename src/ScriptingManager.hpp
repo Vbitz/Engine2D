@@ -32,6 +32,10 @@
 
 #define SCRIPTINGMANAGER_INLINE inline
 
+#define ENGINE_SCRIPT_METHOD(name)
+#define E_SCRIPT_SIGNATURE(name) name ## _V8
+#define _ENGINE_SCRIPT_METHOD_SIGNATURE(name) void E_SCRIPT_SIGNATURE(name)(const v8::FunctionCallbackInfo<v8::Value>& _args)
+
 namespace Engine {
     enum FunctionTemplateTemplates { // It's way too long as an enum class
         FTT_Prototype,

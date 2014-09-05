@@ -23,7 +23,7 @@
 
 #include "JSMathHelper.hpp"
 
-#include "vendor/soil/SOIL.h"
+#include "../vendor/soil/SOIL.h"
 
 #include "Filesystem.hpp"
 #include "Draw2D.hpp"
@@ -350,22 +350,9 @@ namespace Engine {
             ]
          }
          */
-		void Rect(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
-            
-            if (args.AssertCount(4)) return;
-            
-            if (args.Assert(args[0]->IsNumber(), "Arg0 has to be X of a rect") ||
-                args.Assert(args[1]->IsNumber(), "Arg1 has to be Y of a rect") ||
-                args.Assert(args[2]->IsNumber(), "Arg2 has to be Width of a rect") ||
-                args.Assert(args[3]->IsNumber(), "Arg3 has to be Height of a rect")) return;
-            
-            GetDraw2D(args.This())->Rect(args.NumberValue(0),
-                                         args.NumberValue(1),
-                                         args.NumberValue(2),
-                                         args.NumberValue(3));
+        ENGINE_SCRIPT_METHOD(Rect);
+		void Rect(ScriptingManager::Arguments& args, double x, double y, double width, double height) {
+            GetDraw2D(args.This())->Rect(x, y, width, height);
 		}
         
         /***
@@ -380,23 +367,10 @@ namespace Engine {
             ]
          }
          */
-		void Grid(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
-            
-            if (args.AssertCount(4)) return;
-            
-            if (args.Assert(args[0]->IsNumber(), "Arg0 has to be X of a grid") ||
-                args.Assert(args[1]->IsNumber(), "Arg1 has to be Y of a grid") ||
-                args.Assert(args[2]->IsNumber(), "Arg2 has to be Width of a grid") ||
-                args.Assert(args[3]->IsNumber(), "Arg3 has to be Height of a grid")) return;
-            
-            GetDraw2D(args.This())->Grid(args.NumberValue(0),
-                                         args.NumberValue(1),
-                                         args.NumberValue(2),
-                                         args.NumberValue(3));
-		}
+        ENGINE_SCRIPT_METHOD(Grid);
+		void Grid(ScriptingManager::Arguments& args, double x, double y, double width, double height) {
+            GetDraw2D(args.This())->Grid(x, y, width, height);
+        }
 		
 		void Grad(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
@@ -1193,12 +1167,12 @@ namespace Engine {
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             
             f.FillTemplate(drawTable, {
-                {FTT_Static, "rect", f.NewFunctionTemplate(Rect)},
-                {FTT_Static, "grid", f.NewFunctionTemplate(Grid)},
+                {FTT_Static, "rect", f.NewFunctionTemplate(E_SCRIPT_SIGNATURE(Rect))},
+                {FTT_Static, "grid", f.NewFunctionTemplate(E_SCRIPT_SIGNATURE(Grid))},
                 {FTT_Static, "grad", f.NewFunctionTemplate(Grad)},
                 {FTT_Static, "circle", f.NewFunctionTemplate(Circle)},
                 {FTT_Static, "curve", f.NewFunctionTemplate(Curve)},
-                {FTT_Static, "line", f.NewFunctionTemplate(Rect)},
+                {FTT_Static, "line", f.NewFunctionTemplate(Line)},
                 {FTT_Static, "polygon", f.NewFunctionTemplate(Polygon)},
                 
                 {FTT_Static, "colorPalette", f.NewFunctionTemplate(ColorPalette)},
