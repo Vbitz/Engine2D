@@ -212,7 +212,7 @@ namespace Engine {
         
         void SetShader(ShaderPtr shader) override {
             unsigned int id = shader->GetId();
-            if (this->_currentShader == id) {
+            if (this->_currentShader != id) {
                 ENGINE_PROFILER_SCOPE;
                 
                 glUseProgram(id);
