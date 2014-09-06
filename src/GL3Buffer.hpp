@@ -107,6 +107,10 @@ namespace Engine {
         void SetProjectionType(ProjectionType t);
         void SetLookAtView(glm::vec3 source, glm::vec3 target);
         
+        RenderDriverPtr GetRender() {
+            return this->_renderGL;
+        }
+        
 	private:
         void _init();
         void _shutdown();
@@ -120,10 +124,6 @@ namespace Engine {
 		void _upload();
         
         glm::vec4 _getCameraView();
-        
-        RenderDriverPtr _getRender() {
-            return this->_renderGL;
-        }
         
         unsigned int _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
         

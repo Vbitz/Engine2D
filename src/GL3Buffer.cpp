@@ -174,22 +174,22 @@ namespace Engine {
     void VertexBuffer::_upload() {
         ENGINE_PROFILER_SCOPE;
         
-        this->_getRender()->CheckError("GL3Buffer::Upload::PreUploadBufferData");
+        this->GetRender()->CheckError("GL3Buffer::Upload::PreUploadBufferData");
         
         glBufferData(GL_ARRAY_BUFFER, sizeof(BufferFormat) * this->_vertexBuffer.size(), &this->_vertexBuffer[0], GL_STATIC_DRAW);
         
-        this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadBufferData");
+        this->GetRender()->CheckError("GL3Buffer::Upload::PostUploadBufferData");
         
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * this->_vertexCount, &this->_indexBuffer[0], GL_STATIC_DRAW);
         
-        this->_getRender()->CheckError("GL3Buffer::Upload::PostUploadIndexData");
+        this->GetRender()->CheckError("GL3Buffer::Upload::PostUploadIndexData");
         
         if (!this->_shaderBound) {
             this->bindShader();
             this->_shaderBound = true;
         }
         
-        this->_getRender()->CheckError("GL3Buffer::Upload::Post");
+        this->GetRender()->CheckError("GL3Buffer::Upload::Post");
     }
     
     void VertexBuffer::Draw(PolygonMode mode, glm::mat4 model) {
@@ -217,7 +217,7 @@ namespace Engine {
         
         this->_getShader()->Begin();
         
-        this->_getRender()->CheckError("GL3Buffer::Draw::PostBindShader");
+        this->GetRender()->CheckError("GL3Buffer::Draw::PostBindShader");
         
         ShaderSettings settings = this->_currentEffect->GetShaderSettings();
         
@@ -236,9 +236,9 @@ namespace Engine {
         this->_getShader()->UploadUniform(settings.viewMatrixParam, this->_view);
         this->_getShader()->UploadUniform(settings.projectionMatrixParam, proj);
         
-        this->_getRender()->CheckError("VertexBuffer::Draw::PostUploadUniform");
+        this->GetRender()->CheckError("VertexBuffer::Draw::PostUploadUniform");
         
-        this->_getRender()->Set(RenderStateFlag::DepthTest, this->_depthTest);
+        this->GetRender()->Set(RenderStateFlag::DepthTest, this->_depthTest);
         
         if (this->_wireframe) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -250,7 +250,7 @@ namespace Engine {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
         
-        this->_getRender()->CheckError("VertexBuffer::Draw::PostDraw");
+        this->GetRender()->CheckError("VertexBuffer::Draw::PostDraw");
         
         this->_getShader()->End();
         
@@ -348,7 +348,7 @@ namespace Engine {
         
         this->_getShader()->Begin();
         
-        this->_getRender()->CheckError("VertexBuffer::Upload::PostBeginShader");
+        this->GetRender()->CheckError("VertexBuffer::Upload::PostBeginShader");
         
         ShaderSettings settings = this->_currentEffect->GetShaderSettings();
         
@@ -356,13 +356,13 @@ namespace Engine {
         this->_getShader()->BindUniform(settings.viewMatrixParam);
         this->_getShader()->BindUniform(settings.projectionMatrixParam);
         
-        this->_getRender()->CheckError("VertexBuffer::Upload::PostBindViewpointSize");
+        this->GetRender()->CheckError("VertexBuffer::Upload::PostBindViewpointSize");
         
         this->_getShader()->BindVertexAttrib(settings.vertexParam, 3, 9, 0);
         this->_getShader()->BindVertexAttrib(settings.colorParam, 4, 9, 3);
         this->_getShader()->BindVertexAttrib(settings.texCoardParam, 2, 9, 7);
         
-        this->_getRender()->CheckError("VertexBuffer::Upload::PostBindVertexAttributes");
+        this->GetRender()->CheckError("VertexBuffer::Upload::PostBindVertexAttributes");
         
         this->_getShader()->End();
     }

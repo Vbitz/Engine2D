@@ -237,6 +237,8 @@ namespace Engine {
                 ScriptingManager::Arguments args(_args);
                 
                 JS_VertexBuffer2D* thisValue = Unwrap<JS_VertexBuffer2D>(args.This());
+
+                thisValue->VertexBuffer::GetRender()->FlushAll();
                 
                 thisValue->VertexBuffer::Draw(PolygonMode::Triangles, JsMathHelper::JS_Matrix::GetValue(args, args.This()->Get(args.NewString("model"))));
             }
