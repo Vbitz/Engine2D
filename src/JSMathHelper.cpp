@@ -184,8 +184,45 @@ namespace Engine {
                                            FromJSVector(args, args[0])));
         }
         
+        void JS_Vector::Mul(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            
+            if (args.AssertCount(1)) return;
+            
+            if (IsJSVector(args, args[0])) {
+                args.SetReturnValue(ToJSVector(args,
+                                               FromJSVector(args, args.This()) *
+                                               FromJSVector(args, args[0])));
+            } else if (JS_Matrix::IsJSMatrix(args, args[0]->ToObject())) {
+                args.SetReturnValue(ToJSVector(args,
+                                               FromJSVector(args, args.This()) *
+                                               JS_Matrix::GetValue(args, args[0]->ToObject())));
+            } else {
+                args.ThrowArgError("Arg0 is a Vector4 or a Matrix");
+            }
+        }
+        
         void JS_Vector::Dot(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
+            
+            if (args.AssertCount(1)) return;
+            
+            if (args.Assert(IsJSVector(args, args[0]), "Arg1 is a Vector4")) return;
+            
+            args.SetReturnValue(args.NewNumber(glm::dot(FromJSVector(args, args.This()), FromJSVector(args, args[0]))));
+        }
+        
+        void JS_Vector::Cross(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            
+            if (args.AssertCount(1)) return;
+            
+            if (args.Assert(IsJSVector(args, args[0]), "Arg1 is a Vector4")) return;
+            
+            glm::vec3 ret = glm::cross(glm::vec3(FromJSVector(args, args.This())),
+                                       glm::vec3(FromJSVector(args, args[0])));
+            
+            args.SetReturnValue(ToJSVector(args, glm::vec4(ret, 0.0)));
         }
         
         void JS_Vector::ToString(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -214,9 +251,13 @@ namespace Engine {
             f.FillTemplate(vector_template, {
                 {FTT_Prototype, "toString", f.NewFunctionTemplate(ToString)},
                 {FTT_Prototype, "add", f.NewFunctionTemplate(Add)},
-                {FTT_Prototype, "sub", f.NewFunctionTemplate(Sub)}
-                // TODO: dot()
-                // TODO: cross()
+                {FTT_Prototype, "sub", f.NewFunctionTemplate(Sub)},
+                {FTT_Prototype, "mul", f.NewFunctionTemplate(Mul)},
+                {FTT_Prototype, "dot", f.NewFunctionTemplate(Dot)},
+                {FTT_Prototype, "cross", f.NewFunctionTemplate(Cross)}
+                // TOOD: distince
+                // TODO: length
+                // TODO: normalize
             });
             
             vector_template->InstanceTemplate()->SetInternalFieldCount(1);
@@ -245,6 +286,10 @@ namespace Engine {
         glm::mat4 JS_Matrix::GetValue(ScriptingManager::FactoryRef fac, v8::Handle<v8::Value> val) {
             v8::Handle<v8::Object> objVal = v8::Handle<v8::Object>::Cast(val);
             return Unwrap<JS_Matrix>(objVal)->_value;
+        }
+        
+        bool JS_Matrix::IsJSMatrix(ScriptingManager::FactoryRef fac, v8::Handle<v8::Object> val) {
+            return val->GetConstructorName()->Equals(fac.NewString("Matrix"));
         }
         
          void JS_Matrix::New(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -387,6 +432,7 @@ namespace Engine {
                 // TODO: sub
                 // TODO: mul
                 // TODO: div
+                // TODO: inverse
                 {FTT_Prototype, "translate", f.NewFunctionTemplate(Translate)},
                 {FTT_Prototype, "scale", f.NewFunctionTemplate(Scale)},
                 {FTT_Prototype, "rotate", f.NewFunctionTemplate(Rotate)},
@@ -412,6 +458,16 @@ namespace Engine {
             args.SetReturnValue(args.NewNumber(glm::radians(args.NumberValue(0))));
         }
         
+        void RadToDeg(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            
+            if (args.AssertCount(1)) return;
+            
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is the number in radians to convert to degrees")) return;
+            
+            args.SetReturnValue(args.NewNumber(glm::degrees(args.NumberValue(0))));
+        }
+        
         void InitMathHelper() {
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             v8::Local<v8::Context> ctx = f.GetIsolate()->GetCurrentContext();
@@ -425,7 +481,10 @@ namespace Engine {
                 {FTT_Static, "PI", f.NewNumber(M_PI)},
                 {FTT_Static, "PI_2", f.NewNumber(M_PI_2)},
                 {FTT_Static, "PI_4", f.NewNumber(M_PI_4)},
-                {FTT_Static, "degToRad", f.NewFunctionTemplate(DegToRad)->GetFunction()}
+                {FTT_Static, "degToRad", f.NewFunctionTemplate(DegToRad)->GetFunction()},
+                {FTT_Static, "radToDeg", f.NewFunctionTemplate(RadToDeg)->GetFunction()}
+                // TODO: noise(glm_noise, perlin, periodicPerlin, simplex)
+                // TODO: noiseArray(glm_noise, perlin, periodicPerlin, simplex)
             });
             
             JS_BasicRandom::CreateInterface(f.GetIsolate(), math_table);

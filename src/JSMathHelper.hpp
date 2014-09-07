@@ -36,7 +36,9 @@ namespace Engine {
             static void New(const v8::FunctionCallbackInfo<v8::Value>& _args);
             static void Add(const v8::FunctionCallbackInfo<v8::Value>& _args);
             static void Sub(const v8::FunctionCallbackInfo<v8::Value>& _args);
+            static void Mul(const v8::FunctionCallbackInfo<v8::Value>& _args);
             static void Dot(const v8::FunctionCallbackInfo<v8::Value>& _args);
+            static void Cross(const v8::FunctionCallbackInfo<v8::Value>& _args);
             static void ToString(const v8::FunctionCallbackInfo<v8::Value>& _args);
             
             static void CreateInterface(v8::Isolate* isolate, v8::Handle<v8::Object> math_table);
@@ -46,6 +48,7 @@ namespace Engine {
         class JS_Matrix : public ScriptingManager::ObjectWrap {
         public:
             static v8::Handle<v8::Value> NewInstance(ScriptingManager::FactoryRef fac, glm::mat4 value);
+            static bool IsJSMatrix(ScriptingManager::FactoryRef fac, v8::Handle<v8::Object> val);
             static glm::mat4 GetValue(ScriptingManager::FactoryRef fac, v8::Handle<v8::Value> val);
             
             static void New(const v8::FunctionCallbackInfo<v8::Value>& _args);
