@@ -282,6 +282,21 @@ setTimeout(function () {
 }, 10000);
 
 
+var vBuff = new draw.VertexBuffer2D("shaders/basic.json");
+
+vBuff.setDepthTest(true);
+vBuff.setProjectionPerspective(true);
+vBuff.setLookAtView(2.0, 2.0, 2.0, 0, 0, 0);
+
+// add a triangle
+var vCol = new draw.Color(0x303030);
+vBuff.addVert(-1, -1, vCol);
+vBuff.addVert(1, -1, vCol);
+vBuff.addVert(1, 1, vCol);
+vBuff.addVert(-1, -1, vCol);
+vBuff.addVert(-1, 1, vCol);
+vBuff.addVert(1, 1, vCol);
+
 var graphicsTests = {
 	
 };
@@ -321,6 +336,9 @@ sys.on("draw", "test.draw", function (e) {
 		console.log("Finished Loading");
 		firstDraw = false;
 	}
+
+	vBuff.model.rotate(sys.deltaTime, new Math.Vector(0, 1, 0));
+	vBuff.draw();
 
 	draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
 	draw.drawColor = "black";
