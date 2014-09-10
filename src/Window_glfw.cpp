@@ -339,6 +339,11 @@ namespace Engine {
             return glm::ortho(0.0f, window.x, window.y, 0.0f, 1000.0f, -1000.0f);
         }
         
+        float GetAspectRatio() override {
+            glm::vec2 window = this->GetWindowSize();
+            return window.x / window.y;
+        }
+        
         RenderDriver* GetRender() override {
             return this->_render;
         }

@@ -83,6 +83,7 @@ namespace Engine {
         
         virtual int GetMaxTextureSize() = 0;
         virtual glm::mat4 GetOrthoProjection() = 0;
+        virtual float GetAspectRatio() = 0;
         
         virtual RenderDriverPtr GetRender() = 0;
         

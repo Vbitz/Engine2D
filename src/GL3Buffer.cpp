@@ -193,17 +193,19 @@ namespace Engine {
     }
     
     void VertexBuffer::Draw(PolygonMode mode, glm::mat4 model) {
+        static char* addedData = NULL;
+        
         if (this->_vertexCount == 0) {
             return; // nothing to draw
         }
         
-        char* addedData = new char[128];
+        if (addedData == NULL) {
+            addedData = new char[128];
+        }
         
         sprintf(addedData, "_vertexCount=%d", this->_vertexCount);
         
         ENGINE_PROFILER_SCOPE_EX(addedData);
-        
-        delete [] addedData;
         
         this->_renderGL->TrackStat(RenderStatistic::DrawCall, 1);
         this->_renderGL->TrackStat(RenderStatistic::Verts, this->_vertexCount);
@@ -228,7 +230,7 @@ namespace Engine {
                 break;
             case ProjectionType::Perspective:
                 glm::vec2 windowSize = GetAppSingilton()->GetWindow()->GetWindowSize();
-                proj = glm::perspective(glm::radians(Config::GetFloat("core.render.fovy")), windowSize.x / windowSize.y, 1.0f, 1000.0f);
+                proj = glm::perspective(glm::radians(Config::GetFloat("core.render.fovy")), GetAppSingilton()->GetWindow()->GetAspectRatio(), 1.0f, 1000.0f);
                 break;
         }
         
