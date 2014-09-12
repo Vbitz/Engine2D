@@ -19,10 +19,10 @@
    limitations under the License.
 */
 
-#include "JSFS.hpp"
+#include "../JSFS.hpp"
 
-#include "ScriptingManager.hpp"
-#include "Filesystem.hpp"
+#include "../ScriptingManager.hpp"
+#include "../Filesystem.hpp"
 
 namespace Engine {
     namespace JsFS {

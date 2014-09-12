@@ -19,13 +19,13 @@
    limitations under the License.
 */
 
-#include "JSInput.hpp"
+#include "../JSInput.hpp"
 
 #include <string.h>
 
-#include "Application.hpp"
-#include "Scripting.hpp"
-#include "Util.hpp"
+#include "../Application.hpp"
+#include "../Scripting.hpp"
+#include "../Util.hpp"
 
 namespace Engine {
     namespace JsInput {

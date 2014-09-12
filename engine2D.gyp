@@ -54,12 +54,12 @@
 				"src/Addon.cpp",
 
 				# Script bindings
-				"src/JSInput.cpp",
+				"src/gen/JSInput.cpp",
 				"src/gen/JSDraw.cpp",
-				"src/JSSys.cpp",
-				"src/JSFS.cpp",
-				"src/JSDatabase.cpp",
-				"src/JSMathHelper.cpp",
+				"src/gen/JSSys.cpp",
+				"src/gen/JSFS.cpp",
+				"src/gen/JSDatabase.cpp",
+				"src/gen/JSMathHelper.cpp",
 
 				# Drawables
 				"src/Drawables/CubeDrawableTest.cpp",

@@ -19,17 +19,17 @@
    limitations under the License.
 */
 
-#include "JSSys.hpp"
+#include "../JSSys.hpp"
 
-#include "Application.hpp"
-#include "EngineUI.hpp"
-#include "Timer.hpp"
-#include "WorkerThreadPool.hpp"
+#include "../Application.hpp"
+#include "../EngineUI.hpp"
+#include "../Timer.hpp"
+#include "../WorkerThreadPool.hpp"
 
-#include "RenderDriver.hpp"
+#include "../RenderDriver.hpp"
 
-#include "Config.hpp"
-#include "Profiler.hpp"
+#include "../Config.hpp"
+#include "../Profiler.hpp"
 
 namespace Engine {
 

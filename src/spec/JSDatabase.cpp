@@ -19,12 +19,12 @@
    limitations under the License.
 */
 
-#include "JSDatabase.hpp"
+#include "../JSDatabase.hpp"
 
-#include "Database.hpp"
-#include "Util.hpp"
-#include "ScriptingManager.hpp"
-#include "Filesystem.hpp"
+#include "../Database.hpp"
+#include "../Util.hpp"
+#include "../ScriptingManager.hpp"
+#include "../Filesystem.hpp"
 
 namespace Engine {
     namespace JSDatabase {

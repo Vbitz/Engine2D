@@ -19,17 +19,17 @@
    limitations under the License.
 */
 
-#include "JSMathHelper.hpp"
+#include "../JSMathHelper.hpp"
 
 #include <math.h>
-#include "Scripting.hpp"
-#include "Util.hpp"
-#include "ScriptingManager.hpp"
-#include "stdlib.hpp"
+#include "../Scripting.hpp"
+#include "../Util.hpp"
+#include "../ScriptingManager.hpp"
+#include "../stdlib.hpp"
 
 #define GLM_FORCE_RADIANS
-#include "vendor/glm/glm.hpp"
-#include "vendor/glm/gtc/matrix_transform.hpp"
+#include "../vendor/glm/glm.hpp"
+#include "../vendor/glm/gtc/matrix_transform.hpp"
 
 #include <random>
 #include <iostream>
