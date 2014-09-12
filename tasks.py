@@ -19,60 +19,60 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import sys;
-import os;
-import subprocess;
-import re;
-import shutil;
-import hashlib;
-import ConfigParser;
-import multiprocessing;
-import glob;
+import sys
+import os
+import subprocess
+import re
+import shutil
+import hashlib
+import ConfigParser
+import multiprocessing
+import glob
 
-import inspect;
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())));
-sys.path.insert(0, currentdir + "/tools");
+import inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+sys.path.insert(0, currentdir + "/tools")
 
-import buildAddon;
-import bindingGenerator;
+import buildAddon
+import bindingGenerator
 
-PROJECT_ROOT = 0;
-PROJECT_SOURCE = 1;
-PROJECT_BUILD_PATH = 2;
-PROJECT_TMP_PATH = 3;
+PROJECT_ROOT = 0
+PROJECT_SOURCE = 1
+PROJECT_BUILD_PATH = 2
+PROJECT_TMP_PATH = 3
 
-CTAGS_PATH = "/usr/local/bin/ctags";
+CTAGS_PATH = "/usr/local/bin/ctags"
 
-WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw");
-ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off");
+WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw")
+ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
 
-commands = {};
+commands = {}
 
 class bcolors:
-    HEADER = '\x1b[0;42m\x1b[1;91m';
-    HIGHLIGHT = '\x1b[0;44m\x1b[1;91m';
-    ENDC = '\033[0m';
+    HEADER = '\x1b[0;42m\x1b[1;91m'
+    HIGHLIGHT = '\x1b[0;44m\x1b[1;91m'
+    ENDC = '\033[0m'
 
 def noop():
-	return True;
+	return True
 
 class command(object):
 	def __init__(self, requires=[], usage="TODO: ", check=noop):
-		self.requires = requires;
-		self.usage = usage;
-		self.check = check;
+		self.requires = requires
+		self.usage = usage
+		self.check = check
 	
 	def __call__(self, func):
-		commands[func.__name__] = func;
-		commands[func.__name__].requires = self.requires;
-		commands[func.__name__].usage = self.usage;
-		commands[func.__name__].check = self.check;
-		commands[func.__name__].run = False;
-		return func;
+		commands[func.__name__] = func
+		commands[func.__name__].requires = self.requires
+		commands[func.__name__].usage = self.usage
+		commands[func.__name__].check = self.check
+		commands[func.__name__].run = False
+		return func
 
 def get_exe_name():
 	if sys.platform == "darwin" or sys.platform == "linux2":
-		return "engine2D";
+		return "engine2D"
 
 def get_lib_name():
 	if sys.platform == "darwin":
@@ -82,100 +82,100 @@ def get_lib_name():
 
 def resolve_path(base, path=""):
 	if base == PROJECT_ROOT:
-		return os.path.relpath(path);
+		return os.path.relpath(path)
 	elif base == PROJECT_SOURCE:
-		return os.path.join(resolve_path(PROJECT_ROOT, "src"), path);
+		return os.path.join(resolve_path(PROJECT_ROOT, "src"), path)
 	elif base == PROJECT_BUILD_PATH:
 		if sys.platform == "darwin":
-			return os.path.join(resolve_path(PROJECT_ROOT, "build/Default"), path);
+			return os.path.join(resolve_path(PROJECT_ROOT, "build/Default"), path)
 		elif sys.platform == "linux2":
-			return os.path.join(resolve_path(PROJECT_ROOT, "0/build/Default"), path);
+			return os.path.join(resolve_path(PROJECT_ROOT, "0/build/Default"), path)
 	elif base == PROJECT_TMP_PATH:
-		return os.path.join(resolve_path(PROJECT_ROOT, "tmp"), path);
+		return os.path.join(resolve_path(PROJECT_ROOT, "tmp"), path)
 	else:
-		raise "Invalid base";
+		raise "Invalid base"
 
 def require_in_path(arr):
 	for x in arr:
-		pass;
-	return True;
+		pass
+	return True
 
 def shell_command(cmd, throw=True):
-	print(bcolors.HEADER + "shell in %s : %s" % (os.getcwd(), cmd) + bcolors.ENDC);
+	print(bcolors.HEADER + "shell in %s : %s" % (os.getcwd(), cmd) + bcolors.ENDC)
 	if throw:
-		subprocess.check_call(cmd);
+		subprocess.check_call(cmd)
 	else:
-		subprocess.call(cmd);
+		subprocess.call(cmd)
 
 def run_engine(args):
-	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name())] + args);
+	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name())] + args)
 
 def run_engine_test(args, onlyHighlight=True):
-	cmdArgs = [resolve_path(PROJECT_BUILD_PATH, get_exe_name()), "-test"];
+	cmdArgs = [resolve_path(PROJECT_BUILD_PATH, get_exe_name()), "-test"]
 	if onlyHighlight:
-		cmdArgs += ["-Ccore.log.levels.onlyHighlight=true"];
-	shell_command(cmdArgs + args);
+		cmdArgs += ["-Ccore.log.levels.onlyHighlight=true"]
+	shell_command(cmdArgs + args)
 
 def get_git_hash():
 	# check for .git folder
-	return subprocess.check_output(["git", "rev-parse", "HEAD"])[:10];
+	return subprocess.check_output(["git", "rev-parse", "HEAD"])[:10]
 
 def get_filename_hash(filename):
-	m = hashlib.md5();
+	m = hashlib.md5()
 	with open(filename, "r") as f:
-		m.update(f.read());
-	return m.hexdigest();
+		m.update(f.read())
+	return m.hexdigest()
 
 def ensure_dir(path):
 	if not os.path.exists(path):
-		os.makedirs(path);
+		os.makedirs(path)
 
 def get_arch():
-	return "x64";
+	return "x64"
 
 def get_max_jobs():
-	return multiprocessing.cpu_count();
+	return multiprocessing.cpu_count()
 
-config = ConfigParser.RawConfigParser();
+config = ConfigParser.RawConfigParser()
 try:
-	config.read(resolve_path(PROJECT_TMP_PATH, "tasks.cfg"));
+	config.read(resolve_path(PROJECT_TMP_PATH, "tasks.cfg"))
 except Exception, e:
-	print("Could not load config file");
+	print("Could not load config file")
 
 def write_config():
 	with open(resolve_path(PROJECT_TMP_PATH, "tasks.cfg"), "wb") as config_file:
-		config.write(config_file);
+		config.write(config_file)
 
 def ensure_file_hash(filenames):
 	if not config.has_section("StoredHashes"):
-		return False;
+		return False
 
 	for filename in filenames:
 		if not config.has_option("StoredHashes", filename):
-			return False;
+			return False
 		else:
 			if not config.get("StoredHashes", filename) == get_filename_hash(filename):
-				return False;
+				return False
 
-	return True;
+	return True
 
 def store_file_hash(filenames):
 	if not config.has_section("StoredHashes"):
-		config.add_section("StoredHashes");
+		config.add_section("StoredHashes")
 
 	for filename in filenames:
-		config.set("StoredHashes", filename, get_filename_hash(filename));
+		config.set("StoredHashes", filename, get_filename_hash(filename))
 
 @command(usage="Downloads a local copy of CMake if we can't find one")
 def fetch_cmake(args):
 	if sys.platform == "linux2":
 		# Some of these commands need sudo
 		# just run "sudo apt-get install -y cmake"
-		pass;
+		pass
 
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def build_glfw3(args):
-	os.chdir(resolve_path(PROJECT_ROOT, "third_party/glfw"));
+	os.chdir(resolve_path(PROJECT_ROOT, "third_party/glfw"))
 	
 	shell_command([
 			"cmake",
@@ -184,9 +184,9 @@ def build_glfw3(args):
 			"-DGLFW_BUILD_TESTS:BOOL=OFF",
 			"-DBUILD_SHARED_LIBS:BOOL=ON",
 			"."
-		]);
+		])
 	
-	shell_command(["make"]);
+	shell_command(["make"])
 
 	glfw_glob = ""
 	if sys.platform == "linux2":
@@ -196,9 +196,9 @@ def build_glfw3(args):
 
 	for f in glob.glob(glfw_glob):
 		print "Copying " + f + " to " + "../lib"
-		shutil.copy(f, "../lib");
+		shutil.copy(f, "../lib")
 	
-	os.chdir("../..");
+	os.chdir("../..")
 
 @command(usage="Fetch and build V8 using GYP")
 def build_v8(args):
@@ -209,7 +209,7 @@ def build_v8(args):
 		# copy the relevent files to third_party/lib and third_party/include
 		pass
 	elif sys.platform == "linux2" or sys.platform == "darwin": # linux
-		os.chdir(resolve_path(PROJECT_ROOT, "third_party/v8"));
+		os.chdir(resolve_path(PROJECT_ROOT, "third_party/v8"))
 		if not os.path.exists("build/gyp"):
 			shutil.copytree("../gyp", "build/gyp")
 		shell_command([
@@ -218,16 +218,16 @@ def build_v8(args):
 				"library=shared",
 				"snapshot=on",
 				"i18nsupport=off"
-			]);
+			])
 		if sys.platform == "linux2":
-			shutil.copy("out/native/lib.target/libv8.so", "../lib/libv8.so");
+			shutil.copy("out/native/lib.target/libv8.so", "../lib/libv8.so")
 		elif sys.platform == "darwin":
-			shutil.copy("out/native/libv8.dylib", "../lib/libv8.dylib");
-		os.chdir("../..");
+			shutil.copy("out/native/libv8.dylib", "../lib/libv8.dylib")
+		os.chdir("../..")
 
 @command(requires=["build_glfw3", "build_v8"], usage="Fetches Build Dependancys")
 def build_deps(args):
-	pass;
+	pass
 
 @command(requires=["build_deps"], usage="Builds platform project files")
 def gyp(args):
@@ -238,23 +238,23 @@ def gyp(args):
 			"-DWINDOW=" + WINDOW_SYSTEM,
 			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
-		]);
+		])
 
 @command(requires=["gyp"], usage="Open's the platform specfic IDE")
 def ide(args):
-	print("Opening IDE");
+	print("Opening IDE")
 
 @command(usage="Generates Script Bindings")
 def gen_bindings(args):
-	ensure_dir("src/gen");
-	bindingGenerator.run("src/spec");
+	ensure_dir("src/gen")
+	bindingGenerator.run("src/spec")
 
 @command(usage="Generates Build.hpp")
 def gen_build_hpp(args):
-	f = open(resolve_path(PROJECT_SOURCE, "Build.hpp"), "w");
-	f.write("// AUTOGENERATED BUILD INFOMATION FILE\n");
-	f.write("#define ENGINE_VERSION \"GIT_%s\"\n" % (get_git_hash()));
-	f.close();
+	f = open(resolve_path(PROJECT_SOURCE, "Build.hpp"), "w")
+	f.write("// AUTOGENERATED BUILD INFOMATION FILE\n")
+	f.write("#define ENGINE_VERSION \"GIT_%s\"\n" % (get_git_hash()))
+	f.close()
 
 @command(requires=["gen_bindings", "gen_build_hpp"], usage="Builds dynamicly generated source files")
 def gen_source(args):
@@ -263,32 +263,32 @@ def gen_source(args):
 @command(requires=["gyp", "gen_source"], usage="Cleans object files")
 def clean(args):
 	if sys.platform == "darwin": # OSX
-		shell_command(["xcodebuild", "clean"]);
+		shell_command(["xcodebuild", "clean"])
 	elif sys.platform == "linux2": # Linux
 		pass
 
 def _build_bin(output=True):
 	if sys.platform == "darwin": # OSX
-		shutil.copy("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"));
-		shutil.copy("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"));
-		shell_command(["xcodebuild", "-jobs", str(get_max_jobs())]);
+		shutil.copy("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"))
+		shutil.copy("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"))
+		shell_command(["xcodebuild", "-jobs", str(get_max_jobs())])
 		shell_command(["install_name_tool", "-change",
 			"/usr/local/lib/libengine2D.dylib",
 			"@executable_path/libengine2D.dylib",
-			resolve_path(PROJECT_BUILD_PATH, get_exe_name())]); # libengine2D.dylib
+			resolve_path(PROJECT_BUILD_PATH, get_exe_name())]) # libengine2D.dylib
 		shell_command(["install_name_tool", "-change",
 			"/usr/local/lib/libglfw.dylib",
 			"@executable_path/libglfw.dylib",
-			resolve_path(PROJECT_BUILD_PATH, get_lib_name())]); # libglfw3.dylib
+			resolve_path(PROJECT_BUILD_PATH, get_lib_name())]) # libglfw3.dylib
 		shell_command(["install_name_tool", "-change",
 			"/usr/local/lib/libv8.dylib",
 			"@executable_path/libv8.dylib",
-			resolve_path(PROJECT_BUILD_PATH, get_lib_name())]); # libv8.dylib 
+			resolve_path(PROJECT_BUILD_PATH, get_lib_name())]) # libv8.dylib 
 	elif sys.platform == "linux2":
-		os.chdir(resolve_path(PROJECT_ROOT, "0"));
-		os.environ["CC"] = "clang";
-		os.environ["CXX"] = "clang++";
-		os.environ["CXXFLAGS"] = "-std=gnu++11";
+		os.chdir(resolve_path(PROJECT_ROOT, "0"))
+		os.environ["CC"] = "clang"
+		os.environ["CXX"] = "clang++"
+		os.environ["CXXFLAGS"] = "-std=gnu++11"
 		os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/" # use resolve_path
 		shell_command("make")
 		os.chdir("..")
@@ -296,119 +296,119 @@ def _build_bin(output=True):
 
 @command(requires=["gyp", "gen_source"], usage="Builds executables")
 def build_bin(args):
-	_build_bin();
+	_build_bin()
 
 @command(requires=[], usage="Builds addons")
 def build_addons(args):
 	if sys.platform == "darwin":
 		if not ensure_file_hash(["src/Modules/JSUnsafe.cpp"]):
-			store_file_hash(["src/Modules/JSUnsafe.cpp"]);
-			buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe.dylib", link_v8=True);
+			store_file_hash(["src/Modules/JSUnsafe.cpp"])
+			buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe.dylib", link_v8=True)
 
 @command(requires=["build_bin", "build_addons"], usage="Copys support files to the build path")
 def build_env(args):
-	print("Copying Enviroment");
+	print("Copying Enviroment")
 
 @command(requires=["build_env"], usage="Runs the engine in Development Mode")
 def run(args):
-	run_engine(["-devmode", "-debug"]);
+	run_engine(["-devmode", "-debug"])
 
 @command(requires=["build_env"], usage="Runs the engine in Test Mode")
 def test(args):
-	run_engine_test([]);
-	run_engine_test(["-Ccore.render.openGL=2.0"]);
-	run_engine_test(["-Ccore.test.testFrames=100"]);
-	run_engine_test(["-Ccore.render.openGL=2.0", "-Ccore.test.testFrames=100"]);
+	run_engine_test([])
+	run_engine_test(["-Ccore.render.openGL=2.0"])
+	run_engine_test(["-Ccore.test.testFrames=100"])
+	run_engine_test(["-Ccore.render.openGL=2.0", "-Ccore.test.testFrames=100"])
 
 @command(requires=["build_env"], usage="Runs 1 test of the engine in Test Mode")
 def test_once(args):
-	run_engine_test([], onlyHighlight=False);
+	run_engine_test([], onlyHighlight=False)
 
 @command(requires=["gen_source", "fetch_gyp"], usage="Tests both GLFW and SDL")
 def test_full(args):
-	print("=== Starting Full Test Suite ===");
+	print("=== Starting Full Test Suite ===")
 	
-	print("=== Building GLFW Window ===");
-	clean();
-	WINDOW_SYSTEM = "glfw";
-	gyp();
-	build_bin();
-	print("=== Testing GLFW Window ===");
-	test();
+	print("=== Building GLFW Window ===")
+	clean()
+	WINDOW_SYSTEM = "glfw"
+	gyp()
+	build_bin()
+	print("=== Testing GLFW Window ===")
+	test()
 
-	print("=== Build SDL Window ===");
-	clean();
-	WINDOW_SYSTEM = "sdl";
-	gyp();
-	build_bin();
-	print("=== Testing SDL Window ===");
-	test();
+	print("=== Build SDL Window ===")
+	clean()
+	WINDOW_SYSTEM = "sdl"
+	gyp()
+	build_bin()
+	print("=== Testing SDL Window ===")
+	test()
 
 @command(usage="Build documentation using jsdoc")
 def doc(args):
 	shell_command([
 			"jsdoc", "-d", "./doc/apiDocs/", "./doc/api.js", "./Readme.md"
-		]);
+		])
 
 @command(usage="Prints the commandName and usage for each command")
 def help(args):
 	for x in commands:
-		print("%s | %s" % (x, commands[x].usage));
+		print("%s | %s" % (x, commands[x].usage))
 
 @command(usage="Prints the current building enviroment")
 def env(args):
-	print("sys.platform = %s" % (sys.platform));
-	print("sys.version = %s" % (sys.version));
-	print("sys.version_info = %s" % (sys.version_info));
-	print("resolve_path(PROJECT_ROOT, \"tasks.py\") = %s" % (resolve_path(PROJECT_ROOT, "tasks.py")));
+	print("sys.platform = %s" % (sys.platform))
+	print("sys.version = %s" % (sys.version))
+	print("sys.version_info = %s" % (sys.version_info))
+	print("resolve_path(PROJECT_ROOT, \"tasks.py\") = %s" % (resolve_path(PROJECT_ROOT, "tasks.py")))
 
 @command(usage="Runs CTags on the source directory")
 def tags(args):
-	srcPath = resolve_path(PROJECT_ROOT, "src");
-	srcFiles = [ f for f in os.listdir(srcPath) if os.path.isfile(os.path.join(srcPath,f)) ];
-	srcFiles = [ "src/" + f for f in srcFiles if f != ".DS_Store"];
+	srcPath = resolve_path(PROJECT_ROOT, "src")
+	srcFiles = [ f for f in os.listdir(srcPath) if os.path.isfile(os.path.join(srcPath,f)) ]
+	srcFiles = [ "src/" + f for f in srcFiles if f != ".DS_Store"]
 	shell_command([
-			CTAGS_PATH, "--c++-kinds=+p", "--fields=+iaS", "--extra=+q"] + srcFiles);
+			CTAGS_PATH, "--c++-kinds=+p", "--fields=+iaS", "--extra=+q"] + srcFiles)
 
 @command(requires=["build_env"], usage="Run the engine and take a screenshot after 1 second automaticly")
 def screenshot(args):
 	output = subprocess.check_output([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
-		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"]);
-	output = [f for f in output.split("\n") if "TestScreenshot - ####" in f];
-	reg = re.search("to \[(.*)\]", output[0]);
-	filename = reg.group(0);
-	filename = filename[4:-1];
-	shutil.copyfile(filename, resolve_path(PROJECT_ROOT, "screenshot.bmp"));
+		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"])
+	output = [f for f in output.split("\n") if "TestScreenshot - ####" in f]
+	reg = re.search("to \[(.*)\]", output[0])
+	filename = reg.group(0)
+	filename = filename[4:-1]
+	shutil.copyfile(filename, resolve_path(PROJECT_ROOT, "screenshot.bmp"))
 
 def run_command(cmdName, rawArgs):
 	if not commands[cmdName].check():
-		print("==== Skiping: %s" % (cmdName));
+		print("==== Skiping: %s" % (cmdName))
 		return
 
 	# run all required commands
 	for cmd in commands[cmdName].requires:
 		if not commands[cmdName].run: ## make sure the command is not run twice
-			run_command(cmd, rawArgs);
+			run_command(cmd, rawArgs)
 
 	# finaly run the commadn the user is intrested in
-	print(bcolors.HIGHLIGHT + "==== Running: %s ====" % (cmdName) + bcolors.ENDC);
-	commands[cmdName](rawArgs);
-	commands[cmdName].run = True;
+	print(bcolors.HIGHLIGHT + "==== Running: %s ====" % (cmdName) + bcolors.ENDC)
+	commands[cmdName](rawArgs)
+	commands[cmdName].run = True
 
 def main(args):
 	# require python version 2.7
 	if sys.version_info < (2, 7) or sys.version_info > (3, 0):
-		print("tasks.py requires Python 2.7 or Greater");
+		print("tasks.py requires Python 2.7 or Greater")
 
 	# get the command and run it
 	if len(args) < 2:
-		print("tasks.py : usage: ./tasks.py [commandName]");
+		print("tasks.py : usage: ./tasks.py [commandName]")
 	elif not args[1] in commands:
-		print("tasks.py : command %s not found" % (args[1]));
+		print("tasks.py : command %s not found" % (args[1]))
 	else:
-		run_command(args[1], args);
+		run_command(args[1], args)
 
-	write_config();
+	write_config()
 
 if __name__ == '__main__':
-  main(sys.argv);
+  main(sys.argv)
