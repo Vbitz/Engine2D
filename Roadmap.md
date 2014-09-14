@@ -35,10 +35,11 @@
 	- **DONE** Implement Platform_linux.cpp
 	- **DONE** Update engine2D.gyp
 	- Fix Runtime Bugs
-	- Commit back to upstream
+	- **DONE** Commit back to upstream
 - **Unfreeze Feature Additions**
 - Add new Scripting Features
 	- Implement new functions in javascriptAPI.txt
+	- Implement support for Packages in Javascript
 - Support C++ based add-ons
 	- Effective add-on loading system
 		- Resolve dependences
@@ -54,7 +55,16 @@
 	- Engine2D.h common API header file with wrapper code
 - Entity System
 	- Abstract out messaging to work with entity's
+	- Implement Serialization for the level format
 - UI System
+	- UI Elements
+		+ Button
+		+ Listbox
+		+ Textbox
+		+ Checkbox
+		+ Layout
+		+ etc...
+	- Loading UI from a source format
 - 3D Support
 	- **DONE** 3D Projections
 	- **DONE** 3D Matrix Support
