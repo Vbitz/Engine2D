@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 
-import os,sys,inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
-
-from tasks import shell_command
-
 import uuid
 import sys
 import argparse
+import os
+import subprocess
+
+def shell_command(cmd, throw=True):
+	print("shell in %s : %s" % (os.getcwd(), cmd))
+	if throw:
+		subprocess.check_call(cmd)
+	else:
+		subprocess.call(cmd)
 
 def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 	if outputFilename == None:
