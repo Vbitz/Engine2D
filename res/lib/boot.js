@@ -45,7 +45,7 @@
 		});
 	};
 
-	var libarys = ["ui", "timers", "perlin"];
+	var libarys = ["ui", "timers", "perlin", "detailProfiler"];
 	var currentLib = 0;
 
 	function runLibs(cb) {

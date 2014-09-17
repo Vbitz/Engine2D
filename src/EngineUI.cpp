@@ -69,7 +69,6 @@ namespace Engine {
             this->_lastHeapUsages[i] = 0.0f;
         }
         
-        GetEventsSingilton()->GetEvent("onProfileEnd")->AddListener("EngineUI::_profilerHook", EventEmitter::MakeTarget(_profilerHook, this));
         GetEventsSingilton()->GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", EventEmitter::MakeTarget(_captureLastDrawTimes, this));
         GetEventsSingilton()->GetEvent("logEvent")->AddListener("EngineUI::_createToast", EventEmitter::MakeTarget(_createToast, this));
     }
@@ -575,12 +574,6 @@ namespace Engine {
     
     bool EngineUI::ConsoleActive() {
         return this->_showConsole;
-    }
-    
-    EventMagic EngineUI::_profilerHook(Json::Value args, void* userPointer) {
-        EngineUIPtr eui = static_cast<EngineUIPtr>(userPointer);
-        
-        return EM_OK;
     }
     
     EventMagic EngineUI::_captureLastDrawTimes(Json::Value args, void* userPointer) {

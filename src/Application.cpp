@@ -757,6 +757,8 @@ namespace Engine {
             
             this->_window->Present();
             
+            GetEventsSingilton()->GetEvent("endOfFrame")->Emit();
+            
 			if (this->_window->ShouldClose()) {
 				Logger::begin("Window", Logger::LogLevel_Log) << "Exiting" << Logger::end();
 				this->_running = false;

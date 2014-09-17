@@ -114,7 +114,7 @@ namespace Engine {
             }
             lastRootZone = currentZone;
             if (GetEventsSingilton()->GetEvent("onProfileEnd")->ListenerCount() > 0) {
-                GetEventsSingilton()->GetEvent("onProfileEnd")->Emit();
+                GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(GetLastFrame());
             }
             currentZone = rootZone = NULL;
         }
