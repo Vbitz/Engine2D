@@ -11,6 +11,7 @@
 				global.sys.clearEvent(listenerName);
 				console.toast("Saving profile results to: " + filename);
 				global.fs.writeFile(filename, JSON.stringify(results));
+				results = [];
 			}
 		});
 	}

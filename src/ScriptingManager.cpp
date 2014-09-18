@@ -290,6 +290,7 @@ namespace Engine {
             
             sysTable->Set(isolate, "platform", v8::String::NewFromUtf8(isolate, _PLATFORM));
             sysTable->Set(isolate, "devMode", v8::Boolean::New(isolate, GetAppSingilton()->IsDeveloperMode()));
+            sysTable->Set(isolate, "debugMode", v8::Boolean::New(isolate, GetAppSingilton()->IsDebugMode()));
             sysTable->Set(isolate, "preload", v8::Boolean::New(isolate, true));
             sysTable->Set(isolate, "numProcessers", v8::Number::New(isolate, Platform::GetProcesserCount()));
             
@@ -362,6 +363,7 @@ namespace Engine {
         }
         
         void Context::CheckUpdate() {
+            ENGINE_PROFILER_SCOPE;
             if (Config::GetBoolean("core.script.autoReload")) {
                 for (auto iterator = this->_loadedFiles.begin(); iterator != this->_loadedFiles.end(); iterator++) {
                     long lastMod = Filesystem::GetFileModifyTime(iterator->first);
@@ -483,6 +485,7 @@ namespace Engine {
         }
         
         void Context::TriggerGC() {
+            ENGINE_PROFILER_SCOPE;
             v8::V8::IdleNotification();
         }
         
@@ -522,11 +525,11 @@ namespace Engine {
         }
         
         Json::Value ObjectToJson(v8::Local<v8::Object> obj) {
+            ENGINE_PROFILER_SCOPE;
             return _getValueFromV8Object(obj);
         }
         
-        v8::Local<v8::Value> _getValueFromJson(Json::Value val) {
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+        v8::Local<v8::Value> _getValueFromJson(v8::Isolate* isolate, Json::Value val) {
             switch (val.type()) {
                 case Json::nullValue: return v8::Null(isolate);
                 case Json::intValue: return v8::Number::New(isolate, val.asInt());
@@ -537,14 +540,14 @@ namespace Engine {
                 case Json::arrayValue: {
                     v8::Local<v8::Array> ret = v8::Array::New(isolate);
                     for (auto iter = val.begin(); iter != val.end(); iter++) {
-                        ret->Set(_getValueFromJson(iter.key()), _getValueFromJson(val[iter.key().asString()]));
+                        ret->Set(_getValueFromJson(isolate, iter.key()), _getValueFromJson(isolate, val[iter.key().asString()]));
                     }
                     return ret;
                 }
                 case Json::objectValue: {
                     v8::Local<v8::Object> ret = v8::Object::New(isolate);
                     for (auto iter = val.begin(); iter != val.end(); iter++) {
-                        ret->Set(_getValueFromJson(iter.key()), _getValueFromJson(val[iter.key().asString()]));
+                        ret->Set(v8::String::NewFromUtf8(isolate, iter.key().asCString()), _getValueFromJson(isolate, val[iter.key().asString()]));
                     }
                     return ret;
                 }
@@ -554,7 +557,8 @@ namespace Engine {
         }
         
         v8::Local<v8::Object> GetObjectFromJson(Json::Value val) {
-            return _getValueFromJson(val).As<v8::Object>();
+            ENGINE_PROFILER_SCOPE;
+            return _getValueFromJson(v8::Isolate::GetCurrent(), val).As<v8::Object>();
         }
     }
 }
