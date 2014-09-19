@@ -162,7 +162,15 @@ var tests = {
 		
 		var result = v.add(new Math.Vector(1, 2, 3));
 
-		return result.x == 2;
+		var v2 = new Math.Vector(1, 2, 3, 4);
+
+		v2 = v2.add(new Math.Vector(1, 2, 3, 4));
+		v2 = v2.sub(Math.Vector(0, 2, 1));
+		v2 = v2.mul(Math.Vector(1, 2, 3));
+		v2 = v2.cross(new Math.Vector(1, 3, 10, 4));
+		var v3 = v2.dot(new Math.Vector(1, 2, 3, 4));
+
+		return result.x == 2 && v3 == -9;
 	},
 	"Matrix": function () {
 		var m1 = new Math.Matrix();
