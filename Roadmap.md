@@ -57,6 +57,9 @@
 	- Abstract out messaging to work with entity's
 	- Implement Serialization for the level format
 - UI System
+	- UI specfic event systems
+	- UI rendering framework
+	- UI layout framework
 	- UI Elements
 		+ Button
 		+ Listbox
@@ -69,5 +72,7 @@
 	- **DONE** 3D Projections
 	- **DONE** 3D Matrix Support
 	- Lighting
+		- Fully defered rendering
+		- Physicaly based rendering
 	- Draw3D
 - ???
