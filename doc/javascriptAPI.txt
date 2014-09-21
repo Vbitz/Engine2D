@@ -77,8 +77,8 @@ Done	| Old Syntax														| New Syntax
 	X	| draw.getRGBFromHSV(h, s, v)										| Color.fromHSV(h, s, v)
 	X	| draw.print(x, y, str)												| -
 	X	| draw.getStringWidth(str)											| -
-		| draw.draw(texId, x, y, w, h)										| Rather then texID it will use texture objects
-		| draw.drawSub(texId, x, y, w, h, xSub, ySub, wSub, hSub)			| Same as Above
+	X	| draw.draw(texId, x, y, w, h)										| Rather then texID it will use texture objects
+	X	| draw.drawSub(texId, x, y, w, h, xSub, ySub, wSub, hSub)			| Same as Above
 		| draw.drawSprite(spriteSheet, sprite, x, y, w, h)					| Rather then spriteSheet it will use objects
 		| draw.openImage(filename)											| resource.openImage(filename)
 		| draw.openSpriteSheet(filename)									| resource.openSpriteSheet(filename)
@@ -97,7 +97,7 @@ Done	| Old Syntax														| New Syntax
 		| draw.loadFont(prettyName, filename)								| fontObj = resource.loadFont(filename);
 		| draw.isFontLoaded(prettyName)										| Font.prototype.isValid();
 		| draw.getVerts()													| draw.currentVerts
-		| draw.setDrawOffscreen(draw)										| REMOVED, never used it
+	X	| draw.setDrawOffscreen(draw)										| REMOVED, never used it
 		| draw.setCenter(x, y)												| REMOVED - Not really needed with mature camera controls
 ====================================================================================================================================
 ==== Very Important but I'm not sure how it fits in 																			====
@@ -109,8 +109,8 @@ Done	| Old Syntax														| New Syntax
 		| input.rightMouseButton											| input.mouseState[input.RIGHT_MOUSE_BUTTON]
 ====================================================================================================================================
 ==== The whole API is of limited usefulness and very unsafe, might get removed completly										====
-		| mod.open(filename)												| REMOVED
-		| mod.call(id, method)												| REMOVED
+	X	| mod.open(filename)												| REMOVED
+	X	| mod.call(id, method)												| REMOVED
 ====================================================================================================================================
 ==== Really awesome API and will be extended with some ORM stuff																====
 		| db.open(filename)													| new Database(filename)
@@ -128,14 +128,14 @@ Done	| Old Syntax														| New Syntax
 		| unsafe.getPageSize()												| unsafe.pageSize (Implamented with a Getter)
 = NEW STUFF  =======================================================================================================================
 		|																	| process.supports
-		| 																	| new Matrix([]);
-		| 																	| Math.degToRad(a)
-		| 																	| Math.radToDeg(a)
+	X	| 																	| new Matrix([]);
+	X	| 																	| Math.degToRad(a)
+	X	| 																	| Math.radToDeg(a)
 	X	| 																	| Math.PI_2
 	X	| 																	| Math.PI_4
-		|																	| new Vector2(x, y)
-		| 																	| new Vector3(x, y, z)
-		|																	| new Vector4(x, y, z, w)
+	X	|																	| new Vector2(x, y)
+	X	| 																	| new Vector3(x, y, z)
+	X	|																	| new Vector4(x, y, z, w)
 		| 																	| Math.distince(v1, v2)
 		| 																	| new Rectangle(x, y, w, h)
 		| 																	| Rectangle.intersects(r1, r2)
