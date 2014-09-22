@@ -165,7 +165,7 @@
 						"-lGL",
 						"-luuid",
 						"-L../third_party/lib",
-						"-Wl,-rpath,../third_party/third_party/lib"
+						"-Wl,-rpath,../third_party/lib"
 					],
 					"include_dirs": [
 						"third_party/v8"

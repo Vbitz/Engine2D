@@ -263,8 +263,10 @@ def build_v8(args):
 			])
 		os.chdir("..");
 		if sys.platform == "linux2":
+			print "Copying out/out/Release/lib.target/libv8.so to ../lib"
 			shutil.copy("out/out/Release/lib.target/libv8.so", "../lib/libv8.so")
 		elif sys.platform == "darwin":
+			print "Copying out/out/Release/libv8.dylib to ../lib"
 			shutil.copy("out/out/Release/libv8.dylib", "../lib/libv8.dylib")
 		os.chdir("../..")
 
