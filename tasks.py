@@ -235,17 +235,37 @@ def build_v8(args):
 		os.chdir(resolve_path(PROJECT_ROOT, "third_party/v8"))
 		if not os.path.exists("build/gyp"):
 			shutil.copytree("../gyp", "build/gyp")
+		oldPythonPath = os.environ["PYTHONPATH"]
+		os.environ["PYTHONPATH"] = os.getcwd() + "/tools/generate_shim_headers:" + os.getcwd() + "/build"
+		os.environ["GYP_GENERATORS"] = "make"
+		shell_command([
+				"build/gyp/gyp",
+				"--generator-output=out",
+				"src/d8.gyp",
+	            "-Ibuild/standalone.gypi",
+	            "--depth=.",
+	            "-S.native",
+	            "-Dcomponent=shared_library",
+	            "-Dv8_enable_backtrace=1",
+	            "-Dv8_enable_i18n_support=0",
+	            "-Darm_fpu=default",
+	            "-Darm_float_abi=default"
+			])
+		os.environ["GYP_GENERATORS"] = ""
+		os.environ["PYTHONPATH"] = "PYTHONPATH"
+		os.chdir("out");
 		shell_command([
 				"make",
-				"native",
-				"library=shared",
-				"snapshot=on",
-				"i18nsupport=off"
+				"-fMakefile.native",
+				"BUILDTYPE=Release",
+				"all",
+				"-j" + str(get_max_jobs())
 			])
+		os.chdir("..");
 		if sys.platform == "linux2":
-			shutil.copy("out/native/lib.target/libv8.so", "../lib/libv8.so")
+			shutil.copy("out/out/Release/lib.target/libv8.so", "../lib/libv8.so")
 		elif sys.platform == "darwin":
-			shutil.copy("out/native/libv8.dylib", "../lib/libv8.dylib")
+			shutil.copy("out/out/Release/libv8.dylib", "../lib/libv8.dylib")
 		os.chdir("../..")
 
 @command(requires=["build_glfw3", "build_v8"], usage="Fetches Build Dependancys")
@@ -307,7 +327,10 @@ def _build_bin(output=True, analyze=False):
 	if sys.platform == "darwin": # OSX
 		shutil.copy("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"))
 		shutil.copy("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"))
-		shell_command(["xcodebuild", "-jobs", str(get_max_jobs()), "RUN_CLANG_STATIC_ANALYZER=YES" if analyze else ""])
+		xcodeArgs = ["xcodebuild", "-jobs", str(get_max_jobs())]
+		if analyze:
+			xcodeArgs += ["RUN_CLANG_STATIC_ANALYZER=YES"]
+		shell_command(xcodeArgs)
 		shell_command(["install_name_tool", "-change",
 			"/usr/local/lib/libengine2D.dylib",
 			"@executable_path/libengine2D.dylib",
@@ -324,12 +347,12 @@ def _build_bin(output=True, analyze=False):
 		os.chdir(resolve_path(PROJECT_ROOT, "0"))
 		os.environ["CC"] = "clang"
 		os.environ["CXX"] = "clang++"
+		os.environ["CXXFLAGS"] = "-std=gnu++11"
+		shell_command("make")
 		if analyze:
 			os.environ["CXXFLAGS"] = "-std=gnu++11 --analyze -Wall"
 			os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/" # use resolve_path
 			shell_command("make", throw=False)
-		os.environ["CXXFLAGS"] = "-std=gnu++11"
-		shell_command("make")
 		os.chdir("..")
 
 

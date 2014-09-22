@@ -22,7 +22,7 @@ def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 		"-stdlib=libc++", "-lengine2D", "-Lbuild/Default", "-o", outputFilename]
 	args += ["-D_BUILD_UUID=\"" + str(uuid.uuid4()) + "\""]
 	if link_v8:
-		args += ["-lv8", "-Ithird_party/v8/include"]
+		args += ["-lv8", "-Ithird_party/v8"]
 	args += addedArgs
 	args += sources
 	shell_command(args)

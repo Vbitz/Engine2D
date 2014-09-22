@@ -23,6 +23,8 @@
 
 #include <cstring>
 
+#include <include/libplatform/libplatform.h>
+
 // Scripting Includes
 #include "JSSys.hpp"
 #include "JSDraw.hpp"
@@ -214,10 +216,10 @@ namespace Engine {
             }
         }
         
-        static void JitEventCallback(const v8::JitCodeEvent* e) {
-            if (e != NULL && e->type == v8::JitCodeEvent::CODE_ADDED) {
-                GetAppSingilton()->AddScript(e->name.str, e->name.len);
-            }
+        void Context::StaticInit() {
+            //v8::Platform* platform = v8::platform::CreateDefaultPlatform();
+            //v8::V8::InitializePlatform(platform);
+            v8::V8::Initialize();
         }
         
         Context::Context() : _isolate(v8::Isolate::New()), _scope(this->_isolate) {
@@ -258,8 +260,6 @@ namespace Engine {
             this->_createEventMagic();
             
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
-            
-            v8::V8::SetJitCodeEventHandler(v8::JitCodeEventOptions::kJitCodeEventDefault, JitEventCallback);
             
             v8::EscapableHandleScope handle_scope(isolate);
             
@@ -485,8 +485,9 @@ namespace Engine {
         }
         
         void Context::TriggerGC() {
-            ENGINE_PROFILER_SCOPE;
-            v8::V8::IdleNotification();
+            //ENGINE_PROFILER_SCOPE;
+            
+            //v8::Isolate::GetCurrent()->IdleNotification(1000);
         }
         
         // Globals

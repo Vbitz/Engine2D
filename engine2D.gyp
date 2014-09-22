@@ -136,7 +136,7 @@
 						]
 					},
 					"include_dirs": [
-						"third_party/v8/include"
+						"third_party/v8"
 					],
 					"library_dirs": [
 						"third_party/lib"	
@@ -168,7 +168,7 @@
 						"-Wl,-rpath,../third_party/third_party/lib"
 					],
 					"include_dirs": [
-						"third_party/v8/include"
+						"third_party/v8"
 					],
 					"library_dirs": [
 						"third_party/lib"	

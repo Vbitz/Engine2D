@@ -322,8 +322,7 @@ namespace Engine {
         void JS_Matrix::Copy(const v8::FunctionCallbackInfo<v8::Value> &_args) {
             ScriptingManager::Arguments args(_args);
             
-            v8::Handle<v8::Value> ctor = args.This()->GetConstructor();
-            v8::Handle<v8::Function> ctorFunc = v8::Handle<v8::Function>::Cast(ctor);
+            v8::Handle<v8::Function> ctorFunc = args.GetConstructor();
             v8::Handle<v8::Value> instance = ctorFunc->NewInstance(0, NULL);
             
             v8::Handle<v8::Object> instanceValue = v8::Handle<v8::Object>::Cast(instance);

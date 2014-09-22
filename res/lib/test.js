@@ -97,7 +97,7 @@ var tests = {
 		var iter = testGenerator();
 
 		for (var i = 0; i < items.length; i++) {
-			let iterValue = iter.next().value;
+			var iterValue = iter.next().value;
 			if (iterValue !== items[i]) {
 				console.error("failed: ", iterValue, items[i]);
 				return false;

@@ -831,6 +831,7 @@ namespace Engine {
         
         this->_updateAddonLoad(LoadOrder::PreScript);
         
+        ScriptingManager::Context::StaticInit();
         this->_scripting = new ScriptingManager::Context();
         
         // Scripting has now initalized, Javascript may punch in during any event

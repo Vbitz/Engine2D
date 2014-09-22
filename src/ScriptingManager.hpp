@@ -287,6 +287,11 @@ namespace Engine {
                 return this->_args.This();
             }
             
+            SCRIPTINGMANAGER_INLINE v8::Local<v8::Function> GetConstructor() {
+                v8::Handle<v8::Value> ctor = This()->GetPrototype()->ToObject()->Get(this->NewString("constructor"));
+                return v8::Handle<v8::Function>::Cast(ctor);
+            }
+            
             SCRIPTINGMANAGER_INLINE v8::Handle<v8::Value> operator[](int index) {
                 return this->_args[index];
             }
@@ -312,6 +317,7 @@ namespace Engine {
                 return this->_isolate;
             }
             
+            static void StaticInit();
             static void SetFlag(std::string flag);
             static void RunHelpCommand();
             static void TriggerGC();
