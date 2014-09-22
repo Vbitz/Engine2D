@@ -324,8 +324,11 @@ def _build_bin(output=True, analyze=False):
 		os.chdir(resolve_path(PROJECT_ROOT, "0"))
 		os.environ["CC"] = "clang"
 		os.environ["CXX"] = "clang++"
-		os.environ["CXXFLAGS"] = "-std=gnu++11" + " --analyze -Wall" if analyze else ""
-		os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/" # use resolve_path
+		if analyze:
+			os.environ["CXXFLAGS"] = "-std=gnu++11 --analyze -Wall"
+			os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/" # use resolve_path
+			shell_command("make", throw=False)
+		os.environ["CXXFLAGS"] = "-std=gnu++11"
 		shell_command("make")
 		os.chdir("..")
 
