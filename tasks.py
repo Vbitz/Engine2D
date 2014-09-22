@@ -303,11 +303,11 @@ def clean(args):
 	elif sys.platform == "linux2": # Linux
 		pass
 
-def _build_bin(output=True):
+def _build_bin(output=True, analyze=False):
 	if sys.platform == "darwin": # OSX
 		shutil.copy("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"))
 		shutil.copy("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"))
-		shell_command(["xcodebuild", "-jobs", str(get_max_jobs())])
+		shell_command(["xcodebuild", "-jobs", str(get_max_jobs()), "RUN_CLANG_STATIC_ANALYZER=YES" if analyze else ""])
 		shell_command(["install_name_tool", "-change",
 			"/usr/local/lib/libengine2D.dylib",
 			"@executable_path/libengine2D.dylib",
@@ -324,7 +324,7 @@ def _build_bin(output=True):
 		os.chdir(resolve_path(PROJECT_ROOT, "0"))
 		os.environ["CC"] = "clang"
 		os.environ["CXX"] = "clang++"
-		os.environ["CXXFLAGS"] = "-std=gnu++11"
+		os.environ["CXXFLAGS"] = "-std=gnu++11" + "--analyze -Wall" if analyze else ""
 		os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/" # use resolve_path
 		shell_command("make")
 		os.chdir("..")
@@ -333,6 +333,10 @@ def _build_bin(output=True):
 @command(requires=["gyp", "gen_source"], usage="Builds executables")
 def build_bin(args):
 	_build_bin()
+
+@command(requires=["gyp", "gen_source"], usage="Runs static analyzer")
+def analyze(args):
+	_build_bin(analyze=True)
 
 @command(requires=[], usage="Builds addons")
 def build_addons(args):

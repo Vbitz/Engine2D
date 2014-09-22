@@ -8,4 +8,4 @@ before_install:
 install:
   - sudo apt-get install -y git build-essential clang libglu1-mesa-dev xorg-dev uuid-dev cmake
 script:
-  - ./tasks.py build_bin
+  - ./tasks.py analyze

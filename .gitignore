@@ -53,3 +53,5 @@ tmp/*
 *.Makefile
 
 src/gen
+
+main.plist
