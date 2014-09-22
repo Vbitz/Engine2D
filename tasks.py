@@ -235,7 +235,7 @@ def build_v8(args):
 		os.chdir(resolve_path(PROJECT_ROOT, "third_party/v8"))
 		if not os.path.exists("build/gyp"):
 			shutil.copytree("../gyp", "build/gyp")
-		oldPythonPath = os.environ["PYTHONPATH"]
+		oldPythonPath = os.getenv("PYTHONPATH", "")
 		os.environ["PYTHONPATH"] = os.getcwd() + "/tools/generate_shim_headers:" + os.getcwd() + "/build"
 		os.environ["GYP_GENERATORS"] = "make"
 		shell_command([
