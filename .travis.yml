@@ -1,4 +1,6 @@
 language: cpp
+cache:
+  - apt
 compiler:
   - clang
 before_install:

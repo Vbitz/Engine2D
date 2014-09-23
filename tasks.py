@@ -448,6 +448,13 @@ def screenshot(args):
 	filename = filename[4:-1]
 	shutil.copyfile(filename, resolve_path(PROJECT_ROOT, "screenshot.bmp"))
 
+@command(requires=["build_env"], usage="Builds a release package")
+def release(args):
+	# TODO: 
+	# Copy all files to run the test suite to a release folder and make sure all the permissions and linking work
+	# Zip/tar.gz the result and upload it to some kind of hosting solution if the CI environ is set
+	pass
+
 def run_command(cmdName, rawArgs):
 	if not commands[cmdName].check():
 		print("==== Skiping: %s" % (cmdName))
