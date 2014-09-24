@@ -28,4 +28,5 @@ event.key_L = function vertexBufferTest_load (e) {
 	console.log("Loaded");
 	buff.model.reset();
 	buff.model.rotate(Math.degToRad(90), new Math.Vector(1, 0, 0));
+	buff.computeNormals();
 };

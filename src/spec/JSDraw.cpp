@@ -309,6 +309,12 @@ namespace Engine {
                 JS_VertexBuffer2D::Unwrap<JS_VertexBuffer2D>(args.This())->VertexBuffer::SetWireframe(args.BooleanValue(0));
             }
             
+            static void ComputeNormals(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+
+                JS_VertexBuffer2D::Unwrap<JS_VertexBuffer2D>(args.This())->VertexBuffer::ComputeNormals(PolygonMode::Triangles);
+            }
+
             static void Init(v8::Handle<v8::ObjectTemplate> drawTable) {
                 ScriptingManager::Factory f(v8::Isolate::GetCurrent());
                 v8::HandleScope scope(f.GetIsolate());
@@ -325,7 +331,8 @@ namespace Engine {
                     {FTT_Prototype, "setProjectionPerspective", f.NewFunctionTemplate(SetProjectionPerspective)},
                     {FTT_Prototype, "setLookAtView", f.NewFunctionTemplate(SetLookAtView)},
                     {FTT_Prototype, "setDepthTest", f.NewFunctionTemplate(SetDepthTest)},
-                    {FTT_Prototype, "setWireframe", f.NewFunctionTemplate(SetWireframe)}
+                    {FTT_Prototype, "setWireframe", f.NewFunctionTemplate(SetWireframe)},
+                    {FTT_Prototype, "computeNormals", f.NewFunctionTemplate(ComputeNormals)}
                 });
                 
                 newVertexBuffer->InstanceTemplate()->SetInternalFieldCount(1);

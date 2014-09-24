@@ -322,6 +322,36 @@ namespace Engine {
         this->_view = glm::lookAt(source, target, glm::vec3(0.0f, 0.0f, 1.0f));
     }
     
+    // Code based on Three.js which is in turn based on
+    // http://www.iquilezles.org/www/articles/normals/normals.htm
+    // in part
+    void VertexBuffer::ComputeNormals(PolygonMode polygonFormat) {
+        ENGINE_PROFILER_SCOPE;
+        
+        // TODO: Load them into the normal buffer insteed of the color buffer
+        if (polygonFormat != PolygonMode::Triangles) return;
+        
+        glm::vec3 *normals = new glm::vec3[this->_vertexCount];
+        
+        // calculate normals
+        for (int i = 0; i < this->_vertexCount; i += 3) {
+            glm::vec3 faceNormal = glm::normalize(glm::cross(
+                (this->_vertexBuffer[i + 2].pos - this->_vertexBuffer[i + 1].pos),
+                (this->_vertexBuffer[i + 0].pos - this->_vertexBuffer[i + 1].pos)));
+            normals[i + 0] += faceNormal;
+            normals[i + 1] += faceNormal;
+            normals[i + 2] += faceNormal;
+        }
+        
+        // normalize the normals and load them into the buffer
+        for (int i = 0; i < this->_vertexCount; i++) {
+            normals[i] = glm::normalize(normals[i]);
+            this->_vertexBuffer[i].col = Color4f(normals[i].x, normals[i].y, normals[i].z, 1.0f);
+        }
+        
+        delete [] normals;
+    }
+    
     void VertexBuffer::_begin() {
         if (this->_renderGL->GetOpenGLVersion().major >= 3) {
             glBindVertexArray(this->_vertexArrayPointer);

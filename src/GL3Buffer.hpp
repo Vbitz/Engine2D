@@ -107,6 +107,8 @@ namespace Engine {
         void SetProjectionType(ProjectionType t);
         void SetLookAtView(glm::vec3 source, glm::vec3 target);
         
+        void ComputeNormals(PolygonMode polygonFormat);
+        
         RenderDriverPtr GetRender() {
             return this->_renderGL;
         }
