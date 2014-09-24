@@ -11,3 +11,5 @@ install:
   - sudo apt-get install -y git build-essential clang libglu1-mesa-dev xorg-dev uuid-dev cmake
 script:
   - ./tasks.py analyze
+after_success:
+  - ./tasks.py release

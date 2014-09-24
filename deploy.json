@@ -1,0 +1,13 @@
+{
+	"appName": "engine2D_testSuite",
+	"os": ["darwin", "linux2"],
+	"resourceRoot": "res/",
+	"configFile": "config/config.json",
+	"files": [
+		"lib/*",
+		"texture/*",
+		"shaders/basic*",
+		"modules/js_unsafe.*",
+		"fonts/*"
+	]
+}

@@ -28,6 +28,7 @@ import hashlib
 import ConfigParser
 import multiprocessing
 import glob
+import json
 
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -188,6 +189,13 @@ def store_str_hash(inStrs):
 
 	for inStr in inStrs:
 		config.set("StoredHashes", filename, get_hash(inStr))
+
+def read_json(filename):
+	with open(filename, "r") as f:
+		return json.loads(f.read())
+
+def is_travis():
+	return False
 
 @command(usage="Downloads a local copy of CMake if we can't find one")
 def fetch_cmake(args):
@@ -450,10 +458,44 @@ def screenshot(args):
 
 @command(requires=["build_env"], usage="Builds a release package")
 def release(args):
-	# TODO: 
-	# Copy all files to run the test suite to a release folder and make sure all the permissions and linking work
-	# Zip/tar.gz the result and upload it to some kind of hosting solution if the CI environ is set
-	pass
+	deployFile = read_json(resolve_path(PROJECT_ROOT, "deploy.json"))
+	basePath = resolve_path(PROJECT_ROOT, deployFile["resourceRoot"])
+	outputName = "%s_%s_v%s" % (deployFile["appName"], sys.platform, get_git_hash())
+	outputPath = os.path.join(resolve_path(PROJECT_ROOT, "release"), outputName) 
+
+	# check current operating system is in the [os] array
+	currentPlatform = sys.platform
+	foundOs = False
+	for osName in deployFile["os"]:
+		if osName == currentPlatform:
+			foundOs = True
+	if not foundOs:
+		raise Exception("the deploy.json file does not support your current operating system")
+
+	# build a list of files to copy to release
+	fileList = []
+	fileList += [os.path.join(basePath, deployFile["configFile"])]
+	for fName in deployFile["files"]:
+		fileList += [f for f in glob.glob(os.path.join(basePath, fName))]
+
+	ensure_dir(outputPath)
+	ensure_dir(os.path.join(outputPath, "bin"))
+
+	binPath = resolve_path(PROJECT_BUILD_PATH)
+	binList = [os.path.relpath(f, binPath) for f in glob.glob(os.path.join(binPath, "*"))]
+	for fName in binList:
+		shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
+		if fName == get_exe_name():
+			os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
+
+	for fName in fileList:
+		ensure_dir(os.path.dirname(os.path.join(outputPath, fName)))
+		shutil.copyfile(fName, os.path.join(outputPath, fName))
+
+	shutil.make_archive(outputName, "gztar", root_dir=resolve_path(PROJECT_ROOT, "release"))
+
+	if is_travis():
+		pass
 
 def run_command(cmdName, rawArgs):
 	if not commands[cmdName].check():
@@ -474,6 +516,7 @@ def main(args):
 	# require python version 2.7
 	if sys.version_info < (2, 7) or sys.version_info > (3, 0):
 		print("tasks.py requires Python 2.7 or Greater")
+		return
 
 	# get the command and run it
 	if len(args) < 2:
