@@ -50,9 +50,9 @@ ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
 commands = {}
 
 class bcolors:
-    HEADER = '\x1b[0;42m\x1b[1;91m'
-    HIGHLIGHT = '\x1b[0;44m\x1b[1;91m'
-    ENDC = '\033[0m'
+	HEADER = '\x1b[0;42m\x1b[1;91m'
+	HIGHLIGHT = '\x1b[0;44m\x1b[1;91m'
+	ENDC = '\033[0m'
 
 def noop():
 	return True
@@ -197,6 +197,21 @@ def read_json(filename):
 def is_travis():
 	return False
 
+def get_size(start_path = '.'):
+	total_size = 0
+	for dirpath, dirnames, filenames in os.walk(start_path):
+		for f in filenames:
+			fp = os.path.join(dirpath, f)
+			total_size += os.path.getsize(fp)
+	return total_size
+
+def sizeof_fmt(num):
+	for x in ['bytes','KB','MB','GB']:
+		if num < 1024.0:
+			return "%3.1f%s" % (num, x)
+		num /= 1024.0
+	return "%3.1f%s" % (num, 'TB')
+
 @command(usage="Downloads a local copy of CMake if we can't find one")
 def fetch_cmake(args):
 	if sys.platform == "linux2":
@@ -226,7 +241,7 @@ def build_glfw3(args):
 		glfw_glob = "src/libglfw.*dylib"
 
 	for f in glob.glob(glfw_glob):
-		print "Copying " + f + " to " + "../lib"
+		print "[build_glfw3] copying %s to ../lib" % (f)
 		shutil.copy(f, "../lib")
 	
 	os.chdir("../..")
@@ -250,14 +265,14 @@ def build_v8(args):
 				"build/gyp/gyp",
 				"--generator-output=out",
 				"src/d8.gyp",
-	            "-Ibuild/standalone.gypi",
-	            "--depth=.",
-	            "-S.native",
-	            "-Dcomponent=shared_library",
-	            "-Dv8_enable_backtrace=1",
-	            "-Dv8_enable_i18n_support=0",
-	            "-Darm_fpu=default",
-	            "-Darm_float_abi=default"
+				"-Ibuild/standalone.gypi",
+				"--depth=.",
+				"-S.native",
+				"-Dcomponent=shared_library",
+				"-Dv8_enable_backtrace=1",
+				"-Dv8_enable_i18n_support=0",
+				"-Darm_fpu=default",
+				"-Darm_float_abi=default"
 			])
 		os.environ["GYP_GENERATORS"] = ""
 		os.environ["PYTHONPATH"] = "PYTHONPATH"
@@ -271,10 +286,10 @@ def build_v8(args):
 			])
 		os.chdir("..");
 		if sys.platform == "linux2":
-			print "Copying out/out/Release/lib.target/libv8.so to ../lib"
+			print "[build_v8] copying out/out/Release/lib.target/libv8.so to ../lib"
 			shutil.copy("out/out/Release/lib.target/libv8.so", "../lib/libv8.so")
 		elif sys.platform == "darwin":
-			print "Copying out/out/Release/libv8.dylib to ../lib"
+			print "[build_v8] copying out/out/Release/libv8.dylib to ../lib"
 			shutil.copy("out/out/Release/libv8.dylib", "../lib/libv8.dylib")
 		os.chdir("../..")
 
@@ -305,8 +320,11 @@ def gen_bindings(args):
 	for f in srcFiles:
 		filePath = os.path.join(srcPath, f)
 		if not ensure_file_hash([filePath]):
+			print "[gen_bindings] building %s" % (filePath)
 			store_file_hash([filePath])
 			bindingGenerator.parseFile(filePath, f)
+		else:
+			print "[gen_bindings] skiping %s" % (filePath)
 
 @command(usage="Generates Build.hpp")
 def gen_build_hpp(args):
@@ -378,8 +396,11 @@ def analyze(args):
 def build_addons(args):
 	if sys.platform == "darwin":
 		if not ensure_file_hash(["src/Modules/JSUnsafe.cpp"]):
+			print "[build_addons] building res/modules/js_unsafe.dylib"
 			store_file_hash(["src/Modules/JSUnsafe.cpp"])
 			buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe.dylib", link_v8=True)
+		else:
+			print "[build_addons] skiping res/modules/js_unsafe.dylib"
 
 @command(requires=["build_bin", "build_addons"], usage="Copys support files to the build path")
 def build_env(args):
@@ -433,10 +454,10 @@ def help(args):
 
 @command(usage="Prints the current building enviroment")
 def env(args):
-	print("sys.platform = %s" % (sys.platform))
-	print("sys.version = %s" % (sys.version))
-	print("sys.version_info = %s" % (sys.version_info))
-	print("resolve_path(PROJECT_ROOT, \"tasks.py\") = %s" % (resolve_path(PROJECT_ROOT, "tasks.py")))
+	print "[env] sys.platform = \"%s\"" % (sys.platform)
+	print "[env] sys.version = \"%s\"" % (sys.version.replace("\n", ""))
+	print "[env] sys.version_info = %s" % (sys.version_info)
+	print "[env] resolve_path(PROJECT_ROOT, \"tasks.py\") = \"%s\"" % (resolve_path(PROJECT_ROOT, "tasks.py"))
 
 @command(usage="Runs CTags on the source directory")
 def tags(args):
@@ -461,7 +482,9 @@ def release(args):
 	deployFile = read_json(resolve_path(PROJECT_ROOT, "deploy.json"))
 	basePath = resolve_path(PROJECT_ROOT, deployFile["resourceRoot"])
 	outputName = "%s_%s_v%s" % (deployFile["appName"], sys.platform, get_git_hash())
-	outputPath = os.path.join(resolve_path(PROJECT_ROOT, "release"), outputName) 
+	outputPath = os.path.join(resolve_path(PROJECT_ROOT, "release"), outputName)
+
+	print "[release] begining release build for %s on %s" % (deployFile["appName"], sys.platform)
 
 	# check current operating system is in the [os] array
 	currentPlatform = sys.platform
@@ -485,14 +508,23 @@ def release(args):
 	binList = [os.path.relpath(f, binPath) for f in glob.glob(os.path.join(binPath, "*"))]
 	for fName in binList:
 		shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
+		print "[release] copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
 		if fName == get_exe_name():
 			os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
 
 	for fName in fileList:
 		ensure_dir(os.path.dirname(os.path.join(outputPath, fName)))
+		print "[release] copying %s to %s" % (fName, os.path.join(outputPath, fName))
 		shutil.copyfile(fName, os.path.join(outputPath, fName))
 
+	print "[release] building %s" % (outputName + ".tar.gz")
 	shutil.make_archive(outputName, "gztar", root_dir=resolve_path(PROJECT_ROOT, "release"))
+
+	uncompressedSize = get_size(start_path=resolve_path(PROJECT_ROOT, "release"))
+	compressedSize = os.path.getsize(outputName + ".tar.gz")
+
+	print "[release] built %s with output size %s compressed from %s (%s%%)" % (outputName + ".tar.gz", \
+		sizeof_fmt(compressedSize), sizeof_fmt(uncompressedSize), "%.2f" % ((1.0 * compressedSize / uncompressedSize) * 100.0))
 
 	if is_travis():
 		pass
