@@ -479,15 +479,26 @@ def screenshot(args):
 
 @command(requires=["build_env"], usage="Builds a release package")
 def release(args):
-	deployFile = read_json(resolve_path(PROJECT_ROOT, "deploy.json"))
-	basePath = resolve_path(PROJECT_ROOT, deployFile["resourceRoot"])
-	outputName = "%s_%s_v%s" % (deployFile["appName"], sys.platform, get_git_hash())
-	outputPath = os.path.join(resolve_path(PROJECT_ROOT, "release"), outputName)
+	deployFilename	= resolve_path(PROJECT_ROOT, "deploy.json")
+	deployFile		= read_json(deployFilename)
+	basePath		= resolve_path(PROJECT_ROOT, deployFile["resourceRoot"])
+	outputName		= "%s_%s_v%s" % (deployFile["appName"], sys.platform, get_git_hash())
+	outputPath		= os.path.join(resolve_path(PROJECT_ROOT, "release"), outputName)
+	binPath			= resolve_path(PROJECT_BUILD_PATH)
+	currentPlatform = sys.platform
 
-	print "[release] begining release build for %s on %s" % (deployFile["appName"], sys.platform)
+	print "[release] === release config ==="
+	print "[release] deployFilename = \"%s\"" % (deployFilename)
+	print "[release] basePath = \"%s\"" % (basePath)
+	print "[release] outputName = \"%s\"" % (outputName)
+	print "[release] outputPath = \"%s\"" % (outputPath)
+	print "[release] binPath = \"%s\"" % (binPath)
+	print "[release] currentPlatform = \"%s\"" % (currentPlatform)
+	print "[release] platformList = \"%s\"" % (deployFile["os"])
+
+	print "[release] begining release build for %s on %s" % (deployFile["appName"], currentPlatform)
 
 	# check current operating system is in the [os] array
-	currentPlatform = sys.platform
 	foundOs = False
 	for osName in deployFile["os"]:
 		if osName == currentPlatform:
@@ -504,7 +515,13 @@ def release(args):
 	ensure_dir(outputPath)
 	ensure_dir(os.path.join(outputPath, "bin"))
 
-	binPath = resolve_path(PROJECT_BUILD_PATH)
+	if currentPlatform == "linux2":
+		ensure_dir(os.path.join(outputPath, "lib"))
+		libPath = os.path.join(resolve_path(PROJECT_ROOT, "third_party"), "lib")
+		for fName in [os.path.join(libPath, "libv8.so"), os.path.join(libPath, "libglfw.so")]:
+			shutil.copyfile(fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath)))
+			print "[release] copying %s to %s" % (fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath)))
+
 	binList = [os.path.relpath(f, binPath) for f in glob.glob(os.path.join(binPath, "*"))]
 	for fName in binList:
 		shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
