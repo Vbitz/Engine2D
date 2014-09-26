@@ -523,12 +523,18 @@ def release(args):
 			shutil.copyfile(fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath)))
 			print "[release] copying %s to %s" % (fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath)))
 
-	binList = [os.path.relpath(f, binPath) for f in glob.glob(os.path.join(binPath, "*"))]
-	for fName in binList:
-		shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
-		print "[release] copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
-		if fName == get_exe_name():
-			os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
+		for fName in ["engine2D", "libengine2D.so"]:
+			shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
+			print "[release] copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
+			if fName == get_exe_name():
+				os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
+	else:
+		binList = [os.path.relpath(f, binPath) for f in glob.glob(os.path.join(binPath, "*"))]
+		for fName in binList:
+			shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
+			print "[release] copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
+			if fName == get_exe_name():
+				os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
 
 	for fName in fileList:
 		ensure_dir(os.path.dirname(os.path.join(outputPath, fName)))
@@ -546,7 +552,7 @@ def release(args):
 
 	if not is_travis():
 		return
-	
+
 	print "[release] detected travis ci"
 
 def run_command(cmdName, rawArgs):
