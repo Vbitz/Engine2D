@@ -90,7 +90,7 @@ def resolve_path(base, path=""):
 		if sys.platform == "darwin":
 			return os.path.join(resolve_path(PROJECT_ROOT, "build/Default"), path)
 		elif sys.platform == "linux2":
-			return os.path.join(resolve_path(PROJECT_ROOT, "0/build/Default"), path)
+			return os.path.join(resolve_path(PROJECT_ROOT, "0/out/Default"), path)
 	elif base == PROJECT_TMP_PATH:
 		return os.path.join(resolve_path(PROJECT_ROOT, "tmp"), path)
 	else:
@@ -195,7 +195,7 @@ def read_json(filename):
 		return json.loads(f.read())
 
 def is_travis():
-	return False
+	return os.getenv("TRAVIS", "false") == "true"
 
 def get_size(start_path = '.'):
 	total_size = 0
@@ -494,7 +494,8 @@ def release(args):
 	print "[release] outputPath = \"%s\"" % (outputPath)
 	print "[release] binPath = \"%s\"" % (binPath)
 	print "[release] currentPlatform = \"%s\"" % (currentPlatform)
-	print "[release] platformList = \"%s\"" % (deployFile["os"])
+	print "[release] platformList = %s" % (deployFile["os"])
+	print "[release] is_travis = %s" % (is_travis())
 
 	print "[release] begining release build for %s on %s" % (deployFile["appName"], currentPlatform)
 
@@ -543,8 +544,10 @@ def release(args):
 	print "[release] built %s with output size %s compressed from %s (%s%%)" % (outputName + ".tar.gz", \
 		sizeof_fmt(compressedSize), sizeof_fmt(uncompressedSize), "%.2f" % ((1.0 * compressedSize / uncompressedSize) * 100.0))
 
-	if is_travis():
-		pass
+	if not is_travis():
+		return
+	
+	print "[release] detected travis ci"
 
 def run_command(cmdName, rawArgs):
 	if not commands[cmdName].check():
