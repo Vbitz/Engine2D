@@ -71,14 +71,23 @@ class command(object):
 		commands[func.__name__].run = False
 		return func
 
+def is_linux():
+	return sys.platform == "linux2"
+
+def is_osx():
+	return sys.platform == "darwin"
+
+def is_windows():
+	return sys.platform == "win32"
+
 def get_exe_name():
-	if sys.platform == "darwin" or sys.platform == "linux2":
+	if is_linux() or is_osx():
 		return "engine2D"
 
 def get_lib_name():
-	if sys.platform == "darwin":
+	if is_osx():
 		return "libengine2D.dylib"
-	elif sys.platform == "linux2":
+	elif is_linux():
 		return "libengine2D.so"
 
 def resolve_path(base, path=""):
@@ -87,9 +96,9 @@ def resolve_path(base, path=""):
 	elif base == PROJECT_SOURCE:
 		return os.path.join(resolve_path(PROJECT_ROOT, "src"), path)
 	elif base == PROJECT_BUILD_PATH:
-		if sys.platform == "darwin":
+		if is_osx():
 			return os.path.join(resolve_path(PROJECT_ROOT, "build/Default"), path)
-		elif sys.platform == "linux2":
+		elif is_linux():
 			return os.path.join(resolve_path(PROJECT_ROOT, "0/out/Default"), path)
 	elif base == PROJECT_TMP_PATH:
 		return os.path.join(resolve_path(PROJECT_ROOT, "tmp"), path)
@@ -214,7 +223,7 @@ def sizeof_fmt(num):
 
 @command(usage="Downloads a local copy of CMake if we can't find one")
 def fetch_cmake(args):
-	if sys.platform == "linux2":
+	if is_linux():
 		# Some of these commands need sudo
 		# just run "sudo apt-get install -y cmake"
 		pass
@@ -235,9 +244,9 @@ def build_glfw3(args):
 	shell_command(["make"])
 
 	glfw_glob = ""
-	if sys.platform == "linux2":
+	if is_linux():
 		glfw_glob = "src/libglfw.so*"
-	elif sys.platform == "darwin":
+	elif is_osx():
 		glfw_glob = "src/libglfw.*dylib"
 
 	for f in glob.glob(glfw_glob):
@@ -248,13 +257,13 @@ def build_glfw3(args):
 
 @command(usage="Fetch and build V8 using GYP")
 def build_v8(args):
-	if sys.platform == "win32": # windows
+	if is_windows(): # windows
 		# svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@231940 third_party/cygwin
 		# python build\gyp_v8 -Dv8_enable_i18n_support=0
 		# msbuild /p:Configuration=Release build\All.sln
 		# copy the relevent files to third_party/lib and third_party/include
 		pass
-	elif sys.platform == "linux2" or sys.platform == "darwin": # linux
+	elif is_linux() or is_osx(): # linux/osx
 		os.chdir(resolve_path(PROJECT_ROOT, "third_party/v8"))
 		if not os.path.exists("build/gyp"):
 			shutil.copytree("../gyp", "build/gyp")
@@ -285,10 +294,10 @@ def build_v8(args):
 				"-j" + str(get_max_jobs())
 			])
 		os.chdir("..");
-		if sys.platform == "linux2":
+		if is_linux():
 			print "[build_v8] copying out/out/Release/lib.target/libv8.so to ../lib"
 			shutil.copy("out/out/Release/lib.target/libv8.so", "../lib/libv8.so")
-		elif sys.platform == "darwin":
+		elif is_osx():
 			print "[build_v8] copying out/out/Release/libv8.dylib to ../lib"
 			shutil.copy("out/out/Release/libv8.dylib", "../lib/libv8.dylib")
 		os.chdir("../..")
@@ -346,13 +355,13 @@ def gen_source(args):
 
 @command(requires=["gyp", "gen_source"], usage="Cleans object files")
 def clean(args):
-	if sys.platform == "darwin": # OSX
+	if is_osx(): # OSX
 		shell_command(["xcodebuild", "clean"])
-	elif sys.platform == "linux2": # Linux
+	elif is_linux(): # Linux
 		pass
 
 def _build_bin(output=True, analyze=False):
-	if sys.platform == "darwin": # OSX
+	if is_osx(): # OSX
 		shutil.copy("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"))
 		shutil.copy("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"))
 		xcodeArgs = ["xcodebuild", "-jobs", str(get_max_jobs())]
@@ -371,7 +380,7 @@ def _build_bin(output=True, analyze=False):
 			"/usr/local/lib/libv8.dylib",
 			"@executable_path/libv8.dylib",
 			resolve_path(PROJECT_BUILD_PATH, get_lib_name())]) # libv8.dylib 
-	elif sys.platform == "linux2":
+	elif is_linux():
 		os.chdir(resolve_path(PROJECT_ROOT, "0"))
 		os.environ["CC"] = "clang"
 		os.environ["CXX"] = "clang++"
@@ -394,7 +403,7 @@ def analyze(args):
 
 @command(requires=[], usage="Builds addons")
 def build_addons(args):
-	if sys.platform == "darwin":
+	if is_osx():
 		if not ensure_file_hash(["src/Modules/JSUnsafe.cpp"]):
 			print "[build_addons] building res/modules/js_unsafe.dylib"
 			store_file_hash(["src/Modules/JSUnsafe.cpp"])
@@ -516,7 +525,7 @@ def release(args):
 	ensure_dir(outputPath)
 	ensure_dir(os.path.join(outputPath, "bin"))
 
-	if currentPlatform == "linux2":
+	if is_linux():
 		ensure_dir(os.path.join(outputPath, "lib"))
 		libPath = os.path.join(resolve_path(PROJECT_ROOT, "third_party"), "lib")
 		for fName in [os.path.join(libPath, "libv8.so"), os.path.join(libPath, "libglfw.so")]:
