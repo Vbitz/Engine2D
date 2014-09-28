@@ -42,7 +42,8 @@ PROJECT_SOURCE = 1
 PROJECT_BUILD_PATH = 2
 PROJECT_TMP_PATH = 3
 
-CTAGS_PATH = "/usr/local/bin/ctags"
+CTAGS_PATH = "/usr/local/bin/ctags" # installed with "brew install ctags"
+GCOV_PATH = "/usr/local/bin/gcov-4.2" # installed with "brew install gcc"
 
 WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw")
 ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
@@ -360,13 +361,16 @@ def clean(args):
 	elif is_linux(): # Linux
 		pass
 
-def _build_bin(output=True, analyze=False):
+def _build_bin(output=True, analyze=False, coverage=False):
 	if is_osx(): # OSX
 		shutil.copy("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"))
 		shutil.copy("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"))
 		xcodeArgs = ["xcodebuild", "-jobs", str(get_max_jobs())]
 		if analyze:
 			xcodeArgs += ["RUN_CLANG_STATIC_ANALYZER=YES"]
+		if coverage:
+			xcodeArgs += ["GCC_GENERATE_TEST_COVERAGE_FILES=YES",
+				"GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"]
 		shell_command(xcodeArgs)
 		shell_command(["install_name_tool", "-change",
 			"/usr/local/lib/libengine2D.dylib",
@@ -400,6 +404,18 @@ def build_bin(args):
 @command(requires=["gyp", "gen_source"], usage="Runs static analyzer")
 def analyze(args):
 	_build_bin(analyze=True)
+
+@command(requires=["gyp", "gen_source"], usage="Runs code coverage")
+def ccov(args):
+	_build_bin(coverage=True)
+
+	oldDir = os.getcwd()
+	os.chdir("build/engine2D.build/Default/libengine2D.build/Objects-normal/x86_64")
+	objectFiles = glob.glob("*.o")
+	shell_command([GCOV_PATH, "--no-output"] + objectFiles)
+	os.chdir(oldDir)
+
+	# TODO: Parse the output into a better report
 
 @command(requires=[], usage="Builds addons")
 def build_addons(args):
