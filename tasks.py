@@ -111,10 +111,13 @@ def require_in_path(arr):
 		pass
 	return True
 
-def shell_command(cmd, throw=True):
+def shell_command(cmd, throw=True, output=False):
 	print(bcolors.HEADER + "shell in %s : %s" % (os.getcwd(), cmd) + bcolors.ENDC)
 	if throw:
-		subprocess.check_call(cmd)
+		if output:
+			return subprocess.check_output(cmd)
+		else:
+			subprocess.check_call(cmd)
 	else:
 		subprocess.call(cmd)
 
@@ -405,17 +408,34 @@ def build_bin(args):
 def analyze(args):
 	_build_bin(analyze=True)
 
+ccovExpr = re.compile("File '(.*)'\nLines executed:(.*) of (.*)\n")
+
+def parseCcovLine(m):
+	filename = m.group(1)
+	linesP = m.group(2)
+	totalLines = m.group(3)
+	return "[ccov] '%s' : executed %s of %s lines" % (filename, linesP, totalLines)
+
 @command(requires=["gyp", "gen_source"], usage="Runs code coverage")
 def ccov(args):
+	if not is_osx(): # This won't work on linux yet
+		return
+
+	print "[ccov] _build_bin(coverage=True)"
 	_build_bin(coverage=True)
 
+	print "[ccov] run_engine([\"-test\"])"
+	run_engine(["-test"])
+
+	print "[ccov] running gcov"
 	oldDir = os.getcwd()
 	os.chdir("build/engine2D.build/Default/libengine2D.build/Objects-normal/x86_64")
 	objectFiles = glob.glob("*.o")
-	shell_command([GCOV_PATH, "--no-output"] + objectFiles)
+	out = shell_command([GCOV_PATH, "--no-output"] + objectFiles, output=True)
 	os.chdir(oldDir)
 
-	# TODO: Parse the output into a better report
+	print "[ccov] output"
+	print re.sub(ccovExpr, parseCcovLine, out)
 
 @command(requires=[], usage="Builds addons")
 def build_addons(args):
