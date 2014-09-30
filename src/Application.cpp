@@ -699,6 +699,7 @@ namespace Engine {
         this->_running = true;
         
 		while (this->_running) {
+            
             if (!this->_window->ShouldClose() &&  // Check to make sure were not going to close
                 !this->_window->IsFocused()) { // Check to make sure were not focused
                 if (!this->_window->GetFullscreen() && // Check to make sure were not in fullscreen mode
@@ -719,6 +720,9 @@ namespace Engine {
             RenderDriverPtr render = this->GetRender();
             
             Profiler::BeginProfileFrame();
+            
+            Engine::Profiler::Scope profilerScope("FrameScope");
+            
             FramePerfMonitor::BeginFrame();
             Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
             GetEventsSingilton()->PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
@@ -784,6 +788,8 @@ namespace Engine {
             if (this->_testMode && this->_frames++ > Config::GetInt("core.test.testFrames")) {
                 this->Exit();
             }
+            
+            profilerScope.Close();
             
             this->GetRender()->EndFrame();
             FramePerfMonitor::EndFrame();

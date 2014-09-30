@@ -387,6 +387,8 @@ namespace Engine {
         }
         
         bool Context::_runFile(std::string path, bool persist) {
+            ENGINE_PROFILER_SCOPE_EX(path.c_str());
+            
             Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Loading File: " << path << Logger::end();
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
             v8::HandleScope scp(isolate);

@@ -245,8 +245,11 @@ namespace Engine {
         if (this->_wireframe) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
-            
-        glDrawElements(_polygonModeToGLMode(mode), this->_vertexCount, GL_UNSIGNED_SHORT, 0);
+        
+        {
+            ENGINE_PROFILER_SCOPE_EX("glDrawElements");
+            glDrawElements(_polygonModeToGLMode(mode), this->_vertexCount, GL_UNSIGNED_SHORT, 0);
+        }
         
         if (this->_wireframe) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
