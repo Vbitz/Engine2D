@@ -45,14 +45,14 @@
 		});
 	};
 
-	var libarys = ["ui", "timers", "perlin", "detailProfiler"];
+	var libraries = ["timers", "perlin", "detailProfiler"];
 	var currentLib = 0;
 
 	function runLibs(cb) {
-		if (!libarys[currentLib]) {
+		if (!libraries[currentLib]) {
 			cb();
 		} else {
-			debugRunFile("lib/" + libarys[currentLib], false, function () {
+			debugRunFile("lib/" + libraries[currentLib], false, function () {
 				currentLib++;
 				runLibs(cb);
 			});
