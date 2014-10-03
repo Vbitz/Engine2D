@@ -336,7 +336,7 @@ sys.on("draw", "test.draw", function (e) {
 	}
 
 	if (!draw.isFontLoaded("light")) {
-		//console.log("Loading Font");
+		console.log("Loading Font");
 		draw.loadFont("light", "fonts/open_sans.json");
 	}
 
@@ -454,6 +454,12 @@ event.key_F = function test_fullscreen(e) {
 		event.toggleFullscreen();
 	}
 };
+
+event.key_P = function test_profile(e) {
+	if (e.state === "press") {
+		event.detailProfile({filename: "profile.log", frames: 50});
+	}
+}
 
 sys.on("input", "test.input", function (e) {
 	var key = e.key;
