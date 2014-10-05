@@ -21,13 +21,18 @@ var tests = {
 		return fs.readFile("testing.txt") === "Hello world";
 	},
 	"Database": function () {
-		db.open("test.db");
+		var testDb = new db.Database("test.db"),
+			testDb2 = new db.Database("test2.db");
 
-		db.exec("DROP TABLE IF EXISTS testing");
-		db.exec("CREATE TABLE testing(t1 TEXT)");
-		db.exec("INSERT INTO testing VALUES('hello world')");
+		testDb.exec("DROP TABLE IF EXISTS testing");
+		testDb.exec("CREATE TABLE testing(t1 TEXT)");
+		testDb.exec("INSERT INTO testing VALUES('hello world')");
 
-		return db.execPrepare("SELECT * FROM testing")[0].t1 === "hello world";
+		testDb2.exec("DROP TABLE IF EXISTS testing2");
+		testDb2.exec("CREATE TABLE testing2(t1 TEXT)");
+		testDb2.exec("INSERT INTO testing2 VALUES('" + testDb.execPrepare("SELECT * FROM testing")[0].t1 + "')");
+
+		return testDb2.execPrepare("SELECT * FROM testing2")[0].t1 === "hello world";
 	},
 	"Unsafe": function () {
 		if (!sys.runFile("modules/js_unsafe.dylib", false)) {

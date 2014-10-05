@@ -28,87 +28,91 @@
 
 namespace Engine {
     namespace JSDatabase {
-        DatabasePtr currentDatabase = NULL;
-        
-        void OpenDatabase(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.AssertCount(1)) return;
-            
-            if (args.Assert(args[0]->IsString(), "Arg0 is the filename of the database")) return;
-            
-            if (args.Assert(Filesystem::HasSetUserDir(), "fs.configDir needs to be called before db.open can be called")) return;
-            
-            std::string path = args.StringValue(0);
-            
-            Filesystem::TouchFile(path);
-            
-            if (currentDatabase != NULL) {
-                delete currentDatabase;
-                currentDatabase = NULL;
+        class JS_Database : public ScriptingManager::ObjectWrap {
+        public:
+            ~JS_Database() {
+                delete this->_db;
+            }
+
+            static void Create(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.RecallAsConstructor()) return;
+                
+                args.AssertCount(1);
+                
+                args.Assert(args[0]->IsString(), "Arg0 is the Filename to load or create the database from");
+                
+                JS_Database::Wrap<JS_Database>(args.GetIsolate(), args.This());
+
+                Filesystem::TouchFile(args.StringValue(0));
+
+                JS_Database::Unwrap<JS_Database>(args.This())->_db = Database::CreateDatabase(Filesystem::GetRealPath(args.StringValue(0)));
+            }
+
+            static void Exec(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(args[0]->IsString(), "Arg0 is the query to be run on the database")) return;
+                
+                JS_Database::Unwrap<JS_Database>(args.This())->_db->Execute(args.StringValue(0));
             }
             
-            currentDatabase = Database::CreateDatabase(Filesystem::GetRealPath(path));
-        }
-        
-        void CloseDatabase(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.Assert(currentDatabase != NULL, "A database needs to be loaded with fs.open before it can be closed")) return;
-            
-            delete currentDatabase;
-            currentDatabase = NULL;
-        }
-        
-        void Exec(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.AssertCount(1)) return;
-            
-            if (args.Assert(args[0]->IsString(), "Arg0 is the query to be run on the database")) return;
-            
-            if (args.Assert(currentDatabase != NULL, "A database needs to be loaded with fs.open before it can be closed")) return;
-            
-            currentDatabase->Execute(args.StringValue(0));
-        }
-        
-        void ExecPrepare(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            v8::Handle<v8::Number> num = v8::Number::New(args.GetIsolate(), 2);
-            
-            if (args.AssertCount(1)) return;
-            
-            if (args.Assert(args[0]->IsString(), "Arg0 is the query to be run on the database")) return;
-            
-            if (args.Assert(currentDatabase != NULL, "A database needs to be loaded with fs.open before it can be closed")) return;
-            
-            v8::Handle<v8::Array> arr = v8::Array::New(args.GetIsolate());
-            
-            std::vector<std::map<std::string, std::string>> ret = currentDatabase->ExecutePrepare(args.StringValue(0));
-            
-            int rows = 0;
-            
-            for (auto iterator1 = ret.begin(); iterator1 != ret.end(); iterator1++) {
-                v8::Local<v8::Object> row = args.NewObject();
-                for (auto iterator2 = iterator1->begin(); iterator2 != iterator1->end(); iterator2++) {
-                    row->Set(args.NewString(iterator2->first), args.NewString(iterator2->second));
+            static void ExecPrepare(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                v8::Handle<v8::Number> num = v8::Number::New(args.GetIsolate(), 2);
+                
+                if (args.AssertCount(1)) return;
+                
+                if (args.Assert(args[0]->IsString(), "Arg0 is the query to be run on the database")) return;
+                
+                v8::Handle<v8::Array> arr = v8::Array::New(args.GetIsolate());
+                
+                std::vector<std::map<std::string, std::string>> ret = JS_Database::Unwrap<JS_Database>(args.This())
+                    ->_db->ExecutePrepare(args.StringValue(0));
+                
+                int rows = 0;
+                
+                for (auto iterator1 = ret.begin(); iterator1 != ret.end(); iterator1++) {
+                    v8::Local<v8::Object> row = args.NewObject();
+                    for (auto iterator2 = iterator1->begin(); iterator2 != iterator1->end(); iterator2++) {
+                        row->Set(args.NewString(iterator2->first), args.NewString(iterator2->second));
+                    }
+                    arr->Set(rows++, row);
                 }
-                arr->Set(rows++, row);
+                
+                args.SetReturnValue(arr);
             }
-            
-            args.SetReturnValue(arr);
-        }
-        
+
+            static void Init(v8::Handle<v8::ObjectTemplate> databaseTable) {
+                ScriptingManager::Factory f(v8::Isolate::GetCurrent());
+                v8::HandleScope scope(f.GetIsolate());
+                
+                v8::Handle<v8::FunctionTemplate> newDatabase = f.NewFunctionTemplate(Create);
+                
+                newDatabase->SetClassName(f.NewString("Database"));
+                
+                f.FillTemplate(newDatabase, {
+                    {FTT_Prototype, "exec", f.NewFunctionTemplate(Exec)},
+                    {FTT_Prototype, "execPrepare", f.NewFunctionTemplate(ExecPrepare)}
+                });
+                
+                newDatabase->InstanceTemplate()->SetInternalFieldCount(1);
+                
+                databaseTable->Set(f.GetIsolate(), "Database", newDatabase);
+            }
+
+        private:
+            DatabasePtr _db =  NULL;
+        };
+
         void InitDatabase(v8::Handle<v8::ObjectTemplate> dbTable) {
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             
-            f.FillTemplate(dbTable, {
-                {FTT_Static, "open", f.NewFunctionTemplate(OpenDatabase)},
-                {FTT_Static, "close", f.NewFunctionTemplate(CloseDatabase)},
-                {FTT_Static, "exec", f.NewFunctionTemplate(Exec)},
-                {FTT_Static, "execPrepare", f.NewFunctionTemplate(ExecPrepare)}
-            });
+            JS_Database::Init(dbTable);
         }
     }
 }
