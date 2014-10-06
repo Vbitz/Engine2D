@@ -10,45 +10,63 @@ import json
 scriptMethodSearch = re.compile("([ \t]+)/\*\*\*(.*?)\*/\n\s+ENGINE_SCRIPT_METHOD\((\w+)\);\n", re.DOTALL and re.DOTALL)
 
 def stypeToCPPType(typeName):
-	if typeName == "string":
+	if typeName == "string" or typeName == "String":
 		return "std::string"
 	elif typeName == "int":
 		return "int"
-	elif typeName == "number":
+	elif typeName == "number" or typeName == "Number":
 		return "double"
-	elif typeName == "bool":
+	elif typeName == "bool" or typeName == "boolean":
 		return "bool"
+	elif typeName == "Function":
+		return "v8::Handle<v8::Function>"
+	elif typeName == "*":
+		return "v8::Handle<v8::Value>"
+	elif typeName == "...*":
+		return "v8::Handle<v8::Value>*"
 	else:
-		raise "Bad typeName"
+		print "[bindingGenerator] WARN: Bad typeName: " + typeName
+		return "v8::Handle<v8::Value>"
 
 def marshalSTypeToCPPValue(typeName, argPosition):
-	if typeName == "string":
+	if typeName == "string" or typeName == "String":
 		return "args.StringValue(" + str(argPosition) + ")"
 	elif typeName == "int":
 		return "args.Int32Value(" + str(argPosition) + ")"
-	elif typeName == "number":
+	elif typeName == "number" or typeName == "Number":
 		return "args.NumberValue(" + str(argPosition) + ")"
-	elif typeName == "bool":
+	elif typeName == "bool" or typeName == "boolean":
 		return "args.BooleanValue(" + str(argPosition) + ")"
+	elif typeName == "Function":
+		return "args[" + str(argPosition) + "]->ToFunction()"
+	elif typeName == "*":
+		return "args[" + str(argPosition) + "]"
+	elif typeName == "...*":
+		return "args.Slice(" + str(argPosition) + ")"
 	else:
-		raise "Bad typeName"
+		print "[bindingGenerator] WARN: Bad typeName: " + typeName
+		return "args[" + str(argPosition) + "]"
 
 def marshalSTypeToCPPCheck(typeName, argPosition):
-	if typeName == "string":
+	if typeName == "string" or typeName == "String":
 		return "args[" + str(argPosition) + "]->IsString()"
 	elif typeName == "int":
 		return "args[" + str(argPosition) + "]->IsInt32()"
-	elif typeName == "number":
+	elif typeName == "number" or typeName == "Number":
 		return "args[" + str(argPosition) + "]->IsNumber()"
-	elif typeName == "bool":
+	elif typeName == "bool" or typeName == "boolean":
 		return "args[" + str(argPosition) + "]->IsBoolean()"
+	elif typeName == "Function":
+		return "args[" + str(argPosition) + "]->IsFunction()"
+	elif typeName == "*":
+		return "true"
+	elif typeName == "...*":
+		return "true"
 	else:
-		raise "Bad typeName"
+		print "[bindingGenerator] WARN: Bad typeName: " + typeName
+		return "true"
 
-def parseMethod(m):
-	whitespace = m.group(1)
-	jsonBlob = json.loads(m.group(2))
-	methodName = m.group(3)
+def compileMethod(whitespace, jsonBlob, methodName):
 	ret = ""
 
 	# write generated method signature
@@ -90,6 +108,12 @@ def parseMethod(m):
 			(", " + methodCallArgs if len(methodCallArgs) > 0 else "") + ");" + "\n";
 	ret += whitespace + "}" + "\n\n"
 	return whitespace + methodSignature + "\n\n" + ret
+
+def parseMethod(m):
+	whitespace = m.group(1)
+	jsonBlob = json.loads(m.group(2))
+	methodName = m.group(3)
+	return compileMethod(whitespace, jsonBlob, methodName)
 
 def parseFile(path, filename):
 	lines = []
