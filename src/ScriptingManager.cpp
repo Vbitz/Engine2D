@@ -250,8 +250,6 @@ namespace Engine {
             }
         }
         
-#define addItem(table, js_name, funct) table->Set(isolate, js_name, v8::FunctionTemplate::New(isolate, funct))
-        
         v8::Handle<v8::Context> Context::_initScripting() {
             Logger::begin("ScriptingContext", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
             
@@ -263,18 +261,24 @@ namespace Engine {
             
             v8::EscapableHandleScope handle_scope(isolate);
             
+            ScriptingManager::Factory f(isolate);
+            
             v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
             
-            global->SetAccessor(v8::String::NewFromUtf8(isolate, "global"), globalAccessor);
+            global->SetAccessor(f.NewString("global"), globalAccessor);
             
-            addItem(global, "assert", JsSys::Assert);
+            f.FillTemplate(global, {
+                {FTT_Static, "assert", f.NewFunctionTemplate(JsSys::Assert)}
+            });
             
             // consoleTable
             v8::Handle<v8::ObjectTemplate> consoleTable = v8::ObjectTemplate::New();
             
-            addItem(consoleTable, "_log", JsSys::Println);
-            addItem(consoleTable, "clear", JsSys::ClearConsole);
-            addItem(consoleTable, "toggle", JsSys::ToggleConsole);
+            f.FillTemplate(consoleTable, {
+                {FTT_Static, "_log", f.NewFunctionTemplate(JsSys::Println)},
+                {FTT_Static, "clear", f.NewFunctionTemplate(JsSys::ClearConsole)},
+                {FTT_Static, "toggle", f.NewFunctionTemplate(JsSys::ToggleConsole)}
+            });
             
             global->Set(isolate, "console", consoleTable);
             
@@ -288,15 +292,15 @@ namespace Engine {
             
             JsSys::InitSys(sysTable);
             
-            sysTable->Set(isolate, "platform", v8::String::NewFromUtf8(isolate, _PLATFORM));
-            sysTable->Set(isolate, "devMode", v8::Boolean::New(isolate, GetAppSingilton()->IsDeveloperMode()));
-            sysTable->Set(isolate, "debugMode", v8::Boolean::New(isolate, GetAppSingilton()->IsDebugMode()));
-            sysTable->Set(isolate, "preload", v8::Boolean::New(isolate, true));
-            sysTable->Set(isolate, "numProcessers", v8::Number::New(isolate, Platform::GetProcesserCount()));
+            sysTable->Set(isolate, "platform", f.NewString(_PLATFORM));
+            sysTable->Set(isolate, "devMode", f.NewBoolean(GetAppSingilton()->IsDeveloperMode()));
+            sysTable->Set(isolate, "debugMode", f.NewBoolean(GetAppSingilton()->IsDebugMode()));
+            sysTable->Set(isolate, "preload", f.NewBoolean(true));
+            sysTable->Set(isolate, "numProcessers", f.NewNumber(Platform::GetProcesserCount()));
             
             // depending on the runtime being used in the future this will be set to something unique per system
             // for example on steam it can be the friends name or SteamID
-            sysTable->Set(isolate, "username", v8::String::NewFromUtf8(isolate, Platform::GetUsername().c_str()));
+            sysTable->Set(isolate, "username", f.NewString(Platform::GetUsername()));
             
             sysTable->Set(isolate, "runtimeConfig", configTable);
             
@@ -352,8 +356,6 @@ namespace Engine {
             
             return handle_scope.Escape(ctx);
         }
-        
-#undef addItem
         
         v8::Local<v8::Object> Context::GetScriptTable(std::string name) {
             v8::Local<v8::Context> ctx = this->_isolate->GetCurrentContext();
