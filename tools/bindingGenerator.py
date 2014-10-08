@@ -25,7 +25,7 @@ def stypeToCPPType(typeName):
 	elif typeName == "...*":
 		return "v8::Handle<v8::Value>*"
 	else:
-		print "[bindingGenerator] WARN: Bad typeName: " + typeName
+		#print "[bindingGenerator] WARN: Bad typeName: " + typeName
 		return "v8::Handle<v8::Value>"
 
 def marshalSTypeToCPPValue(typeName, argPosition):
@@ -44,7 +44,7 @@ def marshalSTypeToCPPValue(typeName, argPosition):
 	elif typeName == "...*":
 		return "args.Slice(" + str(argPosition) + ")"
 	else:
-		print "[bindingGenerator] WARN: Bad typeName: " + typeName
+		sys.stderr.write("[bindingGenerator] WARN: Bad typeName: " + typeName + "\n")
 		return "args[" + str(argPosition) + "]"
 
 def marshalSTypeToCPPCheck(typeName, argPosition):
@@ -63,7 +63,7 @@ def marshalSTypeToCPPCheck(typeName, argPosition):
 	elif typeName == "...*":
 		return "true"
 	else:
-		print "[bindingGenerator] WARN: Bad typeName: " + typeName
+		#print "[bindingGenerator] WARN: Bad typeName: " + typeName
 		return "true"
 
 def compileMethod(whitespace, jsonBlob, methodName):
@@ -75,7 +75,8 @@ def compileMethod(whitespace, jsonBlob, methodName):
 
 	# assert on flags 
 	argsLength = len(jsonBlob["args"])
-	ret += whitespace + "    if (args.AssertCount(" + str(argsLength) + ")) return;" + "\n"
+	if argsLength > 0:
+		ret += whitespace + "    if (args.AssertCount(" + str(argsLength) + ")) return;" + "\n"
 	for flag in jsonBlob["flags"]:
 		if flag == "requiresGraphicsContext":
 			ret += whitespace + "    if (args.Assert(HasGLContext(), \"No OpenGL Context\")) return;" + "\n"
@@ -91,8 +92,10 @@ def compileMethod(whitespace, jsonBlob, methodName):
 		typeName, argName, helpText = arg
 		methodSignature += ", " + stypeToCPPType(typeName) + " " + argName
 		methodCallArgs += (", " if (len(methodCallArgs) > 0) else "") + argName
-		ret += whitespace + "    if (args.Assert(" + marshalSTypeToCPPCheck(typeName, index) + \
-			", \"" + helpText + "\")) return;" + "\n"
+		cppCheck = marshalSTypeToCPPCheck(typeName, index)
+		if cppCheck is not "true":
+			ret += whitespace + "    if (args.Assert(" + cppCheck + \
+				", \"" + helpText + "\")) return;" + "\n"
 		ret += whitespace + "    " + stypeToCPPType(typeName) + " " + argName + " = " + \
 			marshalSTypeToCPPValue(typeName, index) + ";" + "\n"
 		index += 1
