@@ -43,7 +43,8 @@
 - Support C++ based add-ons
 	- Effective add-on loading system
 		- Resolve dependences
-		- Fix circler depends
+		- **DONE** Fix circler depends
+			+ It depends a lot on the kind of circler depend, it doesn't resolve a better order in response to a circler dependency yet.
 		- **DONE** Cache Loading
 	- **DONE** Basic .dll/.so/.dylib loading support
 	- **DONE** Engine2D.hpp common API header file
@@ -57,7 +58,7 @@
 	- Abstract out messaging to work with entity's
 	- Implement Serialization for the level format
 - UI System
-	- UI specfic event systems
+	- UI specific event systems
 	- UI rendering framework
 	- UI layout framework
 	- UI Elements
@@ -72,7 +73,7 @@
 	- **DONE** 3D Projections
 	- **DONE** 3D Matrix Support
 	- Lighting
-		- Fully defered rendering
-		- Physicaly based rendering
+		- Fully deferred rendering
+		- Physically based rendering
 	- Draw3D
 - ???
