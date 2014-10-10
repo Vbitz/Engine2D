@@ -342,6 +342,98 @@ namespace Engine {
                 drawTable->Set(f.GetIsolate(), "VertexBuffer2D", newVertexBuffer);
             }
         };
+
+        v8::Persistent<v8::FunctionTemplate> _textureInstance;
+
+        class JS_Texture : public ScriptingManager::ObjectWrap {
+        public:
+
+            static void Create(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.RecallAsConstructor()) return;
+                
+                RenderDriverPtr render = GetAppSingilton()->GetRender();
+                
+                JS_Texture::Wrap<JS_Texture>(args.GetIsolate(), args.This());
+                
+                if (args.Length() == 1 && args[0]->IsString()) {
+                    if (!Filesystem::FileExists(args.StringValue(0))) {
+                        args.ThrowArgError("File does not Exist");
+                        return;
+                    }
+                    
+                    std::string filename = args.StringValue(0);
+                    
+                    if (!ResourceManager::HasSource(filename)) {
+                        ResourceManager::Load(filename);
+                    }
+                    
+                    ResourceManager::ImageResourcePtr img = new ResourceManager::ImageResource(filename);
+                    
+                    img->Load();
+                    
+                    JS_Texture::Unwrap<JS_Texture>(args.This())->_tex = img->GetTexture();
+                } else if (args.Length() == 3) {
+                    if (args.Assert(args[0]->IsFloat32Array(), "Arg0 is a Float32Array of values to fetch the pixels from") ||
+                        args.Assert(args[1]->IsNumber(), "Arg1 is the width of the image to create") ||
+                        args.Assert(args[2]->IsNumber(), "Arg2 is the height of the image to create")) return;
+                    
+                    v8::Handle<v8::Float32Array> pixels = v8::Handle<v8::Float32Array>::Cast(args[0]);
+                    int width = args.Int32Value(1),
+                        height = args.Int32Value(2);
+                    
+                    if (args.Assert(pixels->Length() >= width * height * 4, "Arg0 needs to be equal or more then width*height*4 elements in size")) return;
+                    
+                    JS_Texture::Unwrap<JS_Texture>(args.This())->_tex = ImageReader::TextureFromBuffer((float*) pixels->Buffer()->GetIndexedPropertiesExternalArrayData(), width, height);
+                } else {
+                    args.ThrowArgError("TODO");
+                }
+            }
+            
+            static v8::Handle<v8::Value> NewInstance(ScriptingManager::FactoryRef fac, TexturePtr value) {
+                v8::Local<v8::FunctionTemplate> ctor = v8::Local<v8::FunctionTemplate>::New(fac.GetIsolate(), _textureInstance);
+                v8::Handle<v8::Function> ctorFunc = ctor->GetFunction();
+                v8::Handle<v8::Value> instance = ctorFunc->NewInstance(0, NULL);
+                assert(instance->IsObject());
+                v8::Handle<v8::Object> instanceValue = instance->ToObject();
+                
+                Unwrap<JS_Texture>(instanceValue)->_tex = value;
+                
+                return instanceValue;
+            }
+            
+            static TexturePtr GetValue(ScriptingManager::FactoryRef fac, v8::Handle<v8::Value> val) {
+                v8::Handle<v8::Object> objVal = v8::Handle<v8::Object>::Cast(val);
+                return Unwrap<JS_Texture>(objVal)->_tex;
+            }
+            
+            static bool IsTexture(ScriptingManager::FactoryRef fac, v8::Handle<v8::Object> val) {
+                return val->GetConstructorName()->Equals(fac.NewString("Texture"));
+            }
+            
+            TexturePtr GetTexture() {
+                return this->_tex;
+            }
+
+            static void Init(v8::Handle<v8::ObjectTemplate> drawTable) {
+                ScriptingManager::Factory f(v8::Isolate::GetCurrent());
+                v8::HandleScope scope(f.GetIsolate());
+                
+                v8::Handle<v8::FunctionTemplate> newTexture = f.NewFunctionTemplate(Create);
+                
+                newTexture->SetClassName(f.NewString("Texture"));
+
+                newTexture->InstanceTemplate()->SetInternalFieldCount(1);
+                
+                _textureInstance.Reset(f.GetIsolate(), newTexture);
+
+                drawTable->Set(f.GetIsolate(), "Texture", newTexture);
+            }
+
+        private:
+            TexturePtr _tex = NULL;
+        };
         
         inline Draw2DPtr GetDraw2D(v8::Local<v8::Object> thisValue) {
             return (Draw2DPtr) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_draw")).As<v8::External>()->Value();
@@ -736,13 +828,13 @@ namespace Engine {
             
             if (args.AssertCount(5)) return;
             
-            if (args.Assert(args[0]->IsExternal(), "Arg0 is a valid texture that's been loaded since the last context change") ||
+            if (args.Assert(JS_Texture::IsTexture(args, args[0]->ToObject()), "Arg0 is a valid texture that's been loaded since the last context change") ||
                 args.Assert(args[1]->IsNumber(), "Arg1 has to be X of a rect") ||
                 args.Assert(args[2]->IsNumber(), "Arg2 has to be Y of a rect") ||
                 args.Assert(args[3]->IsNumber(), "Arg3 has to be Width of a rect") ||
                 args.Assert(args[4]->IsNumber(), "Arg4 has to be Height of a rect")) return;
             
-            TexturePtr tex = (TexturePtr)args.ExternalValue(0);
+            TexturePtr tex = JS_Texture::GetValue(args, args[0]->ToObject());
             
             if (tex->IsValid()) {
                 GetDraw2D(args.This())->DrawImage(tex,
@@ -764,7 +856,7 @@ namespace Engine {
             
             if (args.AssertCount(9)) return;
             
-            if (args.Assert(args[0]->IsExternal(), "Arg0 is a valid texture that's been loaded since the last context change") ||
+            if (args.Assert(JS_Texture::IsTexture(args, args[0]->ToObject()), "Arg0 is a valid texture that's been loaded since the last context change") ||
                 args.Assert(args[1]->IsNumber(), "Arg1 has to be X of a rect") ||
                 args.Assert(args[2]->IsNumber(), "Arg2 has to be Y of a rect") ||
                 args.Assert(args[3]->IsNumber(), "Arg3 has to be Width of a rect") ||
@@ -774,7 +866,7 @@ namespace Engine {
                 args.Assert(args[7]->IsNumber(), "Arg7 has to be Width of a sub rectangle") ||
                 args.Assert(args[8]->IsNumber(), "Arg8 has to be Height of a sub rectangle")) return;
             
-            TexturePtr tex = (TexturePtr)args.ExternalValue(0);
+            TexturePtr tex = JS_Texture::GetValue(args, args[0]->ToObject());
             
             if (tex->IsValid()) {
                 GetDraw2D(args.This())->DrawImage(tex,
@@ -845,7 +937,7 @@ namespace Engine {
             
             img->Load();
             
-            args.SetReturnValue(args.NewExternal(img->GetTexture()));
+            args.SetReturnValue(JS_Texture::NewInstance(args, img->GetTexture()));
         }
         
         void OpenSpriteSheet(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -929,49 +1021,6 @@ namespace Engine {
             args.SetReturnValue(array);
         }
         
-        void CreateImageArray(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.AssertCount(2)) return;
-            
-            if (args.Assert(args[0]->IsInt32(), "Arg0 is the width of the new Image Array") ||
-                args.Assert(args[1]->IsInt32(), "Arg1 is the height of the new Image Array")) return;
-            
-            int imageWidth = args.Int32Value(0),
-                imageHeight = args.Int32Value(1);
-            
-            int arraySize = imageWidth * imageHeight * 4;
-            
-            v8::Handle<v8::Object> array = args.NewObject();
-            
-            float* rawArray = new float[arraySize];
-            
-            for (int i = 0; i < arraySize; i += 4) {
-                rawArray[i] = 1.0f;
-                rawArray[i + 1] = 1.0f;
-                rawArray[i + 2] = 1.0f;
-                rawArray[i + 3] = 1.0f;
-            }
-            
-            v8::Persistent<v8::Object> arr;
-            
-            arr.Reset(args.GetIsolate(), array);
-            
-            arr.MarkIndependent();
-            arr.SetWeak(rawArray, ReadBufferWeakCallback);
-            
-            args.GetIsolate()->AdjustAmountOfExternalAllocatedMemory(arraySize * sizeof(float));
-            
-            array->SetIndexedPropertiesToExternalArrayData(rawArray, v8::kExternalFloatArray, arraySize * sizeof(float));
-            
-            array->Set(args.NewString("length"), args.NewNumber(arraySize));
-            array->Set(args.NewString("width"), args.NewNumber(imageWidth));
-            array->Set(args.NewString("height"), args.NewNumber(imageHeight));
-            array->Set(args.NewString("byteLength"), args.NewNumber(arraySize * sizeof(float)));
-            
-            args.SetReturnValue(array);
-        }
-        
         void CreateImage(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
             
@@ -1038,7 +1087,7 @@ namespace Engine {
                 delete [] pixels;
             }
             
-            args.SetReturnValue(args.NewExternal(t));
+            args.SetReturnValue(JS_Texture::NewInstance(args, t));
         }
         
         void SaveImage(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -1048,10 +1097,10 @@ namespace Engine {
             
             if (args.AssertCount(2)) return;
             
-            if (args.Assert(args[0]->IsExternal(), "Arg0 is the index of the image returned from draw.createImage or draw.openImage") ||
+            if (args.Assert(JS_Texture::IsTexture(args, args[0]->ToObject()), "Arg0 is an instance of an image") ||
                 args.Assert(args[1]->IsString(), "Arg1 is the filename to save the image as")) return;
             
-            TexturePtr tex = (TexturePtr)args.ExternalValue(0);
+            TexturePtr tex = JS_Texture::GetValue(args, args[0]->ToObject());
             
             if (tex->IsValid()) {
                 tex->Save(args.StringValue(1));
@@ -1064,18 +1113,6 @@ namespace Engine {
             }
         }
         
-        void FreeImage(const v8::FunctionCallbackInfo<v8::Value>& _args) {
-            ScriptingManager::Arguments args(_args);
-            
-            if (args.Assert(HasGLContext(), "No OpenGL Context")) return;
-            
-            if (args.AssertCount(1)) return;
-            
-            if (args.Assert(args[0]->IsExternal(), "Arg0 is the texture to free")) return;
-            
-            ((TexturePtr) args.ExternalValue(0))->Invalidate();
-        }
-        
         void IsTexture(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
             
@@ -1084,7 +1121,7 @@ namespace Engine {
             if (args.AssertCount(1)) return;
             
             if (args[0]->IsExternal()) {
-                args.SetReturnValue(args.NewBoolean(((TexturePtr) args.ExternalValue(0))->IsValid()));
+                args.SetReturnValue(args.NewBoolean(JS_Texture::IsTexture(args, args[0]->ToObject())));
             } else {
                 args.SetReturnValue(args.NewBoolean(0));
             }
@@ -1172,6 +1209,7 @@ namespace Engine {
         void InitDraw(v8::Handle<v8::ObjectTemplate> drawTable) {
             InitColorObject(drawTable);
             JS_VertexBuffer2D::Init(drawTable);
+            JS_Texture::Init(drawTable);
             
             ScriptingManager::Factory f(v8::Isolate::GetCurrent());
             
@@ -1200,10 +1238,8 @@ namespace Engine {
                 {FTT_Static, "openImage", f.NewFunctionTemplate(OpenImage)},
                 {FTT_Static, "openSpriteSheet", f.NewFunctionTemplate(OpenSpriteSheet)},
                 {FTT_Static, "getImageArray", f.NewFunctionTemplate(GetImageArray)},
-                {FTT_Static, "createImageArray", f.NewFunctionTemplate(CreateImageArray)},
                 {FTT_Static, "createImage", f.NewFunctionTemplate(CreateImage)},
                 {FTT_Static, "saveImage", f.NewFunctionTemplate(SaveImage)},
-                {FTT_Static, "freeImage", f.NewFunctionTemplate(FreeImage)},
                 {FTT_Static, "isTexture", f.NewFunctionTemplate(IsTexture)},
                 {FTT_Static, "isSpriteSheet", f.NewFunctionTemplate(IsSpriteSheet)},
                 

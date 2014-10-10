@@ -220,7 +220,7 @@ console._log("highlight", "test.js Tests Complete: " + passedTests + " passed : 
 
 draw.clearColor(0x010101);
 
-var pix = draw.createImageArray(100, 100);
+var pix = new Float32Array(100 * 100 * 4);
 
 for (var i = 0; i < 100 * 100 * 4; i += 4) {
 	pix[i] = Math.cos(i);
@@ -228,7 +228,7 @@ for (var i = 0; i < 100 * 100 * 4; i += 4) {
 	pix[i + 2] = Math.tan(i + 2);
 }
 
-var hsv = draw.createImageArray(360, 100);
+var hsv = new Float32Array(360 * 100 * 4);
 
 var point = 0;
 
@@ -242,18 +242,18 @@ for (var x = 0; x < 360; x++) {
 	}
 }
 
-var img = img ? img : draw.openImage("texture/testing.png");
-var img2 = img2 ? img2 : draw.createImage(pix, 100, 100);
-var img3 = img3 ? img3 : draw.createImage(hsv, 360, 100);
-var mImgA = mImgA ? mImgA : draw.getImageArray("texture/testing.png");
+var img = img ? img : new draw.Texture("texture/testing.png");
+var img2 = img2 ? img2 : new draw.Texture(pix, 100, 100);
+var img3 = img3 ? img3 : new draw.Texture(hsv, 360, 100);
+//var mImgA = mImgA ? mImgA : draw.getImageArray("texture/testing.png");
 
-for (var i = 0; i < mImgA.length; i += 4) {
-	mImgA[i + 0] = 1 - mImgA[i + 0];
-	mImgA[i + 1] = 1 - mImgA[i + 1];
-	mImgA[i + 2] = 1 - mImgA[i + 2];
-}
+//for (var i = 0; i < mImgA.length; i += 4) {
+//	mImgA[i + 0] = 1 - mImgA[i + 0];
+//	mImgA[i + 1] = 1 - mImgA[i + 1];
+//	mImgA[i + 2] = 1 - mImgA[i + 2];
+//}
 
-var mImg = mImg ? mImg : draw.createImage(mImgA, 128, 128);
+//var mImg = mImg ? mImg : draw.createImage(mImgA, 128, 128);
 
 var spriteSheet = spriteSheet ? spriteSheet : (function () {
 	console.log("Loading Sprite Sheet");
@@ -315,26 +315,6 @@ var graphicsTests = {
 };
 
 sys.on("draw", "test.draw", function (e) {
-	if (!draw.isTexture(img)) {
-		console.log("Loading Image 1");
-		img = draw.openImage("texture/testing.png");
-	}
-
-	if (!draw.isTexture(img2)) {
-		console.log("Loading Image 2");
-		img2 = draw.createImage(pix, 100, 100);
-	}
-
-	if (!draw.isTexture(img3)) {
-		console.log("Loading Image 3");
-		img3 = draw.createImage(hsv, 360, 100);
-	}
-
-	if (!draw.isTexture(mImg)) {
-		console.log("Loading Modded Image");
-		mImg = draw.createImage(mImgA, 128, 128);
-	}
-
 	if (!draw.isSpriteSheet(spriteSheet)) {
 		console.log("Loading Sprite Sheet");
 		spriteSheet = draw.openSpriteSheet("texture/spriteTest.json");
@@ -409,8 +389,8 @@ sys.on("draw", "test.draw", function (e) {
 	draw.print(760, 240, "Circle");
 	draw.circle(770 + 50, 270 + 50, 50, 40, 200, 0.1, 1.0, true);
 
-	draw.print(900, 240, "Modded Image");
-	draw.draw(mImg, 900, 270, 100, 100);
+	//draw.print(900, 240, "Modded Image");
+	//draw.draw(mImg, 900, 270, 100, 100);
 
 	draw.print(400, 380, "Sprite Sheet");
 	draw.drawSprite(spriteSheet, "idle", 410, 390, 100, 100);
