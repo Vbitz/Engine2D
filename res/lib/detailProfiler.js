@@ -1,9 +1,8 @@
 (function (global) {
-	var listenerName = "detailProfiler_listener";
-
 	function start(filename, frames) {
 		var currentFrames = 0,
-			results = [];
+			results = [],
+			listenerName = "detailProfiler_listener_" + Math.random();
 
 		global.sys.on("onProfileEnd", listenerName, function (args) {
 			results.push(args);

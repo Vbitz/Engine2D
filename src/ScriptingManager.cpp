@@ -22,6 +22,7 @@
 #include "ScriptingManager.hpp"
 
 #include <cstring>
+#include <unordered_map>
 
 #include <include/libplatform/libplatform.h>
 
@@ -50,6 +51,75 @@ public:
 
 namespace Engine {
     namespace ScriptingManager {
+        class EngineV8Platform : public v8::Platform {
+        public:
+            static void *BackgroundThread(void *threadArg) {
+                EngineV8Platform *self = (EngineV8Platform*) threadArg;
+                v8::Task *task = NULL;
+                while (true) {
+                    self->_backgroundMutex->Enter();
+                    if (self->_backgroundTasks.size() > 0) {
+                        task = self->_backgroundTasks.top();
+                        self->_backgroundTasks.pop();
+                    }
+                    self->_backgroundMutex->Exit();
+                    
+                    if (task != NULL) {
+                        task->Run();
+                    }
+                    
+                    task = NULL;
+                    
+                    delete task;
+                    
+                    Engine::Platform::NanoSleep(1000);
+                }
+            }
+            
+            EngineV8Platform() {
+                _backgroundMutex = Engine::Platform::CreateMutex();
+                _backgroundThread = Engine::Platform::CreateThread(BackgroundThread, this);
+            }
+            
+            void CallOnBackgroundThread(v8::Task* task,
+                                        ExpectedRuntime expected_runtime) override {
+                _backgroundMutex->Enter();
+                _backgroundTasks.push(task);
+                _backgroundMutex->Exit();
+            }
+            
+            void CallOnForegroundThread(v8::Isolate* isolate, v8::Task* task) override {
+                _foregroundTasks[isolate].tasks.push(task);
+            }
+            
+            bool PumpMessages(v8::Isolate* isolate) {
+                if (_foregroundTasks.count(isolate) == 0) {
+                    return false;
+                }
+                
+                TaskList &list = _foregroundTasks[isolate];
+                
+                if (list.tasks.size() > 0) {
+                    v8::Task *task = list.tasks.top();
+                    list.tasks.pop();
+                    task->Run();
+                    delete task;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            
+        private:
+            struct TaskList {
+                std::stack<v8::Task*> tasks;
+            };
+            
+            std::unordered_map<v8::Isolate*, TaskList> _foregroundTasks;
+            std::stack<v8::Task*> _backgroundTasks;
+            Engine::Platform::ThreadPtr _backgroundThread;
+            Engine::Platform::MutexPtr _backgroundMutex;
+        };
         
         // It's just the v8 code fitted closer to the engine's coding style
         void ReportException(v8::Isolate* isolate, v8::TryCatch* try_catch) {
@@ -216,9 +286,14 @@ namespace Engine {
             }
         }
         
+        EngineV8Platform* platform = NULL;
+        
         void Context::StaticInit() {
-            //v8::Platform* platform = v8::platform::CreateDefaultPlatform();
-            //v8::V8::InitializePlatform(platform);
+            if (platform != NULL) {
+                return;
+            }
+            platform = new EngineV8Platform();
+            v8::V8::InitializePlatform(platform);
             v8::V8::Initialize();
         }
         
@@ -489,9 +564,12 @@ namespace Engine {
         }
         
         void Context::TriggerGC() {
-            //ENGINE_PROFILER_SCOPE;
+            ENGINE_PROFILER_SCOPE;
             
-            //v8::Isolate::GetCurrent()->IdleNotification(1000);
+            v8::Isolate *isolate = v8::Isolate::GetCurrent();
+            
+            isolate->IdleNotification(1000);
+            platform->PumpMessages(isolate);
         }
         
         // Globals

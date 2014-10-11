@@ -442,6 +442,7 @@ event.key_F = function test_fullscreen(e) {
 
 event.key_P = function test_profile(e) {
 	if (e.state === "press") {
+		console.log("Profiling for 50 frames");
 		event.detailProfile({filename: "profile.log", frames: 50});
 	}
 }
