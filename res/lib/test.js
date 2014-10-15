@@ -226,6 +226,7 @@ for (var i = 0; i < 100 * 100 * 4; i += 4) {
 	pix[i] = Math.cos(i);
 	pix[i + 1] = Math.sin(i + 1);
 	pix[i + 2] = Math.tan(i + 2);
+	pix[i + 4] = 1.0;
 }
 
 var hsv = new Float32Array(360 * 100 * 4);

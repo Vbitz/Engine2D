@@ -92,6 +92,10 @@ namespace Engine {
                 _foregroundTasks[isolate].tasks.push(task);
             }
             
+            double MonotonicallyIncreasingTime() override {
+                return Engine::Platform::GetTime();
+            }
+            
             bool PumpMessages(v8::Isolate* isolate) {
                 if (_foregroundTasks.count(isolate) == 0) {
                     return false;
