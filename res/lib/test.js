@@ -354,8 +354,12 @@ sys.on("draw", "test.draw", function (e) {
 	}
 
 	draw.drawColor = 0xffffff;
+	draw.print(10, x++ * 30 + 40, "Platform: " + sys.platform);
 	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + supportsFramebuffer);
 	draw.print(10, x++ * 30 + 40, "Number of Processers: " + sys.numProcessers);
+	if (sys.config("core.test.screenshotTime") === 0) {
+		draw.print(10, x++ * 30 + 40, "Username: " + sys.username);
+	}
 
 	draw.setFont("light", 8);
 	draw.print(20, x * 30 + 40, "Custom Loaded Font");
