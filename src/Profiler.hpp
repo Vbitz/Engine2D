@@ -36,6 +36,7 @@
 #define ENGINE_PROFILER_SCOPE_EX(str) Engine::Profiler::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__, str)
 #else
 #define ENGINE_PROFILER_SCOPE
+#define ENGINE_PROFILER_SCOPE_EX
 #endif
 
 namespace Engine {

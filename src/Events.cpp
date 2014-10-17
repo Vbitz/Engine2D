@@ -71,6 +71,8 @@ namespace Engine {
         }
         
         inline EventMagic Run(Json::Value& e, int jsArgC, v8::Handle<v8::Value> jsArgV[]) {
+            static EventMagic ret_magic = EM_BADTARGET; // Warning this could cause issues with threads.
+            
             v8::Isolate* currentIsolate = v8::Isolate::GetCurrent();
             v8::Local<v8::Context> ctx = currentIsolate->GetCurrentContext();
             if (ctx.IsEmpty() || ctx->Global().IsEmpty()) return EM_BADTARGET;
@@ -97,14 +99,19 @@ namespace Engine {
             v8::Local<v8::Function> func = v8::Local<v8::Function>::New(currentIsolate, _func);
                 
             v8::Local<v8::Value> ret = func->Call(ctx->Global(), 1 + jsArgC, args);
-                
+            
+            ret_magic = GetScriptingReturnType(ret);
+            
+            ret.Clear();
+            func.Clear();
+            
             delete [] args;
                 
             if (!tryCatch.StackTrace().IsEmpty()) {
                 ScriptingManager::ReportException(currentIsolate, &tryCatch);
                 return EM_BADTARGET;
             } else {
-                return GetScriptingReturnType(ret);
+                return ret_magic;
             }
         }
             

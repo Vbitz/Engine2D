@@ -455,6 +455,10 @@ def build_env(args):
 def run(args):
 	run_engine(["-devmode", "-debug"])
 
+@command(requires=["build_env"], usage="Runs the engine in Development Mode with garbage collector tracing enabled")
+def run_gc_trace(args):
+	run_engine(["-devmode", "-debug", "-v8trace-gc"])
+
 @command(requires=["build_env"], usage="Runs the engine in Test Mode")
 def test(args):
 	run_engine_test([])
