@@ -301,8 +301,40 @@ namespace Engine {
             v8::V8::Initialize();
         }
         
+        inline std::string GetGCTypeString(v8::GCType type) {
+            switch (type) {
+                case v8::kGCTypeAll:
+                    return "all";
+                case v8::kGCTypeMarkSweepCompact:
+                    return "markSweepCompact";
+                case v8::kGCTypeScavenge:
+                    return "compact";
+                default:
+                    return "unknown";
+            }
+        }
+        
+        void Context::_v8PostGCCallback(v8::Isolate* isolate, v8::GCType type, v8::GCCallbackFlags flags) {
+            static Engine::Platform::MutexPtr gcMutex = NULL;
+            if (gcMutex == NULL) {
+                gcMutex = Engine::Platform::CreateMutex();
+            }
+            
+            gcMutex->Enter();
+            
+            Json::Value args = Json::Value(Json::objectValue);
+            args["type"] = GetGCTypeString(type);
+            GetEventsSingilton()->GetEvent("v8_postGC")->Emit(args);
+            
+            gcMutex->Exit();
+        }
+        
         Context::Context() : _isolate(v8::Isolate::New()), _scope(this->_isolate) {
             this->_isolate->Enter();
+            
+            GetEventsSingilton()->GetEvent("v8_postGC")->SetNoScript(true);
+            
+            this->_isolate->AddGCEpilogueCallback(_v8PostGCCallback);
             
             v8::Handle<v8::Context> ctx = this->_initScripting();
             

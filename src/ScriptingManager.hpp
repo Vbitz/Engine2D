@@ -333,6 +333,8 @@ namespace Engine {
             
             bool _runFile(std::string filename, bool persist);
             
+            static void _v8PostGCCallback(v8::Isolate* isolate, v8::GCType type, v8::GCCallbackFlags flags);
+            
             std::map<std::string, long> _loadedFiles;
         };
         
