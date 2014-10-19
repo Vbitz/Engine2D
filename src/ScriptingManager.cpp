@@ -378,79 +378,69 @@ namespace Engine {
             
             global->SetAccessor(f.NewString("global"), globalAccessor);
             
+            v8::Handle<v8::ObjectTemplate>
+                consoleTable = v8::ObjectTemplate::New(),
+                configTable = v8::ObjectTemplate::New(),
+                sysTable = v8::ObjectTemplate::New(),
+                eventTable = v8::ObjectTemplate::New(),
+                drawTable = v8::ObjectTemplate::New(),
+                fsTable = v8::ObjectTemplate::New(),
+                dbTable = v8::ObjectTemplate::New(),
+                inputTable = v8::ObjectTemplate::New();
+            
             f.FillTemplate(global, {
                 {FTT_Static, "assert", f.NewFunctionTemplate(JsSys::Assert)}
             });
             
-            // consoleTable
-            v8::Handle<v8::ObjectTemplate> consoleTable = v8::ObjectTemplate::New();
-            
+            //consoleTable
             f.FillTemplate(consoleTable, {
                 {FTT_Static, "_log", f.NewFunctionTemplate(JsSys::Println)},
                 {FTT_Static, "clear", f.NewFunctionTemplate(JsSys::ClearConsole)},
                 {FTT_Static, "toggle", f.NewFunctionTemplate(JsSys::ToggleConsole)}
             });
             
-            global->Set(isolate, "console", consoleTable);
-            
             // configTable
-            v8::Handle<v8::ObjectTemplate> configTable = v8::ObjectTemplate::New();
-            
             configTable->SetNamedPropertyHandler(ConfigGetterCallback, ConfigSetterCallback);
             
             // sysTable
-            v8::Handle<v8::ObjectTemplate> sysTable = v8::ObjectTemplate::New();
-            
             JsSys::InitSys(sysTable);
             
-            sysTable->Set(isolate, "platform", f.NewString(_PLATFORM));
-            sysTable->Set(isolate, "devMode", f.NewBoolean(GetAppSingilton()->IsDeveloperMode()));
-            sysTable->Set(isolate, "debugMode", f.NewBoolean(GetAppSingilton()->IsDebugMode()));
-            sysTable->Set(isolate, "preload", f.NewBoolean(true));
-            sysTable->Set(isolate, "numProcessers", f.NewNumber(Platform::GetProcesserCount()));
-            
-            // depending on the runtime being used in the future this will be set to something unique per system
-            // for example on steam it can be the friends name or SteamID
-            sysTable->Set(isolate, "username", f.NewString(Platform::GetUsername()));
-            
-            sysTable->Set(isolate, "runtimeConfig", configTable);
-            
-            global->Set(isolate, "sys", sysTable);
+            f.FillTemplate(sysTable, {
+                {FTT_Static, "platform", f.NewString(_PLATFORM)},
+                {FTT_Static, "devMode", f.NewBoolean(GetAppSingilton()->IsDeveloperMode())},
+                {FTT_Static, "debugMode", f.NewBoolean(GetAppSingilton()->IsDebugMode())},
+                {FTT_Static, "preload", f.NewBoolean(true)},
+                {FTT_Static, "numProcessers", f.NewNumber(Platform::GetProcesserCount())},
+                // depending on the runtime being used in the future this will be set to something unique per system
+                // for example on steam it can be the friends name or SteamID
+                {FTT_Static, "username", f.NewString(Platform::GetUsername())},
+                {FTT_Static, "runtimeConfig", configTable}
+            });
             
             // eventTable
-            v8::Handle<v8::ObjectTemplate> eventTable = v8::ObjectTemplate::New();
-            
             eventTable->SetNamedPropertyHandler(EventGetterCallback, EventSetterCallback);
             
-            global->Set(isolate, "event", eventTable);
-            
             // drawTable
-            v8::Handle<v8::ObjectTemplate> drawTable = v8::ObjectTemplate::New();
-            
             JsDraw::InitDraw(drawTable);
             
-            global->Set(isolate, "draw", drawTable);
-            
             // fsTable
-            v8::Handle<v8::ObjectTemplate> fsTable = v8::ObjectTemplate::New();
-            
             JsFS::InitFS(fsTable);
             
-            global->Set(isolate, "fs", fsTable);
-            
             // dbTable
-            v8::Handle<v8::ObjectTemplate> dbTable = v8::ObjectTemplate::New();
-            
             JSDatabase::InitDatabase(dbTable);
             
-            global->Set(isolate, "db", dbTable);
-            
             // inputTable
-            v8::Handle<v8::ObjectTemplate> inputTable = v8::ObjectTemplate::New();
-            
             JsInput::InitInput(inputTable);
             
-            global->Set(isolate, "input", inputTable);
+            f.FillTemplate(global, {
+                {FTT_Static, "console", consoleTable},
+                {FTT_Static, "sys", sysTable},
+                {FTT_Static, "event", eventTable},
+                {FTT_Static, "draw", drawTable},
+                {FTT_Static, "fs", fsTable},
+                {FTT_Static, "db", dbTable},
+                {FTT_Static, "input", inputTable}
+            });
             
             v8::Local<v8::Context> ctx = v8::Context::New(isolate, NULL, global);
             
