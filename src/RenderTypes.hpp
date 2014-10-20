@@ -64,7 +64,7 @@ namespace Engine {
         Key_Up = 265,
         Key_Down = 264,
 #ifndef _PLATFORM_WIN32
-        Key_Console = 161,
+        Key_Console = '`',
 #else
         Key_Console = 96,
 #endif

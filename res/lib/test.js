@@ -452,7 +452,7 @@ sys.on("input", "test.input", function (e) {
 	var key = e.key;
 	var press = e.state === "press" || e.state === "repeat";
 
-	console.log("[INPUT] : " + key + " : " + press);
+	console.log("[INPUT] : (" + key.charCodeAt(0) + ") " + key + " : " + press);
 });
 
 sys.on("mouseButton", "test.mouseButton", function (e) {

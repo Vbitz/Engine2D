@@ -378,6 +378,10 @@ namespace Engine {
             
             std::string key = glfwGetKeyName(rawKey);
             
+            if (rawKey == -1) { // On OSX -1 is the function key and should be ignored
+                return;
+            }
+            
             Json::Value val(Json::objectValue);
             
             val["rawKey"] = rawKey;
