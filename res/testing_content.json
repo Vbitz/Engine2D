@@ -1,0 +1,9 @@
+{
+	"files": [
+		"lib/test.js"
+	],
+	"index": {
+		"test1": "Hello, World",
+		"test2": "This is a test"
+	}
+}

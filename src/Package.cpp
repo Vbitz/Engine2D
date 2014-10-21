@@ -208,6 +208,34 @@ namespace Engine {
         return new Package(Platform::OpenMemoryMappedFile(Filesystem::GetRealPath(filename), Platform::FileMode::Write));
     }
     
+    PackagePtr Package::FromJsonSpec(std::string inputFile, std::string outputFile) {
+        return Package::FromJsonSpec(Filesystem::LoadJsonFile(inputFile), outputFile);
+    }
+    
+    PackagePtr Package::FromJsonSpec(Json::Value inputFile, std::string outputFile) {
+        assert(inputFile.isObject());
+        Json::Value fileList = inputFile["files"];
+        assert(fileList.isArray());
+        
+        PackagePtr ret = Package::FromFile(outputFile);
+        
+        for (auto iter = fileList.begin(); iter != fileList.end(); iter++) {
+            Json::Value value = *iter;
+            assert(value.isString());
+            long fileLength = 0;
+            char* fileContent = Filesystem::GetFileContent(value.asString(), fileLength);
+            assert(fileLength < UINT32_MAX);
+            ret->WriteFile(value.asString(), (uint8_t*) fileContent, (uint32_t) fileLength, PackageFileFlags());
+        }
+        
+        if (!inputFile.get("index", Json::nullValue).isNull()) {
+            ret->GetIndex() = inputFile["index"];
+            ret->SaveIndex();
+        }
+        
+        return ret;
+    }
+    
     Package::Package(Platform::MemoryMappedFilePtr f) : _file(f) {
         this->_headerRegion = this->_file->MapRegion(0, sizeof(PackageDiskHeader));
         

@@ -126,6 +126,8 @@ namespace Engine {
         const char* INDEX_FILENAME = "__INDEX__";
         
         static PackagePtr FromFile(std::string filename);
+        static PackagePtr FromJsonSpec(std::string inputFile, std::string outputFile);
+        static PackagePtr FromJsonSpec(Json::Value inputFile, std::string outputFile);
         
         static const PackageFileFlags DefaultFileFlags;
         static const PackageFileFlags CompressedFileFlags;

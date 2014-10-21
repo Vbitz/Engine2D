@@ -19,6 +19,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+# TODO: Split off useful functions like buildAddon into a seprate library directory
+
 import sys
 import os
 import subprocess
