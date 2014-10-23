@@ -191,6 +191,15 @@ var tests = {
 			new Math.Vector(10, 10, 10));
 			
 		return true;
+	},
+	"Package": function () {
+		var pkg = new sys.Package("testing_output.epkg");
+
+		var str = pkg.readFile("lib/test.js");
+
+		console.log("res://testing_output.epkg/lib/test.js length=" + str.length);
+
+		return str.length > 0;
 	}
 };
 

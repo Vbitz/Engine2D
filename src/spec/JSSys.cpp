@@ -25,6 +25,7 @@
 #include "../EngineUI.hpp"
 #include "../Timer.hpp"
 #include "../WorkerThreadPool.hpp"
+#include "../Package.hpp"
 
 #include "../RenderDriver.hpp"
 
@@ -47,6 +48,61 @@ namespace Engine {
         ApplicationPtr GetApp(v8::Local<v8::Object> thisValue) {
             return (ApplicationPtr) thisValue->GetHiddenValue(v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), "_app")).As<v8::External>()->Value();
         }
+
+        class JS_Package : public ScriptingManager::ObjectWrap {
+        public:
+            
+            ~JS_Package() {
+                delete _pkg;
+            }
+
+            static void New(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+                
+                if (args.RecallAsConstructor()) return;
+                if (args.AssertCount(1)) return;
+                if (args.Assert(args[0]->IsString(), "Arg0 is the filename to open")) return;
+                
+                JS_Package* jsPkg = Wrap<JS_Package>(args.GetIsolate(), args.This());
+
+                jsPkg->_pkg = Package::FromFile(args.StringValue(0));
+            }
+
+            static void ReadFile(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+
+                if (args.AssertCount(1)) return;
+                if (args.Assert(args[0]->IsString(), "Arg0 is the filename to read")) return;
+
+                uint32_t fileSize = 0;
+
+                uint8_t *fileData = Unwrap<JS_Package>(args.This())->_pkg->ReadFile(args.StringValue(0), fileSize);
+
+                // TODO: Support decoding as array
+                std::string fileString = std::string((char*) fileData, (size_t) fileSize);
+
+                args.SetReturnValue(args.NewString(fileString)); // Sigh
+            }
+            
+            static void Init(v8::Isolate* isolate, v8::Handle<v8::ObjectTemplate> sys_table) {
+                ScriptingManager::Factory f(isolate);
+                
+                v8::Handle<v8::FunctionTemplate> newPackage = f.NewFunctionTemplate(New);
+                
+                newPackage->SetClassName(f.NewString("Package"));
+                
+                f.FillTemplate(newPackage, {
+                    {FTT_Prototype, "readFile", f.NewFunctionTemplate(ReadFile)},
+                });
+                
+                newPackage->InstanceTemplate()->SetInternalFieldCount(1);
+                
+                sys_table->Set(f.NewString("Package"), newPackage);
+            }
+
+        private:
+            PackagePtr _pkg = NULL;
+        };
         
         void Println(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
@@ -590,6 +646,8 @@ namespace Engine {
             addItem(sysTable, "dumpLog", DumpLog);
             
             addItem(sysTable, "createWorker", CreateWorker);
+
+            JS_Package::Init(isolate, sysTable);
         }
         
 #undef addItem

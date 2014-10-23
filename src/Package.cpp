@@ -195,7 +195,8 @@ namespace Engine {
     }
     
     void Package::Close() {
-        this->SaveIndex();
+        // Don't implictly save indexes until we can be sure it has'nt changed or we can overwrite without changing block layout
+        // this->SaveIndex();
         this->_file->UnmapRegion(this->_headerRegion);
         this->_file->Close();
     }
