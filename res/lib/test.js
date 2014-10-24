@@ -195,6 +195,10 @@ var tests = {
 	"Package": function () {
 		var pkg = new sys.Package("testing_output.epkg");
 
+		if (!pkg.fileExists("lib/test.js")) {
+			return false;
+		}
+
 		var str = pkg.readFile("lib/test.js");
 
 		console.log("res://testing_output.epkg/lib/test.js length=" + str.length);

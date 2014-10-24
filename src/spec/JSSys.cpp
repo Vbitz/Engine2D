@@ -83,6 +83,15 @@ namespace Engine {
 
                 args.SetReturnValue(args.NewString(fileString)); // Sigh
             }
+
+            static void FileExists(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+
+                if (args.AssertCount(1)) return;
+                if (args.Assert(args[0]->IsString(), "Arg0 is the filename to read")) return;
+
+                args.SetReturnValue(args.NewBoolean(Unwrap<JS_Package>(args.This())->_pkg->FileExists(args.StringValue(0))));
+            }
             
             static void Init(v8::Isolate* isolate, v8::Handle<v8::ObjectTemplate> sys_table) {
                 ScriptingManager::Factory f(isolate);
@@ -93,6 +102,7 @@ namespace Engine {
                 
                 f.FillTemplate(newPackage, {
                     {FTT_Prototype, "readFile", f.NewFunctionTemplate(ReadFile)},
+                    {FTT_Prototype, "fileExists", f.NewFunctionTemplate(FileExists)},
                 });
                 
                 newPackage->InstanceTemplate()->SetInternalFieldCount(1);
