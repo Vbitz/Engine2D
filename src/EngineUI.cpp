@@ -271,6 +271,10 @@ namespace Engine {
                 
                 this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), this->_profilerDrawTimeScale, this->_lastDrawTimes, timingResolution);
                 
+                renderGL->SetColor("blue");
+                
+                this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), this->_profilerDrawTimeScale, this->_lastFrameTimes, timingResolution);
+                
                 renderGL->SetColor("red");
                 
                 this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), y - 70 - 95, this->_lastHeapUsages, timingResolution);
@@ -354,6 +358,7 @@ namespace Engine {
         if (Config::GetBoolean("core.debug.profiler")) {
             double drawTime = FramePerfMonitor::GetDrawTime();
             this->_lastHeapUsages[this->_currentLastDrawTimePos] = _getHeapUsage();
+            this->_lastFrameTimes[this->_currentLastDrawTimePos] = FramePerfMonitor::GetFrameTime();
             this->_lastDrawTimes[this->_currentLastDrawTimePos++] = drawTime;
             
             if (this->_currentLastDrawTimePos >= timingResolution) {

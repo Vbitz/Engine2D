@@ -73,6 +73,7 @@ namespace Engine {
         static const int timingResolution = 1000;
         
         double _lastDrawTimes[timingResolution];
+        double _lastFrameTimes[timingResolution];
         double _lastHeapUsages[timingResolution];
         int _currentLastDrawTimePos = 0;
         double _profilerDrawTimeScale = 10000;
