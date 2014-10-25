@@ -385,6 +385,8 @@ namespace Engine {
                     
                     if (args.Assert(pixels->Length() >= width * height * 4, "Arg0 needs to be equal or more then width*height*4 elements in size")) return;
                     
+                    // I'm not realy sure why this does'nt work but I'm going to guess it relates to how I read the array data
+
                     JS_Texture::Unwrap<JS_Texture>(args.This())->_tex = ImageReader::TextureFromBuffer((float*) pixels->Buffer()->GetIndexedPropertiesExternalArrayData(), width, height);
                 } else {
                     args.ThrowArgError("TODO");

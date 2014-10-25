@@ -261,6 +261,8 @@ def build_glfw3(args):
 	
 	os.chdir("../..")
 
+
+# TODO: Migrate to the new v8 git repo
 @command(usage="Fetch and build V8 using GYP")
 def build_v8(args):
 	if is_windows(): # windows
