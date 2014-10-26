@@ -92,6 +92,18 @@ namespace Engine {
 
                 args.SetReturnValue(args.NewBoolean(Unwrap<JS_Package>(args.This())->_pkg->FileExists(args.StringValue(0))));
             }
+
+            static void FromJsonSpec(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+                ScriptingManager::Arguments args(_args);
+
+                if (args.AssertCount(2)) return;
+                if (args.Assert(args[0]->IsString(), "Arg0 is the source manifest to read") ||
+                    args.Assert(args[1]->IsString(), "Arg0 is the destintaiton package filename to write")) return;
+
+                PackagePtr pkg = Package::FromJsonSpec(args.StringValue(0), args.StringValue(1));
+
+                delete pkg;
+            }
             
             static void Init(v8::Isolate* isolate, v8::Handle<v8::ObjectTemplate> sys_table) {
                 ScriptingManager::Factory f(isolate);
@@ -103,6 +115,7 @@ namespace Engine {
                 f.FillTemplate(newPackage, {
                     {FTT_Prototype, "readFile", f.NewFunctionTemplate(ReadFile)},
                     {FTT_Prototype, "fileExists", f.NewFunctionTemplate(FileExists)},
+                    {FTT_Static, "fromJsonSpec", f.NewFunctionTemplate(FromJsonSpec)},
                 });
                 
                 newPackage->InstanceTemplate()->SetInternalFieldCount(1);

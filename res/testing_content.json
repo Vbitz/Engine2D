@@ -1,6 +1,6 @@
 {
 	"files": [
-		"lib/test.js"
+		{"src": "lib/test.js", "dest": "test.js", "compress": true}
 	],
 	"index": {
 		"test1": "Hello, World",

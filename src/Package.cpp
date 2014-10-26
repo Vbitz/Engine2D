@@ -222,11 +222,23 @@ namespace Engine {
         
         for (auto iter = fileList.begin(); iter != fileList.end(); iter++) {
             Json::Value value = *iter;
-            assert(value.isString());
+            
+            std::string srcFilename, destFilename;
+            bool compress = true;
+            
+            if (value.isString()) {
+                assert(value.isString());
+                srcFilename = destFilename = value.asString();
+            } else {
+                assert(value.isObject());
+                srcFilename = value["src"].asString();
+                destFilename = value.get("dest", srcFilename).asString();
+                compress = value.get("compress", true).asBool();
+            }
             long fileLength = 0;
-            char* fileContent = Filesystem::GetFileContent(value.asString(), fileLength);
+            char* fileContent = Filesystem::GetFileContent(srcFilename, fileLength);
             assert(fileLength < UINT32_MAX);
-            ret->WriteFile(value.asString(), (uint8_t*) fileContent, (uint32_t) fileLength, PackageFileFlags());
+            ret->WriteFile(destFilename, (uint8_t*) fileContent, (uint32_t) fileLength, compress ? CompressedFileFlags : DefaultFileFlags);
         }
         
         if (!inputFile.get("index", Json::nullValue).isNull()) {
