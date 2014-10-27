@@ -259,16 +259,18 @@ namespace Engine {
                 << Logger::end();
             Logger::begin("Events", Logger::LogLevel_Log)
                 << "    Event Class: " << iter->first
-                << Logger::end();
-            Logger::begin("Events", Logger::LogLevel_Log)
-                << "    Event Security: " << iter->second->Security.ToString()
-                << Logger::end();
-            Logger::begin("Events", Logger::LogLevel_Log) << "    Event Defered Messages: " << cls->GetDeferedMessageCount() << Logger::end();
-            Logger::begin("Events", Logger::LogLevel_Log)
-                << "    Event Members: "
-                << Logger::end();
+            << Logger::end();
+            if (cls != NULL) {
+                Logger::begin("Events", Logger::LogLevel_Log)
+                    << "    Event Security: " << iter->second->Security.ToString()
+                    << Logger::end();
+                Logger::begin("Events", Logger::LogLevel_Log) << "    Event Defered Messages: " << cls->GetDeferedMessageCount() << Logger::end();
+                Logger::begin("Events", Logger::LogLevel_Log)
+                    << "    Event Members: "
+                    << Logger::end();
             
-            cls->LogEvents("Events");
+                cls->LogEvents("Events");
+            }
         }
         return EM_OK;
     }
