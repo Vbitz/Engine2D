@@ -1,5 +1,5 @@
 // Engine2D Javascript API Documentation
-// Correct as of 18th Jan 2014
+// Correct as of 27th Oct 2014
 
 /** @namespace */
 this.global = this; // Global object exposed as global
@@ -92,6 +92,18 @@ global.console.verbose = function (obj) {};
  */
 global.console.writeRaw = function (obj) {};
 
+/**
+ * Derived off global.console._log, prints highlighted text at the highest log level
+ * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ */
+global.console.highlight = function (obj) {};
+
+/**
+ * Derived off global.console._log, inserts a toast into the EngineUI display which overrides the console visiblity
+ * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ */
+global.console.toast = function (obj) {};
+
 /** @namespace */
 global.sys = {};
 
@@ -110,36 +122,59 @@ global.sys.argv = function () {};
 global.sys.runFile = function (filename, persists) {};
 
 /**
- * @callback DrawFunction
- */
-
-/**
- * Calls func each frame so drawing can be performed
- * @deprecated In favor of the "draw" event
- * @param  {DrawFunction} func
- */
-global.sys.drawFunc = function (func) {};
-
-/**
- * @callback KeyboardFunction
- * @param {null} _ - Always ""
- * @param {string} char - The key pressed/released
- * @param {boolean} press - True if the key was pressed otherwise false
- */
-
-/**
- * Calls func whenever a key is pressed
- * @deprecated In favor of the "input" event
- * @param  {KeyboardFunction} func
- */
-global.sys.keyboardFunc = function (func) {};
-
-/**
  * Called each frame for draw code to be called.
  * All draw code should be performed during this event.
  * 
  * @event draw
  */
+
+/**
+ * TODO: Fill in event
+ * 
+ * @event dumpProfile
+ */
+
+/**
+ * Called when the mouse is clicked
+ * Params:
+ * 		string buttonName = enum { mouseLeft, mouseRight, mouseMiddle,
+ * 			mouse4, mouse5, mouse6, mouse7, mouse8, unknown };
+ * 		string action = enum { press, release };
+ * 		int rawMods;
+ * 		int x, y;
+ * 
+ * @event mouseButton
+ */
+
+/**
+ * Called when the frame finishes
+ * 
+ * @event endOfFrame
+ */
+
+/**
+ * Called when a file is run using sys.runFile(filename, params)
+ * Use EM_CANCEL to override the result
+ * Params:
+ * 		string path;
+ * 
+ * @event runFile
+ */
+
+/**
+ * Called when a key is pressed,
+ * there's also seprate events prefixed by key_ which are called when that key is pressed
+ * Params:
+ * 		int rawKey;
+ * 		string key;
+ * 		int rawPress
+ *   	string state = enum { press, release, repeat };
+ *    	bool shift;
+ *    	
+ * @event input
+ */
+
+// TODO: Fill in all the other events
 
 /**
  * @callback EventCallback
@@ -163,10 +198,27 @@ global.sys.on = function (event, id, filter, func) {};
 global.sys.emit = function (event, args) {};
 
 /**
+ * Run any pending event handers
+ * @param  {string} event
+ */
+global.sys.pollDeferedMessages = function (event) {};
+
+/**
+ * Set defer to prevent events from executing until pollDeferedMessages is called
+ * @param {string} event
+ * @param {bool} defer
+ */
+global.sys.setDeferedEvent = function (event, defer) {};
+
+/**
  * Disables any event with id
  * @param  {string} id
  */
 global.sys.clearEvent = function (id) {};
+
+global.sys.createTimer = function () {};
+
+global.sys.deleteTimer = function () {};
 
 /**
  * Returns the number of seconds since the engine started with at least milisecond accuracy
@@ -252,31 +304,6 @@ global.sys.getMaxTextureSize = function () {};
  * @param  {number} height
  */
 global.sys.resizeWindow = function (width, height) {};
-
-/**
- * Returns the last timespan zone took in seconds
- * @param  {string} zone
- * @return {number}
- */
-global.sys.getProfilerTime = function (zone) {};
-
-/**
- * Returns a list of all profiler zones in this session
- * @return {string[]}
- */
-global.sys.getProfilerZones = function () {};
-
-/**
- * @callback TimingFuncion
- */
-
-/**
- * Time how long it takes for func to execute using the profiler
- * Requires core.debug.profiler
- * @param  {string} name - A label to use for the results
- * @param  {TimingFuncion} func
- */
-global.sys.perf = function () {};
 
 /**
  * Time how long it takes for func to execute
@@ -371,6 +398,12 @@ global.sys.msgBox = function (title, msg, modal) {};
 global.sys.shell = function (filename) {};
 
 /**
+ * Returns a newly generated UUID
+ * @return {string}
+ */
+global.sys.uuid = function () {};
+
+/**
  * Saves the entire log to filename, fs.configDir has be called beforehand.
  * @param  {string} filename The filename to save the log to
  */
@@ -426,6 +459,12 @@ global.sys.platform = "";
 global.sys.devMode = false;
 
 /**
+ * Is the engine running in debug mode.
+ * @type {Boolean}
+ */
+global.sys.debugMode = false;
+
+/**
  * Has the OpenGL context been created yet?
  * @type {Boolean}
  */
@@ -460,6 +499,23 @@ global.sys.screenHeight = 0;
  * @type {Number}
  */
 global.sys.deltaTime = 0;
+
+/**
+ * A read write object providing access to the config system
+ * @type {Object}
+ */
+global.sys.runtimeConfig = {};
+
+/**
+ * A read write object providing a interface to the event system
+ * @example <caption>You can bind new events</caption>
+ * event.draw = function test_event (args) { draw.rect(0, 0, 100, 100); };
+ * @example <caption>You can call existing events</caption>
+ * event.exit();
+ * event.detailProfile({filename: "test.log", frames: 100});
+ * @type {Object}
+ */
+global.event = {};
 
 /** @namespace */
 global.fs = {};
@@ -518,6 +574,13 @@ global.fs.mkdir = function (path) {};
  * @return {string[]}
  */
 global.fs.lsdir = function (path) {};
+
+/**
+ * Returns the SHA512 hash of a file
+ * @param  {string} path 
+ * @return {string}
+ */
+global.fs.hashFile = function (path) {};
 
 /** @namespace */
 global.draw = {};
