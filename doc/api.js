@@ -281,7 +281,7 @@ global.sys.getGLVersion = function () {};
 
 /**
  * Returns true if the OpenGL extention is avalibe to current instance of the Engine
- * @param  {strirg}  extention
+ * @param  {string}  extention
  * @return {Boolean}
  */
 global.sys.hasExtention = function (extention) {};
