@@ -22,6 +22,8 @@ def stypeToCPPType(typeName):
 		return "v8::Handle<v8::Function>"
 	elif typeName == "*":
 		return "v8::Handle<v8::Value>"
+	elif typeName == "Object":
+		return "v8::Handle<v8::Object>"
 	elif typeName == "...*":
 		return "v8::Handle<v8::Value>*"
 	else:
@@ -39,6 +41,8 @@ def marshalSTypeToCPPValue(typeName, argPosition):
 		return "args.BooleanValue(" + str(argPosition) + ")"
 	elif typeName == "Function":
 		return "args[" + str(argPosition) + "]->ToFunction()"
+	elif typeName == "Object":
+		return "args[" + str(argPosition) + "]->ToObject()"
 	elif typeName == "*":
 		return "args[" + str(argPosition) + "]"
 	elif typeName == "...*":
@@ -58,6 +62,8 @@ def marshalSTypeToCPPCheck(typeName, argPosition):
 		return "args[" + str(argPosition) + "]->IsBoolean()"
 	elif typeName == "Function":
 		return "args[" + str(argPosition) + "]->IsFunction()"
+	elif typeName == "Object":
+		return "args[" + str(argPosition) + "]->IsObject()"
 	elif typeName == "*":
 		return "true"
 	elif typeName == "...*":
