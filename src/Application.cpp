@@ -112,61 +112,70 @@ namespace Engine {
     }
     
     void Application::_loadBasicConfigs() {
-        // new names in comments
-        // I still need to think though and make sure these match up
-        
+        // Core
         Config::SetBoolean( "core.runOnIdle",                       false);
         Config::SetBoolean( "core.throttleOnIdle",                  true);
         Config::SetBoolean( "core.catchErrors",                     !this->_debugMode && !this->_testMode);
-        
+
+        // Modes
         Config::SetBoolean( "core.debugMode",                       this->_debugMode);
         Config::SetBoolean( "core.devMode",                         this->_developerMode);
         Config::SetBoolean( "core.testMode",                        this->_testMode);
         
+        // Window
         Config::SetNumber(  "core.window.width",                    800);
         Config::SetNumber(  "core.window.height",                   600);
-        Config::SetNumber(  "core.render.aa",                       4);
         Config::SetBoolean( "core.window.vsync",                    false); // lack of vsync causes FPS issues
         Config::SetBoolean( "core.window.fullscreen",               false);
-        Config::SetString(  "core.render.openGL",                   "3.2");
-        Config::SetString(  "core.content.fontPath",                "fonts/open_sans.json");
-        Config::SetBoolean( "core.debug.engineUI.showVerboseLog",   false);
-        Config::SetBoolean( "core.debug.engineUI",                  this->_developerMode);
-        Config::SetNumber( "core.debug.engineUI.profilerScale",     500);
-        Config::SetBoolean( "core.debug.profiler",                  this->_developerMode || this->_debugMode);
         Config::SetString(  "core.window.title",                    "Engine2D");
-        Config::SetBoolean( "core.debug.debugRenderer",             false);
+        
+        // Render
+        Config::SetNumber(  "core.render.aa",                       4);
+        Config::SetString(  "core.render.openGL",                   "3.2");
         Config::SetString(  "core.render.basicEffect",              "shaders/basic.json");
         Config::SetNumber(  "core.render.targetFrameTime",          1.0f / 30.0f);
-        
         Config::SetBoolean( "core.render.clampTexture",             true);
         Config::SetBoolean( "core.render.forceMipmaps",             true);
         Config::SetNumber(  "core.render.fovy",                     45.0f);
+        Config::SetBoolean( "core.render.halfPix",                  false);
+
+        // Content
+        Config::SetString(  "core.content.fontPath",                "fonts/open_sans.json");
+
+        // Debug
+        Config::SetBoolean( "core.debug.engineUI.showVerboseLog",   false);
+        Config::SetBoolean( "core.debug.engineUI",                  this->_developerMode);
+        Config::SetNumber(  "core.debug.engineUI.profilerScale",    500);
+        Config::SetBoolean( "core.debug.profiler",                  this->_developerMode || this->_debugMode);
+        Config::SetBoolean( "core.debug.debugRenderer",             false);
+        Config::SetBoolean( "core.debug.v8Debug",                   this->_developerMode);
+        Config::SetNumber(  "core.debug.v8Debug.port",              5858);
+        Config::SetBoolean( "core.debug.slowload",                  false);
         
+        // Script
         Config::SetBoolean( "core.script.autoReload",               this->_developerMode);
         Config::SetBoolean( "core.script.gcOnFrame",                this->_developerMode);
         Config::SetString(  "core.script.loader",                   "lib/boot.js");
-        Config::SetString(  "core.config.path",                     "config/config.json");
         Config::SetString(  "core.script.entryPoint",               "script/basic");
+
+        // Config
+        Config::SetString(  "core.config.path",                     "config/config.json");
+
+        // Test
+        Config::SetNumber(  "core.test.testFrames",                 0);
+        Config::SetNumber(  "core.test.screenshotTime",             0);
         
-        // log_console = core.log.enableConsole
+        // Log
         // With quite a bit of research into console logging performance on windows it seems like I should be using
         // printf or buffered std::cout
         Config::SetBoolean( "core.log.enableConsole",               true);
         Config::SetBoolean( "core.log.filePath",                    "");
         Config::SetBoolean( "core.log.levels.verbose",              this->_developerMode || this->_debugMode);
-        Config::SetBoolean("core.log.levels.onlyHighlight",         false);
+        Config::SetBoolean( "core.log.levels.onlyHighlight",        false);
         Config::SetBoolean( "core.log.showColors",                  true);
         Config::SetBoolean( "core.log.src.undefinedValue",          this->_developerMode);
         Config::SetBoolean( "core.log.src.perfIssues",              this->_developerMode);
         Config::SetBoolean( "core.log.src.createImage",             true);
-        
-        Config::SetBoolean( "core.debug.v8Debug",                   this->_developerMode);
-        Config::SetNumber(  "core.debug.v8Debug.port",              5858);
-        Config::SetBoolean( "core.debug.slowload",                  false);
-        Config::SetBoolean( "core.render.halfPix",                  false);
-        Config::SetNumber(  "core.test.testFrames",                 0);
-        Config::SetNumber(  "core.test.screenshotTime",             0);
     }
     
     EventMagic Application::_config_CoreRenderAA(Json::Value args, void* userPointer) {
@@ -190,11 +199,13 @@ namespace Engine {
     }
     
     void Application::_hookConfigs() {
-        GetEventsSingilton()->GetEvent("config:core.render.aa")->AddListener("Application::Config_CoreRenderAA", EventEmitter::MakeTarget(_config_CoreRenderAA, this));
-        GetEventsSingilton()->GetEvent("config:core.window.vsync")->AddListener("Application::Config_CoreWindowVSync", EventEmitter::MakeTarget(_config_CoreWindowVSync, this));
-        GetEventsSingilton()->GetEvent("config:core.window.width")->AddListener("Application::ConfigWindowSize_Width", EventEmitter::MakeTarget(_config_CoreWindowSize, this));
-        GetEventsSingilton()->GetEvent("config:core.window.height")-> AddListener("Application::ConfigWindowSize_Height", EventEmitter::MakeTarget(_config_CoreWindowSize, this));
-        GetEventsSingilton()->GetEvent("config:core.window.title")->AddListener("Application::Config_CoreWindowTitle", EventEmitter::MakeTarget(_config_CoreWindowTitle, this));
+        EventEmitterPtr eventsSingilton = GetEventsSingilton();
+
+        eventsSingilton->GetEvent("config:core.render.aa")->AddListener("Application::Config_CoreRenderAA", EventEmitter::MakeTarget(_config_CoreRenderAA, this));
+        eventsSingilton->GetEvent("config:core.window.vsync")->AddListener("Application::Config_CoreWindowVSync", EventEmitter::MakeTarget(_config_CoreWindowVSync, this));
+        eventsSingilton->GetEvent("config:core.window.width")->AddListener("Application::ConfigWindowSize_Width", EventEmitter::MakeTarget(_config_CoreWindowSize, this));
+        eventsSingilton->GetEvent("config:core.window.height")-> AddListener("Application::ConfigWindowSize_Height", EventEmitter::MakeTarget(_config_CoreWindowSize, this));
+        eventsSingilton->GetEvent("config:core.window.title")->AddListener("Application::Config_CoreWindowTitle", EventEmitter::MakeTarget(_config_CoreWindowTitle, this));
     }
     
     void Application::_loadConfigFile(std::string configPath) {
@@ -247,16 +258,18 @@ namespace Engine {
     }
     
     void Application::_hookEvents() {
-        GetEventsSingilton()->GetEvent("exit")->AddListener("Application::_appEvent_Exit", EventEmitter::MakeTarget(_appEvent_Exit, this));
-        GetEventsSingilton()->GetEvent("dumpScripts")->AddListener("Applicaton::_appEvent_DumpScripts", EventEmitter::MakeTarget(_appEvent_DumpScripts, this));
+        EventEmitterPtr eventsSingilton = GetEventsSingilton();
         
-        GetEventsSingilton()->GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", EventEmitter::MakeTarget(_toggleFullscreen, this))->SetDefered(true);
-        GetEventsSingilton()->GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", EventEmitter::MakeTarget(_restartRenderer, this))->SetDefered(true);
-        GetEventsSingilton()->GetEvent("screenshot")->AddListener("Application::_saveScreenshot", EventEmitter::MakeTarget(_saveScreenshot, this))->SetDefered(true);
-        GetEventsSingilton()->GetEvent("dumpLog")->AddListener("Application::_dumpLog", EventEmitter::MakeTarget(_dumpLog, this));
+        eventsSingilton->GetEvent("exit")->AddListener("Application::_appEvent_Exit", EventEmitter::MakeTarget(_appEvent_Exit, this));
+        eventsSingilton->GetEvent("dumpScripts")->AddListener("Applicaton::_appEvent_DumpScripts", EventEmitter::MakeTarget(_appEvent_DumpScripts, this));
         
-        GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary, this));
-        GetEventsSingilton()->GetEvent("runFile")->AddListener(10, "Application::_requireConfigFile", EventEmitter::MakeTarget(_requireConfigFile, this));
+        eventsSingilton->GetEvent("toggleFullscreen")->AddListener("Application::_toggleFullscreen", EventEmitter::MakeTarget(_toggleFullscreen, this))->SetDefered(true);
+        eventsSingilton->GetEvent("restartRenderer")->AddListener("Application::_restartRenderer", EventEmitter::MakeTarget(_restartRenderer, this))->SetDefered(true);
+        eventsSingilton->GetEvent("screenshot")->AddListener("Application::_saveScreenshot", EventEmitter::MakeTarget(_saveScreenshot, this))->SetDefered(true);
+        eventsSingilton->GetEvent("dumpLog")->AddListener("Application::_dumpLog", EventEmitter::MakeTarget(_dumpLog, this));
+        
+        eventsSingilton->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary, this));
+        eventsSingilton->GetEvent("runFile")->AddListener(10, "Application::_requireConfigFile", EventEmitter::MakeTarget(_requireConfigFile, this));
     }
     
     void Application::_initGLContext(GraphicsVersion v) {
@@ -899,7 +912,9 @@ namespace Engine {
 	int Application::Start(int argc, char const *argv[]) {
         // At this point Logger is not avalible
         Logger::Init();
+        
         Platform::IsMainThread(); // Make sure we know which is the main thread
+        
         Config::SetBoolean("core.log.enableConsole", true); // make sure we can log to the console right from the start
         
         Platform::SetRawCommandLine(argc, argv);
