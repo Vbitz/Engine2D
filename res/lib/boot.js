@@ -98,6 +98,7 @@
 			var versionInfo = sys.version();
 			console.log("Using OpenGL: " + versionInfo.openGL);
 			console.log("Using OpenGL Renderer: " + versionInfo.glRenderer);
+			console.log("Using entryPoint: " + sys.config("core.script.entryPoint"));
 			sys.screenWidth = parseInt(sys.config("core.window.width"), 10);
 			sys.screenHeight = parseInt(sys.config("core.window.height"), 10);
 			sys.clearEvent("bootloaderLoad");
