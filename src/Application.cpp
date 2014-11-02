@@ -392,23 +392,24 @@ namespace Engine {
         bool _exit = false;
         
         for (int i = 1; i < argc; i++) {
-            if (strcmp(argv[i], "-devmode") == 0) {
+            std::string arg = std::string(argv[i]);
+            if (arg == "-devmode") {
                 // enable devmode
                 _developerMode = true;
-            } else if (strcmp(argv[i], "-debug") == 0) {
+            } else if (arg == "-debug") {
                 // enable debug
                 _debugMode = true;
-            } else if (strcmp(argv[i], "-test") == 0) {
+            } else if (arg == "-test") {
                 // start test mode
                 _testMode = true;
-            } else if (strcmp(argv[i], "-headless") == 0) {
+            } else if (arg == "-headless") {
                 // enable headless mode
-            } else if (strcmp(argv[i], "-v8-options") == 0) {
+            } else if (arg == "-v8-options") {
                 ScriptingManager::Context::RunHelpCommand();
                 _exit = true; // v8 exits automaticly but let's just help it along
-            } else if (strcmp(argv[i], "-Cvars") == 0) {
+            } else if (arg == "-Cvars") {
                 _configVarsMode = true;
-            } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0) {
+            } else if (arg == "-h" | arg == "-help") {
                 std::cerr << "Engine2D\n"
                 "==================\n"
                 "\n"
@@ -434,50 +435,28 @@ namespace Engine {
                 "regular path).\n"
                 "-v8-options                    - Prints v8 option help then exits.\n"
                 "-v8flag=value                  - Set's v8 flags from the command line.\n"
+                "(NYI) -recordReplay=filename   - Records a replay and saves it to json file\n"
+                "(NYI) -playReplay=filename     - Plays back a replay\n"
                 "-h                             - Prints this message.\n"
                 "" << std::endl;
                 _exit = true;
-            } else if (strncmp(argv[i], "-C", 2) == 0) {
+            } else if (arg.find("-C") == 0) {
                 // set delayed config
-                size_t keyLength = strcspn(argv[i], "=") - 2;
-                size_t valueLength = strlen(argv[i]) - keyLength - 3; // 2 chars for -C and 1 for =
-                
-                char* key = (char*) malloc(keyLength + 1);
-                key[keyLength] = '\0';
-                strncpy(key, &argv[i][2], keyLength);
-                
-                char* value = (char*) malloc(valueLength + 1);
-                value[valueLength] = '\0';
-                strncpy(value, &argv[i][2 + keyLength + 1], valueLength);
+                std::string key = arg.substr(2, arg.find("="));
+                std::string value = arg.substr(arg.find("=") + 1);
                 
                 _delayedConfigs[key] = std::string(value);
-                
-                free(key);
-                free(value);
-            } else if (strncmp(argv[i], "-v8", 3) == 0) {
+            } else if (arg.find("-v8") == 0) {
                 // set delayed config
-                size_t configLength = strlen(argv[i]) - 3;
-                char* key = (char*) malloc(2 + configLength + 1);
-                key[0] = '-'; key[1] = '-';
-                strncpy(&key[2], &argv[i][3], configLength);
-                key[2 + configLength] = '\0';
+                std::string key = arg.substr(3);
                 
-                Logger::begin("Scripting_CFG", Logger::LogLevel_Log) << "Setting V8 Option: " << key << Logger::end();
+                Logger::begin("Scripting_CFG", Logger::LogLevel_Log) << "Setting V8 Option: --" << key << Logger::end();
                 
-                ScriptingManager::Context::SetFlag(std::string(key));
-                
-                free(key);
-            } else if (strncmp(argv[i], "-mountPath=", 11) == 0) {
+                ScriptingManager::Context::SetFlag("--" + key);
+            } else if (arg.find("-mountPath=") == 0) {
                 // add archive to PhysFS after PhysFS Init
-                size_t configLength = strlen(argv[i]) - 11;
-                char* archive = (char*) malloc(configLength + 1);
-                strncpy(archive, &argv[i][11], configLength);
-                archive[configLength] = '\0';
-                
-                this->_archivePaths.push_back(archive);
-                
-                free(archive);
-            } else if (strncmp(argv[i], "-log=", 5) == 0) {
+                this->_archivePaths.push_back(arg.substr(11));
+            } else if (arg.find("-log=") == 0) {
                 // set logfile and enable logging
             } else {
                 // push to JS args
