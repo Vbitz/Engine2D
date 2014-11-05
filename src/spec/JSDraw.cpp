@@ -51,6 +51,19 @@ namespace Engine {
             
             delete[] args.GetParameter();
         }
+
+        class ArrayBufferContentsStore {
+        public:
+            ArrayBufferContentsStore(v8::ArrayBuffer::Contents contents)
+                        : _contents(contents) {}
+            
+            static void WeakCallback(const v8::WeakCallbackData<v8::ArrayBuffer, ArrayBufferContentsStore>& args) {
+                assert(args.GetValue()->IsExternal());
+                free(args.GetParameter()->_contents.Data());
+            }
+        private:
+            v8::ArrayBuffer::Contents _contents;
+        };
         
         v8::Persistent<v8::FunctionTemplate> colorTemplate, vertexBuffer2DTemplate;
         
@@ -380,14 +393,21 @@ namespace Engine {
                         args.Assert(args[2]->IsNumber(), "Arg2 is the height of the image to create")) return;
                     
                     v8::Handle<v8::Float32Array> pixels = v8::Handle<v8::Float32Array>::Cast(args[0]);
+                    
+                    v8::Handle<v8::ArrayBuffer> arrBuff = pixels->Buffer();
+                    v8::Persistent<v8::ArrayBuffer> arrBuffP;
+                    arrBuffP.Reset(args.GetIsolate(), arrBuff);
+                    v8::ArrayBuffer::Contents contents = arrBuff->Externalize();
+                    arrBuffP.SetWeak(new ArrayBufferContentsStore(contents), ArrayBufferContentsStore::WeakCallback);
+                    
                     int width = args.Int32Value(1),
                         height = args.Int32Value(2);
                     
-                    if (args.Assert(pixels->Length() >= width * height * 4, "Arg0 needs to be equal or more then width*height*4 elements in size")) return;
+                    if (args.Assert(contents.ByteLength() >= width * height * 4 * sizeof(float),
+                        "Arg0 needs to be equal or more then width*height*4 elements in size")) return;
                     
-                    // I'm not realy sure why this does'nt work but I'm going to guess it relates to how I read the array data
-
-                    JS_Texture::Unwrap<JS_Texture>(args.This())->_tex = ImageReader::TextureFromBuffer((float*) pixels->Buffer()->GetIndexedPropertiesExternalArrayData(), width, height);
+                    JS_Texture::Unwrap<JS_Texture>(args.This())->_tex =
+                        ImageReader::TextureFromBuffer((float*) contents.Data(), width, height);
                 } else {
                     args.ThrowArgError("TODO");
                 }
