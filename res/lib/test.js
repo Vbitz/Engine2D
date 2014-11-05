@@ -261,7 +261,7 @@ for (var i = 0; i < 100 * 100 * 4; i += 4) {
 	pix[i] = Math.cos(i);
 	pix[i + 1] = Math.sin(i + 1);
 	pix[i + 2] = Math.tan(i + 2);
-	pix[i + 4] = 1.0;
+	pix[i + 3] = 1.0;
 }
 
 var hsv = new Float32Array(360 * 100 * 4);
@@ -298,7 +298,7 @@ var spriteSheet = spriteSheet ? spriteSheet : (function () {
 
 var t = 0;
 
-var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object") || sys.hasExtention("GL_EXT_framebuffer_object");
+var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object")|| sys.hasExtention("GL_EXT_framebuffer_object");
 
 console.log("OpenGL Extentions:");
 sys.getExtentions().forEach(function (i) {
