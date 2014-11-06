@@ -61,6 +61,14 @@ namespace Engine {
         return (double) stats.used_heap_size() / (double) stats.total_heap_size();
     }
     
+    std::string _getHeapUsageString() {
+        v8::HeapStatistics stats;
+        v8::Isolate::GetCurrent()->GetHeapStatistics(&stats);
+        std::stringstream ss;
+        ss << stats.used_heap_size() << " bytes / " << stats.total_heap_size() << " bytes";
+        return ss.str();
+    }
+    
     EngineUI::EngineUI(ApplicationPtr app) : _app(app) {
         this->_draw = new Draw2D(app->GetRender());
         
@@ -279,12 +287,18 @@ namespace Engine {
                 
                 this->_draw->LineGraph(80, y - 70, ((windowSize.x - 120) / timingResolution), y - 70 - 95, this->_lastHeapUsages, timingResolution);
                 
+                renderGL->SetFont("basic", 10);
+                
+                ss.str("");
+                
+                ss << "v8 Heap: " << _getHeapUsageString();
+                
+                renderGL->Print(100, y - 85, ss.str().c_str());
+                
                 renderGL->SetColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f);
                 
                 this->_draw->Line(80, y - 70, windowSize.x - 40, y - 70);
                 this->_draw->Line(80, 95, 80, y - 70);
-                
-                renderGL->SetFont("basic", 10);
                 
                 int graphHeight = y - 70 - 95;
                 double gsYinc = 0;
