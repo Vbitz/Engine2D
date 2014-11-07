@@ -6,7 +6,7 @@ import json
 MAX_WIDTH = 1000
 
 def drawRect(x, y, width, height, title):
-	color = "%s, %s, %s" % (y, y, y)
+	color = "%s, 0, 0" % (y)
 	print ("<rect x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\"" + \
 		" fill=\"rgb(%s)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\"><title>%s</title></rect>") % (x, y, width, height, color, title)
 
