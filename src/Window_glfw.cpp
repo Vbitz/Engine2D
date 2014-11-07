@@ -267,7 +267,9 @@ namespace Engine {
         }
         
         bool GetFullscreen() override {
-            return this->_fullscreen;
+            return this->_fullscreen
+                || glfwGetWindowMonitor(this->_window) != NULL
+                || this->GetWindowSize() == this->_getCurrentScreenSize();
         }
         
         void SetFullscreen(bool fullscreen) override {
@@ -349,6 +351,11 @@ namespace Engine {
         }
         
     private:
+        glm::vec2 _getCurrentScreenSize() {
+            const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            return {mode->width, mode->height};
+        }
+        
         void _init() override {
             
         }

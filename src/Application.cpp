@@ -147,6 +147,9 @@ namespace Engine {
         Config::SetBoolean( "core.debug.engineUI",                  this->_developerMode);
         Config::SetNumber(  "core.debug.engineUI.profilerScale",    500);
         Config::SetBoolean( "core.debug.profiler",                  this->_developerMode || this->_debugMode);
+        Config::SetNumber(  "core.debug.profiler.maxFrameTime",     1.0f / 50.0f);
+        Config::SetBoolean( "core.debug.profiler.dumpFrames",       this->_debugMode);
+        Config::SetNumber(  "core.debug.profiler.dumpCooldown",     100);
         Config::SetBoolean( "core.debug.debugRenderer",             false);
         Config::SetBoolean( "core.debug.v8Debug",                   this->_developerMode);
         Config::SetNumber(  "core.debug.v8Debug.port",              5858);

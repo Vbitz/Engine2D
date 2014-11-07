@@ -27,11 +27,16 @@
 #include <map>
 #include <stack>
 
+#include <iomanip>
+#include <ctime>
+
 #include "vendor/json/json.h"
 
 #include "Logger.hpp"
 #include "Config.hpp"
 #include "Events.hpp"
+#include "FramePerfMonitor.hpp"
+#include "Application.hpp"
 
 #include "Platform.hpp"
 
@@ -39,6 +44,8 @@ namespace Engine {
     namespace Profiler {
         
         ProfileZoneMetadata *lastRootZone, *rootZone, *currentZone;
+        
+        int currentLogCooldownFrames = 0;
         
         void BeginProfile(ScopePtr scope) {
             if (currentZone == NULL) return;
@@ -115,6 +122,33 @@ namespace Engine {
             lastRootZone = currentZone;
             if (GetEventsSingilton()->GetEvent("onProfileEnd")->ListenerCount() > 0) {
                 GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(GetLastFrame());
+            }
+            if (currentLogCooldownFrames > 0) {
+                currentLogCooldownFrames--;
+            } else {
+                if ((FramePerfMonitor::GetFrameTime() > Config::GetFloat("core.debug.profiler.maxFrameTime")) &&
+                    GetAppSingilton()->GetWindow()->GetFullscreen()) {
+                    if (Config::GetBoolean("core.debug.profiler.dumpFrames") && Filesystem::HasSetUserDir()) {
+                        if (!Filesystem::FolderExists("/profilerDumps")) {
+                            Filesystem::Mkdir("/profilerDumps");
+                        }
+                        std::stringstream ss;
+                        ss << GetLastFrame();
+                        std::stringstream filename;
+                        filename << "/profilerDumps/" << "profileDump_";
+                        auto t = std::time(NULL);
+                        auto tm = *std::localtime(&t);
+                        filename << std::put_time(&tm, "%H_%M_%S_%Y_%m_%d");
+                        filename << ".json";
+                        Filesystem::WriteFile(filename.str(), ss.str().c_str(), ss.str().length());
+                        Logger::begin("Profiler", Logger::LogLevel_Warning) <<
+                            "FrameTime exceeded limit: frameTime=" <<
+                            FramePerfMonitor::GetFrameTime() << " maxFrameTime=" <<
+                            Config::GetFloat("core.debug.profiler.maxFrameTime") <<
+                            " wrote log to " << filename.str() << Logger::end();
+                        currentLogCooldownFrames = Config::GetInt("core.debug.profiler.dumpCooldown");
+                    }
+                }
             }
             currentZone = rootZone = NULL;
         }
