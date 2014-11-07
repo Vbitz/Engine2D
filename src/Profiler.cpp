@@ -123,6 +123,7 @@ namespace Engine {
             if (GetEventsSingilton()->GetEvent("onProfileEnd")->ListenerCount() > 0) {
                 GetEventsSingilton()->GetEvent("onProfileEnd")->Emit(GetLastFrame());
             }
+#ifdef _PLATFORM_OSX
             if (currentLogCooldownFrames > 0) {
                 currentLogCooldownFrames--;
             } else {
@@ -150,6 +151,7 @@ namespace Engine {
                     }
                 }
             }
+#endif
             currentZone = rootZone = NULL;
         }
         
