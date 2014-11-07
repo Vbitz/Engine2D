@@ -1,0 +1,2070 @@
+
+{
+	"avg" : -1,
+	"children" : 
+	{
+		"FrameScope" : 
+		{
+			"avg" : 0.391106128692627,
+			"children" : 
+			{
+				"DrawScope" : 
+				{
+					"avg" : 0.001848936080932617,
+					"children" : 
+					{
+						"Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : draw" : 
+						{
+							"avg" : 0.001585960388183594,
+							"children" : 
+							{
+								"Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : test.draw" : 
+								{
+									"avg" : 0.001582145690917969,
+									"children" : 
+									{
+										"virtual void Engine::RenderGL3::FlushAll()" : 
+										{
+											"avg" : 3.099441528320312e-06,
+											"children" : {},
+											"count" : 1,
+											"max" : 3.099441528320312e-06,
+											"min" : 3.099441528320312e-06,
+											"name" : "virtual void Engine::RenderGL3::FlushAll()",
+											"self" : 3.099441528320312e-06,
+											"total" : 3.099441528320312e-06
+										},
+										"void Engine::Draw2D::BezierCurve(const glm::vec2 &, const glm::vec2 &, const glm::vec2 &, const glm::vec2 &, int)" : 
+										{
+											"avg" : 6.437301635742188e-06,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 1.192092895507812e-06,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 2.002716064453125e-05,
+															"children" : 
+															{
+																"void Engine::RenderGL3::_switchTextures()" : 
+																{
+																	"avg" : 1.9073486328125e-06,
+																	"children" : 
+																	{
+																		"void Engine::Texture::Begin()" : 
+																		{
+																			"avg" : 0,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.225073858507201e-308,
+																			"min" : 0,
+																			"name" : "void Engine::Texture::Begin()",
+																			"self" : 0,
+																			"total" : 0
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.9073486328125e-06,
+																	"min" : 1.9073486328125e-06,
+																	"name" : "void Engine::RenderGL3::_switchTextures()",
+																	"self" : 1.9073486328125e-06,
+																	"total" : 1.9073486328125e-06
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=6" : 
+																{
+																	"avg" : 1.382827758789062e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 4.053115844726562e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 4.053115844726562e-06,
+																			"min" : 4.053115844726562e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 4.053115844726562e-06,
+																			"total" : 4.053115844726562e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 2.145767211914062e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.145767211914062e-06,
+																			"min" : 2.145767211914062e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 2.145767211914062e-06,
+																			"total" : 2.145767211914062e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.382827758789062e-05,
+																	"min" : 1.382827758789062e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=6",
+																	"self" : 7.62939453125e-06,
+																	"total" : 1.382827758789062e-05
+																}
+															},
+															"count" : 1,
+															"max" : 2.002716064453125e-05,
+															"min" : 2.002716064453125e-05,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 4.291534423828125e-06,
+															"total" : 2.002716064453125e-05
+														}
+													},
+													"count" : 20,
+													"max" : 2.193450927734375e-05,
+													"min" : 0,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 3.814697265625e-06,
+													"total" : 2.384185791015625e-05
+												}
+											},
+											"count" : 20,
+											"max" : 2.789497375488281e-05,
+											"min" : 4.053115844726562e-06,
+											"name" : "void Engine::Draw2D::BezierCurve(const glm::vec2 &, const glm::vec2 &, const glm::vec2 &, const glm::vec2 &, int)",
+											"self" : 0.0001049041748046875,
+											"total" : 0.0001287460327148438
+										},
+										"void Engine::Draw2D::Circle(float, float, float, float, int, float, float, bool)" : 
+										{
+											"avg" : 7.677078247070312e-05,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 9.5367431640625e-07,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 0,
+															"children" : {},
+															"count" : 1,
+															"max" : 2.225073858507201e-308,
+															"min" : 0,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 0,
+															"total" : 0
+														}
+													},
+													"count" : 1,
+													"max" : 9.5367431640625e-07,
+													"min" : 9.5367431640625e-07,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 9.5367431640625e-07,
+													"total" : 9.5367431640625e-07
+												},
+												"virtual void Engine::RenderGL3::FlushAll()" : 
+												{
+													"avg" : 1.740455627441406e-05,
+													"children" : 
+													{
+														"void Engine::RenderGL3::_switchTextures()" : 
+														{
+															"avg" : 9.5367431640625e-07,
+															"children" : 
+															{
+																"void Engine::Texture::Begin()" : 
+																{
+																	"avg" : 0,
+																	"children" : {},
+																	"count" : 1,
+																	"max" : 2.225073858507201e-308,
+																	"min" : 0,
+																	"name" : "void Engine::Texture::Begin()",
+																	"self" : 0,
+																	"total" : 0
+																}
+															},
+															"count" : 1,
+															"max" : 9.5367431640625e-07,
+															"min" : 9.5367431640625e-07,
+															"name" : "void Engine::RenderGL3::_switchTextures()",
+															"self" : 9.5367431640625e-07,
+															"total" : 9.5367431640625e-07
+														},
+														"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=36" : 
+														{
+															"avg" : 1.215934753417969e-05,
+															"children" : 
+															{
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																{
+																	"avg" : 2.86102294921875e-06,
+																	"children" : {},
+																	"count" : 1,
+																	"max" : 2.86102294921875e-06,
+																	"min" : 2.86102294921875e-06,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																	"self" : 2.86102294921875e-06,
+																	"total" : 2.86102294921875e-06
+																},
+																"void Engine::VertexBuffer::_upload()" : 
+																{
+																	"avg" : 9.5367431640625e-07,
+																	"children" : {},
+																	"count" : 1,
+																	"max" : 9.5367431640625e-07,
+																	"min" : 9.5367431640625e-07,
+																	"name" : "void Engine::VertexBuffer::_upload()",
+																	"self" : 9.5367431640625e-07,
+																	"total" : 9.5367431640625e-07
+																}
+															},
+															"count" : 1,
+															"max" : 1.215934753417969e-05,
+															"min" : 1.215934753417969e-05,
+															"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=36",
+															"self" : 8.344650268554688e-06,
+															"total" : 1.215934753417969e-05
+														},
+														"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=362" : 
+														{
+															"avg" : 1.382827758789062e-05,
+															"children" : 
+															{
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																{
+																	"avg" : 3.099441528320312e-06,
+																	"children" : {},
+																	"count" : 1,
+																	"max" : 3.099441528320312e-06,
+																	"min" : 3.099441528320312e-06,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																	"self" : 3.099441528320312e-06,
+																	"total" : 3.099441528320312e-06
+																},
+																"void Engine::VertexBuffer::_upload()" : 
+																{
+																	"avg" : 3.099441528320312e-06,
+																	"children" : {},
+																	"count" : 1,
+																	"max" : 3.099441528320312e-06,
+																	"min" : 3.099441528320312e-06,
+																	"name" : "void Engine::VertexBuffer::_upload()",
+																	"self" : 3.099441528320312e-06,
+																	"total" : 3.099441528320312e-06
+																}
+															},
+															"count" : 1,
+															"max" : 1.382827758789062e-05,
+															"min" : 1.382827758789062e-05,
+															"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=362",
+															"self" : 7.62939453125e-06,
+															"total" : 1.382827758789062e-05
+														}
+													},
+													"count" : 2,
+													"max" : 1.788139343261719e-05,
+													"min" : 1.692771911621094e-05,
+													"name" : "virtual void Engine::RenderGL3::FlushAll()",
+													"self" : 7.867813110351562e-06,
+													"total" : 3.480911254882812e-05
+												}
+											},
+											"count" : 1,
+											"max" : 7.677078247070312e-05,
+											"min" : 7.677078247070312e-05,
+											"name" : "void Engine::Draw2D::Circle(float, float, float, float, int, float, float, bool)",
+											"self" : 4.100799560546875e-05,
+											"total" : 7.677078247070312e-05
+										},
+										"void Engine::Draw2D::DrawImage(TexturePtr, float, float, float, float)" : 
+										{
+											"avg" : 2.606709798177083e-05,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 2.471605936686198e-05,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 2.368291219075521e-05,
+															"children" : 
+															{
+																"void Engine::RenderGL3::_switchTextures()" : 
+																{
+																	"avg" : 1.112620035807292e-06,
+																	"children" : 
+																	{
+																		"void Engine::Texture::Begin()" : 
+																		{
+																			"avg" : 0,
+																			"children" : {},
+																			"count" : 3,
+																			"max" : 2.225073858507201e-308,
+																			"min" : 0,
+																			"name" : "void Engine::Texture::Begin()",
+																			"self" : 0,
+																			"total" : 0
+																		}
+																	},
+																	"count" : 3,
+																	"max" : 1.192092895507812e-06,
+																	"min" : 9.5367431640625e-07,
+																	"name" : "void Engine::RenderGL3::_switchTextures()",
+																	"self" : 3.337860107421875e-06,
+																	"total" : 3.337860107421875e-06
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=54" : 
+																{
+																	"avg" : 1.406669616699219e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 3.933906555175781e-06,
+																			"children" : {},
+																			"count" : 2,
+																			"max" : 4.053115844726562e-06,
+																			"min" : 3.814697265625e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 7.867813110351562e-06,
+																			"total" : 7.867813110351562e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 1.430511474609375e-06,
+																			"children" : {},
+																			"count" : 2,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 9.5367431640625e-07,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 2.86102294921875e-06,
+																			"total" : 2.86102294921875e-06
+																		}
+																	},
+																	"count" : 2,
+																	"max" : 1.406669616699219e-05,
+																	"min" : 1.406669616699219e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=54",
+																	"self" : 1.740455627441406e-05,
+																	"total" : 2.813339233398438e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=72" : 
+																{
+																	"avg" : 1.478195190429688e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 4.053115844726562e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 4.053115844726562e-06,
+																			"min" : 4.053115844726562e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 4.053115844726562e-06,
+																			"total" : 4.053115844726562e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 2.145767211914062e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.145767211914062e-06,
+																			"min" : 2.145767211914062e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 2.145767211914062e-06,
+																			"total" : 2.145767211914062e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.478195190429688e-05,
+																	"min" : 1.478195190429688e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=72",
+																	"self" : 8.58306884765625e-06,
+																	"total" : 1.478195190429688e-05
+																}
+															},
+															"count" : 3,
+															"max" : 3.314018249511719e-05,
+															"min" : 1.692771911621094e-05,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 2.47955322265625e-05,
+															"total" : 7.104873657226562e-05
+														}
+													},
+													"count" : 3,
+													"max" : 3.409385681152344e-05,
+													"min" : 1.811981201171875e-05,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 3.099441528320312e-06,
+													"total" : 7.414817810058594e-05
+												}
+											},
+											"count" : 3,
+											"max" : 3.600120544433594e-05,
+											"min" : 1.9073486328125e-05,
+											"name" : "void Engine::Draw2D::DrawImage(TexturePtr, float, float, float, float)",
+											"self" : 4.053115844726562e-06,
+											"total" : 7.82012939453125e-05
+										},
+										"void Engine::Draw2D::DrawImage(TexturePtr, float, float, float, float, float, float, float, float)" : 
+										{
+											"avg" : 2.288818359375e-05,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 2.09808349609375e-05,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 2.002716064453125e-05,
+															"children" : 
+															{
+																"void Engine::RenderGL3::_switchTextures()" : 
+																{
+																	"avg" : 9.5367431640625e-07,
+																	"children" : 
+																	{
+																		"void Engine::Texture::Begin()" : 
+																		{
+																			"avg" : 0,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.225073858507201e-308,
+																			"min" : 0,
+																			"name" : "void Engine::Texture::Begin()",
+																			"self" : 0,
+																			"total" : 0
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 9.5367431640625e-07,
+																	"min" : 9.5367431640625e-07,
+																	"name" : "void Engine::RenderGL3::_switchTextures()",
+																	"self" : 9.5367431640625e-07,
+																	"total" : 9.5367431640625e-07
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=54" : 
+																{
+																	"avg" : 1.406669616699219e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 2.86102294921875e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.86102294921875e-06,
+																			"min" : 2.86102294921875e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 2.86102294921875e-06,
+																			"total" : 2.86102294921875e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 9.5367431640625e-07,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 9.5367431640625e-07,
+																			"min" : 9.5367431640625e-07,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 9.5367431640625e-07,
+																			"total" : 9.5367431640625e-07
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.406669616699219e-05,
+																	"min" : 1.406669616699219e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=54",
+																	"self" : 1.025199890136719e-05,
+																	"total" : 1.406669616699219e-05
+																}
+															},
+															"count" : 1,
+															"max" : 2.002716064453125e-05,
+															"min" : 2.002716064453125e-05,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 5.006790161132812e-06,
+															"total" : 2.002716064453125e-05
+														}
+													},
+													"count" : 1,
+													"max" : 2.09808349609375e-05,
+													"min" : 2.09808349609375e-05,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 9.5367431640625e-07,
+													"total" : 2.09808349609375e-05
+												}
+											},
+											"count" : 1,
+											"max" : 2.288818359375e-05,
+											"min" : 2.288818359375e-05,
+											"name" : "void Engine::Draw2D::DrawImage(TexturePtr, float, float, float, float, float, float, float, float)",
+											"self" : 1.9073486328125e-06,
+											"total" : 2.288818359375e-05
+										},
+										"void Engine::Draw2D::DrawSprite(SpriteSheetPtr, std::string, float, float, float, float)" : 
+										{
+											"avg" : 2.503395080566406e-05,
+											"children" : 
+											{
+												"void Engine::Draw2D::DrawImage(TexturePtr, float, float, float, float, float, float, float, float)" : 
+												{
+													"avg" : 2.193450927734375e-05,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+														{
+															"avg" : 2.002716064453125e-05,
+															"children" : 
+															{
+																"virtual void Engine::RenderGL3::FlushAll()" : 
+																{
+																	"avg" : 1.9073486328125e-05,
+																	"children" : 
+																	{
+																		"void Engine::RenderGL3::_switchTextures()" : 
+																		{
+																			"avg" : 1.9073486328125e-06,
+																			"children" : 
+																			{
+																				"void Engine::Texture::Begin()" : 
+																				{
+																					"avg" : 0,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 2.225073858507201e-308,
+																					"min" : 0,
+																					"name" : "void Engine::Texture::Begin()",
+																					"self" : 0,
+																					"total" : 0
+																				}
+																			},
+																			"count" : 1,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 1.9073486328125e-06,
+																			"name" : "void Engine::RenderGL3::_switchTextures()",
+																			"self" : 1.9073486328125e-06,
+																			"total" : 1.9073486328125e-06
+																		},
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=72" : 
+																		{
+																			"avg" : 1.287460327148438e-05,
+																			"children" : 
+																			{
+																				"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																				{
+																					"avg" : 3.099441528320312e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 3.099441528320312e-06,
+																					"min" : 3.099441528320312e-06,
+																					"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																					"self" : 3.099441528320312e-06,
+																					"total" : 3.099441528320312e-06
+																				},
+																				"void Engine::VertexBuffer::_upload()" : 
+																				{
+																					"avg" : 1.9073486328125e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 1.9073486328125e-06,
+																					"min" : 1.9073486328125e-06,
+																					"name" : "void Engine::VertexBuffer::_upload()",
+																					"self" : 1.9073486328125e-06,
+																					"total" : 1.9073486328125e-06
+																				}
+																			},
+																			"count" : 1,
+																			"max" : 1.287460327148438e-05,
+																			"min" : 1.287460327148438e-05,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=72",
+																			"self" : 7.867813110351562e-06,
+																			"total" : 1.287460327148438e-05
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.9073486328125e-05,
+																	"min" : 1.9073486328125e-05,
+																	"name" : "virtual void Engine::RenderGL3::FlushAll()",
+																	"self" : 4.291534423828125e-06,
+																	"total" : 1.9073486328125e-05
+																}
+															},
+															"count" : 1,
+															"max" : 2.002716064453125e-05,
+															"min" : 2.002716064453125e-05,
+															"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+															"self" : 9.5367431640625e-07,
+															"total" : 2.002716064453125e-05
+														}
+													},
+													"count" : 1,
+													"max" : 2.193450927734375e-05,
+													"min" : 2.193450927734375e-05,
+													"name" : "void Engine::Draw2D::DrawImage(TexturePtr, float, float, float, float, float, float, float, float)",
+													"self" : 1.9073486328125e-06,
+													"total" : 2.193450927734375e-05
+												}
+											},
+											"count" : 1,
+											"max" : 2.503395080566406e-05,
+											"min" : 2.503395080566406e-05,
+											"name" : "void Engine::Draw2D::DrawSprite(SpriteSheetPtr, std::string, float, float, float, float)",
+											"self" : 3.099441528320312e-06,
+											"total" : 2.503395080566406e-05
+										},
+										"void Engine::Draw2D::Grad(float, float, float, float, int, int, bool)" : 
+										{
+											"avg" : 8.66254170735677e-06,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 6.357828776041666e-06,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 1.788139343261719e-05,
+															"children" : 
+															{
+																"void Engine::RenderGL3::_switchTextures()" : 
+																{
+																	"avg" : 1.9073486328125e-06,
+																	"children" : 
+																	{
+																		"void Engine::Texture::Begin()" : 
+																		{
+																			"avg" : 9.5367431640625e-07,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 9.5367431640625e-07,
+																			"min" : 9.5367431640625e-07,
+																			"name" : "void Engine::Texture::Begin()",
+																			"self" : 9.5367431640625e-07,
+																			"total" : 9.5367431640625e-07
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.9073486328125e-06,
+																	"min" : 1.9073486328125e-06,
+																	"name" : "void Engine::RenderGL3::_switchTextures()",
+																	"self" : 9.5367431640625e-07,
+																	"total" : 1.9073486328125e-06
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=48" : 
+																{
+																	"avg" : 1.096725463867188e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 1.9073486328125e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 1.9073486328125e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 1.9073486328125e-06,
+																			"total" : 1.9073486328125e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 1.9073486328125e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 1.9073486328125e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 1.9073486328125e-06,
+																			"total" : 1.9073486328125e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.096725463867188e-05,
+																	"min" : 1.096725463867188e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=48",
+																	"self" : 7.152557373046875e-06,
+																	"total" : 1.096725463867188e-05
+																}
+															},
+															"count" : 1,
+															"max" : 1.788139343261719e-05,
+															"min" : 1.788139343261719e-05,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 5.006790161132812e-06,
+															"total" : 1.788139343261719e-05
+														}
+													},
+													"count" : 3,
+													"max" : 1.9073486328125e-05,
+													"min" : 0,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 1.192092895507812e-06,
+													"total" : 1.9073486328125e-05
+												}
+											},
+											"count" : 3,
+											"max" : 2.09808349609375e-05,
+											"min" : 9.5367431640625e-07,
+											"name" : "void Engine::Draw2D::Grad(float, float, float, float, int, int, bool)",
+											"self" : 6.914138793945312e-06,
+											"total" : 2.598762512207031e-05
+										},
+										"void Engine::Draw2D::Grid(float, float, float, float)" : 
+										{
+											"avg" : 2.193450927734375e-05,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 1.9073486328125e-05,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 1.811981201171875e-05,
+															"children" : 
+															{
+																"void Engine::RenderGL3::_switchTextures()" : 
+																{
+																	"avg" : 1.192092895507812e-06,
+																	"children" : 
+																	{
+																		"void Engine::Texture::Begin()" : 
+																		{
+																			"avg" : 0,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.225073858507201e-308,
+																			"min" : 0,
+																			"name" : "void Engine::Texture::Begin()",
+																			"self" : 0,
+																			"total" : 0
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.192092895507812e-06,
+																	"min" : 1.192092895507812e-06,
+																	"name" : "void Engine::RenderGL3::_switchTextures()",
+																	"self" : 1.192092895507812e-06,
+																	"total" : 1.192092895507812e-06
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=24" : 
+																{
+																	"avg" : 1.192092895507812e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 2.145767211914062e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.145767211914062e-06,
+																			"min" : 2.145767211914062e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 2.145767211914062e-06,
+																			"total" : 2.145767211914062e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 1.192092895507812e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 1.192092895507812e-06,
+																			"min" : 1.192092895507812e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 1.192092895507812e-06,
+																			"total" : 1.192092895507812e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.192092895507812e-05,
+																	"min" : 1.192092895507812e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=24",
+																	"self" : 8.58306884765625e-06,
+																	"total" : 1.192092895507812e-05
+																}
+															},
+															"count" : 1,
+															"max" : 1.811981201171875e-05,
+															"min" : 1.811981201171875e-05,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 5.006790161132812e-06,
+															"total" : 1.811981201171875e-05
+														}
+													},
+													"count" : 1,
+													"max" : 1.9073486328125e-05,
+													"min" : 1.9073486328125e-05,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 9.5367431640625e-07,
+													"total" : 1.9073486328125e-05
+												}
+											},
+											"count" : 1,
+											"max" : 2.193450927734375e-05,
+											"min" : 2.193450927734375e-05,
+											"name" : "void Engine::Draw2D::Grid(float, float, float, float)",
+											"self" : 2.86102294921875e-06,
+											"total" : 2.193450927734375e-05
+										},
+										"void Engine::Draw2D::Rect(float, float, float, float)" : 
+										{
+											"avg" : 2.050399780273438e-05,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 1.943111419677734e-05,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 1.901388168334961e-05,
+															"children" : 
+															{
+																"void Engine::RenderGL3::_switchTextures()" : 
+																{
+																	"avg" : 1.053015391031901e-06,
+																	"children" : 
+																	{
+																		"void Engine::Texture::Begin()" : 
+																		{
+																			"avg" : 3.178914388020834e-07,
+																			"children" : {},
+																			"count" : 12,
+																			"max" : 9.5367431640625e-07,
+																			"min" : 0,
+																			"name" : "void Engine::Texture::Begin()",
+																			"self" : 3.814697265625e-06,
+																			"total" : 3.814697265625e-06
+																		}
+																	},
+																	"count" : 12,
+																	"max" : 1.9073486328125e-06,
+																	"min" : 0,
+																	"name" : "void Engine::RenderGL3::_switchTextures()",
+																	"self" : 8.821487426757812e-06,
+																	"total" : 1.263618469238281e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=24" : 
+																{
+																	"avg" : 1.192092895507812e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 3.099441528320312e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 3.099441528320312e-06,
+																			"min" : 3.099441528320312e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 3.099441528320312e-06,
+																			"total" : 3.099441528320312e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 9.5367431640625e-07,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 9.5367431640625e-07,
+																			"min" : 9.5367431640625e-07,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 9.5367431640625e-07,
+																			"total" : 9.5367431640625e-07
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.192092895507812e-05,
+																	"min" : 1.192092895507812e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=24",
+																	"self" : 7.867813110351562e-06,
+																	"total" : 1.192092895507812e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=36" : 
+																{
+																	"avg" : 1.198053359985352e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 3.039836883544922e-06,
+																			"children" : {},
+																			"count" : 4,
+																			"max" : 3.099441528320312e-06,
+																			"min" : 2.86102294921875e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 1.215934753417969e-05,
+																			"total" : 1.215934753417969e-05
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 2.384185791015625e-06,
+																			"children" : {},
+																			"count" : 4,
+																			"max" : 3.099441528320312e-06,
+																			"min" : 2.145767211914062e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 9.5367431640625e-06,
+																			"total" : 9.5367431640625e-06
+																		}
+																	},
+																	"count" : 4,
+																	"max" : 1.406669616699219e-05,
+																	"min" : 1.096725463867188e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=36",
+																	"self" : 2.622604370117188e-05,
+																	"total" : 4.792213439941406e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=396" : 
+																{
+																	"avg" : 2.002716064453125e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 5.960464477539062e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 5.960464477539062e-06,
+																			"min" : 5.960464477539062e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 5.960464477539062e-06,
+																			"total" : 5.960464477539062e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 4.053115844726562e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 4.053115844726562e-06,
+																			"min" : 4.053115844726562e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 4.053115844726562e-06,
+																			"total" : 4.053115844726562e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 2.002716064453125e-05,
+																	"min" : 2.002716064453125e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=396",
+																	"self" : 1.001358032226562e-05,
+																	"total" : 2.002716064453125e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=42" : 
+																{
+																	"avg" : 1.406669616699219e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 2.86102294921875e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.86102294921875e-06,
+																			"min" : 2.86102294921875e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 2.86102294921875e-06,
+																			"total" : 2.86102294921875e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 1.9073486328125e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 1.9073486328125e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 1.9073486328125e-06,
+																			"total" : 1.9073486328125e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.406669616699219e-05,
+																	"min" : 1.406669616699219e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=42",
+																	"self" : 9.298324584960938e-06,
+																	"total" : 1.406669616699219e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=48" : 
+																{
+																	"avg" : 1.287460327148438e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 3.099441528320312e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 3.099441528320312e-06,
+																			"min" : 3.099441528320312e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 3.099441528320312e-06,
+																			"total" : 3.099441528320312e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 1.9073486328125e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 1.9073486328125e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 1.9073486328125e-06,
+																			"total" : 1.9073486328125e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.287460327148438e-05,
+																	"min" : 1.287460327148438e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=48",
+																	"self" : 7.867813110351562e-06,
+																	"total" : 1.287460327148438e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=54" : 
+																{
+																	"avg" : 1.192092895507812e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 3.099441528320312e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 3.099441528320312e-06,
+																			"min" : 3.099441528320312e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 3.099441528320312e-06,
+																			"total" : 3.099441528320312e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 9.5367431640625e-07,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 9.5367431640625e-07,
+																			"min" : 9.5367431640625e-07,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 9.5367431640625e-07,
+																			"total" : 9.5367431640625e-07
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.192092895507812e-05,
+																	"min" : 1.192092895507812e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=54",
+																	"self" : 7.867813110351562e-06,
+																	"total" : 1.192092895507812e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=60" : 
+																{
+																	"avg" : 1.347064971923828e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 2.980232238769531e-06,
+																			"children" : {},
+																			"count" : 2,
+																			"max" : 3.099441528320312e-06,
+																			"min" : 2.86102294921875e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 5.960464477539062e-06,
+																			"total" : 5.960464477539062e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 2.503395080566406e-06,
+																			"children" : {},
+																			"count" : 2,
+																			"max" : 3.099441528320312e-06,
+																			"min" : 1.9073486328125e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 5.006790161132812e-06,
+																			"total" : 5.006790161132812e-06
+																		}
+																	},
+																	"count" : 2,
+																	"max" : 1.502037048339844e-05,
+																	"min" : 1.192092895507812e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=60",
+																	"self" : 1.597404479980469e-05,
+																	"total" : 2.694129943847656e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=78" : 
+																{
+																	"avg" : 1.311302185058594e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 2.86102294921875e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.86102294921875e-06,
+																			"min" : 2.86102294921875e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 2.86102294921875e-06,
+																			"total" : 2.86102294921875e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 1.9073486328125e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 1.9073486328125e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 1.9073486328125e-06,
+																			"total" : 1.9073486328125e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.311302185058594e-05,
+																	"min" : 1.311302185058594e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=78",
+																	"self" : 8.344650268554688e-06,
+																	"total" : 1.311302185058594e-05
+																}
+															},
+															"count" : 12,
+															"max" : 2.789497375488281e-05,
+															"min" : 1.597404479980469e-05,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 5.674362182617188e-05,
+															"total" : 0.0002281665802001953
+														}
+													},
+													"count" : 12,
+													"max" : 2.884864807128906e-05,
+													"min" : 1.597404479980469e-05,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 5.006790161132812e-06,
+													"total" : 0.0002331733703613281
+												}
+											},
+											"count" : 12,
+											"max" : 3.218650817871094e-05,
+											"min" : 1.692771911621094e-05,
+											"name" : "void Engine::Draw2D::Rect(float, float, float, float)",
+											"self" : 1.287460327148438e-05,
+											"total" : 0.0002460479736328125
+										},
+										"void Engine::RenderDriver::Print(float, float, const char *)" : 
+										{
+											"avg" : 1.834971564156669e-05,
+											"children" : 
+											{
+												"void Engine::FontSheet::DrawText(RenderDriverPtr, float, float, float, std::string)" : 
+												{
+													"avg" : 1.713207789829799e-05,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+														{
+															"avg" : 1.370906829833985e-05,
+															"children" : 
+															{
+																"virtual void Engine::RenderGL3::FlushAll()" : 
+																{
+																	"avg" : 1.703609119762073e-05,
+																	"children" : 
+																	{
+																		"void Engine::RenderGL3::_switchTextures()" : 
+																		{
+																			"avg" : 1.029534773393111e-06,
+																			"children" : 
+																			{
+																				"void Engine::Texture::Begin()" : 
+																				{
+																					"avg" : 2.709302035245028e-07,
+																					"children" : {},
+																					"count" : 22,
+																					"max" : 1.192092895507812e-06,
+																					"min" : 0,
+																					"name" : "void Engine::Texture::Begin()",
+																					"self" : 5.960464477539062e-06,
+																					"total" : 5.960464477539062e-06
+																				}
+																			},
+																			"count" : 22,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 9.5367431640625e-07,
+																			"name" : "void Engine::RenderGL3::_switchTextures()",
+																			"self" : 1.668930053710938e-05,
+																			"total" : 2.264976501464844e-05
+																		},
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=108" : 
+																		{
+																			"avg" : 1.406669616699219e-05,
+																			"children" : 
+																			{
+																				"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																				{
+																					"avg" : 3.099441528320312e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 3.099441528320312e-06,
+																					"min" : 3.099441528320312e-06,
+																					"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																					"self" : 3.099441528320312e-06,
+																					"total" : 3.099441528320312e-06
+																				},
+																				"void Engine::VertexBuffer::_upload()" : 
+																				{
+																					"avg" : 1.9073486328125e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 1.9073486328125e-06,
+																					"min" : 1.9073486328125e-06,
+																					"name" : "void Engine::VertexBuffer::_upload()",
+																					"self" : 1.9073486328125e-06,
+																					"total" : 1.9073486328125e-06
+																				}
+																			},
+																			"count" : 1,
+																			"max" : 1.406669616699219e-05,
+																			"min" : 1.406669616699219e-05,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=108",
+																			"self" : 9.059906005859375e-06,
+																			"total" : 1.406669616699219e-05
+																		},
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=12" : 
+																		{
+																			"avg" : 1.215934753417969e-05,
+																			"children" : 
+																			{
+																				"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																				{
+																					"avg" : 2.86102294921875e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 2.86102294921875e-06,
+																					"min" : 2.86102294921875e-06,
+																					"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																					"self" : 2.86102294921875e-06,
+																					"total" : 2.86102294921875e-06
+																				},
+																				"void Engine::VertexBuffer::_upload()" : 
+																				{
+																					"avg" : 9.5367431640625e-07,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 9.5367431640625e-07,
+																					"min" : 9.5367431640625e-07,
+																					"name" : "void Engine::VertexBuffer::_upload()",
+																					"self" : 9.5367431640625e-07,
+																					"total" : 9.5367431640625e-07
+																				}
+																			},
+																			"count" : 1,
+																			"max" : 1.215934753417969e-05,
+																			"min" : 1.215934753417969e-05,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=12",
+																			"self" : 8.344650268554688e-06,
+																			"total" : 1.215934753417969e-05
+																		},
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=5" : 
+																		{
+																			"avg" : 1.215934753417969e-05,
+																			"children" : 
+																			{
+																				"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																				{
+																					"avg" : 2.86102294921875e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 2.86102294921875e-06,
+																					"min" : 2.86102294921875e-06,
+																					"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																					"self" : 2.86102294921875e-06,
+																					"total" : 2.86102294921875e-06
+																				},
+																				"void Engine::VertexBuffer::_upload()" : 
+																				{
+																					"avg" : 9.5367431640625e-07,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 9.5367431640625e-07,
+																					"min" : 9.5367431640625e-07,
+																					"name" : "void Engine::VertexBuffer::_upload()",
+																					"self" : 9.5367431640625e-07,
+																					"total" : 9.5367431640625e-07
+																				}
+																			},
+																			"count" : 1,
+																			"max" : 1.215934753417969e-05,
+																			"min" : 1.215934753417969e-05,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=5",
+																			"self" : 8.344650268554688e-06,
+																			"total" : 1.215934753417969e-05
+																		},
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=570" : 
+																		{
+																			"avg" : 1.692771911621094e-05,
+																			"children" : 
+																			{
+																				"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																				{
+																					"avg" : 4.053115844726562e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 4.053115844726562e-06,
+																					"min" : 4.053115844726562e-06,
+																					"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																					"self" : 4.053115844726562e-06,
+																					"total" : 4.053115844726562e-06
+																				},
+																				"void Engine::VertexBuffer::_upload()" : 
+																				{
+																					"avg" : 5.006790161132812e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 5.006790161132812e-06,
+																					"min" : 5.006790161132812e-06,
+																					"name" : "void Engine::VertexBuffer::_upload()",
+																					"self" : 5.006790161132812e-06,
+																					"total" : 5.006790161132812e-06
+																				}
+																			},
+																			"count" : 1,
+																			"max" : 1.692771911621094e-05,
+																			"min" : 1.692771911621094e-05,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=570",
+																			"self" : 7.867813110351562e-06,
+																			"total" : 1.692771911621094e-05
+																		},
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=6" : 
+																		{
+																			"avg" : 1.28325294045841e-05,
+																			"children" : 
+																			{
+																				"virtual void Engine::RenderGL3::SetShader(ShaderPtr)" : 
+																				{
+																					"avg" : 1.9073486328125e-06,
+																					"children" : {},
+																					"count" : 1,
+																					"max" : 1.9073486328125e-06,
+																					"min" : 1.9073486328125e-06,
+																					"name" : "virtual void Engine::RenderGL3::SetShader(ShaderPtr)",
+																					"self" : 1.9073486328125e-06,
+																					"total" : 1.9073486328125e-06
+																				},
+																				"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																				{
+																					"avg" : 3.478106330422794e-06,
+																					"children" : {},
+																					"count" : 17,
+																					"max" : 1.120567321777344e-05,
+																					"min" : 1.9073486328125e-06,
+																					"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																					"self" : 5.91278076171875e-05,
+																					"total" : 5.91278076171875e-05
+																				},
+																				"void Engine::VertexBuffer::_upload()" : 
+																				{
+																					"avg" : 1.893324010512408e-06,
+																					"children" : {},
+																					"count" : 17,
+																					"max" : 5.960464477539062e-06,
+																					"min" : 9.5367431640625e-07,
+																					"name" : "void Engine::VertexBuffer::_upload()",
+																					"self" : 3.218650817871094e-05,
+																					"total" : 3.218650817871094e-05
+																				}
+																			},
+																			"count" : 17,
+																			"max" : 3.385543823242188e-05,
+																			"min" : 1.096725463867188e-05,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=6",
+																			"self" : 0.0001249313354492188,
+																			"total" : 0.0002181529998779297
+																		}
+																	},
+																	"count" : 22,
+																	"max" : 4.291534423828125e-05,
+																	"min" : 2.145767211914062e-06,
+																	"name" : "virtual void Engine::RenderGL3::FlushAll()",
+																	"self" : 7.867813110351562e-05,
+																	"total" : 0.0003747940063476562
+																}
+															},
+															"count" : 28,
+															"max" : 4.410743713378906e-05,
+															"min" : 0,
+															"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+															"self" : 9.059906005859375e-06,
+															"total" : 0.0003838539123535156
+														}
+													},
+													"count" : 28,
+													"max" : 5.507469177246094e-05,
+													"min" : 3.099441528320312e-06,
+													"name" : "void Engine::FontSheet::DrawText(RenderDriverPtr, float, float, float, std::string)",
+													"self" : 9.584426879882812e-05,
+													"total" : 0.0004796981811523438
+												}
+											},
+											"count" : 28,
+											"max" : 6.008148193359375e-05,
+											"min" : 4.053115844726562e-06,
+											"name" : "void Engine::RenderDriver::Print(float, float, const char *)",
+											"self" : 3.409385681152344e-05,
+											"total" : 0.0005137920379638672
+										},
+										"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=6" : 
+										{
+											"avg" : 6.103515625e-05,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::SetShader(ShaderPtr)" : 
+												{
+													"avg" : 3.814697265625e-06,
+													"children" : {},
+													"count" : 1,
+													"max" : 3.814697265625e-06,
+													"min" : 3.814697265625e-06,
+													"name" : "virtual void Engine::RenderGL3::SetShader(ShaderPtr)",
+													"self" : 3.814697265625e-06,
+													"total" : 3.814697265625e-06
+												},
+												"void Engine::Shader::UploadUniform(std::string, glm::mat4)" : 
+												{
+													"avg" : 3.099441528320312e-06,
+													"children" : {},
+													"count" : 1,
+													"max" : 3.099441528320312e-06,
+													"min" : 3.099441528320312e-06,
+													"name" : "void Engine::Shader::UploadUniform(std::string, glm::mat4)",
+													"self" : 3.099441528320312e-06,
+													"total" : 3.099441528320312e-06
+												},
+												"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+												{
+													"avg" : 2.408027648925781e-05,
+													"children" : {},
+													"count" : 1,
+													"max" : 2.408027648925781e-05,
+													"min" : 2.408027648925781e-05,
+													"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+													"self" : 2.408027648925781e-05,
+													"total" : 2.408027648925781e-05
+												}
+											},
+											"count" : 1,
+											"max" : 6.103515625e-05,
+											"min" : 6.103515625e-05,
+											"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=6",
+											"self" : 3.004074096679688e-05,
+											"total" : 6.103515625e-05
+										}
+									},
+									"count" : 1,
+									"max" : 0.001582145690917969,
+									"min" : 0.001582145690917969,
+									"name" : "Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : test.draw",
+									"self" : 0.0003786087036132812,
+									"total" : 0.001582145690917969
+								}
+							},
+							"count" : 1,
+							"max" : 0.001585960388183594,
+							"min" : 0.001585960388183594,
+							"name" : "Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : draw",
+							"self" : 3.814697265625e-06,
+							"total" : 0.001585960388183594
+						},
+						"virtual void Engine::RenderGL3::Begin2d()" : 
+						{
+							"avg" : 4.410743713378906e-06,
+							"children" : 
+							{
+								"virtual void Engine::RenderGL3::EnableSmooth()" : 
+								{
+									"avg" : 1.549720764160156e-06,
+									"children" : {},
+									"count" : 2,
+									"max" : 2.145767211914062e-06,
+									"min" : 9.5367431640625e-07,
+									"name" : "virtual void Engine::RenderGL3::EnableSmooth()",
+									"self" : 3.099441528320312e-06,
+									"total" : 3.099441528320312e-06
+								},
+								"virtual void Engine::RenderGL3::ResetMatrix()" : 
+								{
+									"avg" : 9.5367431640625e-07,
+									"children" : {},
+									"count" : 2,
+									"max" : 9.5367431640625e-07,
+									"min" : 9.5367431640625e-07,
+									"name" : "virtual void Engine::RenderGL3::ResetMatrix()",
+									"self" : 1.9073486328125e-06,
+									"total" : 1.9073486328125e-06
+								}
+							},
+							"count" : 2,
+							"max" : 5.960464477539062e-06,
+							"min" : 2.86102294921875e-06,
+							"name" : "virtual void Engine::RenderGL3::Begin2d()",
+							"self" : 3.814697265625e-06,
+							"total" : 8.821487426757812e-06
+						},
+						"virtual void Engine::RenderGL3::End2d()" : 
+						{
+							"avg" : 3.349781036376953e-05,
+							"children" : 
+							{
+								"virtual void Engine::RenderGL3::FlushAll()" : 
+								{
+									"avg" : 3.254413604736328e-05,
+									"children" : 
+									{
+										"void Engine::RenderGL3::_switchTextures()" : 
+										{
+											"avg" : 9.5367431640625e-07,
+											"children" : 
+											{
+												"void Engine::Texture::Begin()" : 
+												{
+													"avg" : 0,
+													"children" : {},
+													"count" : 1,
+													"max" : 2.225073858507201e-308,
+													"min" : 0,
+													"name" : "void Engine::Texture::Begin()",
+													"self" : 0,
+													"total" : 0
+												}
+											},
+											"count" : 1,
+											"max" : 9.5367431640625e-07,
+											"min" : 9.5367431640625e-07,
+											"name" : "void Engine::RenderGL3::_switchTextures()",
+											"self" : 9.5367431640625e-07,
+											"total" : 9.5367431640625e-07
+										},
+										"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=2568" : 
+										{
+											"avg" : 4.100799560546875e-05,
+											"children" : 
+											{
+												"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+												{
+													"avg" : 1.192092895507812e-05,
+													"children" : {},
+													"count" : 1,
+													"max" : 1.192092895507812e-05,
+													"min" : 1.192092895507812e-05,
+													"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+													"self" : 1.192092895507812e-05,
+													"total" : 1.192092895507812e-05
+												},
+												"void Engine::VertexBuffer::_upload()" : 
+												{
+													"avg" : 1.9073486328125e-05,
+													"children" : {},
+													"count" : 1,
+													"max" : 1.9073486328125e-05,
+													"min" : 1.9073486328125e-05,
+													"name" : "void Engine::VertexBuffer::_upload()",
+													"self" : 1.9073486328125e-05,
+													"total" : 1.9073486328125e-05
+												}
+											},
+											"count" : 1,
+											"max" : 4.100799560546875e-05,
+											"min" : 4.100799560546875e-05,
+											"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=2568",
+											"self" : 1.001358032226562e-05,
+											"total" : 4.100799560546875e-05
+										},
+										"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=300" : 
+										{
+											"avg" : 1.382827758789062e-05,
+											"children" : 
+											{
+												"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+												{
+													"avg" : 3.099441528320312e-06,
+													"children" : {},
+													"count" : 1,
+													"max" : 3.099441528320312e-06,
+													"min" : 3.099441528320312e-06,
+													"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+													"self" : 3.099441528320312e-06,
+													"total" : 3.099441528320312e-06
+												},
+												"void Engine::VertexBuffer::_upload()" : 
+												{
+													"avg" : 3.099441528320312e-06,
+													"children" : {},
+													"count" : 1,
+													"max" : 3.099441528320312e-06,
+													"min" : 3.099441528320312e-06,
+													"name" : "void Engine::VertexBuffer::_upload()",
+													"self" : 3.099441528320312e-06,
+													"total" : 3.099441528320312e-06
+												}
+											},
+											"count" : 1,
+											"max" : 1.382827758789062e-05,
+											"min" : 1.382827758789062e-05,
+											"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=300",
+											"self" : 7.62939453125e-06,
+											"total" : 1.382827758789062e-05
+										}
+									},
+									"count" : 2,
+									"max" : 4.506111145019531e-05,
+									"min" : 2.002716064453125e-05,
+									"name" : "virtual void Engine::RenderGL3::FlushAll()",
+									"self" : 9.298324584960938e-06,
+									"total" : 6.508827209472656e-05
+								}
+							},
+							"count" : 2,
+							"max" : 4.601478576660156e-05,
+							"min" : 2.09808349609375e-05,
+							"name" : "virtual void Engine::RenderGL3::End2d()",
+							"self" : 1.9073486328125e-06,
+							"total" : 6.699562072753906e-05
+						},
+						"void Engine::EngineUI::Draw()" : 
+						{
+							"avg" : 0.0001699924468994141,
+							"children" : 
+							{
+								"virtual void Engine::RenderGL3::DisableSmooth()" : 
+								{
+									"avg" : 0,
+									"children" : {},
+									"count" : 1,
+									"max" : 2.225073858507201e-308,
+									"min" : 0,
+									"name" : "virtual void Engine::RenderGL3::DisableSmooth()",
+									"self" : 0,
+									"total" : 0
+								},
+								"virtual void Engine::RenderGL3::EnableSmooth()" : 
+								{
+									"avg" : 0,
+									"children" : {},
+									"count" : 1,
+									"max" : 2.225073858507201e-308,
+									"min" : 0,
+									"name" : "virtual void Engine::RenderGL3::EnableSmooth()",
+									"self" : 0,
+									"total" : 0
+								},
+								"virtual void Engine::RenderGL3::ResetMatrix()" : 
+								{
+									"avg" : 0,
+									"children" : {},
+									"count" : 1,
+									"max" : 2.225073858507201e-308,
+									"min" : 0,
+									"name" : "virtual void Engine::RenderGL3::ResetMatrix()",
+									"self" : 0,
+									"total" : 0
+								},
+								"void Engine::Draw2D::LineGraph(float, float, float, float, double *, unsigned int)" : 
+								{
+									"avg" : 6.29425048828125e-05,
+									"children" : 
+									{
+										"void Engine::Draw2D::Lines(double *, unsigned int)" : 
+										{
+											"avg" : 5.412101745605469e-05,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 2.503395080566406e-05,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 2.384185791015625e-05,
+															"children" : 
+															{
+																"void Engine::RenderGL3::_switchTextures()" : 
+																{
+																	"avg" : 9.5367431640625e-07,
+																	"children" : 
+																	{
+																		"void Engine::Texture::Begin()" : 
+																		{
+																			"avg" : 0,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.225073858507201e-308,
+																			"min" : 0,
+																			"name" : "void Engine::Texture::Begin()",
+																			"self" : 0,
+																			"total" : 0
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 9.5367431640625e-07,
+																	"min" : 9.5367431640625e-07,
+																	"name" : "void Engine::RenderGL3::_switchTextures()",
+																	"self" : 9.5367431640625e-07,
+																	"total" : 9.5367431640625e-07
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=84" : 
+																{
+																	"avg" : 1.811981201171875e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 5.960464477539062e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 5.960464477539062e-06,
+																			"min" : 5.960464477539062e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 5.960464477539062e-06,
+																			"total" : 5.960464477539062e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 2.86102294921875e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.86102294921875e-06,
+																			"min" : 2.86102294921875e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 2.86102294921875e-06,
+																			"total" : 2.86102294921875e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.811981201171875e-05,
+																	"min" : 1.811981201171875e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=84",
+																	"self" : 9.298324584960938e-06,
+																	"total" : 1.811981201171875e-05
+																}
+															},
+															"count" : 1,
+															"max" : 2.384185791015625e-05,
+															"min" : 2.384185791015625e-05,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 4.76837158203125e-06,
+															"total" : 2.384185791015625e-05
+														}
+													},
+													"count" : 1,
+													"max" : 2.503395080566406e-05,
+													"min" : 2.503395080566406e-05,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 1.192092895507812e-06,
+													"total" : 2.503395080566406e-05
+												}
+											},
+											"count" : 1,
+											"max" : 5.412101745605469e-05,
+											"min" : 5.412101745605469e-05,
+											"name" : "void Engine::Draw2D::Lines(double *, unsigned int)",
+											"self" : 2.908706665039062e-05,
+											"total" : 5.412101745605469e-05
+										}
+									},
+									"count" : 1,
+									"max" : 6.29425048828125e-05,
+									"min" : 6.29425048828125e-05,
+									"name" : "void Engine::Draw2D::LineGraph(float, float, float, float, double *, unsigned int)",
+									"self" : 8.821487426757812e-06,
+									"total" : 6.29425048828125e-05
+								},
+								"void Engine::Draw2D::Rect(float, float, float, float)" : 
+								{
+									"avg" : 3.099441528320312e-06,
+									"children" : 
+									{
+										"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+										{
+											"avg" : 1.9073486328125e-06,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::FlushAll()" : 
+												{
+													"avg" : 9.5367431640625e-07,
+													"children" : {},
+													"count" : 1,
+													"max" : 9.5367431640625e-07,
+													"min" : 9.5367431640625e-07,
+													"name" : "virtual void Engine::RenderGL3::FlushAll()",
+													"self" : 9.5367431640625e-07,
+													"total" : 9.5367431640625e-07
+												}
+											},
+											"count" : 1,
+											"max" : 1.9073486328125e-06,
+											"min" : 1.9073486328125e-06,
+											"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+											"self" : 9.5367431640625e-07,
+											"total" : 1.9073486328125e-06
+										}
+									},
+									"count" : 1,
+									"max" : 3.099441528320312e-06,
+									"min" : 3.099441528320312e-06,
+									"name" : "void Engine::Draw2D::Rect(float, float, float, float)",
+									"self" : 1.192092895507812e-06,
+									"total" : 3.099441528320312e-06
+								},
+								"void Engine::RenderDriver::Print(float, float, const char *)" : 
+								{
+									"avg" : 2.368291219075521e-05,
+									"children" : 
+									{
+										"void Engine::FontSheet::DrawText(RenderDriverPtr, float, float, float, std::string)" : 
+										{
+											"avg" : 2.169609069824219e-05,
+											"children" : 
+											{
+												"virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)" : 
+												{
+													"avg" : 1.700719197591146e-05,
+													"children" : 
+													{
+														"virtual void Engine::RenderGL3::FlushAll()" : 
+														{
+															"avg" : 2.360343933105469e-05,
+															"children" : 
+															{
+																"void Engine::RenderGL3::_switchTextures()" : 
+																{
+																	"avg" : 1.430511474609375e-06,
+																	"children" : 
+																	{
+																		"void Engine::Texture::Begin()" : 
+																		{
+																			"avg" : 4.76837158203125e-07,
+																			"children" : {},
+																			"count" : 2,
+																			"max" : 9.5367431640625e-07,
+																			"min" : 0,
+																			"name" : "void Engine::Texture::Begin()",
+																			"self" : 9.5367431640625e-07,
+																			"total" : 9.5367431640625e-07
+																		}
+																	},
+																	"count" : 2,
+																	"max" : 1.9073486328125e-06,
+																	"min" : 9.5367431640625e-07,
+																	"name" : "void Engine::RenderGL3::_switchTextures()",
+																	"self" : 1.9073486328125e-06,
+																	"total" : 2.86102294921875e-06
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=1000" : 
+																{
+																	"avg" : 2.288818359375e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 4.053115844726562e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 4.053115844726562e-06,
+																			"min" : 4.053115844726562e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 4.053115844726562e-06,
+																			"total" : 4.053115844726562e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 1.096725463867188e-05,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 1.096725463867188e-05,
+																			"min" : 1.096725463867188e-05,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 1.096725463867188e-05,
+																			"total" : 1.096725463867188e-05
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 2.288818359375e-05,
+																	"min" : 2.288818359375e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=1000",
+																	"self" : 7.867813110351562e-06,
+																	"total" : 2.288818359375e-05
+																},
+																"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=6" : 
+																{
+																	"avg" : 1.192092895507812e-05,
+																	"children" : 
+																	{
+																		"void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements" : 
+																		{
+																			"avg" : 2.86102294921875e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 2.86102294921875e-06,
+																			"min" : 2.86102294921875e-06,
+																			"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : glDrawElements",
+																			"self" : 2.86102294921875e-06,
+																			"total" : 2.86102294921875e-06
+																		},
+																		"void Engine::VertexBuffer::_upload()" : 
+																		{
+																			"avg" : 1.9073486328125e-06,
+																			"children" : {},
+																			"count" : 1,
+																			"max" : 1.9073486328125e-06,
+																			"min" : 1.9073486328125e-06,
+																			"name" : "void Engine::VertexBuffer::_upload()",
+																			"self" : 1.9073486328125e-06,
+																			"total" : 1.9073486328125e-06
+																		}
+																	},
+																	"count" : 1,
+																	"max" : 1.192092895507812e-05,
+																	"min" : 1.192092895507812e-05,
+																	"name" : "void Engine::VertexBuffer::Draw(Engine::PolygonMode, glm::mat4) : _vertexCount=6",
+																	"self" : 7.152557373046875e-06,
+																	"total" : 1.192092895507812e-05
+																}
+															},
+															"count" : 2,
+															"max" : 2.908706665039062e-05,
+															"min" : 1.811981201171875e-05,
+															"name" : "virtual void Engine::RenderGL3::FlushAll()",
+															"self" : 9.5367431640625e-06,
+															"total" : 4.720687866210938e-05
+														}
+													},
+													"count" : 3,
+													"max" : 3.004074096679688e-05,
+													"min" : 9.5367431640625e-07,
+													"name" : "virtual void Engine::RenderGL3::BeginRendering(Engine::PolygonMode)",
+													"self" : 3.814697265625e-06,
+													"total" : 5.102157592773438e-05
+												}
+											},
+											"count" : 3,
+											"max" : 3.504753112792969e-05,
+											"min" : 5.006790161132812e-06,
+											"name" : "void Engine::FontSheet::DrawText(RenderDriverPtr, float, float, float, std::string)",
+											"self" : 1.406669616699219e-05,
+											"total" : 6.508827209472656e-05
+										}
+									},
+									"count" : 3,
+									"max" : 3.790855407714844e-05,
+									"min" : 5.960464477539062e-06,
+									"name" : "void Engine::RenderDriver::Print(float, float, const char *)",
+									"self" : 5.960464477539062e-06,
+									"total" : 7.104873657226562e-05
+								}
+							},
+							"count" : 1,
+							"max" : 0.0001699924468994141,
+							"min" : 0.0001699924468994141,
+							"name" : "void Engine::EngineUI::Draw()",
+							"self" : 3.290176391601562e-05,
+							"total" : 0.0001699924468994141
+						}
+					},
+					"count" : 1,
+					"max" : 0.001848936080932617,
+					"min" : 0.001848936080932617,
+					"name" : "DrawScope",
+					"self" : 1.71661376953125e-05,
+					"total" : 0.001848936080932617
+				},
+				"Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : endOfFrame" : 
+				{
+					"avg" : 2.145767211914062e-06,
+					"children" : {},
+					"count" : 1,
+					"max" : 2.145767211914062e-06,
+					"min" : 2.145767211914062e-06,
+					"name" : "Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : endOfFrame",
+					"self" : 2.145767211914062e-06,
+					"total" : 2.145767211914062e-06
+				},
+				"Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : rawResize" : 
+				{
+					"avg" : 3.004074096679688e-05,
+					"children" : 
+					{
+						"Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : Application::RawResizeHandler" : 
+						{
+							"avg" : 2.408027648925781e-05,
+							"children" : {},
+							"count" : 1,
+							"max" : 2.408027648925781e-05,
+							"min" : 2.408027648925781e-05,
+							"name" : "Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : Application::RawResizeHandler",
+							"self" : 2.408027648925781e-05,
+							"total" : 2.408027648925781e-05
+						}
+					},
+					"count" : 1,
+					"max" : 3.004074096679688e-05,
+					"min" : 3.004074096679688e-05,
+					"name" : "Engine::EventMagic Engine::EventClass::Emit(Json::Value, int, v8::Handle<v8::Value> *) : rawResize",
+					"self" : 5.960464477539062e-06,
+					"total" : 3.004074096679688e-05
+				},
+				"static void Engine::ScriptingManager::Context::TriggerGC()" : 
+				{
+					"avg" : 5.960464477539062e-06,
+					"children" : {},
+					"count" : 1,
+					"max" : 5.960464477539062e-06,
+					"min" : 5.960464477539062e-06,
+					"name" : "static void Engine::ScriptingManager::Context::TriggerGC()",
+					"self" : 5.960464477539062e-06,
+					"total" : 5.960464477539062e-06
+				},
+				"void Engine::EventClass::PollDeferedMessages()" : 
+				{
+					"avg" : 1.674002789436503e-07,
+					"children" : {},
+					"count" : 47,
+					"max" : 1.192092895507812e-06,
+					"min" : 0,
+					"name" : "void Engine::EventClass::PollDeferedMessages()",
+					"self" : 7.867813110351562e-06,
+					"total" : 7.867813110351562e-06
+				},
+				"void Engine::ScriptingManager::Context::CheckUpdate()" : 
+				{
+					"avg" : 5.793571472167969e-05,
+					"children" : {},
+					"count" : 1,
+					"max" : 5.793571472167969e-05,
+					"min" : 5.793571472167969e-05,
+					"name" : "void Engine::ScriptingManager::Context::CheckUpdate()",
+					"self" : 5.793571472167969e-05,
+					"total" : 5.793571472167969e-05
+				}
+			},
+			"count" : 1,
+			"max" : 0.391106128692627,
+			"min" : 0.391106128692627,
+			"name" : "FrameScope",
+			"self" : 0.3891532421112061,
+			"total" : 0.391106128692627
+		}
+	},
+	"count" : 0,
+	"max" : 2.225073858507201e-308,
+	"min" : 1.797693134862316e+308,
+	"name" : "Root",
+	"self" : -0.391106128692627,
+	"total" : 0
+}

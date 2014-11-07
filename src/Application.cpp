@@ -734,24 +734,28 @@ namespace Engine {
             render->Clear();
             
             FramePerfMonitor::BeginDraw();
+            {
+                Engine::Profiler::Scope profilerScopeDraw("DrawScope");
             
-            render->Begin2d();
+                render->Begin2d();
             
-            v8::Handle<v8::Value> args[1] = {
-                v8::Number::New(v8::Isolate::GetCurrent(), FramePerfMonitor::GetFrameTime())
-            };
-            GetEventsSingilton()->GetEvent("draw")->Emit(Json::nullValue, 1, args); // this is when most Javascript runs
+                v8::Handle<v8::Value> args[1] = {
+                    v8::Number::New(v8::Isolate::GetCurrent(), FramePerfMonitor::GetFrameTime())
+                };
+                GetEventsSingilton()->GetEvent("draw")->Emit(Json::nullValue, 1, args); // this is when most Javascript runs
             
-            render->End2d();
+                render->End2d();
             
-            render->Begin2d();
+                render->Begin2d();
             
-            //this->_cubeTest->Draw();
+                //this->_cubeTest->Draw();
             
-            this->_engineUI->Draw();
+                this->_engineUI->Draw();
             
-            render->End2d();
-            
+                render->End2d();
+                
+                profilerScopeDraw.Close();
+            }
             FramePerfMonitor::EndDraw();
             
             this->_window->Present();
