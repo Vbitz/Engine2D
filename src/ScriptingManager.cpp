@@ -329,7 +329,14 @@ namespace Engine {
             gcMutex->Exit();
         }
         
-        Context::Context() : _isolate(v8::Isolate::New()), _scope(this->_isolate) {
+        v8::Isolate *_createIsolate() {
+            v8::Isolate::CreateParams params;
+            Platform::engine_memory_info info = Platform::GetMemoryInfo();
+            params.constraints.ConfigureDefaults(info.totalPhysical, info.totalVirtual, Platform::GetProcesserCount());
+            return v8::Isolate::New(params);
+        }
+        
+        Context::Context() : _isolate(_createIsolate()), _scope(this->_isolate) {
             this->_isolate->Enter();
             
             GetEventsSingilton()->GetEvent("v8_postGC")->SetNoScript(true);
