@@ -441,6 +441,13 @@ def ccov(args):
 	print "[ccov] output"
 	print re.sub(ccovExpr, parseCcovLine, out)
 
+@command(requires=[], usage="Compile a addon by name")
+def build_addon(args):
+	if len(args) < 4:
+		print "[build_addon] usage: ./tasks.py build_addon <cFile> <outputFilename>"
+	if is_osx():
+		buildAddon.compile([args[2]], args[3], link_v8=True)
+
 @command(requires=[], usage="Builds addons")
 def build_addons(args):
 	if is_osx():
