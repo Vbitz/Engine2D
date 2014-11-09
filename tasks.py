@@ -53,8 +53,9 @@ ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
 commands = {}
 
 class bcolors:
-	HEADER = '\x1b[0;42m\x1b[1;91m'
-	HIGHLIGHT = '\x1b[0;44m\x1b[1;91m'
+	LOGSRC = '\x1b[0;42m\x1b[1;91m'
+	HEADER = '\x1b[0;44m\x1b[1;91m'
+	SHELL = '\x1b[0;32m'
 	ENDC = '\033[0m'
 
 def noop():
@@ -73,6 +74,14 @@ class command(object):
 		commands[func.__name__].check = self.check
 		commands[func.__name__].run = False
 		return func
+
+def log(*args, **kwargs):
+	method_name = kwargs["method_name"] if "method_name" in kwargs else True
+	if method_name:
+		parent = inspect.getouterframes(inspect.currentframe())[1][3]
+		print("%s %s" % (bcolors.LOGSRC + "[" + parent + "]" + bcolors.ENDC, " ".join(args)))
+	else:
+		print(" ".join(args))
 
 def is_linux():
 	return sys.platform == "linux2"
@@ -114,7 +123,7 @@ def require_in_path(arr):
 	return True
 
 def shell_command(cmd, throw=True, output=False):
-	print(bcolors.HEADER + "shell in %s : %s" % (os.getcwd(), cmd) + bcolors.ENDC)
+	log("in " + bcolors.SHELL + os.getcwd() + bcolors.ENDC + (" : %s" % (" ".join(cmd))))
 	if throw:
 		if output:
 			return subprocess.check_output(cmd)
@@ -159,7 +168,7 @@ config = ConfigParser.RawConfigParser()
 try:
 	config.read(resolve_path(PROJECT_TMP_PATH, "tasks.cfg"))
 except Exception, e:
-	print("Could not load config file")
+	log("Could not load config file")
 
 def write_config():
 	with open(resolve_path(PROJECT_TMP_PATH, "tasks.cfg"), "wb") as config_file:
@@ -256,7 +265,7 @@ def build_glfw3(args):
 		glfw_glob = "src/libglfw.*dylib"
 
 	for f in glob.glob(glfw_glob):
-		print "[build_glfw3] copying %s to ../lib" % (f)
+		log("copying %s to ../lib" % (f))
 		shutil.copy(f, "../lib")
 	
 	os.chdir("../..")
@@ -303,10 +312,10 @@ def build_v8(args):
 			])
 		os.chdir("..");
 		if is_linux():
-			print "[build_v8] copying out/out/Release/lib.target/libv8.so to ../lib"
+			log("copying out/out/Release/lib.target/libv8.so to ../lib")
 			shutil.copy("out/out/Release/lib.target/libv8.so", "../lib/libv8.so")
 		elif is_osx():
-			print "[build_v8] copying out/out/Release/libv8.dylib to ../lib"
+			log("copying out/out/Release/libv8.dylib to ../lib")
 			shutil.copy("out/out/Release/libv8.dylib", "../lib/libv8.dylib")
 		os.chdir("../..")
 
@@ -327,7 +336,7 @@ def gyp(args):
 
 @command(requires=["gyp"], usage="Open's the platform specfic IDE")
 def ide(args):
-	print("Opening IDE")
+	log("Opening IDE")
 
 @command(usage="Generates Script Bindings")
 def gen_bindings(args):
@@ -337,11 +346,11 @@ def gen_bindings(args):
 	for f in srcFiles:
 		filePath = os.path.join(srcPath, f)
 		if not ensure_file_hash([filePath]):
-			print "[gen_bindings] building %s" % (filePath)
+			log("building %s" % (filePath))
 			store_file_hash([filePath])
 			bindingGenerator.parseFile(filePath, f)
 		else:
-			print "[gen_bindings] skiping %s" % (filePath)
+			log("skiping %s" % (filePath))
 
 @command(usage="Generates Build.hpp")
 def gen_build_hpp(args):
@@ -425,26 +434,26 @@ def ccov(args):
 	if not is_osx(): # This won't work on linux yet
 		return
 
-	print "[ccov] _build_bin(coverage=True)"
+	log("_build_bin(coverage=True)")
 	_build_bin(coverage=True)
 
-	print "[ccov] run_engine([\"-test\"])"
+	log("run_engine([\"-test\"])")
 	run_engine(["-test"])
 
-	print "[ccov] running gcov"
+	log("running gcov")
 	oldDir = os.getcwd()
 	os.chdir("build/engine2D.build/Default/libengine2D.build/Objects-normal/x86_64")
 	objectFiles = glob.glob("*.o")
 	out = shell_command([GCOV_PATH, "--no-output"] + objectFiles, output=True)
 	os.chdir(oldDir)
 
-	print "[ccov] output"
-	print re.sub(ccovExpr, parseCcovLine, out)
+	log("output")
+	log(re.sub(ccovExpr, parseCcovLine, out), method_name=False)
 
 @command(requires=[], usage="Compile a addon by name")
 def build_addon(args):
 	if len(args) < 4:
-		print "[build_addon] usage: ./tasks.py build_addon <cFile> <outputFilename>"
+		log("usage: ./tasks.py build_addon <cFile> <outputFilename>")
 	if is_osx():
 		buildAddon.compile([args[2]], args[3], link_v8=True)
 
@@ -452,15 +461,15 @@ def build_addon(args):
 def build_addons(args):
 	if is_osx():
 		if not ensure_file_hash(["src/Modules/JSUnsafe.cpp"]):
-			print "[build_addons] building res/modules/js_unsafe.dylib"
+			log("building res/modules/js_unsafe.dylib")
 			store_file_hash(["src/Modules/JSUnsafe.cpp"])
 			buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe.dylib", link_v8=True)
 		else:
-			print "[build_addons] skiping res/modules/js_unsafe.dylib"
+			log("skiping res/modules/js_unsafe.dylib")
 
 @command(requires=["build_bin", "build_addons"], usage="Copys support files to the build path")
 def build_env(args):
-	print("Copying Enviroment")
+	log("Copying Enviroment")
 
 @command(requires=["build_env"], usage="Runs the engine in Development Mode")
 def run(args):
@@ -483,22 +492,22 @@ def test_once(args):
 
 @command(requires=["gen_source", "fetch_gyp"], usage="Tests both GLFW and SDL")
 def test_full(args):
-	print("=== Starting Full Test Suite ===")
+	log("Starting Full Test Suite")
 	
-	print("=== Building GLFW Window ===")
+	log("Building GLFW Window")
 	clean()
 	WINDOW_SYSTEM = "glfw"
 	gyp()
 	build_bin()
-	print("=== Testing GLFW Window ===")
+	log("Testing GLFW Window")
 	test()
 
-	print("=== Build SDL Window ===")
+	log("Build SDL Window")
 	clean()
 	WINDOW_SYSTEM = "sdl"
 	gyp()
 	build_bin()
-	print("=== Testing SDL Window ===")
+	log("Testing SDL Window")
 	test()
 
 @command(usage="Build documentation using jsdoc")
@@ -510,14 +519,14 @@ def doc(args):
 @command(usage="Prints the commandName and usage for each command")
 def help(args):
 	for x in commands:
-		print("%s | %s" % (x, commands[x].usage))
+		log("%s | %s" % (x, commands[x].usage))
 
 @command(usage="Prints the current building enviroment")
 def env(args):
-	print "[env] sys.platform = \"%s\"" % (sys.platform)
-	print "[env] sys.version = \"%s\"" % (sys.version.replace("\n", ""))
-	print "[env] sys.version_info = %s" % (sys.version_info)
-	print "[env] resolve_path(PROJECT_ROOT, \"tasks.py\") = \"%s\"" % (resolve_path(PROJECT_ROOT, "tasks.py"))
+	log("sys.platform = \"%s\"" % (sys.platform))
+	log("sys.version = \"%s\"" % (sys.version.replace("\n", "")))
+	log("sys.version_info = %s" % (sys.version_info))
+	log("resolve_path(PROJECT_ROOT, \"tasks.py\") = \"%s\"" % (resolve_path(PROJECT_ROOT, "tasks.py")))
 
 @command(usage="Runs CTags on the source directory")
 def tags(args):
@@ -547,17 +556,17 @@ def release(args):
 	binPath			= resolve_path(PROJECT_BUILD_PATH)
 	currentPlatform = sys.platform
 
-	print "[release] === release config ==="
-	print "[release] deployFilename = \"%s\"" % (deployFilename)
-	print "[release] basePath = \"%s\"" % (basePath)
-	print "[release] outputName = \"%s\"" % (outputName)
-	print "[release] outputPath = \"%s\"" % (outputPath)
-	print "[release] binPath = \"%s\"" % (binPath)
-	print "[release] currentPlatform = \"%s\"" % (currentPlatform)
-	print "[release] platformList = %s" % (deployFile["os"])
-	print "[release] is_travis = %s" % (is_travis())
+	log("=== release config ===")
+	log("deployFilename = \"%s\"" % (deployFilename))
+	log("basePath = \"%s\"" % (basePath))
+	log("outputName = \"%s\"" % (outputName))
+	log("outputPath = \"%s\"" % (outputPath))
+	log("binPath = \"%s\"" % (binPath))
+	log("currentPlatform = \"%s\"" % (currentPlatform))
+	log("platformList = %s" % (deployFile["os"]))
+	log("is_travis = %s" % (is_travis()))
 
-	print "[release] begining release build for %s on %s" % (deployFile["appName"], currentPlatform)
+	log("begining release build for %s on %s" % (deployFile["appName"], currentPlatform))
 
 	# check current operating system is in the [os] array
 	foundOs = False
@@ -581,39 +590,39 @@ def release(args):
 		libPath = os.path.join(resolve_path(PROJECT_ROOT, "third_party"), "lib")
 		for fName in [os.path.join(libPath, "libv8.so"), os.path.join(libPath, "libglfw.so")]:
 			shutil.copyfile(fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath)))
-			print "[release] copying %s to %s" % (fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath)))
+			log("copying %s to %s" % (fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath))))
 
 		for fName in ["engine2D", "libengine2D.so"]:
 			shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
-			print "[release] copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
+			log("copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName)))
 			if fName == get_exe_name():
 				os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
 	else:
 		binList = [os.path.relpath(f, binPath) for f in glob.glob(os.path.join(binPath, "*"))]
 		for fName in binList:
 			shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
-			print "[release] copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
+			log("copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName)))
 			if fName == get_exe_name():
 				os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
 
 	for fName in fileList:
 		ensure_dir(os.path.dirname(os.path.join(outputPath, fName)))
-		print "[release] copying %s to %s" % (fName, os.path.join(outputPath, fName))
+		log("copying %s to %s" % (fName, os.path.join(outputPath, fName)))
 		shutil.copyfile(fName, os.path.join(outputPath, fName))
 
-	print "[release] building %s" % (outputName + ".tar.gz")
+	log("building %s" % (outputName + ".tar.gz"))
 	shutil.make_archive(outputName, "gztar", root_dir=resolve_path(PROJECT_ROOT, "release"))
 
 	uncompressedSize = get_size(start_path=resolve_path(PROJECT_ROOT, "release"))
 	compressedSize = os.path.getsize(outputName + ".tar.gz")
 
-	print "[release] built %s with output size %s compressed from %s (%s%%)" % (outputName + ".tar.gz", \
-		sizeof_fmt(compressedSize), sizeof_fmt(uncompressedSize), "%.2f" % ((1.0 * compressedSize / uncompressedSize) * 100.0))
+	log("built %s with output size %s compressed from %s (%s%%)" % (outputName + ".tar.gz",
+		sizeof_fmt(compressedSize), sizeof_fmt(uncompressedSize), "%.2f" % ((1.0 * compressedSize / uncompressedSize) * 100.0)))
 
 	if not is_travis():
 		return
 
-	print "[release] detected travis ci"
+	log("detected travis ci")
 
 def run_command(cmdName, rawArgs):
 	if not commands[cmdName].check():
@@ -626,7 +635,7 @@ def run_command(cmdName, rawArgs):
 			run_command(cmd, rawArgs)
 
 	# finaly run the commadn the user is intrested in
-	print(bcolors.HIGHLIGHT + "==== Running: %s ====" % (cmdName) + bcolors.ENDC)
+	print(bcolors.HEADER + "==== Running: %s ====" % (cmdName) + bcolors.ENDC)
 	commands[cmdName](rawArgs)
 	commands[cmdName].run = True
 

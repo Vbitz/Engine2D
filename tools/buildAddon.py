@@ -6,12 +6,7 @@ import argparse
 import os
 import subprocess
 
-def shell_command(cmd, throw=True):
-	print("shell in %s : %s" % (os.getcwd(), cmd))
-	if throw:
-		subprocess.check_call(cmd)
-	else:
-		subprocess.call(cmd)
+import tasks
 
 def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 	if outputFilename == None:
@@ -25,11 +20,11 @@ def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 		args += ["-lv8", "-Ithird_party/v8"]
 	args += addedArgs
 	args += sources
-	shell_command(args)
-	shell_command(["install_name_tool", "-change", "/usr/local/lib/libengine2D.dylib",
+	tasks.shell_command(args)
+	tasks.shell_command(["install_name_tool", "-change", "/usr/local/lib/libengine2D.dylib",
 		"@executable_path/libengine2D.dylib", outputFilename])
 	if link_v8:
-		shell_command(["install_name_tool", "-change", "/usr/local/lib/libv8.dylib",
+		tasks.shell_command(["install_name_tool", "-change", "/usr/local/lib/libv8.dylib",
 			"@executable_path/libv8.dylib", outputFilename])
 
 def main(args):
