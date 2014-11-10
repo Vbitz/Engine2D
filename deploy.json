@@ -3,6 +3,9 @@
 	"os": ["darwin", "linux2"],
 	"resourceRoot": "res/",
 	"configFile": "config/config.json",
+	"contentFiles": [
+		"models/*.obj"
+	],
 	"files": [
 		"lib/*",
 		"texture/*",

@@ -64,9 +64,9 @@ def doConvert(inputFilename, outputFilename, scale):
 		for f in faces:
 			for vertex in f:
 				fOutput.write(struct.pack("<fffffffff",
-					vertex[0][0], vertex[0][1], vertex[0][2],	# position	
-					random.random(), random.random(), random.random(), 1,									# color (hardcoded to white)
-					vertex[1][0], vertex[1][1]					# uv
+					vertex[0][0], vertex[0][1], vertex[0][2],				# position	
+					random.random(), random.random(), random.random(), 1,	# color (hardcoded to random)
+					vertex[1][0], vertex[1][1]								# uv
 					))
 				vertexCount += 1
 		indexOffset = fOutput.tell()
@@ -76,10 +76,10 @@ def doConvert(inputFilename, outputFilename, scale):
 		# jump back to the start to write the header
 		fOutput.seek(4, 0)
 		fOutput.write(struct.pack("<IIII",
-			4 + 16, # vertexOffset
-			vertexCount, # vertexCount
-			indexOffset, # indexOffset
-			vertexCount  # indexCount
+			4 + 16,			# vertexOffset
+			vertexCount,	# vertexCount
+			indexOffset,	# indexOffset
+			vertexCount		# indexCount
 			))
 
 def main(args):

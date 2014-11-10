@@ -19,7 +19,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# TODO: Split off useful functions like buildAddon into a seprate library directory
+# TODO: Split off useful functions like buildAddon into a separate library directory
 
 import sys
 import os
@@ -38,6 +38,7 @@ sys.path.insert(0, currentdir + "/tools")
 
 import buildAddon
 import bindingGenerator
+import objToEglb
 
 PROJECT_ROOT = 0
 PROJECT_SOURCE = 1
@@ -319,7 +320,7 @@ def build_v8(args):
 			shutil.copy("out/out/Release/libv8.dylib", "../lib/libv8.dylib")
 		os.chdir("../..")
 
-@command(requires=["build_glfw3", "build_v8"], usage="Fetches Build Dependancys")
+@command(requires=["build_glfw3", "build_v8"], usage="Fetches Build Dependences")
 def build_deps(args):
 	pass
 
@@ -334,7 +335,7 @@ def gyp(args):
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
 		])
 
-@command(requires=["gyp"], usage="Open's the platform specfic IDE")
+@command(requires=["gyp"], usage="Open the platform specific IDE")
 def ide(args):
 	log("Opening IDE")
 
@@ -350,7 +351,7 @@ def gen_bindings(args):
 			store_file_hash([filePath])
 			bindingGenerator.parseFile(filePath, f)
 		else:
-			log("skiping %s" % (filePath))
+			log("skipping %s" % (filePath))
 
 @command(usage="Generates Build.hpp")
 def gen_build_hpp(args):
@@ -366,7 +367,7 @@ def gen_build_hpp(args):
 		f.write("#define ENGINE_VERSION \"GIT_%s\"\n" % (get_git_hash()))
 		f.close()
 
-@command(requires=["gen_bindings", "gen_build_hpp"], usage="Builds dynamicly generated source files")
+@command(requires=["gen_bindings", "gen_build_hpp"], usage="Builds dynamically generated source files")
 def gen_source(args):
 	pass
 
@@ -465,11 +466,11 @@ def build_addons(args):
 			store_file_hash(["src/Modules/JSUnsafe.cpp"])
 			buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe.dylib", link_v8=True)
 		else:
-			log("skiping res/modules/js_unsafe.dylib")
+			log("skipping res/modules/js_unsafe.dylib")
 
-@command(requires=["build_bin", "build_addons"], usage="Copys support files to the build path")
+@command(requires=["build_bin", "build_addons", "build_content"], usage="Copy's support files to the build path")
 def build_env(args):
-	log("Copying Enviroment")
+	log("Copying Environment")
 
 @command(requires=["build_env"], usage="Runs the engine in Development Mode")
 def run(args):
@@ -521,7 +522,7 @@ def help(args):
 	for x in commands:
 		log("%s | %s" % (x, commands[x].usage))
 
-@command(usage="Prints the current building enviroment")
+@command(usage="Prints the current building environment")
 def env(args):
 	log("sys.platform = \"%s\"" % (sys.platform))
 	log("sys.version = \"%s\"" % (sys.version.replace("\n", "")))
@@ -536,7 +537,7 @@ def tags(args):
 	shell_command([
 			CTAGS_PATH, "--c++-kinds=+p", "--fields=+iaS", "--extra=+q"] + srcFiles)
 
-@command(requires=["build_env"], usage="Run the engine and take a screenshot after 1 second automaticly")
+@command(requires=["build_env"], usage="Run the engine and take a screenshot after 1 second automatically")
 def screenshot(args):
 	output = subprocess.check_output([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
 		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"])
@@ -545,6 +546,41 @@ def screenshot(args):
 	filename = reg.group(0)
 	filename = filename[4:-1]
 	shutil.copyfile(filename, resolve_path(PROJECT_ROOT, "screenshot.bmp"))
+
+def build_eglb(filename):
+	if not ensure_file_hash([filename]):
+		log("building %s" % (filename))
+		store_file_hash([filename])
+		rawFilename, rawFileExtension = os.path.splitext(filename)
+		objToEglb.doConvert(filename, rawFilename + ".eglb", 100)
+	else:
+		log("skipping %s" % (filename))
+
+contentBuilders = {
+	".obj": build_eglb
+}
+
+def build_content_file(filename, cType):
+	if cType not in contentBuilders:
+		raise Exception("No contentBuilder for " + cType)
+	contentBuilders[cType](filename)
+
+@command(requires=[], usage="Builds content to release format")
+def build_content(args):
+	# Build each piece of content in the manifest using different drivers
+	# I know this method is very similar to release but it's designed for a different stage
+	deployFilename	= resolve_path(PROJECT_ROOT, "deploy.json")
+	deployFile		= read_json(deployFilename)
+	basePath		= resolve_path(PROJECT_ROOT, deployFile["resourceRoot"])
+	contentFiles	= deployFile["contentFiles"]
+	contentFileList	= []
+
+	for fileGlob in contentFiles:
+		contentFileList += [f for f in glob.glob(os.path.join(basePath, fileGlob))]
+	
+	for contentFile in contentFileList:
+		fileName, fileExtension = os.path.splitext(contentFile)
+		build_content_file(contentFile, fileExtension)
 
 @command(requires=["build_env"], usage="Builds a release package")
 def release(args):
@@ -566,7 +602,7 @@ def release(args):
 	log("platformList = %s" % (deployFile["os"]))
 	log("is_travis = %s" % (is_travis()))
 
-	log("begining release build for %s on %s" % (deployFile["appName"], currentPlatform))
+	log("beginning release build for %s on %s" % (deployFile["appName"], currentPlatform))
 
 	# check current operating system is in the [os] array
 	foundOs = False
@@ -626,7 +662,7 @@ def release(args):
 
 def run_command(cmdName, rawArgs):
 	if not commands[cmdName].check():
-		print("==== Skiping: %s" % (cmdName))
+		print("==== Skipping: %s" % (cmdName))
 		return
 
 	# run all required commands
@@ -634,7 +670,7 @@ def run_command(cmdName, rawArgs):
 		if not commands[cmdName].run: ## make sure the command is not run twice
 			run_command(cmd, rawArgs)
 
-	# finaly run the commadn the user is intrested in
+	# finally run the command the user is interested in
 	print(bcolors.HEADER + "==== Running: %s ====" % (cmdName) + bcolors.ENDC)
 	commands[cmdName](rawArgs)
 	commands[cmdName].run = True
