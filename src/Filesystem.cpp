@@ -230,7 +230,6 @@ namespace Engine {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "UserDir needs to be set to writefiles" << Logger::end();
                 return;
             }
-            std::cout << path << std::endl;
             PHYSFS_File* f = PHYSFS_openWrite(path.c_str());
             if (!PHYSFS_write(f, content, sizeof(char), (unsigned int) length)) {
                 Logger::begin("Filesystem", Logger::LogLevel_Error) << "File Write Failed" << Logger::end();
