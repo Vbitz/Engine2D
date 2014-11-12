@@ -78,11 +78,14 @@ class command(object):
 
 def log(*args, **kwargs):
 	method_name = kwargs["method_name"] if "method_name" in kwargs else True
+	newArgs = []
+	for s in args:
+		newArgs += [str(s)]
 	if method_name:
 		parent = inspect.getouterframes(inspect.currentframe())[1][3]
-		print("%s %s" % (bcolors.LOGSRC + "[" + parent + "]" + bcolors.ENDC, " ".join(args)))
+		print("%s %s" % (bcolors.LOGSRC + "[" + parent + "]" + bcolors.ENDC, " ".join(newArgs)))
 	else:
-		print(" ".join(args))
+		print(" ".join(newArgs))
 
 def is_linux():
 	return sys.platform == "linux2"
@@ -539,8 +542,11 @@ def tags(args):
 
 @command(requires=["build_env"], usage="Run the engine and take a screenshot after 1 second automatically")
 def screenshot(args):
+	log([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
+		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"])
 	output = subprocess.check_output([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
 		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"])
+	print output
 	output = [f for f in output.split("\n") if "TestScreenshot - ####" in f]
 	reg = re.search("to \[(.*)\]", output[0])
 	filename = reg.group(0)

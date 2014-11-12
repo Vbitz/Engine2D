@@ -396,6 +396,7 @@ namespace Engine {
         
         for (int i = 1; i < argc; i++) {
             std::string arg = std::string(argv[i]);
+            
             if (arg == "-devmode") {
                 // enable devmode
                 _developerMode = true;
@@ -445,7 +446,7 @@ namespace Engine {
                 _exit = true;
             } else if (arg.find("-C") == 0) {
                 // set delayed config
-                std::string key = arg.substr(2, arg.find("="));
+                std::string key = arg.substr(2, arg.find("=") - 2);
                 std::string value = arg.substr(arg.find("=") + 1);
                 
                 _delayedConfigs[key] = std::string(value);
