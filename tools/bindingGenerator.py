@@ -26,6 +26,8 @@ def stypeToCPPType(typeName):
 		return "v8::Handle<v8::Object>"
 	elif typeName == "...*":
 		return "v8::Handle<v8::Value>*"
+	elif typeName == "void":
+		return "void"
 	else:
 		#print "[bindingGenerator] WARN: Bad typeName: " + typeName
 		return "v8::Handle<v8::Value>"
@@ -87,17 +89,23 @@ def compileMethod(whitespace, jsonBlob, methodName):
 		if flag == "requiresGraphicsContext":
 			ret += whitespace + "    if (args.Assert(HasGLContext(), \"No OpenGL Context\")) return;" + "\n"
 
-	methodCallArgs = ""
+	methodCallArgs = []
 	methodSignature = ""
+	methodArgs = []
 
 	methodSignature += (stypeToCPPType(jsonBlob["returns"]) if jsonBlob.has_key("returns") else "void") + " " + methodName + "("
-	methodSignature += "ScriptingManager::Arguments& args"
+
+	bindingType = jsonBlob["bindingType"] if "bindingType" in jsonBlob else "smart"
+
+	if bindingType != "smart_noContext":
+		methodArgs += ["ScriptingManager::Arguments& args"]
+		methodCallArgs += ["args"]
 
 	index = 0
 	for arg in jsonBlob["args"]:
 		typeName, argName, helpText = arg
-		methodSignature += ", " + stypeToCPPType(typeName) + " " + argName
-		methodCallArgs += (", " if (len(methodCallArgs) > 0) else "") + argName
+		methodArgs += [stypeToCPPType(typeName) + " " + argName]
+		methodCallArgs += [argName]
 		cppCheck = marshalSTypeToCPPCheck(typeName, index)
 		if cppCheck is not "true":
 			ret += whitespace + "    if (args.Assert(" + cppCheck + \
@@ -106,15 +114,13 @@ def compileMethod(whitespace, jsonBlob, methodName):
 			marshalSTypeToCPPValue(typeName, index) + ";" + "\n"
 		index += 1
 
-	methodSignature += ");"
+	methodSignature += ", ".join(methodArgs) + ");"
 
 	# write method tail
 	if jsonBlob.has_key("returns"):
-		ret += whitespace + "    args.SetReturnValue(" + methodName + "(args" + \
-			(", " + methodCallArgs if len(methodCallArgs) > 0 else "") + "));" + "\n";
+		ret += whitespace + "    args.SetReturnValue(" + methodName + "(" + ", ".join(methodCallArgs) + "));" + "\n";
 	else:
-		ret += whitespace + "    " + methodName + "(args" + \
-			(", " + methodCallArgs if len(methodCallArgs) > 0 else "") + ");" + "\n";
+		ret += whitespace + "    " + methodName + "(" + ", ".join(methodCallArgs) +  ");" + "\n";
 	ret += whitespace + "}" + "\n\n"
 	return whitespace + methodSignature + "\n\n" + ret
 

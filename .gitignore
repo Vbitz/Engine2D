@@ -57,3 +57,6 @@ src/gen
 main.plist
 
 *.tar.gz
+
+# the current generator script randomizes colors so the result is non deterministic
+res/models/*.eglb

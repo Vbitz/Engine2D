@@ -76,12 +76,14 @@ def parse_file(filename):
 			match = re.match(jDocBindingFragment, jDocFragment)
 			if match != None:
 				bindingType = match.groups()[0]
+				continue
 
 			raise Exception("Bad JavaDoc Fragment")
 
 		functionSpec = {
 			"path": functionPath,
 			"bindingType": bindingType,
+			"returns": functionReturnType,
 			"flags": [],
 			"args": functionParams
 		}

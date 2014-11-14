@@ -1057,6 +1057,7 @@ global.unsafe.mprotect = function (address, length, enable) {};
 
 /**
  * Returns the current system pagesize, the only safe method in this namespace
+ * @bind smart_noContext
  * @return {number}
  */
 global.unsafe.getPageSize = function () {};
