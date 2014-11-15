@@ -9,70 +9,61 @@ import json
 
 scriptMethodSearch = re.compile("([ \t]+)/\*\*\*(.*?)\*/\n\s+ENGINE_SCRIPT_METHOD\((\w+)\);\n", re.DOTALL and re.DOTALL)
 
-def stypeToCPPType(typeName):
-	if typeName == "string" or typeName == "String":
-		return "std::string"
-	elif typeName == "int":
-		return "int"
-	elif typeName == "number" or typeName == "Number":
-		return "double"
-	elif typeName == "bool" or typeName == "boolean":
-		return "bool"
-	elif typeName == "Function":
-		return "v8::Handle<v8::Function>"
-	elif typeName == "*":
-		return "v8::Handle<v8::Value>"
-	elif typeName == "Object":
-		return "v8::Handle<v8::Object>"
-	elif typeName == "...*":
-		return "v8::Handle<v8::Value>*"
-	elif typeName == "void":
-		return "void"
-	else:
-		#print "[bindingGenerator] WARN: Bad typeName: " + typeName
-		return "v8::Handle<v8::Value>"
+class MarshalType:
+	def __init__(self, validate, sType, value, check):
+		self.validate = validate
+		self.sType = sType
+		self.check = check
+		self.value = value
 
-def marshalSTypeToCPPValue(typeName, argPosition):
-	if typeName == "string" or typeName == "String":
-		return "args.StringValue(" + str(argPosition) + ")"
-	elif typeName == "int":
-		return "args.Int32Value(" + str(argPosition) + ")"
-	elif typeName == "number" or typeName == "Number":
-		return "args.NumberValue(" + str(argPosition) + ")"
-	elif typeName == "bool" or typeName == "boolean":
-		return "args.BooleanValue(" + str(argPosition) + ")"
-	elif typeName == "Function":
-		return "args[" + str(argPosition) + "]->ToFunction()"
-	elif typeName == "Object":
-		return "args[" + str(argPosition) + "]->ToObject()"
-	elif typeName == "*":
-		return "args[" + str(argPosition) + "]"
-	elif typeName == "...*":
-		return "args.Slice(" + str(argPosition) + ")"
-	else:
-		sys.stderr.write("[bindingGenerator] WARN: Bad typeName: " + typeName + "\n")
-		return "args[" + str(argPosition) + "]"
+defaultType = MarshalType(lambda typeName: typeName == "*", "v8::Handle<v8::Value>",
+				lambda argPosition: "args[" + str(argPosition) + "]",
+				lambda argPosition: "true")
 
-def marshalSTypeToCPPCheck(typeName, argPosition):
-	if typeName == "string" or typeName == "String":
-		return "args[" + str(argPosition) + "]->IsString()"
-	elif typeName == "int":
-		return "args[" + str(argPosition) + "]->IsInt32()"
-	elif typeName == "number" or typeName == "Number":
-		return "args[" + str(argPosition) + "]->IsNumber()"
-	elif typeName == "bool" or typeName == "boolean":
-		return "args[" + str(argPosition) + "]->IsBoolean()"
-	elif typeName == "Function":
-		return "args[" + str(argPosition) + "]->IsFunction()"
-	elif typeName == "Object":
-		return "args[" + str(argPosition) + "]->IsObject()"
-	elif typeName == "*":
-		return "true"
-	elif typeName == "...*":
-		return "true"
-	else:
-		#print "[bindingGenerator] WARN: Bad typeName: " + typeName
-		return "true"
+marshalTypes = [
+	# String
+	MarshalType(lambda typeName: typeName == "string" or typeName == "String", "std::string",
+		lambda argPosition: "args.StringValue(" + str(argPosition) + ")",
+		lambda argPosition: "args[" + str(argPosition) + "]->IsString()"),
+
+	# Int32
+	MarshalType(lambda typeName: typeName == "int", "int",
+		lambda argPosition: "args.Int32Value(" + str(argPosition) + ")",
+		lambda argPosition: "args[" + str(argPosition) + "]->IsInt32()"),
+	
+	# Number
+	MarshalType(lambda typeName: typeName == "number" or typeName == "Number", "double",
+		lambda argPosition: "args.NumberValue(" + str(argPosition) + ")",
+		lambda argPosition: "args[" + str(argPosition) + "]->IsNumber()"),
+	
+	# Boolean
+	MarshalType(lambda typeName: typeName == "bool" or typeName == "boolean", "bool",
+		lambda argPosition: "args.BooleanValue(" + str(argPosition) + ")",
+		lambda argPosition: "args[" + str(argPosition) + "]->IsBoolean()"),
+	
+	# Function
+	MarshalType(lambda typeName: typeName == "Function", "v8::Handle<v8::Function>",
+		lambda argPosition: "args[" + str(argPosition) + "]->ToFunction()",
+		lambda argPosition: "args[" + str(argPosition) + "]->IsFunction()"),
+
+	MarshalType(lambda typeName: typeName == "Object", "v8::Handle<v8::Object>",
+		lambda argPosition: "args[" + str(argPosition) + "]->ToObject()",
+		lambda argPosition: "args[" + str(argPosition) + "]->IsObject()"),
+	
+	MarshalType(lambda typeName: typeName == "...*", "v8::Handle<v8::Value>*",
+		lambda argPosition: "args.Slice(" + str(argPosition) + ")",
+		lambda argPosition: "true"),
+	
+	MarshalType(lambda typeName: typeName == "void", "void",
+		lambda argPosition: "true",
+		lambda argPosition: "true")
+]
+
+def getMarshalType(typeName):
+	for mType in marshalTypes:
+		if mType.validate(typeName):
+			return mType
+	return defaultType
 
 def compileMethod(whitespace, jsonBlob, methodName):
 	ret = ""
@@ -93,7 +84,7 @@ def compileMethod(whitespace, jsonBlob, methodName):
 	methodSignature = ""
 	methodArgs = []
 
-	methodSignature += (stypeToCPPType(jsonBlob["returns"]) if jsonBlob.has_key("returns") else "void") + " " + methodName + "("
+	methodSignature += (getMarshalType(jsonBlob["returns"]).sType if jsonBlob.has_key("returns") else "void") + " " + methodName + "("
 
 	bindingType = jsonBlob["bindingType"] if "bindingType" in jsonBlob else "smart"
 	signaturesOnly = jsonBlob["signaturesOnly"] if "signaturesOnly" in jsonBlob else False
@@ -105,14 +96,15 @@ def compileMethod(whitespace, jsonBlob, methodName):
 	index = 0
 	for arg in jsonBlob["args"]:
 		typeName, argName, helpText = arg
-		methodArgs += [stypeToCPPType(typeName) + " " + argName]
+		marshalType = getMarshalType(typeName)
+		methodArgs += [marshalType.sType + " " + argName]
 		methodCallArgs += [argName]
-		cppCheck = marshalSTypeToCPPCheck(typeName, index)
+		cppCheck = marshalType.check(index)
 		if cppCheck is not "true":
 			ret += whitespace + "    if (args.Assert(" + cppCheck + \
 				", \"" + helpText + "\")) return;" + "\n"
-		ret += whitespace + "    " + stypeToCPPType(typeName) + " " + argName + " = " + \
-			marshalSTypeToCPPValue(typeName, index) + ";" + "\n"
+		ret += whitespace + "    " + marshalType.sType + " " + argName + " = " + \
+			marshalType.value(index) + ";" + "\n"
 		index += 1
 
 	methodSignature += ", ".join(methodArgs) + ");"
