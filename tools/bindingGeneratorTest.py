@@ -3,6 +3,7 @@
 import re
 import bindingGenerator
 import json
+import sys
 
 def read_file(filename):
 	with open(filename, "r") as f:
@@ -14,7 +15,7 @@ jDocParamFragment = re.compile("@param\s+\{([\w\.\*\[\]|]+)\}(\s+([\[\]\w]+)(\s+
 jDocBindingFragment = re.compile("@bind (.*)")
 jDocDeprecatedFragment = re.compile("@deprecated (.*)")
 
-def parse_file(filename):
+def parse_file(filename, signaturesOnly):
 	f = read_file(filename)
 	for match in re.finditer(javaDocRegex, f):
 		fullStr, javaDoc, e1, functionName, e2, functionArgs = match.groups()
@@ -85,13 +86,14 @@ def parse_file(filename):
 			"bindingType": bindingType,
 			"returns": functionReturnType,
 			"flags": [],
-			"args": functionParams
+			"args": functionParams,
+			"signaturesOnly": signaturesOnly
 		}
 
 		print bindingGenerator.compileMethod("", functionSpec, functionName)
 
 def main():
-	parse_file("../doc/api.js")
+	parse_file("../doc/api.js", (len(sys.argv) > 1) and (sys.argv[1] == "signaturesOnly"))
 
 if __name__ == '__main__':
 	main()

@@ -96,6 +96,7 @@ def compileMethod(whitespace, jsonBlob, methodName):
 	methodSignature += (stypeToCPPType(jsonBlob["returns"]) if jsonBlob.has_key("returns") else "void") + " " + methodName + "("
 
 	bindingType = jsonBlob["bindingType"] if "bindingType" in jsonBlob else "smart"
+	signaturesOnly = jsonBlob["signaturesOnly"] if "signaturesOnly" in jsonBlob else False
 
 	if bindingType != "smart_noContext":
 		methodArgs += ["ScriptingManager::Arguments& args"]
@@ -122,7 +123,11 @@ def compileMethod(whitespace, jsonBlob, methodName):
 	else:
 		ret += whitespace + "    " + methodName + "(" + ", ".join(methodCallArgs) +  ");" + "\n";
 	ret += whitespace + "}" + "\n\n"
-	return whitespace + methodSignature + "\n\n" + ret
+
+	if signaturesOnly:
+		return whitespace + methodSignature
+	else:
+		return whitespace + methodSignature + "\n\n" + ret
 
 def parseMethod(m):
 	whitespace = m.group(1)
