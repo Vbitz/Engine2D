@@ -65,42 +65,49 @@ global.console.toggle = function () {};
 /**
  * Derived off global.console._log, prints with a user loglevel
  * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ * @bind none
  */
 global.console.log = function (obj) {};
 
 /**
  * Derived off global.console._log, prints with a warning loglevel
  * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ * @bind none
  */
 global.console.warn = function (obj) {};
 
 /**
  * Derived off global.console._log, prints with a error loglevel
  * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ * @bind none
  */
 global.console.error = function (obj) {};
 
 /**
  * Derived off global.console._log, prints with a verbose loglevel
  * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ * @bind none
  */
 global.console.verbose = function (obj) {};
 
 /**
  * Derived off global.console._log, prints without using the Logger interface directly to the system console
  * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ * @bind none
  */
 global.console.writeRaw = function (obj) {};
 
 /**
  * Derived off global.console._log, prints highlighted text at the highest log level
  * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ * @bind none
  */
 global.console.highlight = function (obj) {};
 
 /**
  * Derived off global.console._log, inserts a toast into the EngineUI display which overrides the console visiblity
  * @param  {...*} obj - The value to print, internaly the values will be joined with spaces
+ * @bind none
  */
 global.console.toast = function (obj) {};
 

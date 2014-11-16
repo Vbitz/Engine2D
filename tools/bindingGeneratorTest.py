@@ -17,6 +17,9 @@ jDocDeprecatedFragment = re.compile("@deprecated (.*)")
 
 def parse_file(filename, signaturesOnly):
 	f = read_file(filename)
+
+	sys.stdout.write("namespace GeneratedBindings {\n")
+
 	for match in re.finditer(javaDocRegex, f):
 		fullStr, javaDoc, e1, functionName, e2, functionArgs = match.groups()
 		functionPath = functionName
@@ -90,7 +93,9 @@ def parse_file(filename, signaturesOnly):
 			"signaturesOnly": signaturesOnly
 		}
 
-		print bindingGenerator.compileMethod("", functionSpec, functionName)
+		sys.stdout.write("    // %s\n%s" % (functionPath, bindingGenerator.compileMethod("    ", functionSpec, functionName)))
+
+	sys.stdout.write("} // end namespace Generated Bindings\n")
 
 def main():
 	parse_file("../doc/api.js", (len(sys.argv) > 1) and (sys.argv[1] == "signaturesOnly"))

@@ -87,6 +87,10 @@ def compileMethod(whitespace, jsonBlob, methodName):
 	methodSignature += (getMarshalType(jsonBlob["returns"]).sType if jsonBlob.has_key("returns") else "void") + " " + methodName + "("
 
 	bindingType = jsonBlob["bindingType"] if "bindingType" in jsonBlob else "smart"
+
+	if bindingType == "none":
+		return "// bindingGenerator.py: Skipped \"" + methodName + "\" due to @bind none\n"
+
 	signaturesOnly = jsonBlob["signaturesOnly"] if "signaturesOnly" in jsonBlob else False
 
 	if bindingType != "smart_noContext":
@@ -100,9 +104,11 @@ def compileMethod(whitespace, jsonBlob, methodName):
 		methodArgs += [marshalType.sType + " " + argName]
 		methodCallArgs += [argName]
 		cppCheck = marshalType.check(index)
+		if len(helpText) > 0 and helpText[0] == "-":
+			helpText = helpText[1:].strip()
 		if cppCheck is not "true":
 			ret += whitespace + "    if (args.Assert(" + cppCheck + \
-				", \"" + helpText + "\")) return;" + "\n"
+				", \"" + helpText.replace("\"", "\\\"") + "\")) return;" + "\n"
 		ret += whitespace + "    " + marshalType.sType + " " + argName + " = " + \
 			marshalType.value(index) + ";" + "\n"
 		index += 1
