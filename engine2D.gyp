@@ -102,7 +102,18 @@
 
 				# SHA1
 				"src/vendor/sha512.cpp",
-				"src/vendor/sha256.cpp"
+				"src/vendor/sha256.cpp",
+
+				# enet
+				"src/vendor/enet/callbacks.c",
+				"src/vendor/enet/compress.c",
+				"src/vendor/enet/host.c",
+				"src/vendor/enet/list.c",
+				"src/vendor/enet/packet.c",
+				"src/vendor/enet/peer.c",
+				"src/vendor/enet/protocol.c",
+				"src/vendor/enet/unix.c",
+				"src/vendor/enet/win32.c"
 			],
 			"conditions": [
 				['OS != "win"', {
