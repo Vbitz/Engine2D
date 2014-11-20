@@ -70,8 +70,10 @@ Most of these come from my internal task list so don't take this as final.
 			- With Microsoft's recent changes this could be done with their API
 - Networking
 	- The networking system will be tier based like the current rendering system
-		- Platform::Socket
-		- NetworkManager::NetConnection
+		- Enet
+			- Get a feel for the libray
+			- Write a small test in the engine with a very simple script binding
+			- Get a feel for the performance and overhead
 		- Events::NetworkTarget / EntityManager::NetworkSync ??
 	- I'll ether roll my own sockets or use enet
 - Multi-Threaded Rendering
