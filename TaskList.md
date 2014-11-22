@@ -39,6 +39,13 @@ Most of these come from my internal task list so don't take this as final.
 	- Write JS API (Maybe raw sound or maybe something more like web audio
 - Support C based add-ons
 	- Engine2D.h common API header file with wrapper code
+		- Wrappers for important classes
+			- Application
+			- Window
+			- Events
+			- Draw2D
+			- RenderDriver
+		- In the future I could add C as a possible target for the script binding system
 - Entity System
 	- Abstract out messaging to work with entity's
 	- Implement Serialization for the level format
