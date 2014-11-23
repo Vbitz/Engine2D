@@ -11,6 +11,8 @@ Most of these come from my internal task list so don't take this as final.
 	- Add WindowOSX
 	- Add WindowLinux
 	- Add WindowWin
+	- I'm not really sure this is needed anymore with the ease of using GLFW
+		- I'd only really consider changing it if GLFw holds the project back
 - Autoset configDir based on filename
 	- You should be able to override this in the configs
 - Change logging to a rotating buffer
@@ -25,12 +27,15 @@ Most of these come from my internal task list so don't take this as final.
 	- Add console color support to windows
 - Port to Linux
 	- Fix runtime crash
+		- It seems to be some kind of memory coruption, I need to check to see if it's fixed in the most recent version
 	- Add linux release uploading to Travis
 - Add new Scripting Features
 	- Add require system
 		- This will likely be based off require js or node's require system
 	- Implement new functions in javascriptAPI.txt
 		- Update and extend javascriptAPI.txt
+		- I think the design should focus even more around a object orintated design although I need to consider what effect
+			that has on support for other scripting engines
 	- Implement support for Packages in Javascript
 		- There's a little right now but it should be full support
 - Audio Support
