@@ -20,6 +20,7 @@
 #   limitations under the License.
 
 # TODO: Split off useful functions like buildAddon into a separate library directory
+# TODO: Improve support for changing build time parameters like PROFILER
 
 import sys
 import os
@@ -662,6 +663,8 @@ def release(args):
 		sizeof_fmt(compressedSize), sizeof_fmt(uncompressedSize), "%.2f" % ((1.0 * compressedSize / uncompressedSize) * 100.0)))
 
 	if not is_travis():
+		# get the release key from ENV
+		# post the compressed release using configs in ENV
 		return
 
 	log("detected travis ci")
