@@ -15,10 +15,13 @@ jDocParamFragment = re.compile("@param\s+\{([\w\.\*\[\]|]+)\}(\s+([\[\]\w]+)(\s+
 jDocBindingFragment = re.compile("@bind (.*)")
 jDocDeprecatedFragment = re.compile("@deprecated (.*)")
 
-def parse_file(filename, signaturesOnly):
+def parse_file(filename, signaturesOnly, createInit):
 	f = read_file(filename)
 
+	# TODO: Include correct headers
 	sys.stdout.write("namespace GeneratedBindings {\n")
+
+	methodBindings = [];
 
 	for match in re.finditer(javaDocRegex, f):
 		fullStr, javaDoc, e1, functionName, e2, functionArgs = match.groups()
@@ -93,12 +96,25 @@ def parse_file(filename, signaturesOnly):
 			"signaturesOnly": signaturesOnly
 		}
 
+		if bindingType != "none":
+			methodBindings += ["{\"%s\", f.NewFunctionTemplate(E_SCRIPT_SIGNATURE(%s))}," % (functionPath, functionName)];
+
 		sys.stdout.write("    // %s\n%s" % (functionPath, bindingGenerator.compileMethod("    ", functionSpec, functionName)))
+
+	sys.stdout.write("    void InitBindings(ScriptingManager::Factory &f, v8::Handle<v8::ObjectTemplate> global) {\n")
+
+	sys.stdout.write("        f.FillGlobalTemplate(global, {\n\t\t")
+
+	sys.stdout.write("\n\t\t".join(methodBindings))
+
+	sys.stdout.write("\n        });\n")
+
+	sys.stdout.write("    }\n")
 
 	sys.stdout.write("} // end namespace Generated Bindings\n")
 
 def main():
-	parse_file("../doc/api.js", (len(sys.argv) > 1) and (sys.argv[1] == "signaturesOnly"))
+	parse_file("../doc/api.js", (len(sys.argv) > 1) and (sys.argv[1] == "signaturesOnly"), True)
 
 if __name__ == '__main__':
 	main()
