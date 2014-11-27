@@ -38,6 +38,11 @@ Most of these come from my internal task list so don't take this as final.
 			that has on support for other scripting engines
 	- Implement support for Packages in Javascript
 		- There's a little right now but it should be full support
+- Extend Packages
+	- Patching support
+	- Hash/Sign/Verify support
+	- Encryption support
+	- Allow overwrite of existing sectors
 - Audio Support
 	- Add OpenAL Depend (maybe another library, something to really look into)
 	- Write C++ Classes
