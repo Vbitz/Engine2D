@@ -18,9 +18,9 @@ Right now the engine builds out of the box on Mac OSX and Linux. To build it for
 
 On a source level you will need to fill in or stub out `Platform_{x}.cpp`.
 
-Once you have the dependences installed you can run `./tasks.py build_bin` and you will hopefully find a executable has been built.
+Once you have the dependences installed you can run `./tasks.py build_env` and you will hopefully find a executable has been built.
 
-##Sample Code
+## Sample Code
 
 ```javascript
 sys.on("draw", "helloWorld.draw", function (e) {
@@ -29,7 +29,7 @@ sys.on("draw", "helloWorld.draw", function (e) {
 });
 ```
 
-##Sample Code 2
+## Sample Code 2
 
 ```javascript
 /* jshint esnext: true */
@@ -59,7 +59,7 @@ sys.on("draw", "helloWorld2.draw", function () {
 });
 ```
 
-##Documentation
+## Documentation
 
 The latest version of the documentation generated using JSDoc can be found under doc/apiDocs or hosted at [http://vbitz.com/public/EngineAPIDocs/](http://vbitz.com/public/EngineAPIDocs/).
 
