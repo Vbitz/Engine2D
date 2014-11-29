@@ -1,7 +1,8 @@
 {
 	"variables": {
 		"WINDOW%": "glfw",
-		"GPERFTOOLS%": "off"
+		"GPERFTOOLS%": "off",
+		"PROFILER%": "off"
 	},
 	"targets": [
 		{
@@ -245,6 +246,13 @@
 						"OTHER_LDFLAGS": [
 							"-ltcmalloc",
 							"-lprofiler"
+						]
+					}
+				}],
+				['("<(PROFILER)" == "on") & (OS == "mac")', {
+					"xcode_settings": {
+						"OTHER_CPLUSPLUSFLAGS": [
+							"-DPROFILER"
 						]
 					}
 				}]

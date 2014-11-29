@@ -51,6 +51,7 @@ GCOV_PATH = "/usr/local/bin/gcov-4.2" # installed with "brew install gcc"
 
 WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw")
 ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
+PROFILER = os.getenv("ENGINE_PROFILER", "off")
 
 commands = {}
 
@@ -336,6 +337,7 @@ def gyp(args):
 			"--depth=0",
 			"-DWINDOW=" + WINDOW_SYSTEM,
 			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
+			"-DPROFILER=" + PROFILER,
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
 		])
 

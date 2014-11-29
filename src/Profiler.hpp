@@ -29,8 +29,6 @@
 #include "Platform.hpp"
 #include "vendor/json/json.h"
 
-#define PROFILER
-
 #ifdef PROFILER
 #define ENGINE_PROFILER_SCOPE Engine::Profiler::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__)
 #define ENGINE_PROFILER_SCOPE_EX(str) Engine::Profiler::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__, str)
