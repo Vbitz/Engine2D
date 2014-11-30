@@ -336,10 +336,17 @@ namespace Engine {
             return v8::Isolate::New(params);
         }
         
+        EventMagic _traceGlobalEnviroment(Json::Value args, void *selfPtr) {
+            ContextPtr self = (ContextPtr) selfPtr;
+            self->TraceGlobalEnviroment();
+            return EM_OK;
+        }
+        
         Context::Context() : _isolate(_createIsolate()), _scope(this->_isolate) {
             this->_isolate->Enter();
             
             GetEventsSingilton()->GetEvent("v8_postGC")->SetNoScript(true);
+            GetEventsSingilton()->GetEvent("v8_env")->AddListener("Context::TraceGlobalEnviroment", EventEmitter::MakeTarget(_traceGlobalEnviroment, this));
             
             this->_isolate->AddGCEpilogueCallback(_v8PostGCCallback);
             
@@ -603,6 +610,71 @@ namespace Engine {
             
             isolate->IdleNotification(1000);
             platform->PumpMessages(isolate);
+        }
+        
+        void _walkValue(std::string valueName, v8::Handle<v8::Value> val, std::vector<std::string>& items) {
+            if (val.IsEmpty()) return;
+            if (valueName.find("global.global") != std::string::npos) return; // recursion
+            if (val->IsString()) {
+                items.push_back(valueName + " : \"" +
+                                std::string(*v8::String::Utf8Value(val)) + "\"");
+            } else if (val->IsNull() || val->IsUndefined()) {
+                items.push_back(valueName + " : \"" +
+                                std::string(*v8::String::Utf8Value(val)) + "\"");
+            } else if (val->IsNumber() || val->IsInt32()) {
+                items.push_back(valueName + " : " + std::to_string(val->ToNumber()->Value()));
+            } else if (val->IsBoolean()) {
+                items.push_back(valueName + " : " + (val->ToBoolean()->Value() ? "true" : "false"));
+            } else if (val->IsExternal()) {
+                items.push_back(valueName + " : " + std::to_string((uint64_t) v8::Handle<v8::External>::Cast(val)->Value()));
+            } else if (val->IsArray()) {
+                v8::Local<v8::Object> obj = val.As<v8::Object>();
+                v8::Local<v8::Array> objNames = obj->GetPropertyNames();
+                
+                items.push_back(valueName + " : array");
+                
+                if (objNames->Length() < 100) {
+                    for (int i = 0; i < objNames->Length(); i++) {
+                        v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
+                        v8::Local<v8::Value> objItem = obj->Get(objKey);
+                        _walkValue(valueName + "[" + *v8::String::Utf8Value(objKey) + "]", objItem, items);
+                    }
+                }
+            } else if (val->IsFunction()) {
+                // TODO: Fetch function arg list and if it's native
+                items.push_back(valueName + " : function");
+            } else if (val->IsObject()) {
+                // TODO: Switch to GetOwnPropertyNames
+                v8::Local<v8::Object> obj = val.As<v8::Object>();
+                v8::Local<v8::Array> objNames = obj->GetPropertyNames();
+                
+                //_walkValue(valueName + "::prototype", obj->GetPrototype(), items);
+                items.push_back(valueName + " : object");
+                
+                if (objNames->Length() < 100) {
+                    for (int i = 0; i < objNames->Length(); i++) {
+                        v8::Local<v8::String> objKey = objNames->Get(i)->ToString();
+                        v8::Local<v8::Value> objItem = obj->Get(objKey);
+                        _walkValue(valueName + "." + *v8::String::Utf8Value(objKey), objItem, items);
+                    }
+                }
+            } else {
+                items.push_back(valueName + " : unknown");
+            }
+        }
+        
+        void Context::TraceGlobalEnviroment() {
+            v8::Local<v8::Context> ctx = this->_isolate->GetCurrentContext();
+            
+            std::vector<std::string> ret;
+            
+            v8::Local<v8::Object> obj = ctx->Global();
+            
+            _walkValue("global", obj, ret);
+            
+            for (auto val : ret) {
+                std::cout << val << std::endl;
+            }
         }
         
         // Globals
