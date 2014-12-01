@@ -642,7 +642,8 @@ namespace Engine {
                 }
             } else if (val->IsFunction()) {
                 // TODO: Fetch function arg list and if it's native
-                items.push_back(valueName + " : function");
+                v8::Handle<v8::Function> func = val.As<v8::Function>();
+                items.push_back(valueName + " : function " + std::string(*v8::String::Utf8Value(func->GetName())));
             } else if (val->IsObject()) {
                 // TODO: Switch to GetOwnPropertyNames
                 v8::Local<v8::Object> obj = val.As<v8::Object>();
