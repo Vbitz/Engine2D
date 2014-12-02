@@ -32,6 +32,7 @@ import ConfigParser
 import multiprocessing
 import glob
 import json
+import struct
 
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -156,16 +157,23 @@ def get_hash(inStr):
 	m.update(inStr)
 	return m.hexdigest()
 
-def get_filename_hash(filename):
+def get_file_content(filename):
 	with open(filename, "r") as f:
-		return get_hash(f.read())
+		return f.read()
+
+def get_filename_hash(filename):
+	return get_hash(get_file_content(filename))
 
 def ensure_dir(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
 
 def get_arch():
-	return "x64"
+	# TODO: Handle ARM
+	if 8 * struct.calcsize("P") == 64:
+		return "x64"
+	else:
+		return "x86"
 
 def get_max_jobs():
 	return multiprocessing.cpu_count()
@@ -221,8 +229,7 @@ def store_str_hash(inStrs):
 		config.set("StoredHashes", filename, get_hash(inStr))
 
 def read_json(filename):
-	with open(filename, "r") as f:
-		return json.loads(f.read())
+	return json.loads(get_file_content(filename))
 
 def is_travis():
 	return os.getenv("TRAVIS", "false") == "true"
@@ -533,6 +540,8 @@ def env(args):
 	log("sys.platform = \"%s\"" % (sys.platform))
 	log("sys.version = \"%s\"" % (sys.version.replace("\n", "")))
 	log("sys.version_info = %s" % (sys.version_info))
+	log("get_arch() = \"%s\"" % (get_arch()))
+	log("get_max_jobs() = %s" % (get_max_jobs()))
 	log("resolve_path(PROJECT_ROOT, \"tasks.py\") = \"%s\"" % (resolve_path(PROJECT_ROOT, "tasks.py")))
 
 @command(usage="Runs CTags on the source directory")
