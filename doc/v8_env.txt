@@ -1,0 +1,215 @@
+global : object
+global.assert : function assert
+global.console : object
+global.console._log : function _log
+global.console.clear : function clear
+global.console.toggle : function toggle
+global.console.log : function
+global.console.warn : function
+global.console.error : function
+global.console.verbose : function
+global.console.highlight : function
+global.console.toast : function
+global.console.writeRaw : function
+global.sys : object
+global.sys.argv : function argv
+global.sys.runFile : function runFile
+global.sys.on : function on
+global.sys.emit : function emit
+global.sys.pollDeferedMessages : function pollDeferedMessages
+global.sys.setDeferedEvent : function setDeferedEvent
+global.sys.clearEvent : function clearEvent
+global.sys.createTimer : function createTimer
+global.sys.deleteTimer : function deleteTimer
+global.sys.microtime : function microtime
+global.sys.heapStats : function heapStats
+global.sys.memoryStats : function memoryStats
+global.sys.trace : function trace
+global.sys.exit : function exit
+global.sys.getGLVersion : function getGLVersion
+global.sys.hasExtention : function hasExtention
+global.sys.getExtentions : function getExtentions
+global.sys.getMaxTextureSize : function getMaxTextureSize
+global.sys.resizeWindow : function resizeWindow
+global.sys.time : function time
+global.sys.config : function config
+global.sys.gc : function gc
+global.sys.reloadRootScript : function reloadRootScript
+global.sys.forceReload : function forceReload
+global.sys.version : function version
+global.sys.msgBox : function msgBox
+global.sys.shell : function shell
+global.sys.uuid : function uuid
+global.sys.dumpLog : function dumpLog
+global.sys.createWorker : function createWorker
+global.sys.Package : function Package
+global.sys.platform : "Darwin (OSX)"
+global.sys.devMode : true
+global.sys.debugMode : true
+global.sys.preload : false
+global.sys.numProcessers : 4.000000
+global.sys.username : "vbitz"
+global.sys.runtimeConfig : object
+global.sys.drawFunc : function
+global.sys.keyboardFunc : function
+global.sys.screenWidth : 1000.000000
+global.sys.screenHeight : 600.000000
+global.sys.deltaTime : 0.016969
+global.event : object
+global.event.key_S : function
+global.event.key_F : function
+global.event.key_P : function
+global.draw : object
+global.draw.drawColor : object
+global.draw.drawColor.r : 0.000000
+global.draw.drawColor.g : 0.501961
+global.draw.drawColor.b : 0.000000
+global.draw.drawColor.a : 0.000000
+global.draw.Color : function Color
+global.draw.VertexBuffer2D : function VertexBuffer2D
+global.draw.Texture : function Texture
+global.draw.rect : function rect
+global.draw.grid : function grid
+global.draw.grad : function grad
+global.draw.circle : function circle
+global.draw.curve : function curve
+global.draw.line : function line
+global.draw.polygon : function polygon
+global.draw.colorPalette : function colorPalette
+global.draw.setColorF : function setColorF
+global.draw.setColor : function setColor
+global.draw.setColorI : function setColorI
+global.draw.getColor : function getColor
+global.draw.clearColor : function clearColor
+global.draw.getRGBFromHSV : function getRGBFromHSV
+global.draw.print : function print
+global.draw.getStringWidth : function getStringWidth
+global.draw.draw : function draw
+global.draw.drawSub : function drawSub
+global.draw.drawSprite : function drawSprite
+global.draw.openImage : function openImage
+global.draw.openSpriteSheet : function openSpriteSheet
+global.draw.getImageArray : function getImageArray
+global.draw.createImage : function createImage
+global.draw.saveImage : function saveImage
+global.draw.isTexture : function isTexture
+global.draw.isSpriteSheet : function isSpriteSheet
+global.draw.cameraReset : function cameraReset
+global.draw.cameraPan : function cameraPan
+global.draw.cameraZoom : function cameraZoom
+global.draw.cameraRotate : function cameraRotate
+global.draw.setFont : function setFont
+global.draw.loadFont : function loadFont
+global.draw.isFontLoaded : function isFontLoaded
+global.draw.setCenter : function setCenter
+global.fs : object
+global.fs.hasSetConfigDir : true
+global.fs.readFile : function readFile
+global.fs.writeFile : function writeFile
+global.fs.fileExists : function fileExists
+global.fs.fileSize : function fileSize
+global.fs.mountFile : function mountFile
+global.fs.configDir : function configDir
+global.fs.mkdir : function mkdir
+global.fs.lsdir : function lsdir
+global.fs.hashFile : function hashFile
+global.db : object
+global.db.Database : function Database
+global.input : object
+global.input.keyDown : function keyDown
+global.input.setCaptureMouse : function setCaptureMouse
+global.input.mouseX : 0.000000
+global.input.mouseY : 0.000000
+global.input.leftMouseButton : false
+global.input.middleMouseButton : false
+global.input.rightMouseButton : false
+global.setTimeout : function
+global.clearTimeout : function
+global.setInterval : function
+global.clearInterval : function
+global.noise : object
+global.noise.seed : function
+global.noise.simplex2 : function
+global.noise.simplex3 : function
+global.noise.perlin2 : function
+global.noise.perlin3 : function
+global.tests : object
+global.tests.Filesystem : function
+global.tests.Database : function
+global.tests.Unsafe : function
+global.tests.Harmony : function
+global.tests.Threading : function
+global.tests.EventMagic : function
+global.tests.DeferedEvents : function
+global.tests.Random : function
+global.tests.Vector : function
+global.tests.Matrix : function
+global.tests.Package : function
+global.testResults : object
+global.testResults.Filesystem : true
+global.testResults.Database : true
+global.testResults.Unsafe : true
+global.testResults.Harmony : true
+global.testResults.Threading : true
+global.testResults.EventMagic : true
+global.testResults.DeferedEvents : true
+global.testResults.Random : true
+global.testResults.Vector : true
+global.testResults.Matrix : true
+global.testResults.Package : true
+global.passedTests : 11.000000
+global.failedTests : 0.000000
+global.i : 40000.000000
+global.pix : object
+global.hsv : object
+global.point : 144000.000000
+global.x : 360.000000
+global.y : 100.000000
+global.rgb : object
+global.rgb.r : 0.990000
+global.rgb.g : 0.000000
+global.rgb.b : 0.016500
+global.rgb.a : 1.000000
+global.rgb.toString : function toString
+global.img : object
+global.img2 : object
+global.img3 : object
+global.spriteSheet : 140314861174624
+global.t : 51.100000
+global.supportsFramebuffer : false
+global.firstDraw : false
+global.vBuff : object
+global.vBuff.model : object
+global.vBuff.model.copy : function copy
+global.vBuff.model.reset : function reset
+global.vBuff.model.translate : function translate
+global.vBuff.model.scale : function scale
+global.vBuff.model.rotate : function rotate
+global.vBuff.model.toString : function toString
+global.vBuff.addVert : function addVert
+global.vBuff.draw : function draw
+global.vBuff.save : function save
+global.vBuff.load : function load
+global.vBuff.setProjectionPerspective : function setProjectionPerspective
+global.vBuff.setLookAtView : function setLookAtView
+global.vBuff.setDepthTest : function setDepthTest
+global.vBuff.setWireframe : function setWireframe
+global.vBuff.computeNormals : function computeNormals
+global.vCol : object
+global.vCol.r : 0.188235
+global.vCol.g : 0.188235
+global.vCol.b : 0.188235
+global.vCol.a : 1.000000
+global.vCol.toString : function toString
+global.graphicsTests : object
+global.unsafe : object
+global.unsafe.getNumberAddress : function getNumberAddress
+global.unsafe.getNative : function getNative
+global.unsafe.call : function call
+global.unsafe.malloc : function malloc
+global.unsafe.free : function free
+global.unsafe.addressOf : function addressOf
+global.unsafe.addressOfExternal : function addressOfExternal
+global.unsafe.mprotect : function mprotect
+global.unsafe.getPageSize : function getPageSize
+global.unsafe.pageSize : 4096.000000
