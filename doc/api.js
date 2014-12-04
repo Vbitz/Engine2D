@@ -950,27 +950,6 @@ global.input.middleMouseButton = false;
  */
 global.input.rightMouseButton = false;
 
-/** @namespace */
-global.mod = {};
-
-/**
- * @typedef {number} ModuleID
- */
-
-/**
- * Open a module at filename
- * @param  {string} filename - The real filename path to the module without a extention
- * @return {ModuleID}
- */
-global.mod.open = function (filename) {};
-
-/**
- * Call a paramterless method exported by the module defined by id
- * @param  {ModuleID} id
- * @param  {string} method
- */
-global.mod.call = function (id, method) {};
-
 /** 
  * db is powered by sqlite3 and uses SQL syntax for statements
  * @namespace
@@ -997,7 +976,9 @@ global.db.exec = function (statement) {};
 global.db.execPrepare = function (statement) {};
 
 /**
- * Currently only defined if Developer Mode is enabled. Also just about every method here can crash the Engine
+ * Exposed as a dynamicly loadable lib, test.js uses
+ * sys.runFile("modules/js_unsafe.dylib", false)
+ * to run it
  * @namespace
 */
 global.unsafe = {};
@@ -1068,3 +1049,9 @@ global.unsafe.mprotect = function (address, length, enable) {};
  * @return {number}
  */
 global.unsafe.getPageSize = function () {};
+
+/**
+ * The currrent systems's pagesize
+ * @type {Number}
+ */
+global.unsafe.pageSize = 4096;

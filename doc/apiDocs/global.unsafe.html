@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>JSDoc: Namespace: unsafe</title>
-    
+
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
@@ -16,96 +16,185 @@
 <body>
 
 <div id="main">
-    
+
     <h1 class="page-title">Namespace: unsafe</h1>
+
     
-    
+
 
 
 
 <section>
-    
+
 <header>
-    <h2>
-        <span class="ancestors"><a href="global.html">global</a>.</span>
     
-    unsafe
-    </h2>
+        <h2>
+            <span class="ancestors"><a href="global.html">global</a>.</span>
+        
+        unsafe
+        </h2>
+        
     
-</header>  
+</header>
 
 <article>
     <div class="container-overview">
     
-    
-    
         
-            <div class="description">Currently only defined if Developer Mode is enabled. Also just about every method here can crash the Engine</div>
+            <div class="description">Exposed as a dynamicly loadable lib, test.js uses
+sys.runFile("modules/js_unsafe.dylib", false)
+to run it</div>
         
+
         
-        
+
+
 <dl class="details">
-    
-        
-    
-    
+
     
 
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
-    
-    
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1003">line 1003</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line984">line 984</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
-        
+
         
     
     </div>
+
     
+
     
+
     
+
+     
+
     
+
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        <h3 class="subsection-title">Methods</h3>
-        
+        <h3 class="subsection-title">Members</h3>
+
         <dl>
             
 <dt>
-    <h4 class="name" id="addressOf"><span class="type-signature">&lt;static> </span>addressOf<span class="signature">(array)</span><span class="type-signature"> &rarr; {<a href="global.html#Address">Address</a>}</span></h4>
-    
+    <h4 class="name" id="pageSize"><span class="type-signature">(static) </span>pageSize<span class="type-signature"> :Number</span></h4>
+
     
 </dt>
 <dd>
     
+    <div class="description">
+        The currrent systems's pagesize
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1057">line 1057</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<dt>
+    
+        <h4 class="name" id="addressOf"><span class="type-signature">(static) </span>addressOf<span class="signature">(array)</span><span class="type-signature"> &rarr; {<a href="global.html#Address">Address</a>}</span></h4>
+
+        
+    
+</dt>
+<dd>
+
     
     <div class="description">
         Returns the real address of a <a href="global.html#MallocArray">MallocArray</a>
@@ -113,38 +202,40 @@
     
 
     
+
     
+
     
-    
+
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
         <tr>
             
                 <td class="name"><code>array</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -153,62 +244,71 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	</tbody>
+
+    
+    </tbody>
 </table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
     
 
     
+
+
+<dl class="details">
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1054">line 1054</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1035">line 1035</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
-    
-    
+
     
     <h5>Returns:</h5>
     
@@ -216,31 +316,33 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type"><a href="global.html#Address">Address</a></span>
 
 
-	</dd>
+    </dd>
 </dl>
 
         
-    
+
     
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="call"><span class="type-signature">&lt;static> </span>call<span class="signature">(address)</span><span class="type-signature"></span></h4>
     
+        <h4 class="name" id="call"><span class="type-signature">(static) </span>call<span class="signature">(address)</span><span class="type-signature"></span></h4>
+
+        
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Casts address to a function pointer and calls it
@@ -248,38 +350,40 @@
     
 
     
+
     
+
     
-    
+
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
         <tr>
             
                 <td class="name"><code>address</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -288,76 +392,87 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	</tbody>
+
+    
+    </tbody>
 </table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
     
 
     
+
+
+<dl class="details">
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1034">line 1034</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1015">line 1015</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
+
     
-    
-    
-    
+
     
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="free"><span class="type-signature">&lt;static> </span>free<span class="signature">(array)</span><span class="type-signature"></span></h4>
     
+        <h4 class="name" id="free"><span class="type-signature">(static) </span>free<span class="signature">(array)</span><span class="type-signature"></span></h4>
+
+        
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Frees the memory in a <a href="global.html#MallocArray">MallocArray</a>
@@ -365,38 +480,40 @@
     
 
     
+
     
+
     
-    
+
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
         <tr>
             
                 <td class="name"><code>array</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -405,76 +522,87 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	</tbody>
+
+    
+    </tbody>
 </table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
     
 
     
+
+
+<dl class="details">
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1047">line 1047</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1028">line 1028</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
+
     
-    
-    
-    
+
     
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="getNative"><span class="type-signature">&lt;static> </span>getNative<span class="signature">(address, length)</span><span class="type-signature"> &rarr; {<a href="global.html#MallocArray">MallocArray</a>}</span></h4>
     
+        <h4 class="name" id="getNative"><span class="type-signature">(static) </span>getNative<span class="signature">(address, length)</span><span class="type-signature"> &rarr; {<a href="global.html#MallocArray">MallocArray</a>}</span></h4>
+
+        
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Returns a <a href="global.html#MallocArray">MallocArray</a> for address
@@ -482,38 +610,40 @@
     
 
     
+
     
+
     
-    
+
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
         <tr>
             
                 <td class="name"><code>address</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -522,21 +652,21 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	
+
+    
+
         <tr>
             
                 <td class="name"><code>length</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -545,62 +675,71 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	</tbody>
+
+    
+    </tbody>
 </table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
     
 
     
+
+
+<dl class="details">
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1028">line 1028</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1009">line 1009</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
-    
-    
+
     
     <h5>Returns:</h5>
     
@@ -608,31 +747,33 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type"><a href="global.html#MallocArray">MallocArray</a></span>
 
 
-	</dd>
+    </dd>
 </dl>
 
         
-    
+
     
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="getNumberAddress"><span class="type-signature">&lt;static> </span>getNumberAddress<span class="signature">(number)</span><span class="type-signature"> &rarr; {<a href="global.html#Address">Address</a>}</span></h4>
     
+        <h4 class="name" id="getNumberAddress"><span class="type-signature">(static) </span>getNumberAddress<span class="signature">(number)</span><span class="type-signature"> &rarr; {<a href="global.html#Address">Address</a>}</span></h4>
+
+        
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Allocates a buffer to store number and returns the address
@@ -640,38 +781,40 @@
     
 
     
+
     
+
     
-    
+
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
         <tr>
             
                 <td class="name"><code>number</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -680,62 +823,71 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	</tbody>
+
+    
+    </tbody>
 </table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
     
 
     
+
+
+<dl class="details">
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1020">line 1020</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1001">line 1001</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
-    
-    
+
     
     <h5>Returns:</h5>
     
@@ -743,31 +895,33 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type"><a href="global.html#Address">Address</a></span>
 
 
-	</dd>
+    </dd>
 </dl>
 
         
-    
+
     
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="getPageSize"><span class="type-signature">&lt;static> </span>getPageSize<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
     
+        <h4 class="name" id="getPageSize"><span class="type-signature">(static) </span>getPageSize<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+        
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Returns the current system pagesize, the only safe method in this namespace
@@ -775,54 +929,65 @@
     
 
     
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
+
     
 
     
+
     
+
     
+
+
+<dl class="details">
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
+    
+
+    
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1070">line 1070</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1051">line 1051</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
-    
-    
+
     
     <h5>Returns:</h5>
     
@@ -830,31 +995,33 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type">number</span>
 
 
-	</dd>
+    </dd>
 </dl>
 
         
-    
+
     
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="malloc"><span class="type-signature">&lt;static> </span>malloc<span class="signature">(length)</span><span class="type-signature"> &rarr; {<a href="global.html#MallocArray">MallocArray</a>}</span></h4>
     
+        <h4 class="name" id="malloc"><span class="type-signature">(static) </span>malloc<span class="signature">(length)</span><span class="type-signature"> &rarr; {<a href="global.html#MallocArray">MallocArray</a>}</span></h4>
+
+        
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Allocates a <a href="global.html#MallocArray">MallocArray</a> array of length
@@ -862,38 +1029,40 @@
     
 
     
+
     
+
     
-    
+
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
         <tr>
             
                 <td class="name"><code>length</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -902,62 +1071,71 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	</tbody>
+
+    
+    </tbody>
 </table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
     
 
     
+
+
+<dl class="details">
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1041">line 1041</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1022">line 1022</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
-    
-    
+
     
     <h5>Returns:</h5>
     
@@ -965,31 +1143,33 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type"><a href="global.html#MallocArray">MallocArray</a></span>
 
 
-	</dd>
+    </dd>
 </dl>
 
         
-    
+
     
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="mprotect"><span class="type-signature">&lt;static> </span>mprotect<span class="signature">(address, length, enable)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
+        <h4 class="name" id="mprotect"><span class="type-signature">(static) </span>mprotect<span class="signature">(address, length, enable)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+        
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         Set's execute permission on pages of memory. Returns true if it's sucessful
@@ -997,38 +1177,40 @@
     
 
     
+
     
+
     
-    
+
     
         <h5>Parameters:</h5>
         
 
 <table class="params">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
         <tr>
             
                 <td class="name"><code>address</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -1037,21 +1219,21 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last">Needs to be aligned to nearest page.</td>
         </tr>
-	
-	
-	
+
+    
+
         <tr>
             
                 <td class="name"><code>length</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -1060,21 +1242,21 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	
+
+    
+
         <tr>
             
                 <td class="name"><code>enable</code></td>
             
-            
+
             <td class="type">
             
                 
@@ -1083,62 +1265,71 @@
 
             
             </td>
+
             
+
             
-            
-            
-            
+
             <td class="description last"></td>
         </tr>
-	
-	
-	</tbody>
+
+    
+    </tbody>
 </table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
     
 
     
+
+
+<dl class="details">
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
+
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1063">line 1063</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line1044">line 1044</a>
     </li></ul></dd>
     
+
     
+
     
-    
-    
-    
+
     
 </dl>
 
+
     
+
     
 
     
 
     
+
     
-    
-    
+
     
     <h5>Returns:</h5>
     
@@ -1146,31 +1337,31 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type">boolean</span>
 
 
-	</dd>
+    </dd>
 </dl>
 
         
-    
+
     
 </dd>
 
         </dl>
     
+
     
-    
-    
+
     
 </article>
 
-</section>  
+</section>
 
 
 
@@ -1178,13 +1369,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Events</h3><ul><li><a href="global.html#event:draw">draw</a></li><li><a href="global.html#event:dumpProfile">dumpProfile</a></li><li><a href="global.html#event:endOfFrame">endOfFrame</a></li><li><a href="global.html#event:input">input</a></li><li><a href="global.html#event:mouseButton">mouseButton</a></li><li><a href="global.html#event:runFile">runFile</a></li></ul><h3>Namespaces</h3><ul><li><a href="global.html">global</a></li><li><a href="global.console.html">console</a></li><li><a href="global.db.html">db</a></li><li><a href="global.draw.html">draw</a></li><li><a href="global.fs.html">fs</a></li><li><a href="global.input.html">input</a></li><li><a href="global.mod.html">mod</a></li><li><a href="global.sys.html">sys</a></li><li><a href="global.unsafe.html">unsafe</a></li><li><a href="ThreadAPI.html">ThreadAPI</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Index</a></h2><h3>Events</h3><ul><li><a href="global.html#event:draw">draw</a></li><li><a href="global.html#event:dumpProfile">dumpProfile</a></li><li><a href="global.html#event:endOfFrame">endOfFrame</a></li><li><a href="global.html#event:input">input</a></li><li><a href="global.html#event:mouseButton">mouseButton</a></li><li><a href="global.html#event:runFile">runFile</a></li></ul><h3>Namespaces</h3><ul><li><a href="global.html">global</a></li><li><a href="global.console.html">console</a></li><li><a href="global.db.html">db</a></li><li><a href="global.draw.html">draw</a></li><li><a href="global.fs.html">fs</a></li><li><a href="global.input.html">input</a></li><li><a href="global.sys.html">sys</a></li><li><a href="global.unsafe.html">unsafe</a></li><li><a href="ThreadAPI.html">ThreadAPI</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha3</a> on Sun Nov 16 2014 23:53:29 GMT+1300 (NZDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha10</a> on Thu Dec 04 2014 23:55:49 GMT+1300 (NZDT)
 </footer>
 
 <script> prettyPrint(); </script>
