@@ -907,7 +907,7 @@ global.draw.setCenter = function (x, y) {};
  * Read/Write value for draw color
  * @type {Color}
  */
-global.draw.drawColor = {r: 0, g: 0: b: 0};
+global.draw.drawColor = {r: 0, g: 0, b: 0};
 
 /** @namespace */
 global.input = {};

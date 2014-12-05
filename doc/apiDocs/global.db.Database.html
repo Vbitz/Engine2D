@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Namespace: ThreadAPI</title>
+    <title>JSDoc: Class: Database</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Namespace: ThreadAPI</h1>
+    <h1 class="page-title">Class: Database</h1>
 
     
 
@@ -29,7 +29,9 @@
 <header>
     
         <h2>
-        ThreadAPI
+            <span class="ancestors"><a href="global.html">global</a><a href="global.db.html">.db</a>.</span>
+        
+        Database
         </h2>
         
     
@@ -39,8 +41,78 @@
     <div class="container-overview">
     
         
+<dt>
+    
+        <h4 class="name" id="Database"><span class="type-signature"></span>new Database<span class="signature">(filename)</span><span class="type-signature"></span></h4>
 
         
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Constructor for sqlite3 database
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filename</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The filename to load the SQLite3 database from</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+    
+
+    
 
 
 <dl class="details">
@@ -70,7 +142,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line420">line 420</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line969">line 969</a>
     </li></ul></dd>
     
 
@@ -82,7 +154,21 @@
 </dl>
 
 
-        
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
     
     </div>
 
@@ -105,7 +191,7 @@
             
 <dt>
     
-        <h4 class="name" id="emit"><span class="type-signature"></span>emit<span class="signature">(target, args)</span><span class="type-signature"></span></h4>
+        <h4 class="name" id="exec"><span class="type-signature"></span>exec<span class="signature">(sql)</span><span class="type-signature"></span></h4>
 
         
     
@@ -114,8 +200,7 @@
 
     
     <div class="description">
-        Sends a event to functions listening for target event.
-If the target is on another thread it will be defered to be dispatched by the event loop on the main thread
+        Run a SQL query on the database
     </div>
     
 
@@ -151,13 +236,13 @@ If the target is on another thread it will be defered to be dispatched by the ev
 
         <tr>
             
-                <td class="name"><code>target</code></td>
+                <td class="name"><code>sql</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">string</span>
 
 
             
@@ -167,30 +252,7 @@ If the target is on another thread it will be defered to be dispatched by the ev
 
             
 
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>args</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
+            <td class="description last">The valid SQL query to execute on the database</td>
         </tr>
 
     
@@ -228,7 +290,7 @@ If the target is on another thread it will be defered to be dispatched by the ev
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line440">line 440</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line975">line 975</a>
     </li></ul></dd>
     
 
@@ -259,7 +321,7 @@ If the target is on another thread it will be defered to be dispatched by the ev
             
 <dt>
     
-        <h4 class="name" id="log"><span class="type-signature"></span>log<span class="signature">(&hellip;obj)</span><span class="type-signature"></span></h4>
+        <h4 class="name" id="execPrepare"><span class="type-signature"></span>execPrepare<span class="signature">(sql)</span><span class="type-signature"> &rarr; {Array.&lt;object>}</span></h4>
 
         
     
@@ -268,7 +330,7 @@ If the target is on another thread it will be defered to be dispatched by the ev
 
     
     <div class="description">
-        The same as console.log but identifys the line with the thread that created it
+        Run a SQL query on the database returning the result as a array
     </div>
     
 
@@ -292,8 +354,6 @@ If the target is on another thread it will be defered to be dispatched by the ev
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -306,33 +366,23 @@ If the target is on another thread it will be defered to be dispatched by the ev
 
         <tr>
             
-                <td class="name"><code>obj</code></td>
+                <td class="name"><code>sql</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">string</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                    &lt;repeatable><br>
-                
-                </td>
-            
 
             
 
-            <td class="description last">The value to print, internaly the values will be joined with spaces</td>
+            <td class="description last">The valid SQL query to execute on the database</td>
         </tr>
 
     
@@ -370,7 +420,7 @@ If the target is on another thread it will be defered to be dispatched by the ev
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line426">line 426</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line982">line 982</a>
     </li></ul></dd>
     
 
@@ -393,136 +443,28 @@ If the target is on another thread it will be defered to be dispatched by the ev
     
 
     
-
+    <h5>Returns:</h5>
     
-</dd>
-
-        
             
-<dt>
-    
-        <h4 class="name" id="sleep"><span class="type-signature"></span>sleep<span class="signature">(secs)</span><span class="type-signature"></span></h4>
+<div class="param-desc">
+    return value as a list of objects
+</div>
 
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
         
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Suspends the thread for secs
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>secs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
+<span class="param-type">Array.&lt;object></span>
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">mesured in seconds</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line432">line 432</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
+    </dd>
 </dl>
 
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+        
 
     
 </dd>
