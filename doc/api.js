@@ -589,6 +589,13 @@ global.fs.lsdir = function (path) {};
  */
 global.fs.hashFile = function (path) {};
 
+/**
+ * Has the config been set yet
+ * @readOnly
+ * @type {Boolean}
+ */
+global.fs.hasSetConfigDir = false;
+
 /** @namespace */
 global.draw = {};
 
@@ -636,15 +643,6 @@ global.draw.grad = function (x, y, w, h, col1, col2, orientation) {};
 global.draw.circle = function (x, y, radius, innerRadius, numberOfSides, startPos, endPos, fillStyle) {};
 
 /**
- * Draw a line from x0, y0 to x1, y1
- * @param  {number} x0
- * @param  {number} y0
- * @param  {number} x1
- * @param  {number} y1
- */
-global.draw.line = function (x0, y0, x1, y1) {};
-
-/**
  * Draw a cubic benzier curve from x0, y0, to x3, y3 through x1, y1 and x2, y2
  * @param  {number} x0
  * @param  {number} y0
@@ -656,6 +654,15 @@ global.draw.line = function (x0, y0, x1, y1) {};
  * @param  {number} y3
  */
 global.draw.curve = function (x0, y0, x1, y1, x2, y2, x3, y3) {};
+
+/**
+ * Draw a line from x0, y0 to x1, y1
+ * @param  {number} x0
+ * @param  {number} y0
+ * @param  {number} x1
+ * @param  {number} y1
+ */
+global.draw.line = function (x0, y0, x1, y1) {};
 
 /**
  * Renders a polygon using a triangle fan with arr points
@@ -681,14 +688,6 @@ global.draw.polygon = function (xCenter, yCenter, arr) {};
 global.draw.colorPalette = function (name, color) {};
 
 /**
- * Set's the current drawing color to r, g, b
- * @param {number} r - The red value between 0.0 and 1.0
- * @param {number} g - The green value between 0.0 and 1.0
- * @param {number} b - The blue value between 0.0 and 1.0
- */
-global.draw.setColorF = function (r, g, b) {};
-
-/**
  * @typedef {Object} Color
  * @property {number} r The red value between 0.0 and 1.0
  * @property {number} g The green value between 0.0 and 1.0
@@ -696,10 +695,12 @@ global.draw.setColorF = function (r, g, b) {};
  */
 
 /**
- * Returns the current draw color
- * @return {Color}
+ * Set's the current drawing color to r, g, b
+ * @param {number} r - The red value between 0.0 and 1.0
+ * @param {number} g - The green value between 0.0 and 1.0
+ * @param {number} b - The blue value between 0.0 and 1.0
  */
-global.draw.getColor = function () {};
+global.draw.setColorF = function (r, g, b) {};
 
 /**
  * Set's the current drawing color
@@ -720,6 +721,12 @@ global.draw.setColor = function (color) {};
  * @param {number} b - The blue value between 0 and 255
  */
 global.draw.setColorI = function (r, g, b) {};
+
+/**
+ * Returns the current draw color
+ * @return {Color}
+ */
+global.draw.getColor = function () {};
 
 /**
  * Set's the background clear color
@@ -815,14 +822,6 @@ global.draw.openSpriteSheet = function (filename) {};
 global.draw.getImageArray = function (filename) {};
 
 /**
- * Returns a {@link Image} with width * height pixels
- * @param  {number} w
- * @param  {number} h
- * @return {Image}
- */
-global.draw.createImageArray = function (w, h) {};
-
-/**
  * Converts a {@link Image} into a {@link TextureID}
  * @param  {Image|number[]} arr - {@link Image} is strongly prefered to number[]
  * @param  {number} w - The width of the Image to create
@@ -837,12 +836,6 @@ global.draw.createImage = function (arr, w, h) {};
  * @param  {string} filename
  */
 global.draw.saveImage = function (texId, filename) {};
-
-/**
- * Delete's texId from the system's graphics memory
- * @param  {TextureID} texId
- */
-global.draw.freeImage = function (texId) {};
 
 /**
  * Returns true if texId is valid
@@ -910,6 +903,12 @@ global.draw.isFontLoaded = function (prettyName) {};
  */
 global.draw.setCenter = function (x, y) {};
 
+/**
+ * Read/Write value for draw color
+ * @type {Color}
+ */
+global.draw.drawColor = {r: 0, g: 0: b: 0};
+
 /** @namespace */
 global.input = {};
 
@@ -919,6 +918,12 @@ global.input = {};
  * @return {boolean}
  */
 global.input.keyDown = function (key) {};
+
+/**
+ * Enable or disable capturing the mouse to the window
+ * @param {boolean} val
+ */
+global.input.setCaptureMouse = function (val) {};
 
 /**
  * The X postion of the mouse
@@ -957,23 +962,24 @@ global.input.rightMouseButton = false;
 global.db = {};
 
 /**
- * Opens or creates a sqlite3 database at filename
- * @param  {string} filename
+ * Constructor for sqlite3 database
+ * @constructor
+ * @param {string} filename The filename to load the SQLite3 database from
  */
-global.db.open = function (filename) {};
+global.db.Database = function (filename) {};
 
 /**
- * Executes a statement
- * @param  {string} statement - A valid SQL statement
+ * Run a SQL query on the database
+ * @param  {string} sql The valid SQL query to execute on the database
  */
-global.db.exec = function (statement) {};
+global.db.Database.prototype.exec = function (sql) {};
 
 /**
- * Executes a statement and returns the responce as a table
- * @param  {string} statement - A valid SQL statement
- * @return {Object[]}
+ * Run a SQL query on the database returning the result as a array
+ * @param  {string} sql The valid SQL query to execute on the database
+ * @return {object[]}   return value as a list of objects
  */
-global.db.execPrepare = function (statement) {};
+global.db.Database.prototype.execPrepare = function (sql) {};
 
 /**
  * Exposed as a dynamicly loadable lib, test.js uses
