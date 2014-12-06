@@ -28,7 +28,11 @@ def parse_file(filename, signaturesOnly, createInit):
 		functionPath = functionName
 		functionNamespace = ""
 		functionName = functionName.strip().split(".")[1:]
-		if len(functionName) > 1:
+		if len(functionName) > 2:
+			functionNamespace = ".".join(functionName[:-1])
+			functionName = functionName[-1:][0]
+		elif len(functionName) == 2: 
+
 			functionNamespace, functionName = functionName
 		else:
 			functionName = functionName[0]
@@ -56,6 +60,11 @@ def parse_file(filename, signaturesOnly, createInit):
 			if jDocFragment == "@internal":
 				#print "ignore"
 				continue
+
+			if jDocFragment == "@constructor":
+				#print "ignore"
+				continue
+
 			#print jDocFragment
 			match = re.match(jDocReturnFragment, jDocFragment)
 			if match != None:
