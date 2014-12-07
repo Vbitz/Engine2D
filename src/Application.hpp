@@ -74,6 +74,10 @@ namespace Engine {
             return _renderGL;
         }
         
+        void RenderCheckError(const char *src) {
+            if (!this->_headlessMode) GetRender()->CheckError(src);
+        }
+        
         // Public EngineUI functions
         EngineUIPtr GetEngineUI() {
             return this->_engineUI;
@@ -88,9 +92,19 @@ namespace Engine {
         void AddScript(const char* filename_str, size_t filename_len);
         void DumpScripts();
         
+        bool IsDebugMode() {
+            return this->_debugMode;
+        }
+        
+        bool IsDeveloperMode() {
+            return this->_developerMode;
+        }
+        
+        bool IsHeadlessMode() {
+            return this->_headlessMode;
+        }
+        
         // Public debug functions
-        bool IsDebugMode();
-        bool IsDeveloperMode();
         void Assert(bool value, std::string reason, std::string line, int lineNumber);
         
         LoadOrder GetCurrentLoadState() {
@@ -112,6 +126,7 @@ namespace Engine {
         
         // Main Loop
         void _mainLoop();
+        void _mainLoopHeadless();
         void _updateFrameTime();
         void _updateMousePos();
         void _processScripts();
@@ -165,10 +180,12 @@ namespace Engine {
         void _openWindow(int width, int height, bool fullscreen, std::string openGLVersion);
         
         // Modes
-        bool _developerMode = false;
-        bool _debugMode = false;
-        bool _testMode = false;
-        bool _configVarsMode = false;
+        bool _developerMode = false,
+             _debugMode = false,
+             _testMode = false,
+             _headlessMode = false,
+             _configVarsMode = false;
+        
         
         // Vars
         bool _running = false;

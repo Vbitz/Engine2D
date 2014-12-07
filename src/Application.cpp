@@ -104,7 +104,9 @@ namespace Engine {
     void Application::_disablePreload() {
         ScriptingManager::Factory f(this->_scripting->GetIsolate());
         
-        this->_scripting->GetScriptTable("draw")->SetHiddenValue(f.NewString("_draw"), f.NewExternal(new Draw2D(GetRender())));
+        if (!this->IsHeadlessMode()) {
+            this->_scripting->GetScriptTable("draw")->SetHiddenValue(f.NewString("_draw"), f.NewExternal(new Draw2D(GetRender())));
+        }
         
         this->_scripting->GetScriptTable("sys")->SetHiddenValue(f.NewString("_app"), f.NewExternal(this));
         
@@ -202,6 +204,7 @@ namespace Engine {
     }
     
     void Application::_hookConfigs() {
+        if (IsHeadlessMode()) return;
         EventEmitterPtr eventsSingilton = GetEventsSingilton();
 
         eventsSingilton->GetEvent("config:core.render.aa")->AddListener("Application::Config_CoreRenderAA", EventEmitter::MakeTarget(_config_CoreRenderAA, this));
@@ -408,6 +411,7 @@ namespace Engine {
                 _testMode = true;
             } else if (arg == "-headless") {
                 // enable headless mode
+                _headlessMode = true;
             } else if (arg == "-v8-options") {
                 ScriptingManager::Context::RunHelpCommand();
                 _exit = true; // v8 exits automaticly but let's just help it along
@@ -430,7 +434,7 @@ namespace Engine {
                 "-Cvars                         - Prints all Config Variables megred from the defaults and the set config file.\n"
                 "-mountPath=archiveFile         - Loads a archive file using PhysFS, this is applyed after physfs is started.\n"
                 "-test                          - Runs the built in test suite.\n"
-                "(NYI) -headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL"
+                "-headless                - Loads scripting without creating a OpenGL context, any calls requiring OpenGL"
                 " will fail.\n"
                 "-devmode                       - Enables developer mode (This enables real time script loading and the console).\n"
                 "-debug                         - Enables debug mode (This enables a OpenGL debug context and will print messages"
@@ -587,14 +591,6 @@ namespace Engine {
     
     std::string Application::GetEngineVersion() {
         return std::string("Engine2D v ") + std::string(ENGINE_VERSION);
-    }
-    
-    bool Application::IsDebugMode() {
-        return this->_debugMode;
-    }
-    
-    bool Application::IsDeveloperMode() {
-        return this->_developerMode;
     }
     
     void Application::Assert(bool value, std::string reason, std::string line, int lineNumber) {
@@ -797,6 +793,10 @@ namespace Engine {
         }
     }
     
+    void Application::_mainLoopHeadless() {
+        
+    }
+    
 	// main function
     
     int Application::_postStart() {
@@ -808,6 +808,10 @@ namespace Engine {
         
         if (this->_developerMode) {
             Logger::begin("Application", Logger::LogLevel_Warning) << "=== Developer Mode Active ===" << Logger::end();
+        }
+        
+        if (this->_headlessMode) {
+            Logger::begin("Application", Logger::LogLevel_Warning) << "=== Headless Mode Active ===" << Logger::end();
         }
         
 		Filesystem::Init(Platform::GetRawCommandLineArgV()[0]);
@@ -844,27 +848,31 @@ namespace Engine {
         
         this->_updateAddonLoad(LoadOrder::PreGraphics);
         
-        this->_initOpenGL();
+        if (!this->IsHeadlessMode()) {
+            this->_initOpenGL();
         
-        this->_engineUI = new EngineUI(this);
+            this->_engineUI = new EngineUI(this);
+            
+            // The window is now ready
         
-        // The window is now ready
+            RenderCheckError("Post InitOpenGL");
         
-        GetRender()->CheckError("Post InitOpenGL");
-        
-        Engine::EnableGLContext();
+            Engine::EnableGLContext();
+        }
         
         this->_disablePreload();
         
         GetEventsSingilton()->GetEvent("postLoad")->Emit();
         
-        GetRender()->CheckError("On JS Post Load");
+        RenderCheckError("On JS Post Load");
         
         //this->_cubeTest = this->_renderGL->CreateDrawable<Drawables::CubeDrawableTest>();
         
-        this->UpdateScreen();
+        if (!this->IsHeadlessMode()) {
+            this->UpdateScreen();
+        }
         
-        GetRender()->CheckError("Post Finish Loading");
+        RenderCheckError("Post Finish Loading");
         
         this->_updateAddonLoad(LoadOrder::Loaded);
         
@@ -876,16 +884,26 @@ namespace Engine {
             this->_loadTests();
             TestSuite::Run();
             if (Config::GetInt("core.test.testFrames") > 0) {
-                this->_mainLoop();
+                if (!IsHeadlessMode()) {
+                    this->_mainLoop();
+                } else {
+                    this->_mainLoopHeadless();
+                }
             }
         } else {
             // Let's get this going
-            this->_mainLoop();
+            if (!IsHeadlessMode()) {
+                this->_mainLoop();
+            } else {
+                this->_mainLoopHeadless();
+            }
         }
         
-        Engine::DisableGLContext();
+        if (!IsHeadlessMode()) {
+            Engine::DisableGLContext();
         
-		this->_shutdownOpenGL();
+            this->_shutdownOpenGL();
+        }
         
         delete this->_scripting;
         

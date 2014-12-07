@@ -316,8 +316,14 @@ namespace Engine {
         
         ENGINE_JS_METHOD(GetMaxTextureSize) {
             ENGINE_JS_SCOPE_OPEN;
-            
-            ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(args.GetIsolate(), GetApp(args.This())->GetWindow()->GetMaxTextureSize()));
+
+            ApplicationPtr app = GetApp(args.This());
+
+            if (app->IsHeadlessMode()) {
+                ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(args.GetIsolate(), 0));
+            } else {
+                ENGINE_JS_SCOPE_CLOSE(v8::Integer::New(args.GetIsolate(), app->GetWindow()->GetMaxTextureSize()));
+            }
         }
         
         ENGINE_JS_METHOD(Microtime) {
@@ -333,9 +339,13 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_INT32(0, "Arg0 is the new X size of the window");
             ENGINE_CHECK_ARG_INT32(1, "Arg1 is the new Y size of the window");
-            
-            GetAppSingilton()->GetWindow()->SetWindowSize(glm::vec2(   ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1)));
-            
+
+            ApplicationPtr app = GetApp(args.This());
+
+            if (!app->IsHeadlessMode()) {
+                app->GetWindow()->SetWindowSize(glm::vec2(   ENGINE_GET_ARG_INT32_VALUE(0), ENGINE_GET_ARG_INT32_VALUE(1)));
+            }
+
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
         
@@ -514,24 +524,28 @@ namespace Engine {
         void Version(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
             
-            if (args.Assert(HasGLContext(), "This function requies a OpemGL context")) return;
+            //if (args.Assert(HasGLContext(), "This function requies a OpemGL context")) return;
             
             v8::Handle<v8::Object> ret = args.NewObject();
             
             ApplicationPtr app = GetAppSingilton();
             
-            OpenGLVersion glVersion = app->GetWindow()->GetGlVersion();
-            
             args.FillObject(ret, {
-                {FTT_Static, "openGL", args.NewString(glVersion.fullGLVersion)},
-                {FTT_Static, "glew", args.NewString(glVersion.glewVersion)},
                 {FTT_Static, "v8", args.NewString(v8::V8::GetVersion())},
                 {FTT_Static, "engine", args.NewString(Application::GetEngineVersion())},
-                {FTT_Static, "window", args.NewString(app->GetWindow()->GetWindowVersion())},
-                {FTT_Static, "glsl", args.NewString(glVersion.glslVersion)},
-                {FTT_Static, "glVendor", args.NewString(glVersion.glVendor)},
-                {FTT_Static, "glRenderer", args.NewString(glVersion.glRenderer)}
             });
+
+            if (!app->IsHeadlessMode()) {
+                OpenGLVersion glVersion = app->GetWindow()->GetGlVersion();
+                args.FillObject(ret, {
+                    {FTT_Static, "openGL", args.NewString(glVersion.fullGLVersion)},
+                    {FTT_Static, "glew", args.NewString(glVersion.glewVersion)},
+                    {FTT_Static, "window", args.NewString(app->GetWindow()->GetWindowVersion())},
+                    {FTT_Static, "glsl", args.NewString(glVersion.glslVersion)},
+                    {FTT_Static, "glVendor", args.NewString(glVersion.glVendor)},
+                    {FTT_Static, "glRenderer", args.NewString(glVersion.glRenderer)}
+                });
+            }
             
             args.SetReturnValue(ret);
         }

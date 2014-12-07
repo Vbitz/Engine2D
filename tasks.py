@@ -500,6 +500,11 @@ def test(args):
 	run_engine_test(["-Ccore.test.testFrames=100"])
 	run_engine_test(["-Ccore.render.openGL=2.0", "-Ccore.test.testFrames=100"])
 
+
+@command(requires=["build_env"], usage="Runs the engine in Headless Mode")
+def headless_test(args):
+	run_engine(["-devmode", "-debug", "-headless", "script/headlessTest"])
+
 @command(requires=["build_env"], usage="Runs 1 test of the engine in Test Mode")
 def test_once(args):
 	run_engine_test([], onlyHighlight=False)

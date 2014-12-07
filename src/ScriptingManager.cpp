@@ -423,6 +423,7 @@ namespace Engine {
                 {FTT_Static, "platform", f.NewString(_PLATFORM)},
                 {FTT_Static, "devMode", f.NewBoolean(GetAppSingilton()->IsDeveloperMode())},
                 {FTT_Static, "debugMode", f.NewBoolean(GetAppSingilton()->IsDebugMode())},
+                {FTT_Static, "headlessMode", f.NewBoolean(GetAppSingilton()->IsHeadlessMode())},
                 {FTT_Static, "preload", f.NewBoolean(true)},
                 {FTT_Static, "numProcessers", f.NewNumber(Platform::GetProcesserCount())},
                 // depending on the runtime being used in the future this will be set to something unique per system
@@ -434,8 +435,10 @@ namespace Engine {
             // eventTable
             eventTable->SetNamedPropertyHandler(EventGetterCallback, EventSetterCallback);
             
-            // drawTable
-            JsDraw::InitDraw(drawTable);
+            if (!GetAppSingilton()->IsHeadlessMode()) {
+                // drawTable
+                JsDraw::InitDraw(drawTable);
+            }
             
             // fsTable
             JsFS::InitFS(fsTable);
