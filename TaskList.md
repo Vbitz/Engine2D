@@ -26,8 +26,7 @@ Most of these come from my internal task list so don't take this as final.
 	- Commit back to upstream
 	- Add console color support to windows
 - Port to Linux
-	- Fix runtime crash
-		- It seems to be some kind of memory coruption, I need to check to see if it's fixed in the most recent version
+	- Fix Windows/OpenGL on linux
 	- Add linux release uploading to Travis
 - Add new Scripting Features
 	- Add require system
