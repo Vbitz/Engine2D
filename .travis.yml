@@ -8,9 +8,10 @@ before_install:
   - ./tasks.py env
   - sudo apt-get update
 install:
-  - sudo apt-get install -y git build-essential clang libglu1-mesa-dev xorg-dev uuid-dev cmake
+  - sudo apt-get install -y git build-essential clang libglu1-mesa-dev xorg-dev uuid-dev cmake valgrind
 script:
   - ./tasks.py analyze
   - ./tasks.py headless_test
+  - ./tasks.py valgrind
 after_success:
   - ./tasks.py release

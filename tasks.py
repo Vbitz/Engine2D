@@ -507,6 +507,13 @@ def test(args):
 def headless_test(args):
 	run_engine(["-devmode", "-debug", "-headless", "script/headlessTest"])
 
+@command(requires=["build_env"], usage="Runs the engine in Headless Mode with Valgrind")
+def valgrind(args):
+	if is_linux():
+		shell_command(["valgrind", "--leak-check=full", "--show-reachable=yes",
+			resolve_path(PROJECT_BUILD_PATH, get_exe_name()), "-devmode", "-debug", "-headless",
+			"script/headlessTest"])
+
 @command(requires=["build_env"], usage="Runs 1 test of the engine in Test Mode")
 def test_once(args):
 	run_engine_test([], onlyHighlight=False)
