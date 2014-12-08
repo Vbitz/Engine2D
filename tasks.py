@@ -512,6 +512,7 @@ def valgrind(args):
 	if is_linux():
 		os.environ["LD_LIBRARY_PATH"] = "third_party/lib/" # TODO: use resolve_path
 		shell_command(["valgrind", "--leak-check=full", "--show-reachable=yes",
+			"--suppressions=tools/valgrind.supp",
 			resolve_path(PROJECT_BUILD_PATH, get_exe_name()), "-devmode", "-debug", "-headless",
 			"script/headlessTest"])
 

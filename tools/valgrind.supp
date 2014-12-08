@@ -1,0 +1,21 @@
+{
+	supp_v8_cond
+	Memcheck:Cond
+	obj:*/third_party/lib/libv8.so
+}
+{
+	supp_v8_free
+	Memcheck:Free
+	obj:*/third_party/lib/libv8.so
+}
+{
+	supp_v8_value8
+	Memcheck:Value8
+	obj:*/third_party/lib/libv8.so
+}
+{
+   supp_v8_leak
+   Memcheck:Leak
+   fun:*alloc
+   obj:*/third_party/lib/libv8.so
+}
