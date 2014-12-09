@@ -296,9 +296,23 @@ def build_v8(args):
 		# copy the relevent files to third_party/lib and third_party/include
 		pass
 	elif is_linux() or is_osx(): # linux/osx
-		os.chdir(resolve_path(PROJECT_ROOT, "third_party/v8"))
-		if not os.path.exists("build/gyp"):
-			shutil.copytree("../gyp", "build/gyp")
+		os.chdir(resolve_path(PROJECT_ROOT, "third_party"))
+		if not os.path.exists("v8/build/gyp"):
+			shutil.copytree("gyp", "v8/build/gyp")
+		if not os.path.exists("v8/buildtools"):
+			shell_command([
+				"git", "clone",
+				"https://chromium.googlesource.com/chromium/buildtools.git",
+				"v8/buildtools"])
+		if not os.path.exists("v8/tools/clang"):
+			shell_command([
+				"git", "clone",
+				"https://chromium.googlesource.com/chromium/src/tools/clang.git",
+				"v8/tools/clang"])
+		shell_command([
+			"python", "v8/tools/clang/scripts/update.py", "--if-needed"
+			])
+		os.chdir("v8")
 		oldPythonPath = os.getenv("PYTHONPATH", "")
 		os.environ["PYTHONPATH"] = os.getcwd() + "/tools/generate_shim_headers:" + os.getcwd() + "/build"
 		os.environ["GYP_GENERATORS"] = "make"

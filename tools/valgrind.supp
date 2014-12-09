@@ -14,8 +14,8 @@
 	obj:*/third_party/lib/libv8.so
 }
 {
-   supp_v8_leak
-   Memcheck:Leak
-   fun:*alloc
-   obj:*/third_party/lib/libv8.so
+	supp_v8_leak
+	Memcheck:Leak
+	fun:*alloc
+	obj:*/third_party/lib/libv8.so
 }
