@@ -794,7 +794,13 @@ namespace Engine {
     }
     
     void Application::_mainLoopHeadless() {
+        this->_running = true;
         
+        while (this->_running) {
+            Timer::Update(); // Timer events may be emited now, this is the soonest into the frame that Javascript can run
+            
+            GetEventsSingilton()->GetEvent("headlessLoop")->Emit();
+        }
     }
     
 	// main function
