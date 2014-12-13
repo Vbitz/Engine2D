@@ -61,6 +61,7 @@
 				"src/gen/JSFS.cpp",
 				"src/gen/JSDatabase.cpp",
 				"src/gen/JSMathHelper.cpp",
+				"src/gen/JSHeadless.cpp",
 
 				# Drawables
 				"src/Drawables/CubeDrawableTest.cpp",

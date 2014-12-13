@@ -11,4 +11,5 @@ sys.createTimer(1, "headlessExit_test");
 
 event.headlessLoop = function headlessTest_loop(e) {
 	loopCounter++;
+	headless.sleep(0.2);
 };

@@ -33,6 +33,7 @@
 #include "JSFS.hpp"
 #include "JSDatabase.hpp"
 #include "JSMathHelper.hpp"
+#include "JSHeadless.hpp"
 
 #include "Events.hpp"
 #include "Logger.hpp"
@@ -400,7 +401,8 @@ namespace Engine {
                 drawTable = v8::ObjectTemplate::New(),
                 fsTable = v8::ObjectTemplate::New(),
                 dbTable = v8::ObjectTemplate::New(),
-                inputTable = v8::ObjectTemplate::New();
+                inputTable = v8::ObjectTemplate::New(),
+                headlessTable = v8::ObjectTemplate::New();
             
             f.FillTemplate(global, {
                 {FTT_Static, "assert", f.NewFunctionTemplate(JsSys::Assert)}
@@ -438,6 +440,9 @@ namespace Engine {
             if (!GetAppSingilton()->IsHeadlessMode()) {
                 // drawTable
                 JsDraw::InitDraw(drawTable);
+            } else {
+                // headlessTable
+                JsHeadless::InitHeadless(headlessTable);
             }
             
             // fsTable
@@ -454,6 +459,7 @@ namespace Engine {
                 {FTT_Static, "sys", sysTable},
                 {FTT_Static, "event", eventTable},
                 {FTT_Static, "draw", drawTable},
+                {FTT_Static, "headless", headlessTable},
                 {FTT_Static, "fs", fsTable},
                 {FTT_Static, "db", dbTable},
                 {FTT_Static, "input", inputTable}
