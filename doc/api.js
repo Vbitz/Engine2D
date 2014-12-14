@@ -472,6 +472,12 @@ global.sys.devMode = false;
 global.sys.debugMode = false;
 
 /**
+ * Is the engine running in headless mode.
+ * @type {Boolean}
+ */
+global.sys.headlessMode = false;
+
+/**
  * Has the OpenGL context been created yet?
  * @type {Boolean}
  */
@@ -908,6 +914,18 @@ global.draw.setCenter = function (x, y) {};
  * @type {Color}
  */
 global.draw.drawColor = {r: 0, g: 0, b: 0};
+
+/**
+ * @namespace
+ */
+global.headless = {};
+
+/**
+ * Block execution for x seconds
+ * @condition IsHeadlessMode()
+ * @param  {number} secs
+ */
+global.headless.sleep = function (secs) {};
 
 /** @namespace */
 global.input = {};
