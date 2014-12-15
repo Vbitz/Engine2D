@@ -79,6 +79,7 @@ Most of these come from my internal task list so don't take this as final.
 	- Remove all instances of v8::Isolate:GetCurrent
 		- I heard that v8 will be removing this or deprecating it soon
 	- Remove all instances of v8 outside of ScriptingManager
+		- Most of these will be removed with the shift away from the old binding models
 	- Add support for other Engines
 		- LuaJit
 		- Python
