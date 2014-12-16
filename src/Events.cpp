@@ -74,6 +74,7 @@ namespace Engine {
             static EventMagic ret_magic = EM_BADTARGET; // Warning this could cause issues with threads.
             
             v8::Isolate* currentIsolate = v8::Isolate::GetCurrent();
+            v8::HandleScope scope(currentIsolate);
             v8::Local<v8::Context> ctx = currentIsolate->GetCurrentContext();
             if (ctx.IsEmpty() || ctx->Global().IsEmpty()) return EM_BADTARGET;
             

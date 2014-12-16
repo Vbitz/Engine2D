@@ -40,7 +40,8 @@ namespace Engine {
     enum FunctionTemplateTemplates { // It's way too long as an enum class
         FTT_Prototype,
         FTT_Instance,
-        FTT_Static
+        FTT_Static,
+        FTT_Hidden
     };
     
     namespace ScriptingManager {
@@ -64,6 +65,10 @@ namespace Engine {
         public:
             Factory(v8::Isolate* isolate) : _isolate(isolate), _scope(isolate) {
                 
+            }
+            
+            static SCRIPTINGMANAGER_INLINE v8::Handle<v8::String> NewString(v8::Isolate *isolate, const char* str) {
+                return v8::String::NewFromUtf8(isolate, str);
             }
             
             SCRIPTINGMANAGER_INLINE v8::Handle<v8::String> NewString(const char* str) {
@@ -136,6 +141,8 @@ namespace Engine {
                         case FTT_Static:
                             handle->Set(this->NewString(iter->key), iter->value);
                             break;
+                        case FTT_Hidden:
+                            handle->SetHiddenValue(this->NewString(iter->key), iter->value);
                         default:
                             break;
                     }
@@ -166,6 +173,8 @@ namespace Engine {
                         case FTT_Static:
                             handle->Set(this->NewString(iter->key), iter->value);
                             break;
+                        case FTT_Hidden:
+                            break; // No hidden values in a template
                     }
                 }
             }
@@ -312,8 +321,11 @@ namespace Engine {
             void InvalidateScript(std::string filename);
             void CheckUpdate();
             v8::Local<v8::Object> GetScriptTable(std::string name);
+            void SetScriptTableValue(std::string name, ObjectValues value);
+            void InitScripting();
             
             v8::Isolate* GetIsolate() {
+                assert(this->_isolate != NULL);
                 return this->_isolate;
             }
             
@@ -324,12 +336,10 @@ namespace Engine {
             void TraceGlobalEnviroment();
         private:
             v8::Isolate* _isolate = NULL;
-            v8::HandleScope _scope;
             
             void _enableTypedArrays();
             void _enableHarmony();
             void _createEventMagic();
-            v8::Handle<v8::Context> _initScripting();
             void _disablePreload();
             
             bool _runFile(std::string filename, bool persist);

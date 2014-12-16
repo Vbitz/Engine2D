@@ -108,8 +108,6 @@ namespace Engine {
             this->_scripting->GetScriptTable("draw")->SetHiddenValue(f.NewString("_draw"), f.NewExternal(new Draw2D(GetRender())));
         }
         
-        this->_scripting->GetScriptTable("sys")->SetHiddenValue(f.NewString("_app"), f.NewExternal(this));
-        
         this->_scripting->GetScriptTable("sys")->Set(f.NewString("preload"), f.NewBoolean(false));
     }
     
@@ -710,6 +708,7 @@ namespace Engine {
             }
             
             RenderDriverPtr render = this->GetRender();
+            ScriptingManager::Factory f(this->GetScriptingContext()->GetIsolate());
             
             Profiler::BeginProfileFrame();
             
@@ -737,7 +736,7 @@ namespace Engine {
                 render->Begin2d();
             
                 v8::Handle<v8::Value> args[1] = {
-                    v8::Number::New(v8::Isolate::GetCurrent(), FramePerfMonitor::GetFrameTime())
+                    f.NewNumber(FramePerfMonitor::GetFrameTime())
                 };
                 GetEventsSingilton()->GetEvent("draw")->Emit(Json::nullValue, 1, args); // this is when most Javascript runs
             
@@ -849,6 +848,7 @@ namespace Engine {
         
         ScriptingManager::Context::StaticInit();
         this->_scripting = new ScriptingManager::Context();
+        this->_scripting->InitScripting();
         
         // Scripting has now initalized, Javascript may punch in during any event
         

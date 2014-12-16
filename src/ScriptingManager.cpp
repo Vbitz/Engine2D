@@ -343,17 +343,13 @@ namespace Engine {
             return EM_OK;
         }
         
-        Context::Context() : _isolate(_createIsolate()), _scope(this->_isolate) {
+        Context::Context() : _isolate(_createIsolate()) {
             this->_isolate->Enter();
             
             GetEventsSingilton()->GetEvent("v8_postGC")->SetNoScript(true);
             GetEventsSingilton()->GetEvent("v8_env")->AddListener("Context::TraceGlobalEnviroment", EventEmitter::MakeTarget(_traceGlobalEnviroment, this));
             
             this->_isolate->AddGCEpilogueCallback(_v8PostGCCallback);
-            
-            v8::Handle<v8::Context> ctx = this->_initScripting();
-            
-            ctx->Enter();
         }
         
         Context::~Context() {
@@ -371,23 +367,20 @@ namespace Engine {
         
         void Context::_createEventMagic() {
             v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            v8::HandleScope scope(isolate);
             if (_EM_CANCEL.IsEmpty()) {
                 _EM_CANCEL.Reset(isolate, v8::External::New(isolate, new EventMagic(EM_CANCEL)));
             }
         }
         
-        v8::Handle<v8::Context> Context::_initScripting() {
+        void Context::InitScripting() {
             Logger::begin("ScriptingContext", Logger::LogLevel_Log) << "Loading Scripting" << Logger::end();
             
             this->_enableTypedArrays();
             this->_enableHarmony();
             this->_createEventMagic();
             
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
-            
-            v8::EscapableHandleScope handle_scope(isolate);
-            
-            ScriptingManager::Factory f(isolate);
+            ScriptingManager::Factory f(this->GetIsolate());
             
             v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New();
             
@@ -465,9 +458,11 @@ namespace Engine {
                 {FTT_Static, "input", inputTable}
             });
             
-            v8::Local<v8::Context> ctx = v8::Context::New(isolate, NULL, global);
+            v8::Local<v8::Context> ctx = v8::Context::New(this->GetIsolate(), NULL, global);
             
             ctx->Enter();
+            
+            this->SetScriptTableValue("sys", {FTT_Hidden, "_app", f.NewExternal(GetAppSingilton())});
             
             JsMathHelper::InitMathHelper();
             
@@ -477,8 +472,6 @@ namespace Engine {
             }
             
             Logger::begin("ScriptingContext", Logger::LogLevel_Log) << "Loaded Scripting" << Logger::end();
-            
-            return handle_scope.Escape(ctx);
         }
         
         v8::Local<v8::Object> Context::GetScriptTable(std::string name) {
@@ -486,6 +479,11 @@ namespace Engine {
             
             v8::Local<v8::Object> obj = ctx->Global();
             return v8::Local<v8::Object>::Cast(obj->Get(v8::String::NewFromUtf8(this->_isolate, name.c_str())));
+        }
+        
+        void Context::SetScriptTableValue(std::string name, ObjectValues value) {
+            Factory f(this->GetIsolate());
+            f.FillObject(this->GetScriptTable(name), {value});
         }
         
         void Context::CheckUpdate() {
@@ -516,7 +514,7 @@ namespace Engine {
             ENGINE_PROFILER_SCOPE_EX(path.c_str());
             
             Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Loading File: " << path << Logger::end();
-            v8::Isolate* isolate = v8::Isolate::GetCurrent();
+            v8::Isolate* isolate = this->_isolate;
             v8::HandleScope scp(isolate);
             v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
             v8::Context::Scope ctx_scope(ctx);
