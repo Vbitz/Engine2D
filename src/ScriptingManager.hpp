@@ -324,6 +324,9 @@ namespace Engine {
             void SetScriptTableValue(std::string name, ObjectValues value);
             void InitScripting();
             
+            void TriggerGC();
+            void TraceGlobalEnviroment();
+            
             v8::Isolate* GetIsolate() {
                 assert(this->_isolate != NULL);
                 return this->_isolate;
@@ -332,8 +335,6 @@ namespace Engine {
             static void StaticInit();
             static void SetFlag(std::string flag);
             static void RunHelpCommand();
-            static void TriggerGC();
-            void TraceGlobalEnviroment();
         private:
             v8::Isolate* _isolate = NULL;
             

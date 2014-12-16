@@ -57,6 +57,8 @@ namespace Engine {
         
         int _renderProfileZone(RenderDriverPtr renderGL, glm::vec2 windowSize, Json::Value& data, int x, int xIndent, int baseY, int y);
         void _pushToast(std::string domain, std::string info);
+        std::string _getHeapUsageString();
+        double _getHeapUsage();
         
         ApplicationPtr _app;
         Draw2DPtr _draw;

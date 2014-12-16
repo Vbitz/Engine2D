@@ -55,20 +55,6 @@ namespace Engine {
         }
     }
     
-    double _getHeapUsage() {
-        v8::HeapStatistics stats;
-        v8::Isolate::GetCurrent()->GetHeapStatistics(&stats);
-        return (double) stats.used_heap_size() / (double) stats.total_heap_size();
-    }
-    
-    std::string _getHeapUsageString() {
-        v8::HeapStatistics stats;
-        v8::Isolate::GetCurrent()->GetHeapStatistics(&stats);
-        std::stringstream ss;
-        ss << stats.used_heap_size() << " bytes / " << stats.total_heap_size() << " bytes";
-        return ss.str();
-    }
-    
     EngineUI::EngineUI(ApplicationPtr app) : _app(app) {
         this->_draw = new Draw2D(app->GetRender());
         
@@ -79,6 +65,20 @@ namespace Engine {
         
         GetEventsSingilton()->GetEvent("captureLastDrawTimes")->AddListener("EngineUI::_captureLastDrawTimes", EventEmitter::MakeTarget(_captureLastDrawTimes, this));
         GetEventsSingilton()->GetEvent("logEvent")->AddListener("EngineUI::_createToast", EventEmitter::MakeTarget(_createToast, this));
+    }
+    
+    std::string EngineUI::_getHeapUsageString() {
+        v8::HeapStatistics stats;
+        this->_app->GetScriptingContext()->GetIsolate()->GetHeapStatistics(&stats);
+        std::stringstream ss;
+        ss << stats.used_heap_size() << " bytes / " << stats.total_heap_size() << " bytes";
+        return ss.str();
+    }
+    
+    double EngineUI::_getHeapUsage() {
+        v8::HeapStatistics stats;
+        this->_app->GetScriptingContext()->GetIsolate()->GetHeapStatistics(&stats);
+        return (double) stats.used_heap_size() / (double) stats.total_heap_size();
     }
     
     void EngineUI::Draw() {

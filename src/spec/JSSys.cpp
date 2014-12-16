@@ -156,7 +156,7 @@ namespace Engine {
             
             v8::Local<v8::Array> argvArray = args.NewArray();
             
-            std::vector<std::string> cArgs = GetAppSingilton()->GetCommandLineArgs();
+            std::vector<std::string> cArgs = GetApp(args.This())->GetCommandLineArgs();
             
             for (int i = 0; i < cArgs.size(); i++) {
                 argvArray->Set(i, v8::String::NewFromUtf8(v8::Isolate::GetCurrent(), cArgs[i].c_str()));
@@ -173,7 +173,7 @@ namespace Engine {
             if (args.Assert(args[0]->IsString(), "Arg0 is the filename of the script to load") ||
                 args.Assert(args[1]->IsBoolean(), "Arg1 is set to automaticly reload Arg0 when it's changed")) return;
 			
-            args.SetReturnValue(args.NewBoolean(GetAppSingilton()->GetScriptingContext()->RunFile(args.StringValue(0), args.BooleanValue(1))));
+            args.SetReturnValue(args.NewBoolean(GetApp(args.This())->GetScriptingContext()->RunFile(args.StringValue(0), args.BooleanValue(1))));
 		}
         
         void EventsOn(const v8::FunctionCallbackInfo<v8::Value>& _args) {
@@ -398,7 +398,7 @@ namespace Engine {
         ENGINE_JS_METHOD(Exit) {
             ENGINE_JS_SCOPE_OPEN;
             
-            GetAppSingilton()->Exit();
+            GetApp(args.This())->Exit();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -478,8 +478,7 @@ namespace Engine {
         ENGINE_JS_METHOD(GC) {
             ENGINE_JS_SCOPE_OPEN;
             
-            // This function crashes the current version of V8
-            ScriptingManager::Context::TriggerGC(); // recomend a full GC (the internals which I've gone through
+            GetApp(args.This())->GetScriptingContext()->TriggerGC(); // recomend a full GC (the internals which I've gone through
                 // say that at the moment this will recomend a full GC but the value is just a hint.)
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
@@ -488,7 +487,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ClearConsole) {
             ENGINE_JS_SCOPE_OPEN;
             
-            GetAppSingilton()->GetEngineUI()->ClearConsole();
+            GetApp(args.This())->GetEngineUI()->ClearConsole();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -496,7 +495,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ToggleConsole) {
             ENGINE_JS_SCOPE_OPEN;
             
-            GetAppSingilton()->GetEngineUI()->ToggleConsole();
+            GetApp(args.This())->GetEngineUI()->ToggleConsole();
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -504,7 +503,7 @@ namespace Engine {
         ENGINE_JS_METHOD(ReloadRootScript) {
             ENGINE_JS_SCOPE_OPEN;
             
-            GetAppSingilton()->GetScriptingContext()->InvalidateScript(Config::GetString("core.script.entryPoint"));
+            GetApp(args.This())->GetScriptingContext()->InvalidateScript(Config::GetString("core.script.entryPoint"));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -516,7 +515,7 @@ namespace Engine {
             
             ENGINE_CHECK_ARG_STRING(0, "Arg0 is the script to reload");
             
-            GetAppSingilton()->GetScriptingContext()->InvalidateScript(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
+            GetApp(args.This())->GetScriptingContext()->InvalidateScript(ENGINE_GET_ARG_CPPSTRING_VALUE(0));
             
             ENGINE_JS_SCOPE_CLOSE_UNDEFINED;
         }
@@ -528,7 +527,7 @@ namespace Engine {
             
             v8::Handle<v8::Object> ret = args.NewObject();
             
-            ApplicationPtr app = GetAppSingilton();
+            ApplicationPtr app = GetApp(args.This());
             
             args.FillObject(ret, {
                 {FTT_Static, "v8", args.NewString(v8::V8::GetVersion())},
@@ -617,7 +616,7 @@ namespace Engine {
         
         ENGINE_JS_METHOD(Assert) {
             ENGINE_JS_SCOPE_OPEN;
-            if (GetAppSingilton()->IsDebugMode()) {
+            if (GetApp(args.This())->IsDebugMode()) {
                 if (args[0]->ToBoolean() == v8::False(args.GetIsolate())) {
                     if (args.Length() > 1 && args[1]->IsString()) {
                         ENGINE_ASSERT(false, ENGINE_GET_ARG_CPPSTRING_VALUE(1));

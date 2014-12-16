@@ -516,7 +516,7 @@ namespace Engine {
             Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Loading File: " << path << Logger::end();
             v8::Isolate* isolate = this->_isolate;
             v8::HandleScope scp(isolate);
-            v8::Local<v8::Context> ctx = v8::Isolate::GetCurrent()->GetCurrentContext();
+            v8::Local<v8::Context> ctx = isolate->GetCurrentContext();
             v8::Context::Scope ctx_scope(ctx);
             
             char* inputScript = Filesystem::GetFileContent(path);
@@ -527,13 +527,13 @@ namespace Engine {
             
             if (script.IsEmpty()) {
                 Logger::begin("Scripting", Logger::LogLevel_Error) << "Could not Load file: " << path << Logger::end();
-                ScriptingManager::ReportException(v8::Isolate::GetCurrent(), &tryCatch);
+                ScriptingManager::ReportException(isolate, &tryCatch);
                 std::free(inputScript);
                 return false;
             } else {
                 script->Run();
                 if (!tryCatch.StackTrace().IsEmpty()) {
-                    ScriptingManager::ReportException(v8::Isolate::GetCurrent(), &tryCatch);
+                    ScriptingManager::ReportException(isolate, &tryCatch);
                     std::free(inputScript);
                     return false;
                 }
@@ -613,7 +613,7 @@ namespace Engine {
         void Context::TriggerGC() {
             ENGINE_PROFILER_SCOPE;
             
-            v8::Isolate *isolate = v8::Isolate::GetCurrent();
+            v8::Isolate *isolate = this->GetIsolate();
             
             isolate->IdleNotification(1000);
             platform->PumpMessages(isolate);

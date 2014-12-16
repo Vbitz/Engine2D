@@ -767,7 +767,7 @@ namespace Engine {
             render->CheckError("endOfRendering");
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
-                ScriptingManager::Context::TriggerGC();
+                this->GetScriptingContext()->TriggerGC();
             }
             
             GetEventsSingilton()->PollDeferedMessages("toggleFullscreen");
