@@ -279,242 +279,248 @@ for (var i in tests) {
 
 console._log("highlight", "test.js Tests Complete: " + passedTests + " passed : " + failedTests + " failed");
 
-draw.clearColor(0x010101);
+if (sys.headlessMode) {
+	setTimeout(function () {
+		event.exit();
+	}, 0);
+} else {
+	draw.clearColor(0x010101);
 
-var pix = new Float32Array(100 * 100 * 4);
+	var pix = new Float32Array(100 * 100 * 4);
 
-for (var i = 0; i < 100 * 100 * 4; i += 4) {
-	pix[i] = Math.cos(i);
-	pix[i + 1] = Math.sin(i + 1);
-	pix[i + 2] = Math.tan(i + 2);
-	pix[i + 3] = 1.0;
-}
-
-var hsv = new Float32Array(360 * 100 * 4);
-
-var point = 0;
-
-for (var x = 0; x < 360; x++) {
-	for (var y = 0; y < 100; y++) {
-		var rgb = draw.getRGBFromHSV(x, 1.0, y / 100);
-		hsv[point++] = rgb.r;
-		hsv[point++] = rgb.g;
-		hsv[point++] = rgb.b;
-		hsv[point++] = 1.0;
+	for (var i = 0; i < 100 * 100 * 4; i += 4) {
+		pix[i] = Math.cos(i);
+		pix[i + 1] = Math.sin(i + 1);
+		pix[i + 2] = Math.tan(i + 2);
+		pix[i + 3] = 1.0;
 	}
-}
 
-var img = img ? img : new draw.Texture("texture/testing.png");
-var img2 = img2 ? img2 : new draw.Texture(pix, 100, 100);
-var img3 = img3 ? img3 : new draw.Texture(hsv, 360, 100);
-//var mImgA = mImgA ? mImgA : draw.getImageArray("texture/testing.png");
+	var hsv = new Float32Array(360 * 100 * 4);
 
-//for (var i = 0; i < mImgA.length; i += 4) {
-//	mImgA[i + 0] = 1 - mImgA[i + 0];
-//	mImgA[i + 1] = 1 - mImgA[i + 1];
-//	mImgA[i + 2] = 1 - mImgA[i + 2];
-//}
+	var point = 0;
 
-//var mImg = mImg ? mImg : draw.createImage(mImgA, 128, 128);
+	for (var x = 0; x < 360; x++) {
+		for (var y = 0; y < 100; y++) {
+			var rgb = draw.getRGBFromHSV(x, 1.0, y / 100);
+			hsv[point++] = rgb.r;
+			hsv[point++] = rgb.g;
+			hsv[point++] = rgb.b;
+			hsv[point++] = 1.0;
+		}
+	}
 
-var spriteSheet = spriteSheet ? spriteSheet : (function () {
-	console.log("Loading Sprite Sheet");
-	return draw.openSpriteSheet("texture/spriteTest.json");
-})();
+	var img = img ? img : new draw.Texture("texture/testing.png");
+	var img2 = img2 ? img2 : new draw.Texture(pix, 100, 100);
+	var img3 = img3 ? img3 : new draw.Texture(hsv, 360, 100);
+	//var mImgA = mImgA ? mImgA : draw.getImageArray("texture/testing.png");
 
-var t = 0;
+	//for (var i = 0; i < mImgA.length; i += 4) {
+	//	mImgA[i + 0] = 1 - mImgA[i + 0];
+	//	mImgA[i + 1] = 1 - mImgA[i + 1];
+	//	mImgA[i + 2] = 1 - mImgA[i + 2];
+	//}
 
-var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object")|| sys.hasExtention("GL_EXT_framebuffer_object");
+	//var mImg = mImg ? mImg : draw.createImage(mImgA, 128, 128);
 
-console.log("OpenGL Extentions:");
-sys.getExtentions().forEach(function (i) {
-	console.log("    " + i);
-});
-
-var firstDraw = true;
-
-sys.on("testTimer1", "test.timer", function () {
-	console.log("[createTimer interval] This runs every 5 seconds");
-});
-
-sys.on("testTimer2", "test.timer", function () {
-	console.log("[createTimer] This runs once after 10 seconds");
-});
-
-sys.createTimer(5, "testTimer1", true);
-sys.createTimer(10, "testTimer2");
-
-setInterval(function () {
-	console.log("[setInterval] This runs every 5 seconds");
-}, 5000);
-
-setTimeout(function () {
-	console.log("[setTimeout] This runs once after 10 seconds");
-}, 10000);
-
-var vBuff = new draw.VertexBuffer2D("shaders/basic.json");
-
-vBuff.setDepthTest(true);
-vBuff.setProjectionPerspective(true);
-vBuff.setLookAtView(2.0, 2.0, 2.0, 0, 0, 0);
-
-// add a triangle
-var vCol = new draw.Color(0x303030);
-vBuff.addVert(-1, -1, vCol);
-vBuff.addVert(1, -1, vCol);
-vBuff.addVert(1, 1, vCol);
-vBuff.addVert(-1, -1, vCol);
-vBuff.addVert(-1, 1, vCol);
-vBuff.addVert(1, 1, vCol);
-
-var graphicsTests = {
-	
-};
-
-sys.on("draw", "test.draw", function (e) {
-	if (!draw.isSpriteSheet(spriteSheet)) {
+	var spriteSheet = spriteSheet ? spriteSheet : (function () {
 		console.log("Loading Sprite Sheet");
-		spriteSheet = draw.openSpriteSheet("texture/spriteTest.json");
-	}
+		return draw.openSpriteSheet("texture/spriteTest.json");
+	})();
 
-	if (!draw.isFontLoaded("light")) {
-		console.log("Loading Font");
-		draw.loadFont("light", "fonts/open_sans.json");
-	}
+	var t = 0;
 
-	if (firstDraw) {
-		console.log("Finished Loading");
-		firstDraw = false;
-	}
+	var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object")|| sys.hasExtention("GL_EXT_framebuffer_object");
 
-	vBuff.model.rotate(sys.deltaTime, new Math.Vector(0, 1, 0));
-	vBuff.draw();
-
-	draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
-	draw.drawColor = "black";
-	draw.setFont("basic", 16);
-	draw.print(10, 35, sys.version().engine + " Test Suite");
-
-	draw.drawColor = "white";
-	draw.print(10, 70, "Automated Tests");
-	draw.print(400, 70, "Rendering Tests");
-
-	draw.setFont("basic", 12);
-	var x = 2;
-	for (var i in testResults) {
-		if (testResults[i]) {
-			draw.drawColor = "green";
-		} else {
-			draw.drawColor = "red";
-		}
-		draw.rect(15, x * 30 + 35, 220, 20);
-		draw.drawColor = "black";
-		draw.print(20, x * 30 + 40, i);
-		x++;
-	}
-
-	draw.drawColor = 0xffffff;
-	draw.print(10, x++ * 30 + 40, "Platform: " + sys.platform);
-	draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + supportsFramebuffer);
-	draw.print(10, x++ * 30 + 40, "Number of Processers: " + sys.numProcessers);
-	if (sys.config("core.test.screenshotTime") === 0) {
-		draw.print(10, x++ * 30 + 40, "Username: " + sys.username);
-	}
-
-	draw.setFont("light", 8);
-	draw.print(20, x * 30 + 40, "Custom Loaded Font");
-
-	draw.setFont("basic", 12);
-	draw.print(420, 100, "Rect");
-	draw.rect(410, 120, 100, 100);
-
-	draw.print(540, 100, "Grid");
-	draw.grid(530, 120, 100, 100);
-
-	draw.print(650, 100, "Gradents");
-	draw.grad(650, 120, 100, 100, 0xffffff, 0x000000, true);
-	draw.grad(770, 120, 100, 100, 0xffffff, 0x000000, false);
-
-	draw.print(400, 240, "PNG Image");
-	draw.drawColor = "white";
-	draw.draw(img, 410, 270, 100, 100);
-
-	draw.print(520, 240, "Gen Image");
-	draw.drawSub(img2, 530, 270, 100, 100, t, t += 0.1, 16, 16);
-
-	draw.print(640, 240, "Tinted Image");
-	draw.drawColor = draw.Color.fromRandom();
-	draw.draw(img, 650, 270, 100, 100);
-
-	draw.drawColor = "white";
-	draw.print(760, 240, "Circle");
-	draw.circle(770 + 50, 270 + 50, 50, 40, 200, 0.1, 1.0, true);
-
-	//draw.print(900, 240, "Modded Image");
-	//draw.draw(mImg, 900, 270, 100, 100);
-
-	draw.print(400, 380, "Sprite Sheet");
-	draw.drawSprite(spriteSheet, "idle", 410, 390, 100, 100);
-
-	draw.print(400, 500, "HSV Image");
-	draw.draw(img3, 410, 520, 360, 100);
-
-// profiler
-/*
-	draw.setFont("basic", 16);
-	draw.print(1040, 70, "Profiler");
-
-	draw.setFont("basic", 12);
-	var y = 100;
-	var zones = sys.getProfilerZones();
-	var h = zones.length * 20;
-	draw.setColor(0xcccccc);
-	draw.rect(1030, y - 10, 150, h + 10);
-	zones.forEach(function (i) {
-		draw.setColor(0x010101);
-		draw.print(1050, y, i);
-		draw.setColor(0xfafafa);
-		draw.print(1190, y, sys.getProfilerTime(i).toFixed(4));
-		y += 20;
+	console.log("OpenGL Extentions:");
+	sys.getExtentions().forEach(function (i) {
+		console.log("    " + i);
 	});
-*/
-	if (sys.config("core.test.screenshotTime") > 0) {
-		for (var curveX = 0; curveX < 2000; curveX += 100) {
-			draw.curve(curveX, 500, curveX, 600, 850, 600, curveX, 500);
+
+	var firstDraw = true;
+
+	sys.on("testTimer1", "test.timer", function () {
+		console.log("[createTimer interval] This runs every 5 seconds");
+	});
+
+	sys.on("testTimer2", "test.timer", function () {
+		console.log("[createTimer] This runs once after 10 seconds");
+	});
+
+	sys.createTimer(5, "testTimer1", true);
+	sys.createTimer(10, "testTimer2");
+
+	setInterval(function () {
+		console.log("[setInterval] This runs every 5 seconds");
+	}, 5000);
+
+	setTimeout(function () {
+		console.log("[setTimeout] This runs once after 10 seconds");
+	}, 10000);
+
+	var vBuff = new draw.VertexBuffer2D("shaders/basic.json");
+
+	vBuff.setDepthTest(true);
+	vBuff.setProjectionPerspective(true);
+	vBuff.setLookAtView(2.0, 2.0, 2.0, 0, 0, 0);
+
+	// add a triangle
+	var vCol = new draw.Color(0x303030);
+	vBuff.addVert(-1, -1, vCol);
+	vBuff.addVert(1, -1, vCol);
+	vBuff.addVert(1, 1, vCol);
+	vBuff.addVert(-1, -1, vCol);
+	vBuff.addVert(-1, 1, vCol);
+	vBuff.addVert(1, 1, vCol);
+
+	var graphicsTests = {
+		
+	};
+
+	sys.on("draw", "test.draw", function (e) {
+		if (!draw.isSpriteSheet(spriteSheet)) {
+			console.log("Loading Sprite Sheet");
+			spriteSheet = draw.openSpriteSheet("texture/spriteTest.json");
 		}
-	} else {
-		for (var curveX = 0; curveX < 2000; curveX += 100) {
-			draw.curve(curveX, 500, curveX, 600, 850, 600, input.mouseX, input.mouseY);
-		}	
-	}
-});
 
-event.key_S = function test_screenshot(e) {
-	if (e.state === "press") {
-		event.screenshot({filename: "testing.png"});
-	}
-};
+		if (!draw.isFontLoaded("light")) {
+			console.log("Loading Font");
+			draw.loadFont("light", "fonts/open_sans.json");
+		}
 
-event.key_F = function test_fullscreen(e) {
-	if (e.state === "press") {
-		event.toggleFullscreen();
-	}
-};
+		if (firstDraw) {
+			console.log("Finished Loading");
+			firstDraw = false;
+		}
 
-event.key_P = function test_profile(e) {
-	if (e.state === "press") {
-		console.log("Profiling for 50 frames");
-		event.detailProfile({filename: "profile.log", frames: 50});
+		vBuff.model.rotate(sys.deltaTime, new Math.Vector(0, 1, 0));
+		vBuff.draw();
+
+		draw.grad(0, 25, 600, 35, 0xfafafa, 0x000000, false);
+		draw.drawColor = "black";
+		draw.setFont("basic", 16);
+		draw.print(10, 35, sys.version().engine + " Test Suite");
+
+		draw.drawColor = "white";
+		draw.print(10, 70, "Automated Tests");
+		draw.print(400, 70, "Rendering Tests");
+
+		draw.setFont("basic", 12);
+		var x = 2;
+		for (var i in testResults) {
+			if (testResults[i]) {
+				draw.drawColor = "green";
+			} else {
+				draw.drawColor = "red";
+			}
+			draw.rect(15, x * 30 + 35, 220, 20);
+			draw.drawColor = "black";
+			draw.print(20, x * 30 + 40, i);
+			x++;
+		}
+
+		draw.drawColor = 0xffffff;
+		draw.print(10, x++ * 30 + 40, "Platform: " + sys.platform);
+		draw.print(10, x++ * 30 + 40, "Supports Framebuffer: " + supportsFramebuffer);
+		draw.print(10, x++ * 30 + 40, "Number of Processers: " + sys.numProcessers);
+		if (sys.config("core.test.screenshotTime") === 0) {
+			draw.print(10, x++ * 30 + 40, "Username: " + sys.username);
+		}
+
+		draw.setFont("light", 8);
+		draw.print(20, x * 30 + 40, "Custom Loaded Font");
+
+		draw.setFont("basic", 12);
+		draw.print(420, 100, "Rect");
+		draw.rect(410, 120, 100, 100);
+
+		draw.print(540, 100, "Grid");
+		draw.grid(530, 120, 100, 100);
+
+		draw.print(650, 100, "Gradents");
+		draw.grad(650, 120, 100, 100, 0xffffff, 0x000000, true);
+		draw.grad(770, 120, 100, 100, 0xffffff, 0x000000, false);
+
+		draw.print(400, 240, "PNG Image");
+		draw.drawColor = "white";
+		draw.draw(img, 410, 270, 100, 100);
+
+		draw.print(520, 240, "Gen Image");
+		draw.drawSub(img2, 530, 270, 100, 100, t, t += 0.1, 16, 16);
+
+		draw.print(640, 240, "Tinted Image");
+		draw.drawColor = draw.Color.fromRandom();
+		draw.draw(img, 650, 270, 100, 100);
+
+		draw.drawColor = "white";
+		draw.print(760, 240, "Circle");
+		draw.circle(770 + 50, 270 + 50, 50, 40, 200, 0.1, 1.0, true);
+
+		//draw.print(900, 240, "Modded Image");
+		//draw.draw(mImg, 900, 270, 100, 100);
+
+		draw.print(400, 380, "Sprite Sheet");
+		draw.drawSprite(spriteSheet, "idle", 410, 390, 100, 100);
+
+		draw.print(400, 500, "HSV Image");
+		draw.draw(img3, 410, 520, 360, 100);
+
+	// profiler
+	/*
+		draw.setFont("basic", 16);
+		draw.print(1040, 70, "Profiler");
+
+		draw.setFont("basic", 12);
+		var y = 100;
+		var zones = sys.getProfilerZones();
+		var h = zones.length * 20;
+		draw.setColor(0xcccccc);
+		draw.rect(1030, y - 10, 150, h + 10);
+		zones.forEach(function (i) {
+			draw.setColor(0x010101);
+			draw.print(1050, y, i);
+			draw.setColor(0xfafafa);
+			draw.print(1190, y, sys.getProfilerTime(i).toFixed(4));
+			y += 20;
+		});
+	*/
+		if (sys.config("core.test.screenshotTime") > 0) {
+			for (var curveX = 0; curveX < 2000; curveX += 100) {
+				draw.curve(curveX, 500, curveX, 600, 850, 600, curveX, 500);
+			}
+		} else {
+			for (var curveX = 0; curveX < 2000; curveX += 100) {
+				draw.curve(curveX, 500, curveX, 600, 850, 600, input.mouseX, input.mouseY);
+			}	
+		}
+	});
+
+	event.key_S = function test_screenshot(e) {
+		if (e.state === "press") {
+			event.screenshot({filename: "testing.png"});
+		}
+	};
+
+	event.key_F = function test_fullscreen(e) {
+		if (e.state === "press") {
+			event.toggleFullscreen();
+		}
+	};
+
+	event.key_P = function test_profile(e) {
+		if (e.state === "press") {
+			console.log("Profiling for 50 frames");
+			event.detailProfile({filename: "profile.log", frames: 50});
+		}
 	}
+
+	sys.on("input", "test.input", function (e) {
+		var key = e.key;
+		var press = e.state === "press" || e.state === "repeat";
+
+		console.log("[INPUT] : (" + key.charCodeAt(0) + ") " + key + " : " + press);
+	});
+
+	sys.on("mouseButton", "test.mouseButton", function (e) {
+		console.log("[MOUSE] : " + e.button + " : " + e.action + " : (" + e.x + ", " + e.y + ")");
+	});
 }
-
-sys.on("input", "test.input", function (e) {
-	var key = e.key;
-	var press = e.state === "press" || e.state === "repeat";
-
-	console.log("[INPUT] : (" + key.charCodeAt(0) + ") " + key + " : " + press);
-});
-
-sys.on("mouseButton", "test.mouseButton", function (e) {
-	console.log("[MOUSE] : " + e.button + " : " + e.action + " : (" + e.x + ", " + e.y + ")");
-});

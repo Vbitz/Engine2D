@@ -519,10 +519,10 @@ def test(args):
 
 @command(requires=["build_env"], usage="Runs the engine in Headless Mode")
 def headless_test(args):
-	run_engine(["-devmode", "-debug", "-headless", "script/headlessTest"])
-	run_engine(["-debug", "-headless", "script/headlessTest"])
-	run_engine(["-devmode", "-headless", "script/headlessTest"])
-	run_engine(["-headless", "script/headlessTest"])
+	run_engine(["-devmode", "-debug", "-headless"])
+	run_engine(["-debug", "-headless"])
+	run_engine(["-devmode", "-headless"])
+	run_engine(["-headless"])
 
 @command(requires=["build_env"], usage="Runs the engine in Headless Mode with Valgrind")
 def valgrind(args):
