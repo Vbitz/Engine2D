@@ -21,6 +21,8 @@
    limitations under the License.
 */
 
+"use strict";
+
 /***
 	{
 		"fontCacheList": [
@@ -129,6 +131,30 @@ var tests = {
 				console.error("failed: ", iterValue, items[i]);
 				return false;
 			}
+		}
+
+		class BaseHello {
+			constructor(target) {
+				this.target = target;
+			}
+
+			sayHello() {
+				return "Hello, " + this.target;
+			}
+		}
+
+		class HelloWorld extends BaseHello {
+			constructor() {
+				super("World");
+			}
+		}
+
+		if ((new BaseHello("Test")).sayHello() != "Hello, Test") {
+			return false;
+		}
+
+		if ((new HelloWorld()).sayHello() != "Hello, World") {
+			return false;
 		}
 
 		return true;
@@ -325,7 +351,6 @@ setInterval(function () {
 setTimeout(function () {
 	console.log("[setTimeout] This runs once after 10 seconds");
 }, 10000);
-
 
 var vBuff = new draw.VertexBuffer2D("shaders/basic.json");
 
