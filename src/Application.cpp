@@ -105,10 +105,10 @@ namespace Engine {
         ScriptingManager::Factory f(this->_scripting->GetIsolate());
         
         if (!this->IsHeadlessMode()) {
-            this->_scripting->GetScriptTable("draw")->SetHiddenValue(f.NewString("_draw"), f.NewExternal(new Draw2D(GetRender())));
+            this->_scripting->SetScriptTableValue("draw", {FTT_Hidden, "_draw", f.NewExternal(new Draw2D(GetRender()))});
         }
         
-        this->_scripting->GetScriptTable("sys")->Set(f.NewString("preload"), f.NewBoolean(false));
+        this->_scripting->SetScriptTableValue("sys", {FTT_Static, "preload", f.NewBoolean(false)});
     }
     
     void Application::_loadBasicConfigs() {
