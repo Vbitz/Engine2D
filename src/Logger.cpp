@@ -120,14 +120,7 @@ namespace Engine {
         }
         
         LogEvent::LogEvent(std::string domain, LogLevel level, std::string event)
-        :   Domain(domain), Level(level), Type(LogType_Text),
-        GraphEvent(NULL), Event(event), Hidden(false) {
-            this->time = Platform::GetTime();
-        }
-        
-        LogEvent::LogEvent(std::string domain, LogLevel level, LogGraphEvent* event)
-        :   Domain(domain), Level(level), Type(LogType_Graphical),
-        GraphEvent(event), Event(""), Hidden(false) {
+        :   Domain(domain), Level(level), Type(LogType_Text), Event(event), Hidden(false) {
             this->time = Platform::GetTime();
         }
         
@@ -204,24 +197,6 @@ namespace Engine {
             }
             
             _logMutex->Exit();
-        }
-        
-        void LogGraph(std::string domain, LogLevel level, LogGraphEvent* event) {
-            bool logConsole = Config::GetBoolean("core.log.enableConsole")
-            && (level != LogLevel_Verbose || Config::GetBoolean("core.log.levels.verbose"));
-            std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
-            
-            _logMutex->Enter();
-            
-            _logEvents.push_back(LogEvent(domain, level, event));
-            
-            _logMutex->Exit();
-            
-            if (logConsole) {
-                std::cout << colorCode << Platform::GetTime()
-                << " : [" << GetLevelString(level) << "] "
-                << domain << " | Graphical" << std::endl;
-            }
         }
         
         std::ostream& begin(std::string domain, LogLevel level) {

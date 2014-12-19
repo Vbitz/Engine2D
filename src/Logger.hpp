@@ -48,24 +48,7 @@ namespace Engine {
         };
         
         enum LogType {
-            LogType_Text,
-            LogType_Graphical
-        };
-        
-        ENGINE_CLASS(LogGraphEvent);
-        
-        class LogGraphEvent {
-        public:
-            LogGraphEvent() {};
-            ~LogGraphEvent() {};
-            
-            virtual int Run(int x, int y) {
-                return 0;
-            }
-            
-            int operator()(int x, int y) {
-                return this->Run(x, y);
-            }
+            LogType_Text
         };
         
         ENGINE_CLASS(LogEvent);
@@ -73,14 +56,12 @@ namespace Engine {
         class LogEvent {
         public:
             LogEvent(std::string domain, LogLevel level, std::string event);
-            LogEvent(std::string domain, LogLevel level, LogGraphEventPtr event);
             
             std::string FormatConsole();
             
             std::string Domain;
             LogLevel Level;
             LogType Type;
-            LogGraphEventPtr GraphEvent;
             std::string Event;
             bool Hidden;
             double time;
@@ -92,7 +73,6 @@ namespace Engine {
         std::string GetLevelString(LogLevel level);
         
         void LogText(std::string domain, LogLevel level, std::string str);
-        void LogGraph(std::string domain, LogLevel level, LogGraphEventPtr event);
         
         std::ostream& begin(std::string domain, LogLevel level);
         StreamFlusher end();

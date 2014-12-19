@@ -200,8 +200,6 @@ namespace Engine {
                     if (iterator->Level != Logger::LogLevel_Verbose || showVerbose) {
                         if (iterator->Type == Logger::LogType_Text) {
                             renderGL->Print(65, i + 7, iterator->Event.c_str());
-                        } else if (iterator->Type == Logger::LogType_Graphical) {
-                            i -= (*iterator->GraphEvent)(65, i);
                         }
                     }
                     
