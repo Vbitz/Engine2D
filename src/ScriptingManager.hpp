@@ -124,7 +124,7 @@ namespace Engine {
             }
             
             SCRIPTINGMANAGER_INLINE bool Assert(bool value, const char* msg) {
-                assert(msg != "");
+                assert(strcmp(msg, "") != 0);
                 if (!value) {
                     this->ThrowArgError(msg);
                 }
