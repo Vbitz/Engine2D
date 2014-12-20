@@ -25,6 +25,7 @@
 
 #include <unordered_map>
 #include <iostream>
+#include <string.h>
 
 #include "stdlib.hpp"
 #include "Scripting.hpp"
