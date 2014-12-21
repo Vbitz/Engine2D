@@ -49,6 +49,7 @@ PROJECT_TMP_PATH = 3
 
 CTAGS_PATH = "/usr/local/bin/ctags" # installed with "brew install ctags"
 GCOV_PATH = "/usr/local/bin/gcov-4.2" # installed with "brew install gcc"
+CPPCHECK_PATH = "/usr/local/bin/cppcheck" # installed with "brew install cppcheck"
 
 WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw")
 ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
@@ -562,6 +563,13 @@ def doc(args):
 	shell_command([
 			"jsdoc", "-d", "./doc/apiDocs/", "./doc/api.js", "./Readme.md"
 		])
+
+@command(usage="Run cppcheck and send output to cppcheck.log")
+def cppcheck(args):
+	with open("cppcheck.log", "w+") as file_output:
+		p = subprocess.Popen([CPPCHECK_PATH, "-j", str(get_max_jobs()),
+			"--enable=all", "--inconclusive", "src"], stderr=file_output)
+		p.wait()
 
 @command(usage="Prints the commandName and usage for each command")
 def help(args):
