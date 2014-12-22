@@ -85,11 +85,13 @@ def log(*args, **kwargs):
 	newArgs = []
 	for s in args:
 		newArgs += [str(s)]
-	if method_name:
+	if method_name == True:
 		parent = inspect.getouterframes(inspect.currentframe())[1][3]
 		print("%s %s" % (bcolors.LOGSRC + "[" + parent + "]" + bcolors.ENDC, " ".join(newArgs)))
-	else:
+	elif method_name == False:
 		print(" ".join(newArgs))
+	else:
+		print("%s %s" % (bcolors.LOGSRC + "[" + method_name + "]" + bcolors.ENDC, " ".join(newArgs)))
 
 def is_linux():
 	return sys.platform == "linux2"
@@ -130,8 +132,11 @@ def require_in_path(arr):
 		pass
 	return True
 
+def print_shellCmd(args):
+	log("in " + bcolors.SHELL + os.getcwd() + bcolors.ENDC + (" : %s" % (" ".join(args))), method_name="shell_command")
+
 def shell_command(cmd, throw=True, output=False):
-	log("in " + bcolors.SHELL + os.getcwd() + bcolors.ENDC + (" : %s" % (" ".join(cmd))))
+	print_shellCmd("in " + bcolors.SHELL + os.getcwd() + bcolors.ENDC + (" : %s" % (" ".join(cmd))))
 	if throw:
 		if output:
 			return subprocess.check_output(cmd)
@@ -567,8 +572,9 @@ def doc(args):
 @command(usage="Run cppcheck and send output to cppcheck.log")
 def cppcheck(args):
 	with open("cppcheck.log", "w+") as file_output:
-		p = subprocess.Popen([CPPCHECK_PATH, "-j", str(get_max_jobs()),
-			"--enable=all", "--inconclusive", "src"], stderr=file_output)
+		cppcheck_args = [CPPCHECK_PATH, "--config-exclude=" + resolve_path(PROJECT_SOURCE, "vendor"), "src"]
+		print_shellCmd(cppcheck_args)
+		p = subprocess.Popen(cppcheck_args, stderr=file_output)
 		p.wait()
 
 @command(usage="Prints the commandName and usage for each command")
