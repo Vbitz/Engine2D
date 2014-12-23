@@ -133,10 +133,10 @@ def require_in_path(arr):
 	return True
 
 def print_shellCmd(args):
-	log("in " + bcolors.SHELL + os.getcwd() + bcolors.ENDC + (" : %s" % (" ".join(args))), method_name="shell_command")
+	log("in " + bcolors.SHELL + os.getcwd() + bcolors.ENDC + (" : %s" % (args)), method_name="shell_command")
 
 def shell_command(cmd, throw=True, output=False):
-	print_shellCmd("in " + bcolors.SHELL + os.getcwd() + bcolors.ENDC + (" : %s" % (" ".join(cmd))))
+	print_shellCmd(" ".join(cmd))
 	if throw:
 		if output:
 			return subprocess.check_output(cmd)
@@ -158,7 +158,7 @@ def run_engine_test(args, onlyHighlight=True):
 
 def get_git_hash():
 	# check for .git folder
-	return subprocess.check_output(["git", "rev-parse", "HEAD"])[:10]
+	return shell_command(["git", "rev-parse", "HEAD"], output=True)[:10]
 
 def get_hash(inStr):
 	m = hashlib.md5()
@@ -572,7 +572,8 @@ def doc(args):
 @command(usage="Run cppcheck and send output to cppcheck.log")
 def cppcheck(args):
 	with open("cppcheck.log", "w+") as file_output:
-		cppcheck_args = [CPPCHECK_PATH, "--config-exclude=" + resolve_path(PROJECT_SOURCE, "vendor"), "src"]
+		cppcheck_args = [CPPCHECK_PATH,
+			"--enable=all", "--inconclusive", "--config-exclude=" + resolve_path(PROJECT_SOURCE, "vendor"), "src"]
 		print_shellCmd(cppcheck_args)
 		p = subprocess.Popen(cppcheck_args, stderr=file_output)
 		p.wait()
@@ -601,10 +602,8 @@ def tags(args):
 
 @command(requires=["build_env"], usage="Run the engine and take a screenshot after 1 second automatically")
 def screenshot(args):
-	log([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
-		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"])
-	output = subprocess.check_output([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
-		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"])
+	output = shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name()),
+		"-devmode", "-debug", "-Ccore.test.screenshotTime=1"], output=True)
 	print output
 	output = [f for f in output.split("\n") if "TestScreenshot - ####" in f]
 	reg = re.search("to \[(.*)\]", output[0])
