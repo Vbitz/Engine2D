@@ -135,11 +135,14 @@ def require_in_path(arr):
 def print_shellCmd(args):
 	log("in " + bcolors.SHELL + os.getcwd() + bcolors.ENDC + (" : %s" % (args)), method_name="shell_command")
 
-def shell_command(cmd, throw=True, output=False):
+def shell_command(cmd, throw=True, output=False, shell=False):
 	print_shellCmd(" ".join(cmd))
 	if throw:
 		if output:
 			return subprocess.check_output(cmd)
+		elif shell:
+			p = subprocess.Popen(cmd, shell=True)
+			p.wait()
 		else:
 			subprocess.check_call(cmd)
 	else:
@@ -257,19 +260,41 @@ def sizeof_fmt(num):
 		num /= 1024.0
 	return "%3.1f%s" % (num, 'TB')
 
+def get_cmake_path(prefix):
+	if is_linux():
+		return os.path.join(prefix, resolve_path(PROJECT_TMP_PATH, "cmake/bin/cmake"))
+	elif is_osx():
+		return os.path.join(prefix, resolve_path(PROJECT_TMP_PATH, "cmake/CMake.app/Contents/bin/cmake"))
+
 @command(usage="Downloads a local copy of CMake if we can't find one")
 def fetch_cmake(args):
+	cmakeUrl = ""
+	cmakePath = ""
 	if is_linux():
-		# Some of these commands need sudo
-		# just run "sudo apt-get install -y cmake"
-		pass
+		cmakeUrl = "http://www.cmake.org/files/v3.1/cmake-3.1.0-Linux-x86_64.tar.gz"
+		cmakePath = "cmake-3.1.0-Linux-x86_64"
+	elif is_osx():
+		cmakeUrl = "http://www.cmake.org/files/v3.1/cmake-3.1.0-Darwin64.tar.gz"
+		cmakePath = "cmake-3.1.0-Darwin64"
+	else:
+		raise Exception("Could not download cmake")
+
+	if not os.path.exists(resolve_path(PROJECT_TMP_PATH, "cmake")):
+		# glfw head requires a newer version of cmake then travis has so I need to download it myself
+		# download  to tmp/cmake-3.1.0-Linux-x86_64.tar.gz
+		# extract the downloaded file to tmp/cmake-3.1.0-Linux-x86_64
+		# rename the extracted folder to tmp/cmake
+		shell_command(["curl", cmakeUrl, "-o", resolve_path(PROJECT_TMP_PATH, "cmake.tar.gz")])
+		shell_command(["tar", "xf", resolve_path(PROJECT_TMP_PATH, "cmake.tar.gz")])
+		shell_command(["mv", resolve_path(PROJECT_ROOT, cmakePath),
+			resolve_path(PROJECT_TMP_PATH, "cmake")])
 
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def build_glfw3(args):
 	os.chdir(resolve_path(PROJECT_ROOT, "third_party/glfw"))
 	
 	shell_command([
-			"cmake",
+			get_cmake_path("../.."),
 			"-Wno-dev",
 			"-DGLFW_BUILD_EXAMPLES:BOOL=OFF",
 			"-DGLFW_BUILD_TESTS:BOOL=OFF",
