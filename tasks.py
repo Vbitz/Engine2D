@@ -397,7 +397,8 @@ def gyp(args):
 
 @command(requires=["gyp"], usage="Open the platform specific IDE")
 def ide(args):
-	log("Opening IDE")
+	if is_osx():
+		shell_command(["open", "engine2D.xcodeproj"]);
 
 @command(usage="Generates Script Bindings")
 def gen_bindings(args):
