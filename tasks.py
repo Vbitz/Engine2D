@@ -524,7 +524,7 @@ def build_addon(args):
 
 @command(requires=[], usage="Builds addons")
 def build_addons(args):
-	if is_osx() or is_linux():
+	if is_osx():
 		if not ensure_file_hash(["src/Modules/JSUnsafe.cpp"]):
 			log("building res/modules/js_unsafe" + get_lib_postfix())
 			store_file_hash(["src/Modules/JSUnsafe.cpp"])
