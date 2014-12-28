@@ -13,7 +13,7 @@ def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 		outputFilename = "addon." + tasks.get_lib_postfix()
 	if addedArgs == None:
 		addedArgs = []
-	args = ["clang++", "-dynamiclib", "-std=gnu++11",
+	args = ["clang++", "-dynamiclib", "-std=gnu++11", "-D_FORTIFY_SOURCE=2", "-pthread", "-fPIC",
 		"-stdlib=libc++", "-lengine2D", "-L" + tasks.resolve_path(tasks.PROJECT_BUILD_PATH, ""), "-o", outputFilename]
 	args += ["-D_BUILD_UUID=\"" + str(uuid.uuid4()) + "\""]
 	if link_v8:
