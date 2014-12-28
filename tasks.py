@@ -106,11 +106,14 @@ def get_exe_name():
 	if is_linux() or is_osx():
 		return "engine2D"
 
-def get_lib_name():
+def get_lib_postfix():
 	if is_osx():
-		return "libengine2D.dylib"
+		return ".dylib"
 	elif is_linux():
-		return "libengine2D.so"
+		return ".so"
+
+def get_lib_name():
+	return "libengine2D" + get_lib_postfix();
 
 def resolve_path(base, path=""):
 	if base == PROJECT_ROOT:
@@ -516,18 +519,18 @@ def ccov(args):
 def build_addon(args):
 	if len(args) < 4:
 		log("usage: ./tasks.py build_addon <cFile> <outputFilename>")
-	if is_osx():
+	if is_osx() or is_linux():
 		buildAddon.compile([args[2]], args[3], link_v8=True)
 
 @command(requires=[], usage="Builds addons")
 def build_addons(args):
-	if is_osx():
+	if is_osx() or is_linux():
 		if not ensure_file_hash(["src/Modules/JSUnsafe.cpp"]):
-			log("building res/modules/js_unsafe.dylib")
+			log("building res/modules/js_unsafe" + get_lib_postfix())
 			store_file_hash(["src/Modules/JSUnsafe.cpp"])
-			buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe.dylib", link_v8=True)
+			buildAddon.compile(["src/Modules/JSUnsafe.cpp"], "res/modules/js_unsafe" + get_lib_postfix(), link_v8=True)
 		else:
-			log("skipping res/modules/js_unsafe.dylib")
+			log("skipping res/modules/js_unsafe" + get_lib_postfix())
 
 @command(requires=["build_bin", "build_addons", "build_content"], usage="Copy's support files to the build path")
 def build_env(args):

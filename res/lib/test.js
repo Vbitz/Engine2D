@@ -59,7 +59,7 @@ var tests = {
 		return testDb2.execPrepare("SELECT * FROM testing2")[0].t1 === "hello world";
 	},
 	"Unsafe": function () {
-		if (!sys.runFile("modules/js_unsafe.dylib", false)) {
+		if (!sys.runFile("modules/js_unsafe" + sys.dylinkPostfix, false)) {
 			return false; // If we can't load the module then fail the test
 		}
 

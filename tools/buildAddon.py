@@ -10,22 +10,23 @@ import tasks
 
 def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 	if outputFilename == None:
-		outputFilename = "addon.dylib"
+		outputFilename = "addon." + tasks.get_lib_postfix()
 	if addedArgs == None:
 		addedArgs = []
 	args = ["clang++", "-dynamiclib", "-std=gnu++11",
-		"-stdlib=libc++", "-lengine2D", "-Lbuild/Default", "-o", outputFilename]
+		"-stdlib=libc++", "-lengine2D", "-L" + tasks.resolvePath(PROJECT_BUILD_PATH, ""), "-o", outputFilename]
 	args += ["-D_BUILD_UUID=\"" + str(uuid.uuid4()) + "\""]
 	if link_v8:
 		args += ["-lv8", "-Ithird_party/v8"]
 	args += addedArgs
 	args += sources
 	tasks.shell_command(args)
-	tasks.shell_command(["install_name_tool", "-change", "/usr/local/lib/libengine2D.dylib",
-		"@executable_path/libengine2D.dylib", outputFilename])
-	if link_v8:
-		tasks.shell_command(["install_name_tool", "-change", "/usr/local/lib/libv8.dylib",
-			"@executable_path/libv8.dylib", outputFilename])
+	if tasks.is_osx():
+		tasks.shell_command(["install_name_tool", "-change", "/usr/local/lib/libengine2D.dylib",
+			"@executable_path/libengine2D.dylib", outputFilename])
+		if link_v8:
+			tasks.shell_command(["install_name_tool", "-change", "/usr/local/lib/libv8.dylib",
+				"@executable_path/libv8.dylib", outputFilename])
 
 def main(args):
 	parser = argparse.ArgumentParser(description='Build script for Engine2D addons')

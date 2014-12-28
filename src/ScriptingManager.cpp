@@ -416,6 +416,7 @@ namespace Engine {
             
             f.FillTemplate(sysTable, {
                 {FTT_Static, "platform", f.NewString(_PLATFORM)},
+                {FTT_Static, "dylinkPostfix", f.NewString(_PLATFORM_DYLINK)},
                 {FTT_Static, "devMode", f.NewBoolean(GetAppSingilton()->IsDeveloperMode())},
                 {FTT_Static, "debugMode", f.NewBoolean(GetAppSingilton()->IsDebugMode())},
                 {FTT_Static, "headlessMode", f.NewBoolean(GetAppSingilton()->IsHeadlessMode())},
