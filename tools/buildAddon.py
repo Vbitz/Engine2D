@@ -14,7 +14,7 @@ def compile(sources, outputFilename, link_v8=False, addedArgs=[]):
 	if addedArgs == None:
 		addedArgs = []
 	args = ["clang++", "-dynamiclib", "-std=gnu++11",
-		"-stdlib=libc++", "-lengine2D", "-L" + tasks.resolvePath(PROJECT_BUILD_PATH, ""), "-o", outputFilename]
+		"-stdlib=libc++", "-lengine2D", "-L" + tasks.resolve_path(PROJECT_BUILD_PATH, ""), "-o", outputFilename]
 	args += ["-D_BUILD_UUID=\"" + str(uuid.uuid4()) + "\""]
 	if link_v8:
 		args += ["-lv8", "-Ithird_party/v8"]
