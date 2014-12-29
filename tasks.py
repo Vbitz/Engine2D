@@ -222,7 +222,7 @@ def copy_glob(srcGlob, targetPath):
 
 def get_arch():
 	machine = platform.machine()
-	if machine == "AMD64":
+	if machine == "AMD64" or machine == "x86_64":
 		return "x64"
 	else:
 		raise Exception("Bad machine type: " + machine)
