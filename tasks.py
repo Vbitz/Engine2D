@@ -33,6 +33,8 @@ import multiprocessing
 import glob
 import json
 import struct
+import platform
+import urllib2
 
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -50,6 +52,8 @@ PROJECT_TMP_PATH = 3
 CTAGS_PATH = "/usr/local/bin/ctags" # installed with "brew install ctags"
 GCOV_PATH = "/usr/local/bin/gcov-4.2" # installed with "brew install gcc"
 CPPCHECK_PATH = "/usr/local/bin/cppcheck" # installed with "brew install cppcheck"
+MSBUILD_PATH = r'C:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe'
+DEVENV_PATH = r"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.com"
 
 WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw")
 ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
@@ -57,12 +61,34 @@ PROFILER = os.getenv("ENGINE_PROFILER", "off")
 
 commands = {}
 
-class bcolors:
-	LOGSRC = '\x1b[0;42m\x1b[1;91m'
-	HEADER = '\x1b[0;44m\x1b[1;91m'
-	SHELL = '\x1b[0;32m'
-	ENDC = '\033[0m'
+def is_linux():
+	return sys.platform == "linux2"
 
+def is_osx():
+	return sys.platform == "darwin"
+
+def is_unix():
+	return is_linux() or is_osx()
+	
+def is_windows():
+	return sys.platform == "win32"
+
+class bcolors:
+	LOGSRC = ""
+	HEADER = ""
+	SHELL = ""
+	ENDC = ""
+
+def initColors():
+	if is_windows():
+		return
+	bcolors.LOGSRC = "\x1b[0;42m\x1b[1;91m"
+	bcolors.HEADER = "\x1b[0;44m\x1b[1;91m"
+	bcolors.SHELL = "\x1b[0;32m"
+	bcolors.ENDC = "\033[0m"
+
+initColors()
+		
 def noop():
 	return True
 
@@ -93,15 +119,6 @@ def log(*args, **kwargs):
 	else:
 		print("%s %s" % (bcolors.LOGSRC + "[" + method_name + "]" + bcolors.ENDC, " ".join(newArgs)))
 
-def is_linux():
-	return sys.platform == "linux2"
-
-def is_osx():
-	return sys.platform == "darwin"
-
-def is_windows():
-	return sys.platform == "win32"
-
 def get_exe_name():
 	if is_linux() or is_osx():
 		return "engine2D"
@@ -111,6 +128,8 @@ def get_lib_postfix():
 		return ".dylib"
 	elif is_linux():
 		return ".so"
+	elif is_windows():
+		return ".dll"
 
 def get_lib_name():
 	return "libengine2D" + get_lib_postfix();
@@ -178,16 +197,35 @@ def get_file_content(filename):
 def get_filename_hash(filename):
 	return get_hash(get_file_content(filename))
 
+def path_exists(path):
+	return os.path.exists(path)
+
 def ensure_dir(path):
-	if not os.path.exists(path):
+	if not path_exists(path):
 		os.makedirs(path)
 
+def copy_file(src, target):
+	log("copying %s to %s", src, target)
+	shutil.copy(src, target)
+
+def copy_folder(src, target):
+	log("copying %s to %s", src, target)
+	shutil.copytree(src, target)
+
+def move_folder(src, target):
+	log("moving %s to %s", src, target)
+	shutil.move(src, target)
+
+def copy_glob(srcGlob, targetPath):
+	for f in glob.glob(srcGlob):
+		copy_file(f, targetPath)
+
 def get_arch():
-	# TODO: Handle ARM
-	if 8 * struct.calcsize("P") == 64:
+	machine = platform.machine()
+	if machine == "AMD64":
 		return "x64"
 	else:
-		return "x86"
+		raise Exception("Bad machine type: " + machine)
 
 def get_max_jobs():
 	return multiprocessing.cpu_count()
@@ -263,34 +301,72 @@ def sizeof_fmt(num):
 		num /= 1024.0
 	return "%3.1f%s" % (num, 'TB')
 
+def download_file(url, target):
+	if is_linux() or is_osx():
+		shell_command(["curl", url, "-o", target])
+	elif is_windows():
+		u = urllib2.urlopen(url)
+		f = open(target, 'wb')
+		meta = u.info()
+		file_size = int(meta.getheaders("Content-Length")[0])
+		print "Downloading: %s Bytes: %s" % (target, file_size)
+
+		file_size_dl = 0
+		block_sz = 8192
+		while True:
+			buffer = u.read(block_sz)
+			if not buffer:
+				break
+			file_size_dl += len(buffer)
+			f.write(buffer)
+
+		f.close()
+	
 def get_cmake_path(prefix):
 	if is_linux():
 		return os.path.join(prefix, resolve_path(PROJECT_TMP_PATH, "cmake/bin/cmake"))
 	elif is_osx():
 		return os.path.join(prefix, resolve_path(PROJECT_TMP_PATH, "cmake/CMake.app/Contents/bin/cmake"))
+	elif is_windows():
+		return os.path.join(prefix, resolve_path(PROJECT_TMP_PATH, "cmake/bin/cmake.exe"))
+
+def get_python_exe():
+	return sys.executable
 
 @command(usage="Downloads a local copy of CMake if we can't find one")
 def fetch_cmake(args):
 	cmakeUrl = ""
 	cmakePath = ""
+	targetFile = ""
 	if is_linux():
 		cmakeUrl = "http://www.cmake.org/files/v3.1/cmake-3.1.0-Linux-x86_64.tar.gz"
 		cmakePath = "cmake-3.1.0-Linux-x86_64"
+		targetFile = "cmake.tar.gz"
 	elif is_osx():
 		cmakeUrl = "http://www.cmake.org/files/v3.1/cmake-3.1.0-Darwin64.tar.gz"
 		cmakePath = "cmake-3.1.0-Darwin64"
+		targetFile = "cmake.tar.gz"
+	elif is_windows():
+		cmakeUrl = "http://www.cmake.org/files/v3.1/cmake-3.1.0-win32-x86.zip"
+		cmakePath = "cmake-3.1.0-win32-x86"
+		targetFile = "cmake.zip"
 	else:
 		raise Exception("Could not download cmake")
 
-	if not os.path.exists(resolve_path(PROJECT_TMP_PATH, "cmake")):
+	targetFile = resolve_path(PROJECT_TMP_PATH, targetFile)
+
+	if not path_exists(resolve_path(PROJECT_TMP_PATH, "cmake")):
 		# glfw head requires a newer version of cmake then travis has so I need to download it myself
-		# download  to tmp/cmake-3.1.0-Linux-x86_64.tar.gz
-		# extract the downloaded file to tmp/cmake-3.1.0-Linux-x86_64
-		# rename the extracted folder to tmp/cmake
-		shell_command(["curl", cmakeUrl, "-o", resolve_path(PROJECT_TMP_PATH, "cmake.tar.gz")])
-		shell_command(["tar", "xf", resolve_path(PROJECT_TMP_PATH, "cmake.tar.gz")])
-		shell_command(["mv", resolve_path(PROJECT_ROOT, cmakePath),
-			resolve_path(PROJECT_TMP_PATH, "cmake")])
+		
+		download_file(cmakeUrl, targetFile)
+		
+		if is_windows():
+			shell_command(["unzip", "-q", targetFile])
+		else:
+			shell_command(["tar", "xf", targetFile])
+
+		move_folder(resolve_path(PROJECT_ROOT, cmakePath),
+			resolve_path(PROJECT_TMP_PATH, "cmake"))
 
 @command(requires=["fetch_cmake"], usage="Fetch and build glfw3 using cmake")
 def build_glfw3(args):
@@ -305,53 +381,58 @@ def build_glfw3(args):
 			"."
 		])
 	
-	shell_command(["make"])
-
-	glfw_glob = ""
-	if is_linux():
-		glfw_glob = "src/libglfw.so*"
-	elif is_osx():
-		glfw_glob = "src/libglfw.*dylib"
-
-	for f in glob.glob(glfw_glob):
-		log("copying %s to ../lib" % (f))
-		shutil.copy(f, "../lib")
+	if is_unix():
+		shell_command(["make"])
+	elif is_windows():
+		shell_command([MSBUILD_PATH, "ALL_BUILD.vcxproj"])
+		
+	if is_linux() or is_osx():
+		glfw_glob = ""
+		if is_linux():
+			glfw_glob = "src/libglfw.so*"
+		elif is_osx():
+			glfw_glob = "src/libglfw.*dylib"
+	
+		copy_glob(glfw_glob, "../lib")
+	elif is_windows():
+		copy_file("src/Debug/glfw3.dll", "../lib")
+		copy_file("src/Debug/glfw3dll.lib", "../lib")
 	
 	os.chdir("../..")
 
 
-# TODO: Migrate to the new v8 git repo
 @command(usage="Fetch and build V8 using GYP")
 def build_v8(args):
-	if is_windows(): # windows
-		# svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@231940 third_party/cygwin
-		# python build\gyp_v8 -Dv8_enable_i18n_support=0
-		# msbuild /p:Configuration=Release build\All.sln
-		# copy the relevent files to third_party/lib and third_party/include
-		pass
-	elif is_linux() or is_osx(): # linux/osx
+	if is_linux() or is_osx() or is_windows():
 		os.chdir(resolve_path(PROJECT_ROOT, "third_party"))
-		if not os.path.exists("v8/build/gyp"):
-			shutil.copytree("gyp", "v8/build/gyp")
-		if not os.path.exists("v8/buildtools"):
+		if not path_exists("v8/build/gyp"):
+			copy_folder("gyp", "v8/build/gyp")
+		if not path_exists("v8/buildtools"):
 			shell_command([
 				"git", "clone",
 				"https://chromium.googlesource.com/chromium/buildtools.git",
 				"v8/buildtools"])
-		if not os.path.exists("v8/tools/clang"):
+		if not path_exists("v8/tools/clang"):
 			shell_command([
 				"git", "clone",
 				"https://chromium.googlesource.com/chromium/src/tools/clang.git",
 				"v8/tools/clang"])
+		if not path_exists("v8/third_party/cygwin") and is_windows():
+			shell_command([
+				"git", "clone",
+				"https://chromium.googlesource.com/chromium/deps/cygwin.git",
+				"v8/third_party/cygwin"])
 		shell_command([
 			"python", "v8/tools/clang/scripts/update.py", "--if-needed"
 			])
 		os.chdir("v8")
 		oldPythonPath = os.getenv("PYTHONPATH", "")
 		os.environ["PYTHONPATH"] = os.getcwd() + "/tools/generate_shim_headers:" + os.getcwd() + "/build"
-		os.environ["GYP_GENERATORS"] = "make"
+		if is_unix():
+			os.environ["GYP_GENERATORS"] = "make"
 		shell_command([
-				"build/gyp/gyp",
+				get_python_exe(),
+				"build/gyp/gyp_main.py",
 				"--generator-output=out",
 				"src/d8.gyp",
 				"-Ibuild/standalone.gypi",
@@ -364,23 +445,55 @@ def build_v8(args):
 				"-Darm_float_abi=default"
 			])
 		os.environ["GYP_GENERATORS"] = ""
-		os.environ["PYTHONPATH"] = "PYTHONPATH"
-		os.chdir("out");
-		shell_command([
-				"make",
-				"-fMakefile.native",
-				"BUILDTYPE=Release",
-				"all",
-				"-j" + str(get_max_jobs())
-			])
-		os.chdir("..");
+		os.environ["PYTHONPATH"] = oldPythonPath
+		
+		if is_unix():
+			os.chdir("out");
+			shell_command([
+					"make",
+					"-fMakefile.native",
+					"BUILDTYPE=Release",
+					"all",
+					"-j" + str(get_max_jobs())
+				])
+			os.chdir("..");
+		elif is_windows():
+			# Due to a V8 bug the files for js2c are in the wrong place
+			# I could run it on my own or just copy the files to where it expects them
+			copy_file("src/macros.py", "out/src/macros.py")
+			if not path_exists("out/src/third_party"):
+				copy_folder("src/third_party", "out/src/third_party")
+				copy_glob("src/*.js", "out/src")
+			copy_file("tools/js2c.py", "out/tools/js2c.py")
+			copy_file("tools/jsmin.py", "out/tools/jsmin.py")
+			
+			oldPath = os.environ["PATH"]
+			os.environ["PATH"] = oldPath + r':C:\Python27'
+			shell_command([
+				DEVENV_PATH,
+				"/Build",
+				"Release",
+				"out\\src\\d8.native.sln"
+			], throw=False) # First one fails
+			copy_file("build\Release\mksnapshot.native.exe", "build\Release\mksnapshot.exe")
+			shell_command([
+				DEVENV_PATH,
+				"/Build",
+				"Release",
+				"out\\src\\d8.native.sln"
+			]) # Try Again
+			os.environ["PATH"] = oldPath
+			
 		if is_linux():
-			log("copying out/out/Release/lib.target/libv8.so to ../lib")
-			shutil.copy("out/out/Release/lib.target/libv8.so", "../lib/libv8.so")
+			copy_file("out/out/Release/lib.target/libv8.so", "../lib/libv8.so")
 		elif is_osx():
-			log("copying out/out/Release/libv8.dylib to ../lib")
-			shutil.copy("out/out/Release/libv8.dylib", "../lib/libv8.dylib")
+			copy_file("out/out/Release/libv8.dylib", "../lib/libv8.dylib")
+		elif is_windows():
+			copy_file("build/Release/v8.native.dll", "../lib/v8.dll")
+			copy_glob("build/Release/lib/*.lib", "../lib")
 		os.chdir("../..")
+	else:
+		raise Exception("Can't build v8 on: " + sys.platform)
 
 @command(requires=["build_glfw3", "build_v8"], usage="Fetches Build Dependences")
 def build_deps(args):
@@ -390,7 +503,8 @@ def build_deps(args):
 def gyp(args):
 	# run GYP
 	shell_command([
-			resolve_path(PROJECT_ROOT, "third_party/gyp/gyp"),
+			get_python_exe(),
+			resolve_path(PROJECT_ROOT, "third_party/gyp/gyp_main.py"),
 			"--depth=0",
 			"-DWINDOW=" + WINDOW_SYSTEM,
 			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
@@ -401,7 +515,9 @@ def gyp(args):
 @command(requires=["gyp"], usage="Open the platform specific IDE")
 def ide(args):
 	if is_osx():
-		shell_command(["open", "engine2D.xcodeproj"]);
+		shell_command(["open", "engine2D.xcodeproj"])
+	elif is_windows():
+		pass
 
 @command(usage="Generates Script Bindings")
 def gen_bindings(args):
@@ -444,8 +560,8 @@ def clean(args):
 
 def _build_bin(output=True, analyze=False, coverage=False):
 	if is_osx(): # OSX
-		shutil.copy("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"))
-		shutil.copy("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"))
+		copy_file("third_party/lib/libglfw.dylib", resolve_path(PROJECT_BUILD_PATH, "libglfw.dylib"))
+		copy_file("third_party/lib/libv8.dylib", resolve_path(PROJECT_BUILD_PATH, "libv8.dylib"))
 		xcodeArgs = ["xcodebuild", "-jobs", str(get_max_jobs())]
 		if analyze:
 			xcodeArgs += ["RUN_CLANG_STATIC_ANALYZER=YES"]
@@ -476,7 +592,13 @@ def _build_bin(output=True, analyze=False, coverage=False):
 			os.environ["LD_LIBRARY_PATH"] = "../third_party/lib/" # use resolve_path
 			shell_command("make", throw=False)
 		os.chdir("..")
-
+	elif is_windows():
+		shell_command([
+			DEVENV_PATH,
+			"/Build",
+			"Release",
+			"engine2D.sln"
+		])
 
 @command(requires=["gyp", "gen_source"], usage="Builds executables")
 def build_bin(args):
@@ -638,7 +760,7 @@ def screenshot(args):
 	reg = re.search("to \[(.*)\]", output[0])
 	filename = reg.group(0)
 	filename = filename[4:-1]
-	shutil.copyfile(filename, resolve_path(PROJECT_ROOT, "screenshot.bmp"))
+	copy_file(filename, resolve_path(PROJECT_ROOT, "screenshot.bmp"))
 
 def build_eglb(filename):
 	if not ensure_file_hash([filename]):
@@ -718,26 +840,22 @@ def release(args):
 		ensure_dir(os.path.join(outputPath, "lib"))
 		libPath = os.path.join(resolve_path(PROJECT_ROOT, "third_party"), "lib")
 		for fName in [os.path.join(libPath, "libv8.so"), os.path.join(libPath, "libglfw.so")]:
-			shutil.copyfile(fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath)))
-			log("copying %s to %s" % (fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath))))
+			copy_file(fName, os.path.join(outputPath, "lib", os.path.relpath(fName, libPath)))
 
 		for fName in ["engine2D", "libengine2D.so"]:
-			shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
-			log("copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName)))
+			copy_file(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
 			if fName == get_exe_name():
 				os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
 	else:
 		binList = [os.path.relpath(f, binPath) for f in glob.glob(os.path.join(binPath, "*"))]
 		for fName in binList:
-			shutil.copyfile(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
-			log("copying %s to %s" % (os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName)))
+			copy_file(os.path.join(binPath, fName), os.path.join(outputPath, "bin", fName))
 			if fName == get_exe_name():
 				os.chmod(os.path.join(outputPath, "bin", fName), 0o755)
 
 	for fName in fileList:
 		ensure_dir(os.path.dirname(os.path.join(outputPath, fName)))
-		log("copying %s to %s" % (fName, os.path.join(outputPath, fName)))
-		shutil.copyfile(fName, os.path.join(outputPath, fName))
+		copy_file(fName, os.path.join(outputPath, fName))
 
 	log("building %s" % (outputName + ".tar.gz"))
 	shutil.make_archive(outputName, "gztar", root_dir=resolve_path(PROJECT_ROOT, "release"))
@@ -766,7 +884,7 @@ def run_command(cmdName, rawArgs):
 			run_command(cmd, rawArgs)
 
 	# finally run the command the user is interested in
-	print(bcolors.HEADER + "==== Running: %s ====" % (cmdName) + bcolors.ENDC)
+	print(bcolors.HEADER + ("==== Running: %s ====" % (cmdName)) + bcolors.ENDC)
 	commands[cmdName](rawArgs)
 	commands[cmdName].run = True
 
