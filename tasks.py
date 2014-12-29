@@ -205,15 +205,15 @@ def ensure_dir(path):
 		os.makedirs(path)
 
 def copy_file(src, target):
-	log("copying %s to %s", src, target)
+	log("copying %s to %s" % (src, target))
 	shutil.copy(src, target)
 
 def copy_folder(src, target):
-	log("copying %s to %s", src, target)
+	log("copying %s to %s" % (src, target))
 	shutil.copytree(src, target)
 
 def move_folder(src, target):
-	log("moving %s to %s", src, target)
+	log("moving %s to %s" % (src, target))
 	shutil.move(src, target)
 
 def copy_glob(srcGlob, targetPath):
@@ -309,16 +309,16 @@ def download_file(url, target):
 		f = open(target, 'wb')
 		meta = u.info()
 		file_size = int(meta.getheaders("Content-Length")[0])
-		print "Downloading: %s Bytes: %s" % (target, file_size)
+		print "Downloading: %s %s" % (target, sizeof_fmt(file_size))
 
 		file_size_dl = 0
 		block_sz = 8192
 		while True:
-			buffer = u.read(block_sz)
-			if not buffer:
+			buff = u.read(block_sz)
+			if not buff:
 				break
-			file_size_dl += len(buffer)
-			f.write(buffer)
+			file_size_dl += len(buff)
+			f.write(buff)
 
 		f.close()
 	
