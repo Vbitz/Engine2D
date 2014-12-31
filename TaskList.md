@@ -19,9 +19,9 @@ Most of these come from my internal task list so don't take this as final.
 	- This is one of the main memory issues right now
 - Add Missing Textures
 - Report to Windows
-	- Stub Out Platform_win.cpp
-	- Fix linking issues and install library's
-	- Implement Platform_win.cpp
+	- **DONE** Stub Out Platform_win.cpp
+	- **DONE** Fix linking issues and install library's
+	- **DONE** Implement Platform_win.cpp
 	- Fix Runtime Bugs
 	- Commit back to upstream
 	- Add console color support to windows
@@ -82,7 +82,10 @@ Most of these come from my internal task list so don't take this as final.
 		- Most of these will be removed with the shift away from the old binding models
 	- Add support for other Engines
 		- LuaJit
+			- Likely to become a included by default platform
 		- Python
+		- Java ??
+			- Useful for android maybe
 		- C# ??
 			- With Microsoft's recent changes this could be done with their API
 - Networking
