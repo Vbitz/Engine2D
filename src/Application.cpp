@@ -157,7 +157,7 @@ namespace Engine {
         Config::SetBoolean( "core.script.autoReload",               this->_developerMode);
 #ifdef _PLATFORM_WIN32
         Config::SetBoolean( "core.script.gcOnFrame",                false);
-#elif
+#else
 		Config::SetBoolean( "core.script.gcOnFrame",				this->_developerMode);
 #endif
         Config::SetString(  "core.script.loader",                   "lib/boot.js");
