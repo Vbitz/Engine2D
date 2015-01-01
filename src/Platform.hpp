@@ -24,20 +24,17 @@
 #include <string>
 #include <vector>
 
+#include <stdint.h>
 #include <assert.h>
 
 #include "stdlib.hpp"
 
-#ifndef FARPROC
-typedef void* (*FARPROC)(void);
-#endif
-
 typedef void* (*ThreadMethod)(void*);
+
+typedef void* (*ENGINE_FARPROC)(void);
 
 // system includes
 #ifdef _WIN32
-#include <sys\timeb.h>
-#include <Windows.h>
 #define _PLATFORM "Windows"
 #define _PLATFORM_DYLINK ".dll"
 #define _PLATFORM_WIN32
@@ -77,8 +74,8 @@ namespace Engine {
             
             virtual bool IsValid() { return false; }
             
-            virtual FARPROC GetMethod(std::string name) { return NULL; }
-            virtual bool CallMethod(std::string name) { return 2; }
+			virtual ENGINE_FARPROC GetMethod(std::string name) { return NULL; }
+            virtual bool CallMethod(std::string name) { return true; }
             
             virtual std::vector<std::string> GetExportedMethods() {
                 return std::vector<std::string>();

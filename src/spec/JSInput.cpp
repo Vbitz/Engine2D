@@ -21,6 +21,8 @@
 
 #include "../JSInput.hpp"
 
+#include "../Platform.hpp"
+
 #include <string.h>
 
 #include "../Application.hpp"
@@ -34,7 +36,11 @@ namespace Engine {
             char *newstr, *p;
             p = newstr = strdup(str);
             while(*p++ != 0x00) {
-                *p = std::toupper(*p);
+#ifdef _PLATFORM_WIN32
+				*p = toupper(*p);
+#else 
+				*p = std::toupper(*p);
+#endif
             }
             return newstr;
         }

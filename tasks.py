@@ -82,9 +82,9 @@ class bcolors:
 def initColors():
 	if is_windows():
 		return
-	bcolors.LOGSRC = "\x1b[0;42m\x1b[1;91m"
-	bcolors.HEADER = "\x1b[0;44m\x1b[1;91m"
-	bcolors.SHELL = "\x1b[0;32m"
+	bcolors.LOGSRC = "\033[0;42m\033[1;91m"
+	bcolors.HEADER = "\033[0;44m\033[1;91m"
+	bcolors.SHELL = "\033[0;32m"
 	bcolors.ENDC = "\033[0m"
 
 initColors()
@@ -122,6 +122,8 @@ def log(*args, **kwargs):
 def get_exe_name():
 	if is_linux() or is_osx():
 		return "engine2D"
+	elif is_windows():
+		return "engine2D.exe"
 
 def get_lib_postfix():
 	if is_osx():
@@ -144,6 +146,8 @@ def resolve_path(base, path=""):
 			return os.path.join(resolve_path(PROJECT_ROOT, "build/Default"), path)
 		elif is_linux():
 			return os.path.join(resolve_path(PROJECT_ROOT, "0/out/Default"), path)
+		elif is_windows():
+			return os.path.join(resolve_path(PROJECT_ROOT, "bin"), path)
 	elif base == PROJECT_TMP_PATH:
 		return os.path.join(resolve_path(PROJECT_ROOT, "tmp"), path)
 	else:
@@ -509,6 +513,7 @@ def gyp(args):
 			"-DWINDOW=" + WINDOW_SYSTEM,
 			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
 			"-DPROFILER=" + PROFILER,
+			"-Dtarget_arch=" + get_arch(),
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
 		])
 
@@ -594,11 +599,15 @@ def _build_bin(output=True, analyze=False, coverage=False):
 		os.chdir("..")
 	elif is_windows():
 		shell_command([
-			DEVENV_PATH,
-			"/Build",
-			"Release",
+			MSBUILD_PATH,
 			"engine2D.sln"
 		])
+		binFolder = resolve_path(PROJECT_ROOT, "bin")
+		ensure_dir(resolve_path(PROJECT_ROOT, "bin"))
+		copy_file("third_party/lib/glfw3.dll", binFolder + "/glfw3.dll")
+		copy_file("third_party/lib/v8.dll", binFolder + "/v8.native.dll")
+		copy_file("Default/libengine2D.dll", binFolder)
+		copy_file("Default/engine2D.exe", binFolder)
 
 @command(requires=["gyp", "gen_source"], usage="Builds executables")
 def build_bin(args):

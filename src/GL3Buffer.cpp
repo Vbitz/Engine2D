@@ -154,11 +154,7 @@ namespace Engine {
     }
     
     void VertexBuffer::AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv) {
-        this->_vertexBuffer.push_back(BufferFormat({
-            .pos = pos,
-            .col = col,
-            .uv = uv
-        }));
+		this->_vertexBuffer.push_back(BufferFormat(pos, col, uv));
         this->_indexBuffer.push_back(this->_vertexCount);
         this->_vertexCount++;
         this->_dirty = true;
@@ -266,7 +262,12 @@ namespace Engine {
         unsigned char* buff = NULL;
         long fileLength = 0;
         
+		// Anoying VS
         VertexBufferDiskFormat header;
+		header.magic[0] = 'E';
+		header.magic[1] = 'G';
+		header.magic[2] = 'L';
+		header.magic[3] = 'B';
         
         fileLength += sizeof(VertexBufferDiskFormat);
         

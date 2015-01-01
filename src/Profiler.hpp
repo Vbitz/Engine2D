@@ -29,9 +29,15 @@
 #include "Platform.hpp"
 #include "vendor/json/json.h"
 
+#ifdef _PLATFORM_WIN32
+#define ENGINE_FUNC __FUNCSIG__
+#else
+#define ENGINE_FUNC __PRETTY_FUNCTION__
+#endif
+
 #ifdef PROFILER
-#define ENGINE_PROFILER_SCOPE Engine::Profiler::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__)
-#define ENGINE_PROFILER_SCOPE_EX(str) Engine::Profiler::Scope __PROFILER_SCOPE__(__PRETTY_FUNCTION__, str)
+#define ENGINE_PROFILER_SCOPE Engine::Profiler::Scope __PROFILER_SCOPE__(ENGINE_FUNC)
+#define ENGINE_PROFILER_SCOPE_EX(str) Engine::Profiler::Scope __PROFILER_SCOPE__(ENGINE_FUNC, str)
 #else
 #define ENGINE_PROFILER_SCOPE
 #define ENGINE_PROFILER_SCOPE_EX

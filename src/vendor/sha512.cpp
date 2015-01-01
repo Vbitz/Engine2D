@@ -114,7 +114,7 @@ void sha_init(sha512_state& md)
 
 void sha_process(sha512_state& md, const void* src, u32 inlen)
 {
-    const u32 block_size = sizeof(sha512_state::buf);
+    const u32 block_size = 128;
     auto in = static_cast<const unsigned char*>(src);
 
     while(inlen > 0)

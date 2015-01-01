@@ -35,16 +35,19 @@ namespace Engine {
      (u, v)         TexCourd
      */
     
-#pragma pack(0)
+#pragma pack(push, 1)
     struct BufferFormat {
+		BufferFormat(glm::vec3 pos, Color4f col, glm::vec2 uv) : pos(pos), col(col), uv(uv) {}
+
         glm::vec3 pos;
         Color4f col;
         glm::vec2 uv;
     };
+#pragma pack(pop)
     
     // .eglb format
     struct VertexBufferDiskFormat {
-        unsigned char magic[4] = {'E', 'G', 'L', 'B'};
+        unsigned char magic[4];
         
         unsigned int vertexOffset;
         unsigned int vertexCount;

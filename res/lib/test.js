@@ -239,8 +239,8 @@ var tests = {
 			new Math.Vector(10, 10, 10));
 			
 		return true;
-	},
-	"Package": function () {
+	}
+	/*,"Package": function () {
 		var pkg = new sys.Package("testing_output.epkg");
 
 		if (!pkg.fileExists("test.js")) {
@@ -252,7 +252,7 @@ var tests = {
 		console.log("res://testing_output.epkg/test.js length=" + str.length);
 
 		return str.length > 0;
-	}
+	}*/
 };
 
 var testResults = {};

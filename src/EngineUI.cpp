@@ -511,7 +511,7 @@ namespace Engine {
 #ifndef _PLATFORM_WIN32
                 this->_currentConsoleInput << (char) (shift ? getSpecialChars(key) : (char) std::tolower(key));
 #else
-                currentConsoleInput << (char) (shift ? getSpecialChars(key) : tolower(key));
+                this->_currentConsoleInput << (char) (shift ? getSpecialChars(key) : tolower(key));
 #endif
             } else if (key == Key_Backspace && (press == Key_Press || press == Key_Repeat)) {
                 std::string str = this->_currentConsoleInput.str();

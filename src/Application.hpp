@@ -38,8 +38,6 @@
 
 #define ENGINE_ASSERT(value, msg) GetAppSingilton()->Assert(value, msg, __FILE__, __LINE__)
 
-extern "C" int EngineMain(int argc, char const *argv[]);
-
 namespace Engine {
     bool HasGLContext();
     
@@ -116,11 +114,16 @@ namespace Engine {
         
     private:
         struct RawScriptInfo {
+			RawScriptInfo(const char* filename_str, size_t filename_len) : filename_str(filename_str), filename_len(filename_len) {}
+
             const char* filename_str;
             size_t filename_len;
         };
         
-        struct ScriptInfo {
+		struct ScriptInfo {
+			ScriptInfo() : filename("") {}
+			ScriptInfo(std::string filename) : filename(filename) {}
+
             std::string filename;
         };
         

@@ -44,8 +44,6 @@
 
 #include "EngineUI.hpp"
 
-#include <pthread.h>
-
 #include "Build.hpp"
 
 namespace Engine {
@@ -157,7 +155,11 @@ namespace Engine {
         
         // Script
         Config::SetBoolean( "core.script.autoReload",               this->_developerMode);
-        Config::SetBoolean( "core.script.gcOnFrame",                this->_developerMode);
+#ifdef _PLATFORM_WIN32
+        Config::SetBoolean( "core.script.gcOnFrame",                false);
+#elif
+		Config::SetBoolean( "core.script.gcOnFrame",				this->_developerMode);
+#endif
         Config::SetString(  "core.script.loader",                   "lib/boot.js");
         Config::SetString(  "core.script.entryPoint",               "script/basic");
 
@@ -600,10 +602,7 @@ namespace Engine {
     }
     
     void Application::AddScript(const char* filename_str, size_t filename_len) {
-        this->_pendingScripts.push({
-            .filename_str = filename_str,
-            .filename_len = filename_len
-        });
+		this->_pendingScripts.push(RawScriptInfo(filename_str, filename_len ));
     }
     
     void Application::DumpScripts() {
@@ -669,9 +668,7 @@ namespace Engine {
                         // update infomation
                     } else {
                         // add new
-                        this->_scripts[filename] = {
-                            .filename = filename
-                        };
+                        this->_scripts[filename] = ScriptInfo(filename);
                     }
                 }
             }
@@ -719,7 +716,7 @@ namespace Engine {
             GetEventsSingilton()->PollDeferedMessages(); // Events from other threads will run here by default, Javascript may run at this time
             this->_processScripts();
             
-            this->_scripting->CheckUpdate();
+			this->_scripting->CheckUpdate();
             
             this->_updateFrameTime();
             
@@ -730,7 +727,7 @@ namespace Engine {
             render->Clear();
             
             FramePerfMonitor::BeginDraw();
-            {
+			{
                 Engine::Profiler::Scope profilerScopeDraw("DrawScope");
             
                 render->Begin2d();
@@ -750,13 +747,13 @@ namespace Engine {
             
                 render->End2d();
                 
-                profilerScopeDraw.Close();
+				profilerScopeDraw.Close();
             }
             FramePerfMonitor::EndDraw();
-            
+
             this->_window->Present();
             
-            GetEventsSingilton()->GetEvent("endOfFrame")->Emit();
+			GetEventsSingilton()->GetEvent("endOfFrame")->Emit();
             
 			if (this->_window->ShouldClose()) {
 				Logger::begin("Window", Logger::LogLevel_Log) << "Exiting" << Logger::end();
@@ -768,7 +765,7 @@ namespace Engine {
             
             if (Config::GetBoolean("core.script.gcOnFrame")) {
                 this->GetScriptingContext()->TriggerGC();
-            }
+			}
             
             GetEventsSingilton()->PollDeferedMessages("toggleFullscreen");
             GetEventsSingilton()->PollDeferedMessages("restartRenderer");
@@ -964,6 +961,11 @@ namespace Engine {
 	
 } // namespace Engine
 
-extern "C" int EngineMain(int argc, char const *argv[]) {
+#ifdef _PLATFORM_WIN32
+extern "C" _declspec(dllexport)
+#else
+extern "C"
+#endif
+int EngineMain(int argc, char const *argv[]) {
     return Engine::GetAppSingilton()->Start(argc, argv);
 }

@@ -240,8 +240,8 @@ namespace Engine {
         }
         
         bool ShouldClose() override {
-            assert(this->_window != NULL);
-            return glfwWindowShouldClose(this->_window);
+			assert(this->_window != NULL);
+			return glfwWindowShouldClose(this->_window);
         }
         
         void WaitEvents() override {
@@ -374,6 +374,8 @@ namespace Engine {
             
             val["width"] = width;
             val["height"] = height;
+
+			glViewport(0, 0, width, height);
             
             GetEventsSingilton()->GetEvent("rawResize")->Emit(val);
         }

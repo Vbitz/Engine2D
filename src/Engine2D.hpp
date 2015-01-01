@@ -21,7 +21,23 @@
 
 #pragma once
 
-#define ENGINE_CONSTRUCTOR __attribute__((constructor))
+#ifdef _MSC_VER
+
+#define CCALL __cdecl
+#pragma section(".CRT$XCU",read)
+#define INITIALIZER(f) \
+   static void __cdecl f(void); \
+   __declspec(allocate(".CRT$XCU")) void (__cdecl*f##_)(void) = f; \
+   static void __cdecl f(void)
+
+#elif defined(__GNUC__)
+
+#define CCALL
+#define INITIALIZER(f) \
+   static void f(void) __attribute__((constructor)); \
+   static void f(void)
+
+#endif
 
 #ifndef _BUILD_UUID
 #define _BUILD_UUID "INTERNAL_ADDON"
@@ -52,7 +68,11 @@ namespace Engine {
 }
     
 extern "C" {
+#ifndef _WIN32
     __attribute__ ((visibility("default"))) void RegisterCAddon(Engine::AddonSpec spec);
+#else
+	__declspec(dllexport) void RegisterCAddon(Engine::AddonSpec spec);
+#endif
 }
 
 #define ENGINE_ADDON(Name, Author, Startup, Shutdown, LoadOrder) \
@@ -66,7 +86,8 @@ namespace { \
         LoadOrder \
     }; \
 \
-    ENGINE_CONSTRUCTOR void Addon_Init() { \
+    INITIALIZER(Addon_Init); \
+	void Addon_Init() { \
         Engine::RegisterAddon(Addon); \
     } \
 }

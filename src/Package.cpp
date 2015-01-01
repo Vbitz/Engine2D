@@ -11,17 +11,17 @@ namespace Engine {
     const PackageFileFlags Package::CompressedFileFlags = PackageFileFlags(PackageFileCompressionType::DeflateCompression);
     
     uint32_t localOffsetToRegion(uint32_t localOffset) {
-        uint32_t rem = abs(localOffset) % PACKAGE_REGION_SIZE;
+        uint32_t rem = abs((int) localOffset) % PACKAGE_REGION_SIZE;
         if (rem == 0) return localOffset;
         return localOffset + (PACKAGE_REGION_SIZE - rem) - PACKAGE_REGION_SIZE;
     }
     
     uint32_t localOffsetToRegionOffset(uint32_t localOffset) {
-        return abs(localOffset) % PACKAGE_REGION_SIZE;
+		return abs((int)localOffset) % PACKAGE_REGION_SIZE;
     }
     
     uint32_t roundSizeToRegionSize(uint32_t dataSize) {
-        uint32_t rem = abs(dataSize) % PACKAGE_REGION_SIZE;
+        uint32_t rem = abs((int) dataSize) % PACKAGE_REGION_SIZE;
         if (rem == 0) return dataSize;
         return dataSize + (PACKAGE_REGION_SIZE - rem);
     }
@@ -47,7 +47,7 @@ namespace Engine {
         if (flags.compression == PackageFileCompressionType::DeflateCompression) {
             size_t destLength = compressBound(contentLength);
             uint8_t *dest = new uint8_t[destLength];
-            int err = compress(dest, &destLength, compressedContent, compressedContentLength);
+            int err = compress(dest, (uLongf*) &destLength, compressedContent, compressedContentLength);
             if (err != Z_OK) {
                 // compress failed
                 throw "Compress Failed";
@@ -145,7 +145,7 @@ namespace Engine {
         } else {
             size_t decompressedFileSize = fileHeader->decompressedSize;
             uint8_t* decompressedFileData = new uint8_t[decompressedFileSize];
-            int err = uncompress(decompressedFileData, &decompressedFileSize, fileData, fileHeader->size);
+            int err = uncompress(decompressedFileData, (uLongf*) &decompressedFileSize, fileData, fileHeader->size);
             assert(decompressedFileSize == fileHeader->decompressedSize);
             delete [] fileData;
             contentLength = decompressedFileSize;

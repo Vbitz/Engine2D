@@ -249,7 +249,7 @@ namespace Engine {
             ENGINE_PROFILER_SCOPE;
             
             if (Config::GetBoolean("core.debug.debugRenderer") && glDebugMessageCallback != NULL) {
-                glDebugMessageCallback(DebugMessageCallback, NULL);
+                //glDebugMessageCallback(DebugMessageCallback, NULL);
             }
             
             std::string gl3Effect = Config::GetString("core.render.basicEffect");

@@ -28,10 +28,10 @@ namespace Engine {
      More StringChunks or PackageDiskHeader Chunks
      -------------------------------------------- End of File
      */
-    
-#pragma pack(0)
+
+#pragma pack(push, 1)
     struct PackageDiskHeader {
-        uint8_t magic[4] = {'E', 'P', 'K', 'G'};
+        uint8_t magic[4];
         uint16_t version = PACKAGE_FILE_VERSION;
         uint32_t firstFileOffset;
         
@@ -45,7 +45,10 @@ namespace Engine {
         // All regions alligned on 0x1000 (4096) bytes
         uint32_t nextRegionOffset = 0;
         uint32_t nextFileHeaderOffset;
+
+		uint64_t padding1 = 0;
     }; // length = 64 bytes
+#pragma pack(pop)
     
     static_assert(sizeof(PackageDiskHeader) == 64, "For alignment the size of PackageDiskHeader must equal 64");
     
@@ -57,21 +60,26 @@ namespace Engine {
     enum class PackageFileEncryptionType : uint8_t {
         NoEncryption = 0x00
     };
-    
-#pragma pack(0)
+
+#pragma pack(push, 1)
     struct PackageFileFlags {
-        PackageFileCompressionType compression = PackageFileCompressionType::NoCompression;
+		PackageFileCompressionType compression = PackageFileCompressionType::NoCompression;
         PackageFileEncryptionType encryption = PackageFileEncryptionType::NoEncryption;
-        uint8_t padding1[2] = {0x00, 0x00};
-        uint8_t padding2[4] = {0x00, 0x00, 0x00, 0x00};
+		uint8_t padding1[2];
+        uint8_t padding2[4];
         
-        PackageFileFlags() { }
-        PackageFileFlags(PackageFileCompressionType c) : compression(c) { }
-    };
+        PackageFileFlags() {
+			memset(&padding1, NULL, sizeof(padding1) + sizeof(padding2));
+		}
+        PackageFileFlags(PackageFileCompressionType c) : compression(c) {
+			memset(&padding1, NULL, sizeof(padding1) + sizeof(padding2));
+		}
+	};
+#pragma pack(pop)
     
     static_assert(sizeof(PackageFileFlags) == 8, "For alignment the size of PackageFileFlags must equal 8");
 
-#pragma pack(0)
+#pragma pack(push, 1)
     struct PackageDiskFile {
         uint32_t magic = PACKAGE_FILE_MAGIC;
         
@@ -84,27 +92,38 @@ namespace Engine {
         uint32_t latestRevisonOffset = 0;
         uint32_t nextFileOffset = 0;
         
-        unsigned char name[96] = { 0x00 };
+        unsigned char name[96];
+
+		PackageDiskFile() {
+			memset(&name, NULL, sizeof(name));
+		}
     }; // length = 128 bytes
+#pragma pack(pop)
     
     static_assert(sizeof(PackageDiskFile) == 128, "For alignment the size of PackageDiskFile must equal 128");
-    
-#pragma pack(0)
+
+#pragma pack(push, 1)
     struct PackageDiskFileChunk {
         PackageDiskFile files[PACKAGE_FILES_PER_CHUNK];
-    };
+	};
+#pragma pack(pop)
     
     static_assert(sizeof(PackageDiskFileChunk) == PACKAGE_REGION_SIZE, "For alignment the size of PackageDiskFileChunk must equal the region size");
     
-#pragma pack(0)
+#pragma pack(push, 1)
     struct StringChunk {
         uint32_t magic = 0xCAFEBABE;
         uint32_t nextOffset = 0;
         uint16_t length = 0;
-        unsigned char content[512 - (sizeof(nextOffset) + sizeof(length) + sizeof(magic))] = { 0x00 };
+		unsigned char content[512 - (sizeof(uint32_t) + sizeof(uint16_t) + sizeof(uint32_t))];
+
+		StringChunk() {
+			memset(&content, NULL, sizeof(content));
+		}
     }; // length 512 bytes
+#pragma pack(pop)
         
-    static_assert(sizeof(StringChunk) == 512, "");
+    static_assert(sizeof(StringChunk) == 512, "Bad StringChunk Size");
         
     ENGINE_CLASS(Package);
     

@@ -11,6 +11,16 @@
 			"dependencies": ["libengine2D"],
 			"sources": [
 				"src/main.cpp"
+			],
+			
+			"conditions": [
+				['OS == "win"', {
+					'msvs_settings': {
+						'VCLinkerTool': {
+						
+						},
+					}
+				}]
 			]
 		},
 		{
@@ -162,6 +172,41 @@
 						]
 					}
 				}],
+				["OS == \"win\"", {
+					"include_dirs": [
+						"third_party/v8"
+					],
+					"library_dirs": [
+						"third_party/lib"	
+					],
+					'msvs_settings': {
+						'VCCLCompilerTool': {
+							"ObjectFile": "$(IntDir)//%(RelativeDir)/"
+						},
+						'VCLinkerTool': {
+						
+						},
+						'VCResourceCompilerTool': {
+							
+						},
+					},
+					"libraries": [
+						"kernel32.lib",
+						"user32.lib",
+						"gdi32.lib",
+						"comdlg32.lib",
+						"advapi32.lib",
+						"shell32.lib",
+						"ole32.lib",
+						"uuid.lib",
+						"glfw3dll.lib",
+						"v8.native.lib",
+						"opengl32.lib",
+						"Ws2_32.lib",
+						"winmm.lib",
+						"Rpcrt4.lib"
+					]
+				}],
 				["OS == \"linux\"", {
 					"cflags": [
 						"-fPIC"
@@ -242,6 +287,14 @@
 						"/usr/local/include/SDL2"
 					]
 				}],
+				['("<(WINDOW)" == "glfw") & (OS == "win")', {
+					'sources': [
+						"src/Window_glfw.cpp"
+					],
+					"include_dirs": [
+						"third_party/glfw/include"
+					]
+				}],
 				['("<(GPERFTOOLS)" == "on") & (OS == "mac")', {
 					"xcode_settings": {
 						"OTHER_LDFLAGS": [
@@ -256,6 +309,11 @@
 							"-DPROFILER"
 						]
 					}
+				}],
+				['("<(PROFILER)" == "on") & (OS == "win")', {
+					"defines": [
+						"PROFILER"
+					]
 				}]
 			]
 		}

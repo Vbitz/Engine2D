@@ -19,7 +19,12 @@
    limitations under the License.
 */
 
-extern "C" int EngineMain(int argc, char const *argv[]);
+#ifdef _WIN32
+extern "C" _declspec(dllimport)
+#else
+extern "C"
+#endif
+int EngineMain(int argc, char const *argv[]);
 
 int main(int argc, char const *argv[])
 {

@@ -112,6 +112,7 @@ namespace Engine {
         }
         
         // Unreachable
+		// Stupid VS
         assert(false);
     }
     

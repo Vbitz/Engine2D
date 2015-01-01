@@ -60,3 +60,14 @@ main.plist
 
 # the current generator script randomizes colors so the result is non deterministic
 res/models/*.eglb
+
+bin/
+Default/
+
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user

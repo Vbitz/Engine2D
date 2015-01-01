@@ -22,6 +22,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 #include <initializer_list>
 
 #include <type_traits>
@@ -206,10 +207,10 @@ namespace Engine {
             SHA512
         };
         
-        static uint8_t* Digest(DigestType type, const uint8_t* data, const size_t len);
-        static uint8_t* Digest(DigestType type, const std::string data);
+        static uint8_t *Digest(DigestType type, const uint8_t *data, const size_t len);
+        static uint8_t *Digest(DigestType type, const std::string data);
         
-        static std::string HexDigest(DigestType type, const uint8_t* data, const size_t len);
+        static std::string HexDigest(DigestType type, const uint8_t *data, const size_t len);
         static std::string HexDigest(DigestType type, const std::string data);
     };
 }
