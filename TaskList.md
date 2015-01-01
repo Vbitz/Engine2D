@@ -23,7 +23,13 @@ Most of these come from my internal task list so don't take this as final.
 	- **DONE** Fix linking issues and install library's
 	- **DONE** Implement Platform_win.cpp
 	- Fix Runtime Bugs
-	- Commit back to upstream
+		- Finish Memory Mapped File support
+		- Fix switch to fullscreen (Might use NSight)
+	- Profile performance
+		- I expected more of a performance gap between a GTX970 vs Intel HD 5000, there's next to none right now
+	- Release a testing version
+	- **DONE** Commit back to upstream
+	- Add CI Support with http://www.appveyor.com/
 	- Add console color support to windows
 - Port to Linux
 	- Fix Windows/OpenGL on linux
