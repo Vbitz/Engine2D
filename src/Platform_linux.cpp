@@ -75,12 +75,12 @@ namespace Engine {
                 return this->modulePointer != NULL;
             }
             
-            FARPROC GetMethod(std::string name) override {
-                return (FARPROC) dlsym(this->modulePointer, name.c_str());
+            ENGINE_FARPROC GetMethod(std::string name) override {
+                return (ENGINE_FARPROC) dlsym(this->modulePointer, name.c_str());
             }
             
             bool CallMethod(std::string name) override {
-                FARPROC m = this->GetMethod(name);
+                ENGINE_FARPROC m = this->GetMethod(name);
                 if (m != NULL) {
                     m();
                     return 0;
