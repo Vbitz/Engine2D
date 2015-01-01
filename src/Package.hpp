@@ -2,6 +2,8 @@
 
 #include "vendor/json/json.h"
 
+#include <string.h>
+
 #include "stdlib.hpp"
 #include "Platform.hpp"
 #include "Filesystem.hpp"
