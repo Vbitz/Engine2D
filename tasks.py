@@ -174,10 +174,10 @@ def shell_command(cmd, throw=True, output=False, shell=False):
 	else:
 		subprocess.call(cmd)
 
-def run_engine(args):
+def run_engine(args, throw=True):
 	if is_linux():
 		os.environ["LD_LIBRARY_PATH"] = "third_party/lib/" # TODO: use resolve_path
-	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name())] + args)
+	shell_command([resolve_path(PROJECT_BUILD_PATH, get_exe_name())] + args, throw)
 
 def run_engine_test(args, onlyHighlight=True):
 	cmdArgs = ["-test"]
@@ -670,6 +670,10 @@ def build_env(args):
 @command(requires=["build_env"], usage="Runs the engine in Development Mode")
 def run(args):
 	run_engine(["-devmode", "-debug"])
+
+@command(requires=["build_env"], usage="Runs the engine and prints out help on command line args")
+def engine_help(args):
+	run_engine(["-h"], throw=False)
 
 @command(requires=["build_env"], usage="Runs the engine in Development Mode with garbage collector tracing enabled")
 def run_gc_trace(args):
