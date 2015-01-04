@@ -476,12 +476,14 @@ def build_v8(args):
 			os.environ["PATH"] = oldPath + r':C:\Python27'
 			shell_command([
 				MSBUILD_PATH,
+				"/m",
 				"/p:Configuration=Release",
 				"out\\src\\d8.native.sln"
 			], throw=False) # First one fails
 			copy_file("build\Release\mksnapshot.native.exe", "build\Release\mksnapshot.exe")
 			shell_command([
 				MSBUILD_PATH,
+				"/m",
 				"/p:Configuration=Release",
 				"out\\src\\d8.native.sln"
 			]) # Try Again
@@ -602,6 +604,7 @@ def _build_bin(output=True, analyze=False, coverage=False):
 	elif is_windows():
 		shell_command([
 			MSBUILD_PATH,
+			"/m",
 			"engine2D.sln"
 		])
 		binFolder = resolve_path(PROJECT_ROOT, "bin")
