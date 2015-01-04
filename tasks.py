@@ -475,16 +475,14 @@ def build_v8(args):
 			oldPath = os.environ["PATH"]
 			os.environ["PATH"] = oldPath + r':C:\Python27'
 			shell_command([
-				DEVENV_PATH,
-				"/Build",
-				"Release",
+				MSBUILD_PATH,
+				"/p:Configuration=Release",
 				"out\\src\\d8.native.sln"
 			], throw=False) # First one fails
 			copy_file("build\Release\mksnapshot.native.exe", "build\Release\mksnapshot.exe")
 			shell_command([
-				DEVENV_PATH,
-				"/Build",
-				"Release",
+				MSBUILD_PATH,
+				"/p:Configuration=Release",
 				"out\\src\\d8.native.sln"
 			]) # Try Again
 			os.environ["PATH"] = oldPath
