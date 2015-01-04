@@ -58,6 +58,7 @@ DEVENV_PATH = r"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\
 WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw")
 ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
 PROFILER = os.getenv("ENGINE_PROFILER", "off")
+NO_BUILD_DEPS = os.getenv("ENGINE_NO_BUILD_DEPS", "off")
 
 commands = {}
 
@@ -499,7 +500,10 @@ def build_v8(args):
 	else:
 		raise Exception("Can't build v8 on: " + sys.platform)
 
-@command(requires=["build_glfw3", "build_v8"], usage="Fetches Build Dependences")
+def check_build_deps():
+	return NO_BUILD_DEPS != "yes"
+		
+@command(requires=["build_glfw3", "build_v8"], usage="Fetches Build Dependences", check=check_build_deps)
 def build_deps(args):
 	pass
 

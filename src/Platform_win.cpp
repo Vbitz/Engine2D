@@ -328,10 +328,13 @@ namespace Engine {
 		}
 
 		std::string GetUsername() {
-			TCHAR usernameBuff[UNLEN + 1];
-			DWORD usernameLength = 0;
-			::GetUserName(usernameBuff, &usernameLength);
-			return std::string(usernameBuff, usernameLength);
+			static TCHAR usernameBuff[UNLEN + 1];
+			DWORD usernameLength = UNLEN + 1;
+			if (!::GetUserName(usernameBuff, &usernameLength)) {
+				Logger::begin("Platform", Logger::LogLevel_Error) << "GetUserName failed with: " << ::GetLastError() << Logger::end();
+			}
+			std::cout << usernameBuff << " : " << usernameLength << std::endl;
+			return std::string((char*) usernameBuff, usernameLength);
 		}
 
 		void DumpStackTrace() {
