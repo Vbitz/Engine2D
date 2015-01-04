@@ -30,7 +30,7 @@ Most of these come from my internal task list so don't take this as final.
 	- Release a testing version
 	- **DONE** Commit back to upstream
 	- Add CI Support with http://www.appveyor.com/
-	- Add console color support to windows
+	- **DONE** Add console color support to windows
 - Port to Linux
 	- Fix Windows/OpenGL on linux
 	- Add linux release uploading to Travis

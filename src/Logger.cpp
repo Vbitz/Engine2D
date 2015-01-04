@@ -25,6 +25,11 @@
 #include "Platform.hpp"
 #include "Events.hpp"
 
+#ifdef _PLATFORM_WIN32
+#include <Windows.h>
+#undef CreateMutex
+#endif
+
 namespace Engine {
     namespace Logger {
         std::vector<LogEvent> _logEvents;
@@ -50,27 +55,53 @@ namespace Engine {
             return os.flush();
         }
         
-        std::string getEscapeCode(int color, bool bold) {
+        std::string getEscapeCode(int color, bool bold, bool bg) {
             return "\x1b[" + std::string(bold ? "1;" : "0;") + std::to_string(color + 30) + "m";
         }
         
-        std::string GetLevelColor(LogLevel level) {
+        void SetConsoleColor(bool reset, LogLevel level) {
 #ifndef _PLATFORM_WIN32
+			if (reset) {
+				std::cout << "\x1b[0;37m" << std::endl;
+			}
             switch (level) {
-                case LogLevel_Verbose:      return getEscapeCode(0, true);
-                case LogLevel_User:         return getEscapeCode(5, true);
-                case LogLevel_ConsoleInput: return getEscapeCode(6, true);
-                case LogLevel_Log:          return getEscapeCode(7, false);
-                case LogLevel_Warning:      return getEscapeCode(3, false);
-                case LogLevel_Error:        return getEscapeCode(1, true);
+				case LogLevel_Verbose:      std::cout << getEscapeCode(0, true, false);
+				case LogLevel_User:         std::cout << getEscapeCode(5, true, false);
+				case LogLevel_ConsoleInput: std::cout << getEscapeCode(6, true, false);
+				case LogLevel_Log:          std::cout << getEscapeCode(7, false, false);
+				case LogLevel_Warning:      std::cout << getEscapeCode(3, false, false);
+				case LogLevel_Error:        std::cout << getEscapeCode(1, true, false);
                 case LogLevel_Highlight:
-                case LogLevel_Toast:        return "\x1b[0;47m\x1b[1;30m";
-                case LogLevel_TestLog:      return "\x1b[0;47m\x1b[1;30m";
-                case LogLevel_TestError:    return "\x1b[0;41m\x1b[1;37m";
-				default:					return "";
+				case LogLevel_Toast:        std::cout << getEscapeCode(7, false, true) + getEscapeCode(0, true, false);
+				case LogLevel_TestLog:      std::cout << getEscapeCode(7, false, true) + getEscapeCode(0, true, false);
+				case LogLevel_TestError:    std::cout << getEscapeCode(1, false, true) + getEscapeCode(7, true, false);
+				default:					break;
             }
 #else
-			return ""; // windows is not a very sane OS
+			HANDLE hConsole = ::GetStdHandle(STD_OUTPUT_HANDLE);
+			WORD colorCode = 0;
+
+			if (reset) {
+				colorCode = 7;
+			} else {
+				switch (level) {
+				case LogLevel_Verbose:      colorCode = 0 + 8; break;
+				case LogLevel_User:         colorCode = 5 + 8; break;
+				case LogLevel_ConsoleInput: colorCode = 3 + 8; break;
+				case LogLevel_Log:          colorCode = 7; break;
+				case LogLevel_Warning:      colorCode = 6 + 8; break;
+				case LogLevel_Error:        colorCode = 4 + 8; break;
+				case LogLevel_Highlight:
+				case LogLevel_Toast:        colorCode = (16 * 7) + 0; break;
+				case LogLevel_TestLog:      colorCode = (16 * 7) + 0; break;
+				case LogLevel_TestError:    colorCode = (16 * 1) + 4 + 8; break;
+				default:					break;
+				}
+			}
+
+			if (!::SetConsoleTextAttribute(hConsole, colorCode)) {
+				std::cerr << "SetConsoleTextAttribute failed with: " << ::GetLastError() << std::endl;
+			}
 #endif
         }
         
@@ -141,7 +172,8 @@ namespace Engine {
                     logConsole = false;
                 }
             }
-            std::string colorCode = Config::GetBoolean("core.log.showColors") ? GetLevelColor(level) : "";
+
+            bool showColors = Config::GetBoolean("core.log.showColors");
             
             _logMutex->Enter();
             
@@ -166,7 +198,13 @@ namespace Engine {
                 }
 
                 if (logConsole) {
-                    std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
+					if (showColors) {
+						SetConsoleColor(false, level);
+					}
+					std::cout << newEvent.FormatConsole() << std::endl;
+					if (showColors) {
+						SetConsoleColor(true, level);
+					}
                 }
             } else {
                 std::string strCopy = str;
@@ -180,7 +218,13 @@ namespace Engine {
                     _logEvents.push_back(newEvent);
                     
                     if (logConsole) {
-                        std::cout << colorCode  << newEvent.FormatConsole() << "\x1b[0;37m" << std::endl;
+						if (showColors) {
+							SetConsoleColor(false, level);
+						}
+						std::cout << newEvent.FormatConsole() << std::endl;
+						if (showColors) {
+							SetConsoleColor(true, level);
+						}
                     }
                     
                     strCopy.erase(0, newLinePos + 1);
@@ -190,9 +234,15 @@ namespace Engine {
                 _logEvents.push_back(LogEvent(domain, level, strCopy));
                 
                 if (logConsole) {
-                    std::cout << colorCode << Platform::GetTime()
+					if (showColors) {
+						SetConsoleColor(false, level);
+					}
+                    std::cout << Platform::GetTime()
                         << " : [" << GetLevelString(level) << "] "
-                        << domain << " | " << strCopy << std::endl;
+						<< domain << " | " << strCopy << std::endl;
+					if (showColors) {
+						SetConsoleColor(true, level);
+					}
                 }
             }
             
