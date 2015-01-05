@@ -159,7 +159,7 @@
 						]
 					},
 					"include_dirs": [
-						"third_party/v8"
+						"third_party/include"
 					],
 					"library_dirs": [
 						"third_party/lib"	
@@ -174,7 +174,7 @@
 				}],
 				["OS == \"win\"", {
 					"include_dirs": [
-						"third_party/v8"
+						"third_party/include"
 					],
 					"library_dirs": [
 						"third_party/lib"	
@@ -199,7 +199,6 @@
 						"shell32.lib",
 						"ole32.lib",
 						"uuid.lib",
-						"glfw3dll.lib",
 						"v8.native.lib",
 						"opengl32.lib",
 						"Ws2_32.lib",
@@ -226,7 +225,7 @@
 						"-Wl,-rpath,../third_party/lib"
 					],
 					"include_dirs": [
-						"third_party/v8"
+						"third_party/include"
 					],
 					"library_dirs": [
 						"third_party/lib"	
@@ -238,9 +237,6 @@
 					],
 					"ldflags": [
 						"-lglfw"
-					],
-					"include_dirs": [
-						"third_party/glfw/include"
 					]
 				}],
 				['("<(WINDOW)" == "sdl") & (OS == "linux")', {
@@ -261,9 +257,6 @@
 				['("<(WINDOW)" == "glfw") & (OS == "mac")', {
 					'sources': [
 						"src/Window_glfw.cpp"
-					],
-					"include_dirs": [
-						"third_party/glfw/include"
 					],
 					"xcode_settings": {
 						"OTHER_LDFLAGS": [
@@ -291,8 +284,8 @@
 					'sources': [
 						"src/Window_glfw.cpp"
 					],
-					"include_dirs": [
-						"third_party/glfw/include"
+					"libraries": [
+						"glfw3dll.lib"
 					]
 				}],
 				['("<(GPERFTOOLS)" == "on") & (OS == "mac")', {

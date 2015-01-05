@@ -205,6 +205,12 @@ def get_filename_hash(filename):
 def path_exists(path):
 	return os.path.exists(path)
 
+def is_file(path):
+	return path_exists(path) and os.path.isfile(path)
+
+def is_folder(path):
+	return path_exists(path) and os.path.isdir(path) 
+
 def ensure_dir(path):
 	if not path_exists(path):
 		os.makedirs(path)
@@ -217,13 +223,20 @@ def copy_folder(src, target):
 	log("copying %s to %s" % (src, target))
 	shutil.copytree(src, target)
 
+def remove_folder(path):
+	if not is_folder(path):
+		return
+	log("removing %s" % (path))
+	shutil.rmtree(path)
+
 def move_folder(src, target):
 	log("moving %s to %s" % (src, target))
 	shutil.move(src, target)
 
 def copy_glob(srcGlob, targetPath):
 	for f in glob.glob(srcGlob):
-		copy_file(f, targetPath)
+		if is_file(f):	
+			copy_file(f, targetPath)
 
 def get_arch():
 	machine = platform.machine()
@@ -390,7 +403,10 @@ def build_glfw3(args):
 		shell_command(["make"])
 	elif is_windows():
 		shell_command([MSBUILD_PATH, "ALL_BUILD.vcxproj"])
-		
+	
+	remove_folder("../include/GLFW")
+	copy_folder("include/GLFW", "../include/GLFW")
+
 	if is_linux() or is_osx():
 		glfw_glob = ""
 		if is_linux():
@@ -489,6 +505,9 @@ def build_v8(args):
 			]) # Try Again
 			os.environ["PATH"] = oldPath
 			
+		remove_folder("../include/include")
+		copy_folder("include", "../include/include")
+
 		if is_linux():
 			copy_file("out/out/Release/lib.target/libv8.so", "../lib/libv8.so")
 		elif is_osx():
