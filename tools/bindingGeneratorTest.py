@@ -14,6 +14,7 @@ jDocReturnFragment = re.compile("@return\s+\{([\w\.\*\[\]|]+)\}")
 jDocParamFragment = re.compile("@param\s+\{([\w\.\*\[\]|]+)\}(\s+([\[\]\w]+)(\s+(.*))?)?")
 jDocBindingFragment = re.compile("@bind (.*)")
 jDocDeprecatedFragment = re.compile("@deprecated (.*)")
+jDocConditionFragment = re.compile("@condition (.*)")
 
 def parse_file(filename, signaturesOnly, createInit):
 	f = read_file(filename)
@@ -42,6 +43,7 @@ def parse_file(filename, signaturesOnly, createInit):
 
 		functionParams = []
 		functionReturnType = "void"
+		condition = ""
 
 		# Valid binding types are:
 		# 	"smart": Automaticly create a method signature based on the paramters
@@ -89,6 +91,12 @@ def parse_file(filename, signaturesOnly, createInit):
 				deprecatedReason = match.groups()[0]
 				continue
 
+			match = re.match(jDocConditionFragment, jDocFragment)
+			if match != None:
+				#print "isDeprecated", match.groups()
+				condition = match.groups()[0]
+				continue
+
 			match = re.match(jDocBindingFragment, jDocFragment)
 			if match != None:
 				bindingType = match.groups()[0]
@@ -102,7 +110,8 @@ def parse_file(filename, signaturesOnly, createInit):
 			"returns": functionReturnType,
 			"flags": [],
 			"args": functionParams,
-			"signaturesOnly": signaturesOnly
+			"signaturesOnly": signaturesOnly,
+			"condition": condition
 		}
 
 		if bindingType != "none":

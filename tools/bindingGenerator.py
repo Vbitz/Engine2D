@@ -93,9 +93,14 @@ def compileMethod(whitespace, jsonBlob, methodName):
 
 	signaturesOnly = jsonBlob["signaturesOnly"] if "signaturesOnly" in jsonBlob else False
 
+	condition = jsonBlob["condition"] if "condition" in jsonBlob else ""
+
 	if bindingType != "smart_noContext":
 		methodArgs += ["ScriptingManager::Arguments& args"]
 		methodCallArgs += ["args"]
+
+	if condition != "":
+		ret += whitespace + "    if (args.Assert(" + condition + ", \"" + methodName + " requires " + condition + "\")) return;" + "\n"
 
 	index = 0
 	for arg in jsonBlob["args"]:
