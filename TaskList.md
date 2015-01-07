@@ -30,6 +30,9 @@ Most of these come from my internal task list so don't take this as final.
 	- Release a testing version
 	- **DONE** Commit back to upstream
 	- Add CI Support with http://www.appveyor.com/
+		- I've done inital tests but the depenandancys end up being too slow to build
+		- the best solution seems to be to make a 40mb archive of the depends prebuilt and use that
+		- Useful to make the windows developer ux better as well
 	- **DONE** Add console color support to windows
 - Port to Linux
 	- Fix Windows/OpenGL on linux
