@@ -37,11 +37,11 @@ namespace Engine {
     
 #pragma pack(push, 1)
     struct BufferFormat {
-		BufferFormat(glm::vec3 pos, Color4f col, glm::vec2 uv) : pos(pos), col(col), uv(uv) {}
+		BufferFormat(glm::vec3 pos, Color4f col, glm::vec3 uv) : pos(pos), col(col), uv(uv) {}
 
         glm::vec3 pos;
         Color4f col;
-        glm::vec2 uv;
+        glm::vec3 uv;
     };
 #pragma pack(pop)
     

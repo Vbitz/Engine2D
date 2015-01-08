@@ -50,7 +50,7 @@ namespace Engine {
     }
     
     void Texture::Save(std::string filename) {
-        this->Begin();
+        this->Begin(0);
         
         unsigned char* pixels = new unsigned char[4 * this->_width * this->_height];
         glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
@@ -64,7 +64,7 @@ namespace Engine {
         return glIsTexture(this->_textureID);
     }
     
-    void Texture::Begin() {
+    void Texture::Begin(int texId) {
         if (!this->IsValid()) {
             throw "Invalid Texture";
         }
@@ -72,6 +72,11 @@ namespace Engine {
         ENGINE_PROFILER_SCOPE;
         
         this->_render->CheckError("Texture::Begin::PreBind");
+        if (texId == 0) {
+            glActiveTexture(GL_TEXTURE0);
+        } else if (texId == 1) {
+            glActiveTexture(GL_TEXTURE1);
+        }
         glBindTexture(GL_TEXTURE_2D, this->_textureID);
         
         this->_render->CheckError("Texture::Begin::PostBind");
@@ -100,7 +105,7 @@ namespace Engine {
             glDeleteTextures(1, &this->_textureID);
         this->_textureID = textureID;
         
-        this->Begin();
+        this->Begin(0);
         glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
                                  GL_TEXTURE_WIDTH, &this->_width);
         glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,

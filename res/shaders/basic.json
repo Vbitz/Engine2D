@@ -11,7 +11,7 @@
 			"fragment": "basic_v120.frag"
 		}
 	],
-	"textures": 1,
+	"textures": 2,
 	"vertexBufferParams": {
 		"vertex": "vertex",
 		"color": "color",

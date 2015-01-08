@@ -63,10 +63,10 @@ def doConvert(inputFilename, outputFilename, scale):
 		# write vertexs
 		for f in faces:
 			for vertex in f:
-				fOutput.write(struct.pack("<fffffffff",
+				fOutput.write(struct.pack("<ffffffffff",
 					vertex[0][0], vertex[0][1], vertex[0][2],				# position	
 					random.random(), random.random(), random.random(), 1,	# color (hardcoded to random)
-					vertex[1][0], vertex[1][1]								# uv
+					vertex[1][0], vertex[1][1], 0							# uv
 					))
 				vertexCount += 1
 		indexOffset = fOutput.tell()

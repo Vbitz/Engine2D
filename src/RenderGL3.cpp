@@ -177,8 +177,10 @@ namespace Engine {
                 this->_currentMode = mode;
             }
             
-            if (this->_currentTexture != this->_activeTexture) {
-                FlushAll();
+            for (int i = 0; i < 2; i++) {
+                if (this->_currentTexture[i] != this->_activeTexture[i]) {
+                    FlushAll();
+                }
             }
         }
         
@@ -186,12 +188,12 @@ namespace Engine {
             this->TrackStat(RenderStatistic::PrimitiveEnd, 1);
         }
         
-        void EnableTexture(Texture* texId) override {
-            this->_currentTexture = texId;
+        void EnableTexture(TexturePtr texId) override {
+            this->_currentTexture[0] = texId;
         }
         
         void DisableTexture() override {
-            _currentTexture = _defaultTexture;
+            this->_currentTexture[0] = this->_defaultTexture;
         }
         
         void EnableSmooth() override {
@@ -240,8 +242,10 @@ namespace Engine {
             
             this->_gl3Buffer->Reset();
             
-            if (this->_activeTexture != this->_currentTexture) {
-                this->_switchTextures();
+            for (int i = 0; i < 2; i++) {
+                if (this->_activeTexture[i] != this->_currentTexture[i]) {
+                    this->_switchTextures(i);
+                }
             }
         }
 		
@@ -260,7 +264,9 @@ namespace Engine {
                 Logger::begin("RenderGL3", Logger::LogLevel_Verbose) << "Creating Default Texture" << Logger::end();
                 this->_defaultTexture = GenerateDefaultTexture();
             }
-            this->_currentTexture = this->_defaultTexture;
+            for (int i = 0; i < 2; i++) {
+                this->_currentTexture[i] = this->_defaultTexture;
+            }
             
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
@@ -274,7 +280,10 @@ namespace Engine {
             
             EnableSmooth();
             
-            this->_currentTexture = this->_defaultTexture;
+            for (int i = 0; i < 2; i++) {
+                this->_currentTexture[i] = this->_defaultTexture;
+            }
+            
             glDisable(GL_DEPTH_TEST);
             
             ResetMatrix();
@@ -343,16 +352,21 @@ namespace Engine {
         }
         
     private:
-        void _switchTextures() {
+        void _switchTextures(int texId) {
             ENGINE_PROFILER_SCOPE;
             
-            this->_activeTexture = this->_currentTexture;
+            this->_activeTexture[texId] = this->_currentTexture[texId];
+            
+            if (texId > 0) {
+                //std::cout << ".";
+            }
             
             try {
-                this->_activeTexture->Begin();
+                this->_activeTexture[texId]->Begin(texId);
             } catch (...) {
-                this->_activeTexture = this->_defaultTexture;
-                this->_activeTexture->Begin();
+                Logger::begin("RenderGL3", Logger::LogLevel_Error) << "Error switching textures" << Logger::end();
+                this->_activeTexture[texId] = this->_defaultTexture;
+                this->_activeTexture[texId]->Begin(texId);
             }
         }
         
@@ -363,9 +377,8 @@ namespace Engine {
         EffectParametersPtr _currentEffect;
         
         TexturePtr _defaultTexture = NULL;
-        TexturePtr _activeTexture = NULL;
-        
-        TexturePtr _currentTexture = NULL;
+        TexturePtr _activeTexture[2];
+        TexturePtr _currentTexture[2];
         
         VertexBufferPtr _gl3Buffer = NULL;
         

@@ -1,13 +1,13 @@
 attribute vec3 vertex;
 attribute vec4 color;
-attribute vec2 texCoard;
+attribute vec3 texCoard;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 varying vec4 postColor;
-varying vec2 postTexCoard;
+varying vec3 postTexCoard;
 varying vec4 postVertex;
 
 void main() {

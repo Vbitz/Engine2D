@@ -47,7 +47,7 @@ namespace Engine {
         
         bool IsValid();
         
-        void Begin();
+        void Begin(int texId);
         void End();
         
         int GetWidth();

@@ -154,7 +154,7 @@ namespace Engine {
     }
     
     void VertexBuffer::AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv) {
-		this->_vertexBuffer.push_back(BufferFormat(pos, col, uv));
+        this->_vertexBuffer.push_back(BufferFormat(pos, col, glm::vec3(uv, 1)));
         this->_indexBuffer.push_back(this->_vertexCount);
         this->_vertexCount++;
         this->_dirty = true;
@@ -394,9 +394,9 @@ namespace Engine {
         
         this->GetRender()->CheckError("VertexBuffer::Upload::PostBindViewpointSize");
         
-        this->_getShader()->BindVertexAttrib(settings.vertexParam, 3, 9, 0);
-        this->_getShader()->BindVertexAttrib(settings.colorParam, 4, 9, 3);
-        this->_getShader()->BindVertexAttrib(settings.texCoardParam, 2, 9, 7);
+        this->_getShader()->BindVertexAttrib(settings.vertexParam, 3, 10, 0);
+        this->_getShader()->BindVertexAttrib(settings.colorParam, 4, 10, 3);
+        this->_getShader()->BindVertexAttrib(settings.texCoardParam, 3, 10, 7);
         
         this->GetRender()->CheckError("VertexBuffer::Upload::PostBindVertexAttributes");
         

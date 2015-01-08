@@ -62,19 +62,20 @@ namespace Engine {
         void SetConsoleColor(bool reset, LogLevel level) {
 #ifndef _PLATFORM_WIN32
 			if (reset) {
-				std::cout << "\x1b[0;37m" << std::endl;
+				std::cout << "\x1b[0;37m";
+                return;
 			}
             switch (level) {
-				case LogLevel_Verbose:      std::cout << getEscapeCode(0, true, false);
-				case LogLevel_User:         std::cout << getEscapeCode(5, true, false);
-				case LogLevel_ConsoleInput: std::cout << getEscapeCode(6, true, false);
-				case LogLevel_Log:          std::cout << getEscapeCode(7, false, false);
-				case LogLevel_Warning:      std::cout << getEscapeCode(3, false, false);
-				case LogLevel_Error:        std::cout << getEscapeCode(1, true, false);
+                case LogLevel_Verbose:      std::cout << getEscapeCode(0, true, false); break;
+				case LogLevel_User:         std::cout << getEscapeCode(5, true, false); break;
+				case LogLevel_ConsoleInput: std::cout << getEscapeCode(6, true, false); break;
+				case LogLevel_Log:          std::cout << getEscapeCode(7, false, false); break;
+				case LogLevel_Warning:      std::cout << getEscapeCode(3, false, false); break;
+				case LogLevel_Error:        std::cout << getEscapeCode(1, true, false); break;
                 case LogLevel_Highlight:
-				case LogLevel_Toast:        std::cout << getEscapeCode(7, false, true) + getEscapeCode(0, true, false);
-				case LogLevel_TestLog:      std::cout << getEscapeCode(7, false, true) + getEscapeCode(0, true, false);
-				case LogLevel_TestError:    std::cout << getEscapeCode(1, false, true) + getEscapeCode(7, true, false);
+				case LogLevel_Toast:        std::cout << getEscapeCode(7, false, true) + getEscapeCode(0, true, false); break;
+				case LogLevel_TestLog:      std::cout << getEscapeCode(7, false, true) + getEscapeCode(0, true, false); break;
+				case LogLevel_TestError:    std::cout << getEscapeCode(1, false, true) + getEscapeCode(7, true, false); break;
 				default:					break;
             }
 #else
