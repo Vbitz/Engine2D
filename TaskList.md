@@ -25,8 +25,9 @@ Most of these come from my internal task list so don't take this as final.
 	- Fix Runtime Bugs
 		- Finish Memory Mapped File support
 		- Fix switch to fullscreen (Might use NSight)
-	- Profile performance
+	- **DONE** Profile performance
 		- I expected more of a performance gap between a GTX970 vs Intel HD 5000, there's next to none right now
+		- NSight worked well for tracking down the performance difference, it seems the GPU is idling most of the time and it's nothing to worry about.
 	- Release a testing version
 	- **DONE** Commit back to upstream
 	- Add CI Support with http://www.appveyor.com/
