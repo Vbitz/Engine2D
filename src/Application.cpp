@@ -277,16 +277,6 @@ namespace Engine {
         eventsSingilton->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary, this));
         eventsSingilton->GetEvent("runFile")->AddListener(10, "Application::_requireConfigFile", EventEmitter::MakeTarget(_requireConfigFile, this));
     }
-
-	void GLDebugCallback(enum source,
-		unsigned int type,
-		unsigned int id,
-		unsigned int severity,
-		size_t length,
-		const char* message,
-		const void* userParam) {
-
-	}
     
     void Application::_initGLContext(GraphicsVersion v) {
         this->_renderGL = this->_window->GetRender();
