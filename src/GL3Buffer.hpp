@@ -85,7 +85,7 @@ namespace Engine {
 
         void AddVert(glm::vec3 pos);
         void AddVert(glm::vec3 pos, Color4f col);
-        void AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv);
+        void AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv, int texId = 1);
         
         void Reset();
         

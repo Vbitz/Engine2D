@@ -59,6 +59,7 @@ WINDOW_SYSTEM = os.getenv("ENGINE_WINDOW_SYSTEM", "glfw")
 ENABLE_GPROFTOOLS = os.getenv("ENGINE_GPROFTOOLS", "off")
 PROFILER = os.getenv("ENGINE_PROFILER", "off")
 NO_BUILD_DEPS = os.getenv("ENGINE_NO_BUILD_DEPS", "off")
+BUILD_DEBUG_SYMBOLS = os.getenv("ENGINE_BUILD_DEBUG_SYMBOLS", "off")
 
 commands = {}
 
@@ -536,6 +537,7 @@ def gyp(args):
 			"-DWINDOW=" + WINDOW_SYSTEM,
 			"-DGPERFTOOLS=" + ENABLE_GPROFTOOLS,
 			"-DPROFILER=" + PROFILER,
+			"-DBUILD_DEBUG_SYMBOLS=" + BUILD_DEBUG_SYMBOLS,
 			"-Dtarget_arch=" + get_arch(),
 			resolve_path(PROJECT_ROOT, "engine2D.gyp")
 		])
@@ -630,6 +632,8 @@ def _build_bin(output=True, analyze=False, coverage=False):
 		ensure_dir(resolve_path(PROJECT_ROOT, "bin"))
 		copy_file("third_party/lib/glfw3.dll", binFolder + "/glfw3.dll")
 		copy_file("third_party/lib/v8.dll", binFolder + "/v8.native.dll")
+		if path_exists("Default/libengine2D.pdb"):
+			copy_file("Default/libengine2D.pdb", binFolder)
 		copy_file("Default/libengine2D.dll", binFolder)
 		copy_file("Default/engine2D.exe", binFolder)
 

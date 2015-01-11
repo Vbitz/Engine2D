@@ -488,25 +488,38 @@ namespace Engine {
         }
         
         void Context::CheckUpdate() {
-            ENGINE_PROFILER_SCOPE;
+			ENGINE_PROFILER_SCOPE;
             if (Config::GetBoolean("core.script.autoReload")) {
                 for (auto iterator = this->_loadedFiles.begin(); iterator != this->_loadedFiles.end(); iterator++) {
+					if (Platform::GetTime() - iterator->second.lastUpdate > 2.0) {
+						iterator->second.lastUpdate = Platform::GetTime();
+					} else {
+						continue;
+					}
                     long lastMod = Filesystem::GetFileModifyTime(iterator->first);
-                    if (lastMod > iterator->second) {
+                    if (lastMod > iterator->second.lastMod) {
                         Json::Value args = Json::Value(Json::objectValue);
                         args["filename"] = iterator->first;
                         this->_runFile(iterator->first, true);
                         GetEventsSingilton()->GetEvent("scriptReloaded")->Emit(args);
                     }
+					return;
                 }
             } else {
                 for (auto iterator = _loadedFiles.begin(); iterator != _loadedFiles.end(); iterator++) {
-                    if (iterator->second < 0) {
+					if (Platform::GetTime() - iterator->second.lastUpdate > 2.0) {
+						iterator->second.lastUpdate = Platform::GetTime();
+					}
+					else {
+						continue;
+					}
+					if (iterator->second.lastMod < 0) {
                         Json::Value args = Json::Value(Json::objectValue);
                         args["filename"] = iterator->first;
                         this->_runFile(iterator->first, true);
                         GetEventsSingilton()->GetEvent("scriptReloaded")->Emit(args);
-                    }
+					}
+					return;
                 }
             }
         }
@@ -540,7 +553,8 @@ namespace Engine {
                 }
                 Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Loaded File: " << path << Logger::end();
                 if (persist) {
-                    _loadedFiles[path] = Filesystem::GetFileModifyTime(path);
+					_loadedFiles[path].lastMod = Filesystem::GetFileModifyTime(path);
+					_loadedFiles[path].lastUpdate = Platform::GetTime();
                 }
                 std::free(inputScript);
                 return true;
@@ -600,7 +614,8 @@ namespace Engine {
         
         void Context::InvalidateScript(std::string scriptName) {
             Logger::begin("Scripting", Logger::LogLevel_Verbose) << "Invalidating Script: " << scriptName << Logger::end();
-            this->_loadedFiles[scriptName] = -1;
+            this->_loadedFiles[scriptName].lastMod = -1;
+			this->_loadedFiles[scriptName].lastUpdate = -1;
         }
         
         void Context::SetFlag(std::string flag) {

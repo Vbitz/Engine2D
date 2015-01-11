@@ -74,5 +74,7 @@ Default/
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*.psess
+*.vspx
 
 nsight_profiler.cfg

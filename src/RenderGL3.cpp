@@ -84,7 +84,8 @@ namespace Engine {
         }
         
         OpenGLVersion GetOpenGLVersion() override {
-            return GetAppSingilton()->GetWindow()->GetGlVersion();
+			static OpenGLVersion version = GetAppSingilton()->GetWindow()->GetGlVersion();
+            return version;
         }
         
         EffectShaderType GetBestEffectShaderType() override {
@@ -177,10 +178,8 @@ namespace Engine {
                 this->_currentMode = mode;
             }
             
-            for (int i = 0; i < 2; i++) {
-                if (this->_currentTexture[i] != this->_activeTexture[i]) {
-                    FlushAll();
-                }
+			if (this->_currentTexture != this->_activeTexture && this->_currentTexture != NULL) {
+                FlushAll();
             }
         }
         
@@ -189,11 +188,11 @@ namespace Engine {
         }
         
         void EnableTexture(TexturePtr texId) override {
-            this->_currentTexture[0] = texId;
+            this->_currentTexture = texId;
         }
         
         void DisableTexture() override {
-            this->_currentTexture[0] = this->_defaultTexture;
+            this->_currentTexture = NULL;
         }
         
         void EnableSmooth() override {
@@ -242,10 +241,8 @@ namespace Engine {
             
             this->_gl3Buffer->Reset();
             
-            for (int i = 0; i < 2; i++) {
-                if (this->_activeTexture[i] != this->_currentTexture[i]) {
-                    this->_switchTextures(i);
-                }
+            if (this->_activeTexture != this->_currentTexture) {
+                this->_switchTextures();
             }
         }
 		
@@ -260,13 +257,7 @@ namespace Engine {
             this->_currentEffect = EffectReader::GetEffectFromFile(gl3Effect);
             this->_currentEffect->CreateShader();
             this->_gl3Buffer = new VertexBuffer(this, this->_currentEffect);
-            if (this->_defaultTexture == NULL || !this->_defaultTexture->IsValid()) {
-                Logger::begin("RenderGL3", Logger::LogLevel_Verbose) << "Creating Default Texture" << Logger::end();
-                this->_defaultTexture = GenerateDefaultTexture();
-            }
-            for (int i = 0; i < 2; i++) {
-                this->_currentTexture[i] = this->_defaultTexture;
-            }
+            this->_currentTexture = NULL;
             
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
@@ -280,9 +271,7 @@ namespace Engine {
             
             EnableSmooth();
             
-            for (int i = 0; i < 2; i++) {
-                this->_currentTexture[i] = this->_defaultTexture;
-            }
+            this->_currentTexture = NULL;
             
             glDisable(GL_DEPTH_TEST);
             
@@ -348,26 +337,24 @@ namespace Engine {
         
         void _addVert(glm::vec3 pos, Color4f col, glm::vec2 uv, glm::vec3 normal) override {
             this->_gl3Buffer->AddVert(pos - this->_center,
-                                      col, uv);
+                                      col, uv, this->_currentTexture != NULL ? 1 : 2);
         }
         
     private:
-        void _switchTextures(int texId) {
+        void _switchTextures() {
             ENGINE_PROFILER_SCOPE;
             
-            this->_activeTexture[texId] = this->_currentTexture[texId];
+            this->_activeTexture = this->_currentTexture;
             
-            if (texId > 0) {
-                //std::cout << ".";
-            }
-            
-            try {
-                this->_activeTexture[texId]->Begin(texId);
-            } catch (...) {
-                Logger::begin("RenderGL3", Logger::LogLevel_Error) << "Error switching textures" << Logger::end();
-                this->_activeTexture[texId] = this->_defaultTexture;
-                this->_activeTexture[texId]->Begin(texId);
-            }
+			if (this->_activeTexture != NULL) {
+				try {
+					this->_activeTexture->Begin();
+				}
+				catch (...) {
+					Logger::begin("RenderGL3", Logger::LogLevel_Error) << "Error switching textures" << Logger::end();
+					this->_activeTexture = NULL;
+				}
+			}
         }
         
         glm::vec3 _center = glm::vec3(0, 0, 0);
@@ -375,14 +362,15 @@ namespace Engine {
         PolygonMode _currentMode = PolygonMode::Invalid;
         
         EffectParametersPtr _currentEffect;
-        
-        TexturePtr _defaultTexture = NULL;
-        TexturePtr _activeTexture[2];
-        TexturePtr _currentTexture[2];
+
+        TexturePtr _activeTexture = NULL;
+        TexturePtr _currentTexture = NULL;
         
         VertexBufferPtr _gl3Buffer = NULL;
         
         glm::mat4 _currentModelMatrix;
+
+		bool usingTexture = false;
         
         unsigned int _currentShader = std::numeric_limits<unsigned int>::max();
         

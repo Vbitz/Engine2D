@@ -2,7 +2,8 @@
 	"variables": {
 		"WINDOW%": "glfw",
 		"GPERFTOOLS%": "off",
-		"PROFILER%": "off"
+		"PROFILER%": "off",
+		"BUILD_DEBUG_SYMBOLS%": "off"
 	},
 	"targets": [
 		{
@@ -307,6 +308,13 @@
 					"defines": [
 						"PROFILER"
 					]
+				}],
+				['("<(BUILD_DEBUG_SYMBOLS)" != "off") & (OS == "win")', {
+					"msvs_settings": {
+						"VCLinkerTool": {
+							"GenerateDebugInformation": "true"
+						}
+					}
 				}]
 			]
 		}

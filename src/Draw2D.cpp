@@ -142,9 +142,10 @@ namespace Engine {
     
     void Draw2D::Lines(double* points, unsigned int count) {
         ENGINE_PROFILER_SCOPE;
-        renderGL->BeginRendering(PolygonMode::LineStrip);
-        for (int i = 0; i < count * 2; i += 2) {
-            renderGL->AddVert(points[i], points[i + 1], 0);
+        renderGL->BeginRendering(PolygonMode::Lines);
+		for (int i = 0; i < (count - 1) * 2; i += 2) {
+			renderGL->AddVert(points[i], points[i + 1], 0);
+            renderGL->AddVert(points[i + 2], points[i + 3], 0);
         }
         renderGL->EndRendering();
     }

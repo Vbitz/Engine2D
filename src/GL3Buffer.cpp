@@ -153,8 +153,8 @@ namespace Engine {
         this->AddVert(pos, col, glm::vec2(0, 0));
     }
     
-    void VertexBuffer::AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv) {
-        this->_vertexBuffer.push_back(BufferFormat(pos, col, glm::vec3(uv, 1)));
+    void VertexBuffer::AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv, int texId) {
+        this->_vertexBuffer.push_back(BufferFormat(pos, col, glm::vec3(uv, texId)));
         this->_indexBuffer.push_back(this->_vertexCount);
         this->_vertexCount++;
         this->_dirty = true;
@@ -189,19 +189,20 @@ namespace Engine {
     }
     
     void VertexBuffer::Draw(PolygonMode mode, glm::mat4 model) {
-        static char* addedData = NULL;
         
         if (this->_vertexCount == 0) {
             return; // nothing to draw
         }
-        
+#ifdef PROFILER
+		static char* addedData = NULL;
         if (addedData == NULL) {
             addedData = new char[128];
         }
         
         sprintf(addedData, "_vertexCount=%d", this->_vertexCount);
-        
-        ENGINE_PROFILER_SCOPE_EX(addedData);
+
+		ENGINE_PROFILER_SCOPE_EX(addedData);
+#endif
         
         this->_renderGL->TrackStat(RenderStatistic::DrawCall, 1);
         this->_renderGL->TrackStat(RenderStatistic::Verts, this->_vertexCount);
