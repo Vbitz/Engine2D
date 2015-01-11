@@ -141,7 +141,12 @@ namespace Engine {
     enum class RenderStatistic {
         PrimitiveEnd,
         Verts,
-        DrawCall
+        DrawCall,
+        TextureFlush,
+        CameraFlush,
+        PrimitiveFlush,
+        EndRenderFlush,
+        UserFlush
     };
 }
 

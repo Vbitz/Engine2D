@@ -204,6 +204,7 @@ namespace Engine {
             
         protected:
             void _load() override;
+            void _unload() override;
             
         private:
             std::string _name;

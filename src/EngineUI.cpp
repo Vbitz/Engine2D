@@ -383,17 +383,17 @@ namespace Engine {
             
             double lineGraphScale = Config::GetFloat("core.debug.engineUI.profilerScale");
             
-            this->_draw->LineGraph(windowSize.x - 600, 14, 0.2, lineGraphScale, this->_lastDrawTimes, timingResolution);
+            this->_draw->LineGraph(windowSize.x - 670, 14, 0.2, lineGraphScale, this->_lastDrawTimes, timingResolution);
             
             renderGL->EnableSmooth();
             
             // This needs to be printed last because of the stats
             
             this->_ss.str("");
-            this->_ss << "Draws: " << renderGL->GetStatistic(RenderStatistic::DrawCall) << "/" << renderGL->GetStatistic(RenderStatistic::PrimitiveEnd);
+            this->_ss << "Draws: " << renderGL->GetStatistic(RenderStatistic::DrawCall) << "/" << renderGL->GetStatistic(RenderStatistic::CameraFlush) << "/" << renderGL->GetStatistic(RenderStatistic::TextureFlush) << "/" << renderGL->GetStatistic(RenderStatistic::EndRenderFlush) << "/" << renderGL->GetStatistic(RenderStatistic::UserFlush) << "/" << renderGL->GetStatistic(RenderStatistic::PrimitiveFlush) << "/" << renderGL->GetStatistic(RenderStatistic::PrimitiveEnd);
             this->_ss << " | Verts: " << renderGL->GetStatistic(RenderStatistic::Verts);
         
-            renderGL->Print(windowSize.x - 390, 4, this->_ss.str().c_str());
+            renderGL->Print(windowSize.x - 450, 4, this->_ss.str().c_str());
             
             this->_ss.precision(6);
             this->_ss.str("");

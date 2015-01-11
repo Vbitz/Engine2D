@@ -185,6 +185,7 @@ namespace Engine {
         float rEnd = pi2 * end;
         float res = pi2 / segments;
         if (usingGl3) {
+            renderGL->TrackStat(RenderStatistic::UserFlush, 1);
             renderGL->FlushAll();
         }
         renderGL->BeginRendering(fill ? (innerRadius != radius ? PolygonMode::TriangleStrip // doughnut
@@ -215,6 +216,7 @@ namespace Engine {
         }
         renderGL->EndRendering();
         if (usingGl3) {
+            renderGL->TrackStat(RenderStatistic::UserFlush, 1);
             renderGL->FlushAll();
         }
     }
@@ -234,6 +236,7 @@ namespace Engine {
         renderGL->EndRendering();
         
         if (renderGL->GetRendererType() == RendererType::OpenGL3) {
+            renderGL->TrackStat(RenderStatistic::UserFlush, 1);
             renderGL->FlushAll();
         }
     }

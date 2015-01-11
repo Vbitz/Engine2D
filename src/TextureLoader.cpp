@@ -34,8 +34,8 @@ namespace Engine {
         
     }
     
-    Texture::Texture(RenderDriver* render, GLuint textureID) : _render(render) {
-        Logger::begin("Texture", Logger::LogLevel_Verbose) << "Creating Texture: " << textureID << Logger::end();
+    Texture::Texture(RenderDriver* render, GLuint textureID) : _render(render), _uuid(Platform::GenerateUUID()) {
+        Logger::begin("Texture", Logger::LogLevel_Verbose) << "Creating Texture: " << textureID << " [" << Platform::StringifyUUID(this->_uuid) << "]" << Logger::end();
         this->_setTextureID(textureID);
     }
     
@@ -44,6 +44,7 @@ namespace Engine {
     }
     
     void Texture::Invalidate() {
+        Logger::begin("Texture", Logger::LogLevel_Verbose) << "Invalidating Texture: " << this->_textureID << " [" << Platform::StringifyUUID(this->_uuid) << "]" << Logger::end();
         if (this->IsValid())
             glDeleteTextures(1, &this->_textureID);
         this->_textureID = std::numeric_limits<unsigned int>::max();

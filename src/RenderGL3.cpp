@@ -211,11 +211,14 @@ namespace Engine {
             if (this->_currentMode != mode ||
                 this->_currentMode == PolygonMode::LineStrip) {
                 // it's a hack, I really need to fix this
+                this->TrackStat(RenderStatistic::PrimitiveFlush, 1);
                 FlushAll();
                 this->_currentMode = mode;
             }
             
-			if (this->_currentTexture != this->_activeTexture && this->_currentTexture != NULL) {
+            if (this->_currentTexture != this->_activeTexture && this->_currentTexture != NULL) {
+                this->TrackStat(RenderStatistic::TextureFlush, 1);
+                //std::cout << "TextureChange: " << (this->_currentTexture != NULL ?Platform::StringifyUUID(this->_currentTexture->GetUUID()) : "NULL") << " -> " << (this->_activeTexture != NULL ?Platform::StringifyUUID(this->_activeTexture->GetUUID()) : "NULL") << std::endl;
                 FlushAll();
             }
         }
@@ -325,6 +328,7 @@ namespace Engine {
         void End2d() override {
             ENGINE_PROFILER_SCOPE;
             
+            this->TrackStat(RenderStatistic::EndRenderFlush, 1);
             FlushAll();
             
             CheckError("RenderGL3::End2d");
@@ -354,17 +358,20 @@ namespace Engine {
         }
         
         void CameraPan(float x, float y) override {
+            this->TrackStat(RenderStatistic::CameraFlush, 1);
             FlushAll();
             this->_currentModelMatrix = glm::translate(this->_currentModelMatrix, glm::vec3(x, y, 0.0f));
         }
         
         void CameraZoom(float f) override {
+            this->TrackStat(RenderStatistic::CameraFlush, 1);
             FlushAll();
             this->_currentModelMatrix =
             glm::scale(_currentModelMatrix, glm::vec3(f, f, 0.0f));
         }
         
         void CameraRotate(float r) override {
+            this->TrackStat(RenderStatistic::CameraFlush, 1);
             FlushAll();
             r = glm::radians(r);
             this->_currentModelMatrix =

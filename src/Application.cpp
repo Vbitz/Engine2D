@@ -376,6 +376,7 @@ namespace Engine {
 	}
 	
 	void Application::_shutdownOpenGL() {
+        ResourceManager::UnloadAll();
         this->_closeWindow();
         Window::StaticDestroy();
 	}

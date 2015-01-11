@@ -263,6 +263,10 @@ namespace Engine {
             }
         }
         
+        void ImageResource::_unload() {
+            this->_texture->Invalidate();
+        }
+        
         std::vector<ResourcePtr> _resources;
         std::map<std::string, SourcePtr> _sources;
         

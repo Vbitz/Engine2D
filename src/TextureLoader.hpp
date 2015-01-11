@@ -25,6 +25,7 @@
 
 #include "ResourceManager.hpp"
 #include "RenderDriver.hpp"
+#include "Platform.hpp"
 
 namespace Engine {
     ENGINE_CLASS(RenderDriver);
@@ -53,10 +54,15 @@ namespace Engine {
         int GetWidth();
         int GetHeight();
         
+        inline const Platform::UUID& GetUUID() {
+            return this->_uuid;
+        }
+        
     private:
         void _setTextureID(unsigned int textureID);
         void _setTextureID(unsigned int textureID, bool deleteOld);
         
+        Platform::UUID _uuid;
         RenderDriverPtr _render;
         unsigned int _textureID = std::numeric_limits<unsigned int>::max();
         int _width, _height;
