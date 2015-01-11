@@ -80,7 +80,7 @@ namespace Engine {
     void Texture::End() {
         ENGINE_PROFILER_SCOPE;
         
-        glBindTexture(GL_TEXTURE_2D, 0);
+		this->_render->EnableDefaultTexture();
     }
     
     int Texture::GetWidth() {
@@ -133,6 +133,10 @@ namespace Engine {
             render->CheckError("Pre Image Load");
             
             glGenTextures(1, &text);
+
+			if (text == 0) {
+				Logger::begin("TextureLoader", Logger::LogLevel_Error) << "glGenTextures Failed" << Logger::end();
+			}
             
             glBindTexture(GL_TEXTURE_2D, text);
             

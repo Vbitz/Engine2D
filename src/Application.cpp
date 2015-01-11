@@ -148,7 +148,7 @@ namespace Engine {
         Config::SetNumber(  "core.debug.profiler.maxFrameTime",     1.0f / 50.0f);
         Config::SetBoolean( "core.debug.profiler.dumpFrames",       this->_debugMode);
         Config::SetNumber(  "core.debug.profiler.dumpCooldown",     100);
-        Config::SetBoolean( "core.debug.debugRenderer",             false);
+        Config::SetBoolean( "core.debug.debugRenderer",             true);
         Config::SetBoolean( "core.debug.v8Debug",                   this->_developerMode);
         Config::SetNumber(  "core.debug.v8Debug.port",              5858);
         Config::SetBoolean( "core.debug.slowload",                  false);
@@ -277,6 +277,16 @@ namespace Engine {
         eventsSingilton->GetEvent("runFile")->AddListener(10, "Application::_requireDynamicLibary", EventEmitter::MakeTarget(_requireDynamicLibary, this));
         eventsSingilton->GetEvent("runFile")->AddListener(10, "Application::_requireConfigFile", EventEmitter::MakeTarget(_requireConfigFile, this));
     }
+
+	void GLDebugCallback(enum source,
+		unsigned int type,
+		unsigned int id,
+		unsigned int severity,
+		size_t length,
+		const char* message,
+		const void* userParam) {
+
+	}
     
     void Application::_initGLContext(GraphicsVersion v) {
         this->_renderGL = this->_window->GetRender();

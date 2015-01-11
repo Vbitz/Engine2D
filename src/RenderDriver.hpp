@@ -83,6 +83,8 @@ namespace Engine {
         virtual EffectShaderType GetBestEffectShaderType() = 0;
         
         virtual bool CheckError(const char* source) = 0;
+
+		virtual void EnableDefaultTexture() = 0;
         
         virtual bool HasExtention(std::string extentionName)= 0;
         virtual std::vector<std::string> GetExtentions() = 0;
@@ -131,7 +133,7 @@ namespace Engine {
         
         virtual void SetLineWidth(float value) = 0;
         
-        void Print(float x, float y, const char* string);
+        void Print(float x, float y, std::string string);
         
         float CalcStringWidth(std::string str);
         void SetFont(std::string name, int fontSize);

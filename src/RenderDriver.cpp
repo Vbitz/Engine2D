@@ -34,13 +34,10 @@ namespace Engine {
         this->_render->_cleanupDrawable(this);
     }
     
-    void RenderDriver::Print(float x, float y, const char* string) {
-        char* realString = strdup(string);
+    void RenderDriver::Print(float x, float y, std::string string) {
         ENGINE_PROFILER_SCOPE;
         
-        this->_getSheet(this->_currentFontName)->DrawText(this, x, y, this->_currentFontSize, realString);
-        
-        std::free(realString);
+        this->_getSheet(this->_currentFontName)->DrawText(this, x, y, this->_currentFontSize, std::string(string));
     }
     
     float RenderDriver::CalcStringWidth(std::string str) {

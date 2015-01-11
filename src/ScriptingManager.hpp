@@ -246,11 +246,12 @@ namespace Engine {
             }
             
             SCRIPTINGMANAGER_INLINE const char* CStringValue(int arg) {
-                return *v8::String::Utf8Value(this->_args[arg]);
+                return *v8::String::Utf8Value(this->_args[arg]->ToString());
             }
             
             SCRIPTINGMANAGER_INLINE std::string StringValue(int arg) {
-                return std::string(*v8::String::Utf8Value(this->_args[arg]));
+				v8::String::Utf8Value value(this->_args[arg]->ToString());
+                return std::string(*value);
             }
             
             SCRIPTINGMANAGER_INLINE uint32_t Int32Value(int arg) {

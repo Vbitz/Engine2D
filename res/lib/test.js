@@ -331,10 +331,10 @@ if (sys.headlessMode) {
 
 	var supportsFramebuffer = sys.hasExtention("GL_ARB_framebuffer_object")|| sys.hasExtention("GL_EXT_framebuffer_object");
 
-	console.log("OpenGL Extentions:");
-	sys.getExtentions().forEach(function (i) {
-		console.log("    " + i);
-	});
+	//console.log("OpenGL Extentions:");
+	//sys.getExtentions().forEach(function (i) {
+	//	console.log("    " + i);
+	//});
 
 	var firstDraw = true;
 
