@@ -24,10 +24,13 @@ Most of these come from my internal task list so don't take this as final.
 	- **DONE** Implement Platform_win.cpp
 	- Fix Runtime Bugs
 		- Finish Memory Mapped File support
+			- The plan to handle the lack of expanding memory mapped files in windows is to reserve virtual memory space and map the current file size exactly to the region
 		- Fix switch to fullscreen (Might use NSight)
 	- **DONE** Profile performance
 		- I expected more of a performance gap between a GTX970 vs Intel HD 5000, there's next to none right now
 		- NSight worked well for tracking down the performance difference, it seems the GPU is idling most of the time and it's nothing to worry about.
+		- **DONE** Fix performance fluctuations on windows
+			- This is a combination of less state changes and defering script updating frame by frame
 	- Release a testing version
 	- **DONE** Commit back to upstream
 	- Add CI Support with http://www.appveyor.com/
