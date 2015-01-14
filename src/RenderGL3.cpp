@@ -66,7 +66,7 @@ namespace Engine {
         }
     }
     
-	void __stdcall DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam) {
+	void ENGINE_stdcall DebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam) {
 		std::string sourceStr = "[UNKNOWN source]";
 		switch (source) {
 			case GL_DEBUG_SOURCE_API: sourceStr = "OpenGL"; break;
@@ -289,9 +289,11 @@ namespace Engine {
         void Init2d() override {
             ENGINE_PROFILER_SCOPE;
             
+            // Never enabled on OSX due to lack of extention ARB_debug_output
 			if (Config::GetBoolean("core.debug.debugRenderer") && glDebugMessageCallback != NULL) {
 				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, 0, GL_TRUE);
                 glDebugMessageCallback((GLDEBUGPROC) DebugMessageCallback, NULL);
+                Logger::begin("RenderGL3", Logger::LogLevel_Verbose) << "glDebugMessageCallback Enabled" << Logger::end();
             }
             
             std::string gl3Effect = Config::GetString("core.render.basicEffect");

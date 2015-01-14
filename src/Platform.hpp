@@ -57,6 +57,12 @@ typedef void* (*ENGINE_FARPROC)(void);
 #endif
 #endif
 
+#ifdef _PLATFORM_WIN32
+#define ENGINE_stdcall __stdcall
+#else
+#define ENGINE_stdcall
+#endif
+
 namespace Engine {
     namespace Platform {
         
