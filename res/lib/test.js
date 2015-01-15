@@ -110,8 +110,6 @@ var tests = {
 		return true;
 	},
 	"Harmony": function () {
-		"use strict";
-
 		function* testGenerator() {
 			yield "hello";
 			yield "world";
