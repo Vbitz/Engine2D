@@ -56,26 +56,26 @@ namespace Engine {
         }
         
         std::string getEscapeCode(int color, bool bold, bool bg) {
-            return "\x1b[" + std::string(bold ? "1;" : "0;") + std::to_string(color + 30) + "m";
+            return ("\x1b[" + std::string(bold ? "1;" : "0;") + std::to_string(color + 30) + "m");
         }
         
         void SetConsoleColor(bool reset, LogLevel level) {
 #ifndef _PLATFORM_WIN32
 			if (reset) {
-				std::cout << "\x1b[0;37m";
+				puts("\x1b[0;37m");
                 return;
 			}
             switch (level) {
-                case LogLevel_Verbose:      std::cout << getEscapeCode(0, true, false); break;
-				case LogLevel_User:         std::cout << getEscapeCode(5, true, false); break;
-				case LogLevel_ConsoleInput: std::cout << getEscapeCode(6, true, false); break;
-				case LogLevel_Log:          std::cout << getEscapeCode(7, false, false); break;
-				case LogLevel_Warning:      std::cout << getEscapeCode(3, false, false); break;
-				case LogLevel_Error:        std::cout << getEscapeCode(1, true, false); break;
+                case LogLevel_Verbose:      puts(getEscapeCode(0, true, false).c_str()); break;
+				case LogLevel_User:         puts(getEscapeCode(5, true, false).c_str()); break;
+				case LogLevel_ConsoleInput: puts(getEscapeCode(6, true, false).c_str()); break;
+				case LogLevel_Log:          puts(getEscapeCode(7, false, false).c_str()); break;
+				case LogLevel_Warning:      puts(getEscapeCode(3, false, false).c_str()); break;
+				case LogLevel_Error:        puts(getEscapeCode(1, true, false).c_str()); break;
                 case LogLevel_Highlight:
-				case LogLevel_Toast:        std::cout << getEscapeCode(7, false, true) + getEscapeCode(0, true, false); break;
-				case LogLevel_TestLog:      std::cout << getEscapeCode(7, false, true) + getEscapeCode(0, true, false); break;
-				case LogLevel_TestError:    std::cout << getEscapeCode(1, false, true) + getEscapeCode(7, true, false); break;
+				case LogLevel_Toast:        puts(getEscapeCode(7, false, true).c_str()); puts(getEscapeCode(0, true, false).c_str()); break;
+				case LogLevel_TestLog:      puts(getEscapeCode(7, false, true).c_str()); puts(getEscapeCode(0, true, false).c_str()); break;
+				case LogLevel_TestError:    puts(getEscapeCode(1, false, true).c_str()); puts(getEscapeCode(7, true, false).c_str()); break;
 				default:					break;
             }
 #else
@@ -202,7 +202,7 @@ namespace Engine {
 					if (showColors) {
 						SetConsoleColor(false, level);
 					}
-					std::cout << newEvent.FormatConsole() << std::endl;
+					puts(newEvent.FormatConsole().c_str());
 					if (showColors) {
 						SetConsoleColor(true, level);
 					}
@@ -222,7 +222,7 @@ namespace Engine {
 						if (showColors) {
 							SetConsoleColor(false, level);
 						}
-						std::cout << newEvent.FormatConsole() << std::endl;
+						puts(newEvent.FormatConsole().c_str());
 						if (showColors) {
 							SetConsoleColor(true, level);
 						}
@@ -232,15 +232,15 @@ namespace Engine {
                     newLinePos = strCopy.find('\n');
                 }
                 
-                _logEvents.push_back(LogEvent(domain, level, strCopy));
+				LogEvent newEvent(domain, level, strCopy);
+
+				_logEvents.push_back(newEvent);
                 
                 if (logConsole) {
 					if (showColors) {
 						SetConsoleColor(false, level);
 					}
-                    std::cout << Platform::GetTime()
-                        << " : [" << GetLevelString(level) << "] "
-						<< domain << " | " << strCopy << std::endl;
+					puts(newEvent.FormatConsole().c_str());
 					if (showColors) {
 						SetConsoleColor(true, level);
 					}

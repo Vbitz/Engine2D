@@ -37,7 +37,7 @@ namespace Engine {
     
 #pragma pack(push, 1)
     struct BufferFormat {
-		BufferFormat(glm::vec3 pos, Color4f col, glm::vec3 uv) : pos(pos), col(col), uv(uv) {}
+		inline BufferFormat(glm::vec3 pos, Color4f col, glm::vec3 uv) : pos(pos), col(col), uv(uv) {}
 
         glm::vec3 pos;
         Color4f col;
@@ -83,9 +83,24 @@ namespace Engine {
         bool IsValid();
         void Init(RenderDriverPtr render, EffectParametersPtr params);
 
-        void AddVert(glm::vec3 pos);
-        void AddVert(glm::vec3 pos, Color4f col);
-        void AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv, int texId = 1);
+		inline void AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv, int texId = 0) {
+			if (this->_vertexCount > 500 && this->_vertexBuffer.capacity() < this->_vertexCount + 1) {
+				this->_vertexBuffer.reserve(this->_vertexCount * 2);
+			}
+			this->_vertexBuffer[this->_vertexCount].pos = pos;
+			this->_vertexBuffer[this->_vertexCount].col = col;
+			this->_vertexBuffer[this->_vertexCount++].uv = glm::vec3(uv, texId);
+			this->_dirty = true;
+		}
+
+		inline void AddVert(glm::vec3 pos, Color4f col) {
+			this->AddVert(pos, col, glm::vec2(0, 0));
+		}
+
+		inline void AddVert(glm::vec3 pos) {
+			static Color4f colorWhite = Color4f(1.f, 1.f, 1.f, 1.f);
+			this->AddVert(pos, colorWhite, glm::vec2(0, 0));
+		}
         
         void Reset();
         
@@ -115,8 +130,14 @@ namespace Engine {
         RenderDriverPtr GetRender() {
             return this->_renderGL;
         }
+
+		Platform::UUID GetUUID() {
+			return this->_uuid;
+		}
         
 	private:
+		Platform::UUID _uuid;
+
         void _init();
         void _shutdown();
         ShaderPtr _getShader();
@@ -130,14 +151,13 @@ namespace Engine {
         
         glm::vec4 _getCameraView();
         
-        unsigned int _vertexArrayPointer, _elementBufferPointer, _vertexBufferPointer;
+        unsigned int _vertexArrayPointer, _vertexBufferPointer;
         
         ProjectionType _projectionType = ProjectionType::Orthographic;
         
         glm::mat4 _view;
         
         VertexStore _vertexBuffer;
-        IndexStore _indexBuffer;
         
         unsigned short _vertexCount = 0;
         

@@ -66,6 +66,7 @@ namespace Engine {
         }
     };
     
+
     class RenderDriver {
     private:
         Color4f _currentColor = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -77,7 +78,13 @@ namespace Engine {
             
             RenderDriverError(const char* source, int err, std::string errorString) : Source(source), Error(err), ErrorString(errorString) { }
         };
-        
+
+		/**
+			Get the current RendererType for the RenderDriver
+			This will not return the version of the Renderer used just the general type
+
+			@return RendererType
+		*/
         virtual RendererType GetRendererType() = 0;
         virtual OpenGLVersion GetOpenGLVersion() = 0;
         virtual EffectShaderType GetBestEffectShaderType() = 0;
