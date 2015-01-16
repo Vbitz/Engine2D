@@ -74,6 +74,7 @@ Default/
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*.GhostDoc.xml
 *.psess
 *.vspx
 
