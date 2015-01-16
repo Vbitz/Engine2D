@@ -54,13 +54,13 @@ namespace Engine {
     }
     
 	VertexBuffer::VertexBuffer() : _shaderBound(false), _uuid(Platform::GenerateUUID()),
-		_vertexBuffer(512, BufferFormat(glm::vec3(), Color4f(0, 0, 0, 1), glm::vec3())) {
+		_vertexBuffer(128, BufferFormat(glm::vec3(), Color4f(0, 0, 0, 1), glm::vec3())) {
 
     }
     
 	VertexBuffer::VertexBuffer(RenderDriverPtr render, EffectParametersPtr params) : _currentEffect(params),
 			_shaderBound(false), _renderGL(render), _uuid(Platform::GenerateUUID()),
-			_vertexBuffer(512, BufferFormat(glm::vec3(), Color4f(0, 0, 0, 1), glm::vec3())) {
+			_vertexBuffer(128, BufferFormat(glm::vec3(), Color4f(0, 0, 0, 1), glm::vec3())) {
         this->_init();
     }
     

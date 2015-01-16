@@ -62,20 +62,20 @@ namespace Engine {
         void SetConsoleColor(bool reset, LogLevel level) {
 #ifndef _PLATFORM_WIN32
 			if (reset) {
-				puts("\x1b[0;37m");
+				printf("%s", "\x1b[0;37m");
                 return;
 			}
             switch (level) {
-                case LogLevel_Verbose:      puts(getEscapeCode(0, true, false).c_str()); break;
-				case LogLevel_User:         puts(getEscapeCode(5, true, false).c_str()); break;
-				case LogLevel_ConsoleInput: puts(getEscapeCode(6, true, false).c_str()); break;
-				case LogLevel_Log:          puts(getEscapeCode(7, false, false).c_str()); break;
-				case LogLevel_Warning:      puts(getEscapeCode(3, false, false).c_str()); break;
-				case LogLevel_Error:        puts(getEscapeCode(1, true, false).c_str()); break;
+                case LogLevel_Verbose:      printf("%s", getEscapeCode(0, true, false).c_str()); break;
+				case LogLevel_User:         printf("%s", getEscapeCode(5, true, false).c_str()); break;
+				case LogLevel_ConsoleInput: printf("%s", getEscapeCode(6, true, false).c_str()); break;
+				case LogLevel_Log:          printf("%s", getEscapeCode(7, false, false).c_str()); break;
+				case LogLevel_Warning:      printf("%s", getEscapeCode(3, false, false).c_str()); break;
+				case LogLevel_Error:        printf("%s", getEscapeCode(1, true, false).c_str()); break;
                 case LogLevel_Highlight:
-				case LogLevel_Toast:        puts(getEscapeCode(7, false, true).c_str()); puts(getEscapeCode(0, true, false).c_str()); break;
-				case LogLevel_TestLog:      puts(getEscapeCode(7, false, true).c_str()); puts(getEscapeCode(0, true, false).c_str()); break;
-				case LogLevel_TestError:    puts(getEscapeCode(1, false, true).c_str()); puts(getEscapeCode(7, true, false).c_str()); break;
+				case LogLevel_Toast:        printf("%s", getEscapeCode(7, false, true).c_str()); printf("%s", getEscapeCode(0, true, false).c_str()); break;
+				case LogLevel_TestLog:      printf("%s", getEscapeCode(7, false, true).c_str()); printf("%s", getEscapeCode(0, true, false).c_str()); break;
+				case LogLevel_TestError:    printf("%s", getEscapeCode(1, false, true).c_str()); printf("%s", getEscapeCode(7, true, false).c_str()); break;
 				default:					break;
             }
 #else
@@ -202,10 +202,11 @@ namespace Engine {
 					if (showColors) {
 						SetConsoleColor(false, level);
 					}
-					puts(newEvent.FormatConsole().c_str());
+					printf("%s", newEvent.FormatConsole().c_str());
 					if (showColors) {
 						SetConsoleColor(true, level);
 					}
+                    printf("\n");
                 }
             } else {
                 std::string strCopy = str;
@@ -222,10 +223,11 @@ namespace Engine {
 						if (showColors) {
 							SetConsoleColor(false, level);
 						}
-						puts(newEvent.FormatConsole().c_str());
-						if (showColors) {
-							SetConsoleColor(true, level);
-						}
+                        printf("%s", newEvent.FormatConsole().c_str());
+                        if (showColors) {
+                            SetConsoleColor(true, level);
+                        }
+                        printf("\n");
                     }
                     
                     strCopy.erase(0, newLinePos + 1);
@@ -240,10 +242,11 @@ namespace Engine {
 					if (showColors) {
 						SetConsoleColor(false, level);
 					}
-					puts(newEvent.FormatConsole().c_str());
-					if (showColors) {
-						SetConsoleColor(true, level);
-					}
+                    printf("%s", newEvent.FormatConsole().c_str());
+                    if (showColors) {
+                        SetConsoleColor(true, level);
+                    }
+                    printf("\n");
                 }
             }
             
