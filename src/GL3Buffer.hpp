@@ -84,7 +84,7 @@ namespace Engine {
         void Init(RenderDriverPtr render, EffectParametersPtr params);
 
 		inline void AddVert(glm::vec3 pos, Color4f col, glm::vec2 uv, int texId = 2) {
-			if (this->_vertexCount > 500 && this->_vertexBuffer.capacity() < this->_vertexCount + 1) {
+			if (this->_vertexCount > 100 && this->_vertexBuffer.capacity() < this->_vertexCount + 1) {
 				this->_vertexBuffer.reserve(this->_vertexCount * 2);
 			}
 			this->_vertexBuffer[this->_vertexCount].pos = pos;
