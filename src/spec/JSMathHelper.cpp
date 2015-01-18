@@ -30,6 +30,7 @@
 #define GLM_FORCE_RADIANS
 #include "../vendor/glm/glm.hpp"
 #include "../vendor/glm/gtc/matrix_transform.hpp"
+#include "../vendor/glm/gtx/rotate_vector.hpp"
 
 #include <random>
 #include <iostream>
@@ -224,6 +225,20 @@ namespace Engine {
             
             args.SetReturnValue(ToJSVector(args, glm::vec4(ret, 0.0)));
         }
+
+        void JS_Vector::Rotate(const v8::FunctionCallbackInfo<v8::Value>& _args) {
+            ScriptingManager::Arguments args(_args);
+            if (args.AssertCount(2)) return;
+            
+            if (args.Assert(args[0]->IsNumber(), "Arg0 is a Number") &&
+                args.Assert(IsJSVector(args, args[1]), "Arg1 is a Vec3")) return;
+            
+            glm::vec3 ret = glm::rotate(glm::vec3(FromJSVector(args, args.This())),
+                                        (float) args.NumberValue(0),
+                                        glm::vec3(FromJSVector(args, args[1])));
+            
+            args.SetReturnValue(ToJSVector(args, glm::vec4(ret, 0.0)));
+        }
         
         void JS_Vector::ToString(const v8::FunctionCallbackInfo<v8::Value>& _args) {
             ScriptingManager::Arguments args(_args);
@@ -254,7 +269,8 @@ namespace Engine {
                 {FTT_Prototype, "sub", f.NewFunctionTemplate(Sub)},
                 {FTT_Prototype, "mul", f.NewFunctionTemplate(Mul)},
                 {FTT_Prototype, "dot", f.NewFunctionTemplate(Dot)},
-                {FTT_Prototype, "cross", f.NewFunctionTemplate(Cross)}
+                {FTT_Prototype, "cross", f.NewFunctionTemplate(Cross)},
+                {FTT_Prototype, "rotate", f.NewFunctionTemplate(Rotate)}
                 // TOOD: distince
                 // TODO: length
                 // TODO: normalize

@@ -39,6 +39,7 @@ namespace Engine {
             static void Mul(const v8::FunctionCallbackInfo<v8::Value>& _args);
             static void Dot(const v8::FunctionCallbackInfo<v8::Value>& _args);
             static void Cross(const v8::FunctionCallbackInfo<v8::Value>& _args);
+            static void Rotate(const v8::FunctionCallbackInfo<v8::Value>& _args);
             static void ToString(const v8::FunctionCallbackInfo<v8::Value>& _args);
             
             static void CreateInterface(v8::Isolate* isolate, v8::Handle<v8::Object> math_table);

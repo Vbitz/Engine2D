@@ -464,6 +464,7 @@ namespace Engine {
             ctx->Enter();
             
             this->SetScriptTableValue("sys", {FTT_Hidden, "_app", f.NewExternal(GetAppSingilton())});
+            this->SetScriptTableValue("console", {FTT_Hidden, "_app", f.NewExternal(GetAppSingilton())});
             
             JsMathHelper::InitMathHelper();
             

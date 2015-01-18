@@ -101,19 +101,21 @@ namespace Engine {
                 
             v8::Local<v8::Value> ret = func->Call(ctx->Global(), 1 + jsArgC, args);
             
+            if (!tryCatch.StackTrace().IsEmpty()) {
+                ScriptingManager::ReportException(currentIsolate, &tryCatch);
+                ret.Clear();
+                func.Clear();
+                return EM_BADTARGET;
+            }
+            
             ret_magic = GetScriptingReturnType(ret);
             
             ret.Clear();
             func.Clear();
             
             delete [] args;
-                
-            if (!tryCatch.StackTrace().IsEmpty()) {
-                ScriptingManager::ReportException(currentIsolate, &tryCatch);
-                return EM_BADTARGET;
-            } else {
-                return ret_magic;
-            }
+            
+            return ret_magic;
         }
             
         EventMagic Run(Json::Value& e) override {
