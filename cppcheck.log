@@ -1,0 +1,3 @@
+[src/Drawables/CubeDrawableTest.hpp:39]: (style) Class 'CubeDrawableTest' is unsafe, 'CubeDrawableTest::_draw' can leak by wrong usage.
+[src/Modules/JSUnsafe.cpp:43]: (error) Memory leak: numAddr
+[src/ResourceManager.cpp:35]: (error) Mismatching allocation and deallocation: Source::_savedData
