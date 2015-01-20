@@ -1,3 +1,384 @@
-[src/Drawables/CubeDrawableTest.hpp:39]: (style) Class 'CubeDrawableTest' is unsafe, 'CubeDrawableTest::_draw' can leak by wrong usage.
-[src/Modules/JSUnsafe.cpp:43]: (error) Memory leak: numAddr
-[src/ResourceManager.cpp:35]: (error) Mismatching allocation and deallocation: Source::_savedData
+[src/Addon.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/Application.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 80 configurations. Use --force to check all configurations.
+[src/Config.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 13 configurations. Use --force to check all configurations.
+[src/vendor/json/json.h:492] -> [src/vendor/json/json.h:198]: (style, inconclusive) The typedef 'Int' hides a typedef with the same name.
+[src/vendor/json/json.h:491] -> [src/vendor/json/json.h:199]: (style, inconclusive) The typedef 'UInt' hides a typedef with the same name.
+[src/vendor/json/json.h:495] -> [src/vendor/json/json.h:210]: (style, inconclusive) The typedef 'Int64' hides a typedef with the same name.
+[src/vendor/json/json.h:494] -> [src/vendor/json/json.h:211]: (style, inconclusive) The typedef 'UInt64' hides a typedef with the same name.
+[src/vendor/json/json.h:497] -> [src/vendor/json/json.h:213]: (style, inconclusive) The typedef 'LargestInt' hides a typedef with the same name.
+[src/vendor/json/json.h:498] -> [src/vendor/json/json.h:214]: (style, inconclusive) The typedef 'LargestUInt' hides a typedef with the same name.
+[src/vendor/json/json.h:499] -> [src/vendor/json/json.h:260]: (style, inconclusive) The typedef 'ArrayIndex' hides a typedef with the same name.
+[src/Events.hpp:84]: (style) The class 'EventClass' does not have a constructor.
+[src/ScriptingManager.hpp:306]: (style, inconclusive) Technically the member function 'Engine::ScriptingManager::Arguments::operator[]' can be const.
+[src/RenderTypes.hpp:37]: (style, inconclusive) Technically the member function 'Engine::OpenGLVersion::toString' can be const.
+[src/Events.hpp:75]: (style, inconclusive) Technically the member function 'Engine::EventClassSecurity::ToString' can be const.
+[src/stdlib.hpp:211]: (performance) Function parameter 'data' should be passed by reference.
+[src/stdlib.hpp:214]: (performance) Function parameter 'data' should be passed by reference.
+[src/vendor/json/json.h:1136] -> [src/vendor/json/json.h:260]: (style, inconclusive) The typedef 'ArrayIndex' hides a typedef with the same name.
+[src/vendor/json/json.h:495] -> [src/vendor/json/json.h:207]: (style, inconclusive) The typedef 'Int64' hides a typedef with the same name.
+[src/vendor/json/json.h:494] -> [src/vendor/json/json.h:208]: (style, inconclusive) The typedef 'UInt64' hides a typedef with the same name.
+[src/vendor/json/json.h:311]: (information) The code 'class CPPTL_API Features {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:431]: (information) The code 'class CPPTL_API StaticString {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:480]: (information) The code 'class CPPTL_API Value {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:872]: (information) The code 'class CPPTL_API PathArgument {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:905]: (information) The code 'class CPPTL_API Path {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:1281]: (information) The code 'class CPPTL_API ValueIteratorBase {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:1352]: (information) The code 'class CPPTL_API ValueConstIterator :' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:1411]: (information) The code 'class CPPTL_API ValueIterator :' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:1522]: (information) The code 'class CPPTL_API Reader {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:1760]: (information) The code 'class CPPTL_API Writer {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:1774]: (information) The code 'class CPPTL_API FastWriter :' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:1818]: (information) The code 'class CPPTL_API StyledWriter :' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:1875]: (information) The code 'class CPPTL_API StyledStreamWriter {' is not handled. You can use -I or --include to add handling of this code.
+[src/vendor/json/json.h:497] -> [src/vendor/json/json.h:201]: (style, inconclusive) The typedef 'LargestInt' hides a typedef with the same name.
+[src/vendor/json/json.h:498] -> [src/vendor/json/json.h:202]: (style, inconclusive) The typedef 'LargestUInt' hides a typedef with the same name.
+[src/CoreTests.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 16 configurations. Use --force to check all configurations.
+[src/Database.cpp:1]: (information) Skipping configuration 'SQLITE_INT64_TYPE' since the value of 'SQLITE_INT64_TYPE' is unknown. Use -D if you want to check it. You can use -U to skip it explicitly.
+[src/Draw2D.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/Draw3D.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/Drawables/CubeDrawableTest.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/EngineUI.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/Events.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 17 configurations. Use --force to check all configurations.
+[src/Filesystem.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 15 configurations. Use --force to check all configurations.
+[src/Filesystem.cpp:47]: (style, inconclusive) Technically the member function 'Engine::Filesystem::PhysFSFile::GetMode' can be const.
+[src/FontSheet.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/Platform.hpp:155]: (style, inconclusive) Technically the member function 'Engine::Platform::MemoryMappedRegion::Length' can be const.
+[src/GL3Buffer.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 84 configurations. Use --force to check all configurations.
+[src/vendor/glm/fwd.hpp:277] -> [src/vendor/glm/detail/type_int.hpp:42]: (style, inconclusive) The typedef 'int8' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:281] -> [src/vendor/glm/detail/type_int.hpp:43]: (style, inconclusive) The typedef 'int16' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:285] -> [src/vendor/glm/detail/type_int.hpp:44]: (style, inconclusive) The typedef 'int32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:289] -> [src/vendor/glm/detail/type_int.hpp:45]: (style, inconclusive) The typedef 'int64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:879] -> [src/vendor/glm/detail/type_int.hpp:47]: (style, inconclusive) The typedef 'uint8' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:883] -> [src/vendor/glm/detail/type_int.hpp:48]: (style, inconclusive) The typedef 'uint16' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:887] -> [src/vendor/glm/detail/type_int.hpp:49]: (style, inconclusive) The typedef 'uint32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:891] -> [src/vendor/glm/detail/type_int.hpp:50]: (style, inconclusive) The typedef 'uint64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:277] -> [src/vendor/glm/detail/type_int.hpp:89]: (style, inconclusive) The typedef 'int8' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:281] -> [src/vendor/glm/detail/type_int.hpp:90]: (style, inconclusive) The typedef 'int16' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:285] -> [src/vendor/glm/detail/type_int.hpp:91]: (style, inconclusive) The typedef 'int32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:289] -> [src/vendor/glm/detail/type_int.hpp:92]: (style, inconclusive) The typedef 'int64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:879] -> [src/vendor/glm/detail/type_int.hpp:94]: (style, inconclusive) The typedef 'uint8' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:883] -> [src/vendor/glm/detail/type_int.hpp:95]: (style, inconclusive) The typedef 'uint16' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:887] -> [src/vendor/glm/detail/type_int.hpp:96]: (style, inconclusive) The typedef 'uint32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:891] -> [src/vendor/glm/detail/type_int.hpp:97]: (style, inconclusive) The typedef 'uint64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1507] -> [src/vendor/glm/detail/type_float.hpp:37]: (style, inconclusive) The typedef 'float32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1511] -> [src/vendor/glm/detail/type_float.hpp:38]: (style, inconclusive) The typedef 'float64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1507] -> [src/vendor/glm/detail/type_float.hpp:81]: (style, inconclusive) The typedef 'float32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1511] -> [src/vendor/glm/detail/type_float.hpp:82]: (style, inconclusive) The typedef 'float64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1605] -> [src/vendor/glm/detail/type_vec.hpp:65]: (style, inconclusive) The typedef 'highp_vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1571] -> [src/vendor/glm/detail/type_vec.hpp:72]: (style, inconclusive) The typedef 'mediump_vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1537] -> [src/vendor/glm/detail/type_vec.hpp:79]: (style, inconclusive) The typedef 'lowp_vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1609] -> [src/vendor/glm/detail/type_vec.hpp:176]: (style, inconclusive) The typedef 'highp_vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1575] -> [src/vendor/glm/detail/type_vec.hpp:183]: (style, inconclusive) The typedef 'mediump_vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1541] -> [src/vendor/glm/detail/type_vec.hpp:190]: (style, inconclusive) The typedef 'lowp_vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1613] -> [src/vendor/glm/detail/type_vec.hpp:282]: (style, inconclusive) The typedef 'highp_vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1579] -> [src/vendor/glm/detail/type_vec.hpp:288]: (style, inconclusive) The typedef 'mediump_vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1545] -> [src/vendor/glm/detail/type_vec.hpp:294]: (style, inconclusive) The typedef 'lowp_vec4' hides a typedef with the same name.
+[src/vendor/glm/mat2x2.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:65]: (style, inconclusive) The typedef 'lowp_mat2' hides a typedef with the same name.
+[src/vendor/glm/mat2x2.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:72]: (style, inconclusive) The typedef 'mediump_mat2' hides a typedef with the same name.
+[src/vendor/glm/mat2x2.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:79]: (style, inconclusive) The typedef 'highp_mat2' hides a typedef with the same name.
+[src/vendor/glm/mat2x2.hpp:62] -> [src/vendor/glm/detail/type_mat.hpp:86]: (style, inconclusive) The typedef 'lowp_mat2x2' hides a typedef with the same name.
+[src/vendor/glm/mat2x2.hpp:69] -> [src/vendor/glm/detail/type_mat.hpp:93]: (style, inconclusive) The typedef 'mediump_mat2x2' hides a typedef with the same name.
+[src/vendor/glm/mat2x2.hpp:76] -> [src/vendor/glm/detail/type_mat.hpp:100]: (style, inconclusive) The typedef 'highp_mat2x2' hides a typedef with the same name.
+[src/vendor/glm/mat2x3.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:112]: (style, inconclusive) The typedef 'lowp_mat2x3' hides a typedef with the same name.
+[src/vendor/glm/mat2x3.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:119]: (style, inconclusive) The typedef 'mediump_mat2x3' hides a typedef with the same name.
+[src/vendor/glm/mat2x3.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:126]: (style, inconclusive) The typedef 'highp_mat2x3' hides a typedef with the same name.
+[src/vendor/glm/mat2x4.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:138]: (style, inconclusive) The typedef 'lowp_mat2x4' hides a typedef with the same name.
+[src/vendor/glm/mat2x4.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:145]: (style, inconclusive) The typedef 'mediump_mat2x4' hides a typedef with the same name.
+[src/vendor/glm/mat2x4.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:152]: (style, inconclusive) The typedef 'highp_mat2x4' hides a typedef with the same name.
+[src/vendor/glm/mat3x2.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:164]: (style, inconclusive) The typedef 'lowp_mat3x2' hides a typedef with the same name.
+[src/vendor/glm/mat3x2.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:171]: (style, inconclusive) The typedef 'mediump_mat3x2' hides a typedef with the same name.
+[src/vendor/glm/mat3x2.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:178]: (style, inconclusive) The typedef 'highp_mat3x2' hides a typedef with the same name.
+[src/vendor/glm/mat3x3.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:190]: (style, inconclusive) The typedef 'lowp_mat3' hides a typedef with the same name.
+[src/vendor/glm/mat3x3.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:197]: (style, inconclusive) The typedef 'mediump_mat3' hides a typedef with the same name.
+[src/vendor/glm/mat3x3.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:204]: (style, inconclusive) The typedef 'highp_mat3' hides a typedef with the same name.
+[src/vendor/glm/mat3x3.hpp:62] -> [src/vendor/glm/detail/type_mat.hpp:211]: (style, inconclusive) The typedef 'lowp_mat3x3' hides a typedef with the same name.
+[src/vendor/glm/mat3x3.hpp:69] -> [src/vendor/glm/detail/type_mat.hpp:218]: (style, inconclusive) The typedef 'mediump_mat3x3' hides a typedef with the same name.
+[src/vendor/glm/mat3x3.hpp:76] -> [src/vendor/glm/detail/type_mat.hpp:225]: (style, inconclusive) The typedef 'highp_mat3x3' hides a typedef with the same name.
+[src/vendor/glm/mat3x4.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:237]: (style, inconclusive) The typedef 'lowp_mat3x4' hides a typedef with the same name.
+[src/vendor/glm/mat3x4.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:244]: (style, inconclusive) The typedef 'mediump_mat3x4' hides a typedef with the same name.
+[src/vendor/glm/mat3x4.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:251]: (style, inconclusive) The typedef 'highp_mat3x4' hides a typedef with the same name.
+[src/vendor/glm/mat4x2.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:263]: (style, inconclusive) The typedef 'lowp_mat4x2' hides a typedef with the same name.
+[src/vendor/glm/mat4x2.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:270]: (style, inconclusive) The typedef 'mediump_mat4x2' hides a typedef with the same name.
+[src/vendor/glm/mat4x2.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:277]: (style, inconclusive) The typedef 'highp_mat4x2' hides a typedef with the same name.
+[src/vendor/glm/mat4x3.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:289]: (style, inconclusive) The typedef 'lowp_mat4x3' hides a typedef with the same name.
+[src/vendor/glm/mat4x3.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:296]: (style, inconclusive) The typedef 'mediump_mat4x3' hides a typedef with the same name.
+[src/vendor/glm/mat4x3.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:303]: (style, inconclusive) The typedef 'highp_mat4x3' hides a typedef with the same name.
+[src/vendor/glm/mat4x4.hpp:41] -> [src/vendor/glm/detail/type_mat.hpp:316]: (style, inconclusive) The typedef 'lowp_mat4' hides a typedef with the same name.
+[src/vendor/glm/mat4x4.hpp:48] -> [src/vendor/glm/detail/type_mat.hpp:323]: (style, inconclusive) The typedef 'mediump_mat4' hides a typedef with the same name.
+[src/vendor/glm/mat4x4.hpp:55] -> [src/vendor/glm/detail/type_mat.hpp:330]: (style, inconclusive) The typedef 'highp_mat4' hides a typedef with the same name.
+[src/vendor/glm/mat4x4.hpp:62] -> [src/vendor/glm/detail/type_mat.hpp:337]: (style, inconclusive) The typedef 'lowp_mat4x4' hides a typedef with the same name.
+[src/vendor/glm/mat4x4.hpp:69] -> [src/vendor/glm/detail/type_mat.hpp:344]: (style, inconclusive) The typedef 'mediump_mat4x4' hides a typedef with the same name.
+[src/vendor/glm/mat4x4.hpp:76] -> [src/vendor/glm/detail/type_mat.hpp:351]: (style, inconclusive) The typedef 'highp_mat4x4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:2417] -> [src/vendor/glm/fwd.hpp:90]: (style, inconclusive) The typedef 'fquat' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:565] -> [src/vendor/glm/fwd.hpp:486]: (style, inconclusive) The typedef 'lowp_i32vec1' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:569] -> [src/vendor/glm/fwd.hpp:490]: (style, inconclusive) The typedef 'lowp_i32vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:573] -> [src/vendor/glm/fwd.hpp:494]: (style, inconclusive) The typedef 'lowp_i32vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:577] -> [src/vendor/glm/fwd.hpp:498]: (style, inconclusive) The typedef 'lowp_i32vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:582] -> [src/vendor/glm/fwd.hpp:503]: (style, inconclusive) The typedef 'mediump_i32vec1' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:586] -> [src/vendor/glm/fwd.hpp:507]: (style, inconclusive) The typedef 'mediump_i32vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:590] -> [src/vendor/glm/fwd.hpp:511]: (style, inconclusive) The typedef 'mediump_i32vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:594] -> [src/vendor/glm/fwd.hpp:515]: (style, inconclusive) The typedef 'mediump_i32vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:599] -> [src/vendor/glm/fwd.hpp:520]: (style, inconclusive) The typedef 'highp_i32vec1' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:603] -> [src/vendor/glm/fwd.hpp:524]: (style, inconclusive) The typedef 'highp_i32vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:607] -> [src/vendor/glm/fwd.hpp:528]: (style, inconclusive) The typedef 'highp_i32vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:611] -> [src/vendor/glm/fwd.hpp:532]: (style, inconclusive) The typedef 'highp_i32vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:626] -> [src/vendor/glm/fwd.hpp:547]: (style, inconclusive) The typedef 'i32vec1' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:630] -> [src/vendor/glm/fwd.hpp:551]: (style, inconclusive) The typedef 'i32vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:634] -> [src/vendor/glm/fwd.hpp:555]: (style, inconclusive) The typedef 'i32vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:638] -> [src/vendor/glm/fwd.hpp:559]: (style, inconclusive) The typedef 'i32vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1168] -> [src/vendor/glm/fwd.hpp:1089]: (style, inconclusive) The typedef 'lowp_u32vec1' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1172] -> [src/vendor/glm/fwd.hpp:1093]: (style, inconclusive) The typedef 'lowp_u32vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1176] -> [src/vendor/glm/fwd.hpp:1097]: (style, inconclusive) The typedef 'lowp_u32vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1180] -> [src/vendor/glm/fwd.hpp:1101]: (style, inconclusive) The typedef 'lowp_u32vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1185] -> [src/vendor/glm/fwd.hpp:1106]: (style, inconclusive) The typedef 'mediump_u32vec1' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1189] -> [src/vendor/glm/fwd.hpp:1110]: (style, inconclusive) The typedef 'mediump_u32vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1193] -> [src/vendor/glm/fwd.hpp:1114]: (style, inconclusive) The typedef 'mediump_u32vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1197] -> [src/vendor/glm/fwd.hpp:1118]: (style, inconclusive) The typedef 'mediump_u32vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1202] -> [src/vendor/glm/fwd.hpp:1123]: (style, inconclusive) The typedef 'highp_u32vec1' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1206] -> [src/vendor/glm/fwd.hpp:1127]: (style, inconclusive) The typedef 'highp_u32vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1210] -> [src/vendor/glm/fwd.hpp:1131]: (style, inconclusive) The typedef 'highp_u32vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1214] -> [src/vendor/glm/fwd.hpp:1135]: (style, inconclusive) The typedef 'highp_u32vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1229] -> [src/vendor/glm/fwd.hpp:1150]: (style, inconclusive) The typedef 'u32vec1' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1233] -> [src/vendor/glm/fwd.hpp:1154]: (style, inconclusive) The typedef 'u32vec2' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1237] -> [src/vendor/glm/fwd.hpp:1158]: (style, inconclusive) The typedef 'u32vec3' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1241] -> [src/vendor/glm/fwd.hpp:1162]: (style, inconclusive) The typedef 'u32vec4' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1354] -> [src/vendor/glm/fwd.hpp:1330]: (style, inconclusive) The typedef 'lowp_float32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1358] -> [src/vendor/glm/fwd.hpp:1334]: (style, inconclusive) The typedef 'lowp_float64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1362] -> [src/vendor/glm/fwd.hpp:1338]: (style, inconclusive) The typedef 'lowp_float32_t' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1366] -> [src/vendor/glm/fwd.hpp:1342]: (style, inconclusive) The typedef 'lowp_float64_t' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1370] -> [src/vendor/glm/fwd.hpp:1346]: (style, inconclusive) The typedef 'lowp_f32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1374] -> [src/vendor/glm/fwd.hpp:1350]: (style, inconclusive) The typedef 'lowp_f64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1379] -> [src/vendor/glm/fwd.hpp:1354]: (style, inconclusive) The typedef 'lowp_float32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1383] -> [src/vendor/glm/fwd.hpp:1358]: (style, inconclusive) The typedef 'lowp_float64' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1387] -> [src/vendor/glm/fwd.hpp:1362]: (style, inconclusive) The typedef 'lowp_float32_t' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1391] -> [src/vendor/glm/fwd.hpp:1366]: (style, inconclusive) The typedef 'lowp_float64_t' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1395] -> [src/vendor/glm/fwd.hpp:1370]: (style, inconclusive) The typedef 'lowp_f32' hides a typedef with the same name.
+[src/vendor/glm/fwd.hpp:1399] -> [src/vendor/glm/fwd.hpp:1374]: (style, inconclusive) The typedef 'lowp_f64' hides a typedef with the same name.
+[src/TextureLoader.hpp:37] -> [src/ResourceManager.hpp:33]: (style, inconclusive) The typedef 'TexturePtr' hides a typedef with the same name.
+[src/FontSheet.hpp:31] -> [src/ResourceManager.hpp:33]: (style, inconclusive) The typedef 'TexturePtr' hides a typedef with the same name.
+[src/RenderDriver.hpp:36] -> [src/ResourceManager.hpp:33]: (style, inconclusive) The typedef 'TexturePtr' hides a typedef with the same name.
+[src/TextureLoader.hpp:34] -> [src/ResourceManager.hpp:191]: (style, inconclusive) The typedef 'ImageResourcePtr' hides a typedef with the same name.
+[src/Events.hpp:40] -> [src/Platform.hpp:103]: (style, inconclusive) The typedef 'MutexPtr' hides a typedef with the same name.
+[src/FontSheet.hpp:32] -> [src/TextureLoader.hpp:31]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/RenderDriver.hpp:38] -> [src/TextureLoader.hpp:31]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/Window.hpp:34] -> [src/TextureLoader.hpp:31]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/Shader.hpp:35] -> [src/TextureLoader.hpp:31]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/FontSheet.hpp:31] -> [src/TextureLoader.hpp:37]: (style, inconclusive) The typedef 'TexturePtr' hides a typedef with the same name.
+[src/RenderDriver.hpp:36] -> [src/TextureLoader.hpp:37]: (style, inconclusive) The typedef 'TexturePtr' hides a typedef with the same name.
+[src/RenderDriver.hpp:36] -> [src/FontSheet.hpp:31]: (style, inconclusive) The typedef 'TexturePtr' hides a typedef with the same name.
+[src/RenderDriver.hpp:38] -> [src/FontSheet.hpp:32]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/Window.hpp:34] -> [src/FontSheet.hpp:32]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/Shader.hpp:35] -> [src/FontSheet.hpp:32]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/RenderDriver.hpp:37] -> [src/FontSheet.hpp:53]: (style, inconclusive) The typedef 'FontSheetPtr' hides a typedef with the same name.
+[src/Window.hpp:34] -> [src/RenderDriver.hpp:38]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/Shader.hpp:35] -> [src/RenderDriver.hpp:38]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/Shader.hpp:34] -> [src/RenderDriver.hpp:39]: (style, inconclusive) The typedef 'ShaderPtr' hides a typedef with the same name.
+[src/Shader.hpp:35] -> [src/Window.hpp:34]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/Draw2D.hpp:35] -> [src/SpriteSheet.hpp:49]: (style, inconclusive) The typedef 'SpriteSheetPtr' hides a typedef with the same name.
+[src/Application.hpp:50] -> [src/EngineUI.hpp:28]: (style, inconclusive) The typedef 'ApplicationPtr' hides a typedef with the same name.
+[src/Application.hpp:48] -> [src/EngineUI.hpp:30]: (style, inconclusive) The typedef 'EngineUIPtr' hides a typedef with the same name.
+[src/GL3Buffer.cpp:286]: (style) C-style pointer casting
+[src/vendor/glm/gtc/matrix_transform.inl:60]: (style, inconclusive) Statements following return, break, continue, goto or throw will never be executed.
+[src/ResourceManager.hpp:195]: (warning) Member variable 'ImageResource::_manualTexture' is not initialized in the constructor.
+[src/ResourceManager.hpp:195]: (warning) Member variable 'ImageResource::_texture' is not initialized in the constructor.
+[src/RenderDriver.hpp:70]: (style) The class 'RenderDriver' does not have a constructor.
+[src/GL3Buffer.cpp:56]: (warning) Member variable 'VertexBuffer::_vertexArrayPointer' is not initialized in the constructor.
+[src/GL3Buffer.cpp:56]: (warning) Member variable 'VertexBuffer::_vertexBufferPointer' is not initialized in the constructor.
+[src/GL3Buffer.cpp:56]: (warning) Member variable 'VertexBuffer::_projectionType' is not initialized in the constructor.
+[src/Drawables/CubeDrawableTest.hpp:31]: (warning) Member variable 'CubeDrawableTest::_draw' is not initialized in the constructor.
+[src/Application.hpp:54]: (style) The class 'Application' does not have a constructor.
+[src/RenderDriver.hpp:79] -> [src/RenderDriver.hpp:76]: (style, inconclusive) Member variable 'RenderDriverError::Error' is in the wrong place in the initializer list.
+[src/GL3Buffer.cpp:56] -> [src/GL3Buffer.hpp:139]: (style, inconclusive) Member variable 'VertexBuffer::_uuid' is in the wrong place in the initializer list.
+[src/GL3Buffer.cpp:62] -> [src/GL3Buffer.hpp:168]: (style, inconclusive) Member variable 'VertexBuffer::_renderGL' is in the wrong place in the initializer list.
+[src/GL3Buffer.cpp:62] -> [src/GL3Buffer.hpp:139]: (style, inconclusive) Member variable 'VertexBuffer::_uuid' is in the wrong place in the initializer list.
+[src/TextureLoader.hpp:57]: (style, inconclusive) Technically the member function 'Engine::Texture::GetUUID' can be const.
+[src/RenderDriver.hpp:107]: (style, inconclusive) Technically the member function 'Engine::RenderDriver::GetStatistic' can be const.
+[src/Window.hpp:90]: (style, inconclusive) Technically the member function 'Engine::Window::GetGraphicsVersion' can be const.
+[src/Shader.hpp:106]: (style, inconclusive) Technically the member function 'Engine::Shader::IsLoaded' can be const.
+[src/Shader.hpp:110]: (style, inconclusive) Technically the member function 'Engine::Shader::GetId' can be const.
+[src/GL3Buffer.cpp:71] -> [src/GL3Buffer.hpp:83]: (style, inconclusive) Technically the member function 'Engine::VertexBuffer::IsValid' can be const.
+[src/GL3Buffer.hpp:134]: (style, inconclusive) Technically the member function 'Engine::VertexBuffer::GetUUID' can be const.
+[src/GL3Buffer.cpp:345] -> [src/GL3Buffer.hpp:146]: (performance, inconclusive) Technically the member function 'Engine::VertexBuffer::_end' can be static.
+[src/Profiler.hpp:95]: (style, inconclusive) Technically the member function 'Engine::Profiler::Scope::GetName' can be const.
+[src/Profiler.hpp:99]: (style, inconclusive) Technically the member function 'Engine::Profiler::Scope::GetElapsedTime' can be const.
+[src/Addon.hpp:41]: (style, inconclusive) Technically the member function 'Engine::Addon::GetName' can be const.
+[src/Addon.hpp:45]: (style, inconclusive) Technically the member function 'Engine::Addon::GetAuthor' can be const.
+[src/Application.hpp:93]: (style, inconclusive) Technically the member function 'Engine::Application::IsDebugMode' can be const.
+[src/Application.hpp:97]: (style, inconclusive) Technically the member function 'Engine::Application::IsDeveloperMode' can be const.
+[src/Application.hpp:101]: (style, inconclusive) Technically the member function 'Engine::Application::IsHeadlessMode' can be const.
+[src/Application.hpp:108]: (style, inconclusive) Technically the member function 'Engine::Application::GetCurrentLoadState' can be const.
+[src/GL3Buffer.cpp:229]: (warning) Redundant code: Found a statement that begins with string constant.
+[src/GL3Buffer.cpp:61]: (warning) Member variable 'VertexBuffer::_vertexArrayPointer' is not initialized in the constructor.
+[src/GL3Buffer.cpp:61]: (warning) Member variable 'VertexBuffer::_vertexBufferPointer' is not initialized in the constructor.
+[src/GL3Buffer.cpp:61]: (warning) Member variable 'VertexBuffer::_projectionType' is not initialized in the constructor.
+[src/Logger.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 16 configurations. Use --force to check all configurations.
+[src/Modules/JSUnsafe.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 14 configurations. Use --force to check all configurations.
+[src/Modules/buildEpkgFromJson.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/Modules/gcDebug.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 15 configurations. Use --force to check all configurations.
+[src/stdlib.hpp:92]: (performance) Function parameter 'value' should be passed by reference.
+[src/Modules/pongTest.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/Modules/testing.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/Package.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 28 configurations. Use --force to check all configurations.
+[src/PackageTests.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 16 configurations. Use --force to check all configurations.
+[src/TestSuiteAPI.hpp:31]: (style) The class 'Test' does not have a constructor.
+[src/Platform_linux.cpp:237]: (style) Variable 'ret' is not assigned a value.
+[src/Platform_win.cpp:216]: (style) Variable 'ret' is not assigned a value.
+[src/Platform_win.cpp:269]: (style) Variable 'fmode' is assigned a value that is never used.
+[src/Profiler.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/RenderDriver.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/RenderGL3.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 84 configurations. Use --force to check all configurations.
+[src/RenderDriver.hpp:38] -> [src/Window.hpp:34]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/RenderDriver.hpp:39] -> [src/Shader.hpp:34]: (style, inconclusive) The typedef 'ShaderPtr' hides a typedef with the same name.
+[src/RenderDriver.hpp:38] -> [src/Shader.hpp:35]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/RenderGL3.cpp:156]: (style) The scope of the variable 'tex' can be reduced.
+[src/RenderGL3.cpp:105]: (style) The class 'RenderGL3' does not have a constructor.
+[src/ResourceManager.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/ScriptingManager.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/Shader.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 84 configurations. Use --force to check all configurations.
+[src/Shader.cpp:69]: (warning, inconclusive) Member variable 'EffectParameters::_textureCount' is not initialized in the constructor.
+[src/Shader.cpp:145]: (warning) Member variable 'Shader::_render' is not initialized in the constructor.
+[src/Shader.cpp:145]: (warning) Member variable 'Shader::_programPointer' is not initialized in the constructor.
+[src/Shader.cpp:145]: (warning) Member variable 'Shader::_vertPointer' is not initialized in the constructor.
+[src/Shader.cpp:145]: (warning) Member variable 'Shader::_fragPointer' is not initialized in the constructor.
+[src/Shader.cpp:145]: (warning) Member variable 'Shader::_vertLastModify' is not initialized in the constructor.
+[src/Shader.cpp:145]: (warning) Member variable 'Shader::_fragLastModify' is not initialized in the constructor.
+[src/Shader.cpp:149]: (warning) Member variable 'Shader::_loaded' is not initialized in the constructor.
+[src/Shader.cpp:149]: (warning) Member variable 'Shader::_programPointer' is not initialized in the constructor.
+[src/Shader.cpp:149]: (warning) Member variable 'Shader::_vertPointer' is not initialized in the constructor.
+[src/Shader.cpp:149]: (warning) Member variable 'Shader::_fragPointer' is not initialized in the constructor.
+[src/Shader.cpp:149]: (warning) Member variable 'Shader::_vertLastModify' is not initialized in the constructor.
+[src/Shader.cpp:149]: (warning) Member variable 'Shader::_fragLastModify' is not initialized in the constructor.
+[src/Shader.cpp:85] -> [src/Shader.hpp:62]: (style, inconclusive) Technically the member function 'Engine::EffectParameters::GetShaderSettings' can be const.
+[src/Shader.cpp:89] -> [src/Shader.hpp:64]: (performance, inconclusive) Technically the member function 'Engine::EffectParameters::NeedsUpdate' can be static.
+[src/Shader.cpp:167] -> [src/Shader.hpp:94]: (performance, inconclusive) Technically the member function 'Engine::Shader::End' can be static.
+[src/SpriteSheet.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/TestSuite.cpp:40] -> [src/TestSuiteAPI.hpp:39]: (style, inconclusive) Technically the member function 'Engine::Test::GetFailed' can be const.
+[src/TextureLoader.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 84 configurations. Use --force to check all configurations.
+[src/TextureLoader.hpp:37] -> [src/FontSheet.hpp:31]: (style, inconclusive) The typedef 'TexturePtr' hides a typedef with the same name.
+[src/TextureLoader.hpp:31] -> [src/FontSheet.hpp:32]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/TextureLoader.hpp:31] -> [src/Window.hpp:34]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/TextureLoader.hpp:31] -> [src/Shader.hpp:35]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/TextureLoader.hpp:37] -> [src/RenderDriver.hpp:36]: (style, inconclusive) The typedef 'TexturePtr' hides a typedef with the same name.
+[src/TextureLoader.hpp:31] -> [src/RenderDriver.hpp:38]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/TextureLoader.cpp:33]: (warning, inconclusive) Member variable 'Texture::_render' is not initialized in the constructor.
+[src/TextureLoader.cpp:33]: (warning, inconclusive) Member variable 'Texture::_textureID' is not initialized in the constructor.
+[src/TextureLoader.cpp:33]: (warning, inconclusive) Member variable 'Texture::_width' is not initialized in the constructor.
+[src/TextureLoader.cpp:33]: (warning, inconclusive) Member variable 'Texture::_height' is not initialized in the constructor.
+[src/TextureLoader.cpp:37] -> [src/TextureLoader.hpp:65]: (style, inconclusive) Member variable 'Texture::_uuid' is in the wrong place in the initializer list.
+[src/TextureLoader.cpp:87] -> [src/TextureLoader.hpp:54]: (style, inconclusive) Technically the member function 'Engine::Texture::GetWidth' can be const.
+[src/TextureLoader.cpp:91] -> [src/TextureLoader.hpp:55]: (style, inconclusive) Technically the member function 'Engine::Texture::GetHeight' can be const.
+[src/Timer.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 16 configurations. Use --force to check all configurations.
+[src/Window_glfw.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 83 configurations. Use --force to check all configurations.
+[src/Window.hpp:34] -> [src/Shader.hpp:35]: (style, inconclusive) The typedef 'RenderDriverPtr' hides a typedef with the same name.
+[src/Window_glfw.cpp:423]: (style) C-style pointer casting
+[src/Window_glfw.cpp:428]: (style) C-style pointer casting
+[src/Window_glfw.cpp:433]: (style) C-style pointer casting
+[src/Window_glfw.cpp:354]: (performance, inconclusive) Technically the member function 'Engine::Window_glfw::_getCurrentScreenSize' can be static.
+[src/Window_sdl.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 83 configurations. Use --force to check all configurations.
+[src/Window_sdl.cpp:278]: (performance, inconclusive) Technically the member function 'Engine::Window_sdl::_keypressCallback' can be static.
+[src/Window_sdl.cpp:296]: (performance, inconclusive) Technically the member function 'Engine::Window_sdl::_mouseButtonCallback' can be static.
+[src/WorkerThreadPool.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 16 configurations. Use --force to check all configurations.
+[src/spec/JSDatabase.cpp:31]: (style) The class 'JS_Database' does not have a constructor.
+[src/spec/JSDraw.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/spec/JSHeadless.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/spec/JSInput.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 78 configurations. Use --force to check all configurations.
+[src/spec/JSMathHelper.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 76 configurations. Use --force to check all configurations.
+[src/spec/JSMathHelper.cpp:143]: (style) Variable 'vec' is assigned a value that is never used.
+[src/spec/JSMathHelper.cpp:316]: (style) Variable 'matrix' is assigned a value that is never used.
+[src/spec/JSSys.cpp]: (information) Too many #ifdef configurations - cppcheck only checks 12 of 79 configurations. Use --force to check all configurations.
+[src/stdlib.cpp:255] -> [src/stdlib.hpp:90]: (performance, inconclusive) Technically the member function 'Engine::StringBuilder::toString' can be static.
+[src/stdlib.cpp:290] -> [src/stdlib.hpp:115]: (performance, inconclusive) Technically the member function 'Engine::String::concat' can be static.
+[src/stdlib.cpp:306] -> [src/stdlib.hpp:119]: (performance, inconclusive) Technically the member function 'Engine::String::contains' can be static.
+[src/stdlib.cpp:314] -> [src/stdlib.hpp:122]: (performance, inconclusive) Technically the member function 'Engine::String::startsWith' can be static.
+[src/stdlib.cpp:322] -> [src/stdlib.hpp:125]: (performance, inconclusive) Technically the member function 'Engine::String::endsWith' can be static.
+[src/stdlib.cpp:338] -> [src/stdlib.hpp:131]: (performance, inconclusive) Technically the member function 'Engine::String::lastIndexOf' can be static.
+[src/stdlib.cpp:365] -> [src/stdlib.hpp:171]: (performance, inconclusive) Technically the member function 'Engine::String::toCString' can be static.
+[src/stdlib.hpp:106]: (style) 'class String' does not have a copy constructor which is recommended since the class contains a pointer to allocated memory.
+[src/FramePerfMonitor.cpp:53]: (style) The function 'BeginDraw' is never used.
+[src/FramePerfMonitor.cpp:36]: (style) The function 'BeginFrame' is never used.
+[src/RenderGL3.cpp:208]: (style) The function 'BeginRendering' is never used.
+[src/Platform_linux.cpp:82]: (style) The function 'CallMethod' is never used.
+[src/RenderGL3.cpp:362]: (style) The function 'CameraPan' is never used.
+[src/RenderGL3.cpp:375]: (style) The function 'CameraRotate' is never used.
+[src/RenderGL3.cpp:368]: (style) The function 'CameraZoom' is never used.
+[src/RenderGL3.cpp:309]: (style) The function 'Clear' is never used.
+[src/GL3Buffer.cpp:311]: (style) The function 'ComputeNormals' is never used.
+[src/Window_glfw.cpp:531]: (style) The function 'CreateWindow' is never used.
+[src/Platform_linux.cpp:370]: (style) The function 'CryptBytes' is never used.
+[src/Filesystem.cpp:253]: (style) The function 'DeleteFile' is never used.
+[src/Filesystem.cpp:83]: (style) The function 'Destroy' is never used.
+[src/RenderGL3.cpp:247]: (style) The function 'DisableSmooth' is never used.
+[src/RenderGL3.cpp:234]: (style) The function 'DisableTexture' is never used.
+[src/Config.cpp:34]: (style) The function 'EnableConfigEvents' is never used.
+[src/RenderGL3.cpp:230]: (style) The function 'EnableTexture' is never used.
+[src/FramePerfMonitor.cpp:57]: (style) The function 'EndDraw' is never used.
+[src/FramePerfMonitor.cpp:40]: (style) The function 'EndFrame' is never used.
+[src/RenderGL3.cpp:226]: (style) The function 'EndRendering' is never used.
+[src/Filesystem.cpp:125]: (style) The function 'FolderExists' is never used.
+[src/stdlib.cpp:69]: (style) The function 'FromHSV' is never used.
+[src/FramePerfMonitor.cpp:65]: (style) The function 'GetDrawTime' is never used.
+[src/FramePerfMonitor.cpp:69]: (style) The function 'GetFPS' is never used.
+[src/FramePerfMonitor.cpp:61]: (style) The function 'GetFrameTime' is never used.
+[src/TextureLoader.cpp:91]: (style) The function 'GetHeight' is never used.
+[src/Config.cpp:122]: (style) The function 'GetInt' is never used.
+[src/Window_glfw.cpp:225]: (style) The function 'GetKeyStatus' is never used.
+[src/Window_glfw.cpp:331]: (style) The function 'GetMaxTextureSize' is never used.
+[src/Platform_linux.cpp:242]: (style) The function 'GetMemoryUsage' is never used.
+[src/Filesystem.cpp:47]: (style) The function 'GetMode' is never used.
+[src/Window_glfw.cpp:220]: (style) The function 'GetMouseButtonPressed' is never used.
+[src/Platform_linux.cpp:247]: (style) The function 'GetProcesserCount' is never used.
+[src/Platform_linux.cpp:224]: (style) The function 'GetRawCommandLineArgC' is never used.
+[src/Platform_linux.cpp:256]: (style) The function 'GetThisLibary' is never used.
+[src/Platform_linux.cpp:129]: (style) The function 'GetThreadID' is never used.
+[src/Window_glfw.cpp:233]: (style) The function 'GetVisible' is never used.
+[src/TextureLoader.cpp:87]: (style) The function 'GetWidth' is never used.
+[src/Config.cpp:142]: (style) The function 'HasConfig' is never used.
+[src/RenderGL3.cpp:167]: (style) The function 'HasExtention' is never used.
+[src/Window_glfw.cpp:187]: (style) The function 'Hide' is never used.
+[src/RenderGL3.cpp:289]: (style) The function 'Init2d' is never used.
+[src/spec/JSDatabase.cpp:112]: (style) The function 'InitDatabase' is never used.
+[src/spec/JSFS.cpp:157]: (style) The function 'InitFS' is never used.
+[src/spec/JSMathHelper.cpp:486]: (style) The function 'InitMathHelper' is never used.
+[src/Window_glfw.cpp:237]: (style) The function 'IsFocused' is never used.
+[src/Platform_linux.cpp:268]: (style) The function 'IsMainThread' is never used.
+[src/PlatformTests.cpp:36]: (style) The function 'LoadPlatformTests' is never used.
+[src/ScriptingTests.cpp:31]: (style) The function 'LoadScriptingTests' is never used.
+[src/StdLibTests.cpp:39]: (style) The function 'LoadStdLibTests' is never used.
+[src/TestSuite.cpp:72]: (style) The function 'LoadTestSuiteTests' is never used.
+[src/Platform_linux.cpp:177]: (style) The function 'MapRegion' is never used.
+[src/Platform_linux.cpp:366]: (style) The function 'NanoSleep' is never used.
+[src/Filesystem.cpp:57]: (style) The function 'Open' is never used.
+[src/Platform_linux.cpp:252]: (style) The function 'OpenLibary' is never used.
+[src/Platform_linux.cpp:280]: (style) The function 'OpenMemoryMappedFile' is never used.
+[src/Platform_linux.cpp:305]: (style) The function 'ParseUUID' is never used.
+[src/Window_glfw.cpp:202]: (style) The function 'Present' is never used.
+[src/GL3Buffer.cpp:244]: (style) The function 'Save' is never used.
+[src/Window_glfw.cpp:289]: (style) The function 'SetAntiAlias' is never used.
+[src/Window_glfw.cpp:297]: (style) The function 'SetCaptureMouse' is never used.
+[src/RenderGL3.cpp:358]: (style) The function 'SetCenter' is never used.
+[src/Window_glfw.cpp:293]: (style) The function 'SetDebug' is never used.
+[src/stdlib.cpp:65]: (style) The function 'SetDefinedColor' is never used.
+[src/Window_glfw.cpp:275]: (style) The function 'SetFullscreen' is never used.
+[src/RenderGL3.cpp:265]: (style) The function 'SetLineWidth' is never used.
+[src/GL3Buffer.cpp:304]: (style) The function 'SetLookAtView' is never used.
+[src/Shader.cpp:280]: (style) The function 'SetMacro' is never used.
+[src/GL3Buffer.cpp:300]: (style) The function 'SetProjectionType' is never used.
+[src/Platform_linux.cpp:219]: (style) The function 'SetRawCommandLine' is never used.
+[src/Window_glfw.cpp:262]: (style) The function 'SetTitle' is never used.
+[src/Window_glfw.cpp:282]: (style) The function 'SetVSync' is never used.
+[src/Window_glfw.cpp:251]: (style) The function 'SetWindowSize' is never used.
+[src/Platform_linux.cpp:358]: (style) The function 'ShellExecute' is never used.
+[src/Window_glfw.cpp:242]: (style) The function 'ShouldClose' is never used.
+[src/Window_glfw.cpp:178]: (style) The function 'Show' is never used.
+[src/Platform_linux.cpp:327]: (style) The function 'ShowMessageBox' is never used.
+[src/Window_glfw.cpp:527]: (style) The function 'StaticDestroy' is never used.
+[src/Window_glfw.cpp:518]: (style) The function 'StaticInit' is never used.
+[src/Platform_linux.cpp:121]: (style) The function 'Terminate' is never used.
+[src/TextureLoader.cpp:114]: (style) The function 'TextureFromFileBuffer' is never used.
+[src/Platform_linux.cpp:196]: (style) The function 'UnmapRegion' is never used.
+[src/Window_glfw.cpp:247]: (style) The function 'WaitEvents' is never used.
+[src/stdlib.cpp:290]: (style) The function 'concat' is never used.
+[src/stdlib.cpp:264]: (style) The function 'operatorString' is never used.
+[src/stdlib.cpp:354]: (style) The function 'operatorStringBuilder' is never used.
+[src/stdlib.cpp:365]: (style) The function 'toCString' is never used.
+(information) Cppcheck cannot find all the include files (use --check-config for details)
