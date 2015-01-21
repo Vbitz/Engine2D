@@ -31,7 +31,7 @@ Most of these come from my internal task list so don't take this as final.
 		- NSight worked well for tracking down the performance difference, it seems the GPU is idling most of the time and it's nothing to worry about.
 		- **DONE** Fix performance fluctuations on windows
 			- This is a combination of less state changes and defering script updating frame by frame
-	- Release a testing version
+	- **DONE** Release a testing version
 	- **DONE** Commit back to upstream
 	- Add CI Support with http://www.appveyor.com/
 		- I've done inital tests but the depenandancys end up being too slow to build
