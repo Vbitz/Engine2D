@@ -38,6 +38,8 @@ Most of these come from my internal task list so don't take this as final.
 		- the best solution seems to be to make a 40mb archive of the depends prebuilt and use that
 		- Useful to make the windows developer ux better as well
 	- **DONE** Add console color support to windows
+	- Add Release config for Win32
+	- Add 64-bit Windows Option
 - Port to Linux
 	- Fix Windows/OpenGL on linux
 	- Add linux release uploading to Travis
