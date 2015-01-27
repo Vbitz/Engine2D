@@ -1,3 +1,9 @@
+# Bug List
+
+- Fix OpenGL Contexts on Linux
+- Fix remaining rendering bugs on older scripts due to the new batching
+- Fix V8 Classes (Probaly something they broke in an update)
+
 # Task List
 
 These are not necessarily in order that they will be completed.
@@ -46,6 +52,7 @@ Most of these come from my internal task list so don't take this as final.
 - Add new Scripting Features
 	- Add require system
 		- This will likely be based off require js or node's require system
+		- For larger projects this is likaly one of the higher priority topics due to how hard the current system makes it to manage tons of files
 	- Implement new functions in javascriptAPI.txt
 		- Update and extend javascriptAPI.txt
 		- I think the design should focus even more around a object orintated design although I need to consider what effect
@@ -119,3 +126,4 @@ Most of these come from my internal task list so don't take this as final.
 		- Fully deferred rendering
 		- Physically based rendering
 	- Draw3D
+		- I need to consder if this is the best aprouch to 3D or is a more advanded shape + entity system like Three.JS more effective
