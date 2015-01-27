@@ -46,7 +46,7 @@
         <article><h1>&quot;Engine2D&quot; 2D Game Engine</h1><p><a href="https://travis-ci.org/Vbitz/Engine2D"><img src="https://travis-ci.org/Vbitz/Engine2D.svg?branch=master" alt="Build Status"></a></p>
 <h2>Auto-Generated Screenshot</h2><p><img src="screenshot.png" alt="Screenshot"></p>
 <h2>What am I looking at?</h2><p>Engine2D is a 2D Game Engine written in C++ with mature scripting support implemented using Chromium's V8 Javascript engine and graphics using OpenGL. Above is a screen shot of the interactive test suite testing Filesystem, Event dispatch among other core engine services.</p>
-<h2>Building</h2><p>Right now the engine builds out of the box on Mac OSX and Linux. To build it for other platforms you need...</p>
+<h2>Building</h2><p>Right now the engine builds out of the box on Mac OSX, Linux and Windows. To build it for other platforms you need...</p>
 <ul>
 <li>A modern C++ compiler supporting C++11. It's built using <a href="http://clang.llvm.org/">clang</a> right now</li>
 <li><a href="http://www.python.org/">Python</a> v2.7.x (For GYP and tasks.py)</li>
@@ -54,11 +54,15 @@
 <li><a href="https://code.google.com/p/gyp/">GYP</a></li>
 </ul>
 <p>On a source level you will need to fill in or stub out <code>Platform_{x}.cpp</code>.</p>
-<p>Once you have the dependences installed you can run <code>./tasks.py build_env</code> and you will hopefully find a executable has been built.</p>
-<h2>Sample Code</h2><pre class="prettyprint source lang-javascript"><code>sys.on(&quot;draw&quot;, &quot;helloWorld.draw&quot;, function (e) {
+<p>Once you have the dependences installed you can run <code>./tasks.py build_env</code> and you will hopefully find a executable has been built.
+You can run the built executable in devmode/debugmode (Profiler/DebugUI/Live-reloading/Verbose Console enabled) with <code>./tasks.py run</code>.</p>
+<h2>Sample Code</h2><p>Script located in <code>res/script/helloWorld.js</code>.</p>
+<pre class="prettyprint source lang-javascript"><code>sys.on(&quot;draw&quot;, &quot;helloWorld.draw&quot;, function (e) {
     draw.setColor(&quot;blue&quot;);
     draw.rect(100, 100, 100, 100);
-});</code></pre><h2>Sample Code 2</h2><pre class="prettyprint source lang-javascript"><code>/* jshint esnext: true */
+});</code></pre><p>Engine2D's event system allows you to create connections between scripts and C++, <code>draw</code> is called each frame mid way though the rendering when everything is ready.</p>
+<h2>Sample Code 2</h2><p>Script located in <code>res/script/helloWorld2.js</code>.</p>
+<pre class="prettyprint source lang-javascript"><code>/* jshint esnext: true */
 
 var counter = 0;
 var circleColor = 0x101010;
@@ -70,7 +74,6 @@ function* genGradient() {
         }
     }
 }
-
 var generator = genGradient();
 
 setInterval(function () {
@@ -82,13 +85,16 @@ sys.on(&quot;draw&quot;, &quot;helloWorld2.draw&quot;, function () {
     draw.rect(Math.sin(counter) * 100 + 150,
         Math.sin(counter) * 100 + 150, 100, 100);
     counter += sys.deltaTime + (Math.random() / 16);
-});</code></pre><h2>Documentation</h2><p>The latest version of the documentation generated using JSDoc can be found under doc/apiDocs or hosted at <a href="http://vbitz.com/public/EngineAPIDocs/">http://vbitz.com/public/EngineAPIDocs/</a>.</p>
+});</code></pre><p>Engine2D enables all ES6 features currently supported in V8 by default including but not limited to...</p>
+<pre class="prettyprint source"><code>- Classes
+- Generators
+- Block Scopeing (let)</code></pre><h2>Documentation</h2><p>The latest version of the documentation generated using JSDoc can be found under doc/apiDocs or hosted at <a href="http://vbitz.com/public/EngineAPIDocs/">http://vbitz.com/public/EngineAPIDocs/</a>.
+Additional command line args that can be passed to the executable are documented under the <code>-h</code> executable flag or with the <code>engine_help</code> tasks.py task.</p>
 <h2>Getting Started</h2><ul>
-<li>Copy the sample code and save it under res/script/helloWorld.js.</li>
-<li>Run <code>build/Default/engine2D -devmode -debug script/helloWorld</code> (You can substitute the path for any path under res/).</li>
+<li>Run <code>build/Default/engine2D -devmode -debug script/helloWorld</code>.</li>
 <li>If you want to edit your script then just change the file and save, the engine reloads automatically if <code>-devmode</code> is enabled.</li>
 </ul>
-<h2>Contributing</h2><p>Code Contributions are welcome large and small. Issues with scripting, running or building the engine can also be reported using the issue tracker to the right.</p>
+<h2>Contributing</h2><p>Code Contributions are welcome large and small. Issues with scripting, running or building the engine can be reported using the issue tracker to the right.</p>
 <h2>License</h2><p>Engine2D is licensed under the Apache 2 License. A copy can be found in LICENCE.</p></article>
     </section>
 
@@ -100,13 +106,13 @@ sys.on(&quot;draw&quot;, &quot;helloWorld2.draw&quot;, function () {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="global.db.Database.html">Database</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:draw">draw</a></li><li><a href="global.html#event:dumpProfile">dumpProfile</a></li><li><a href="global.html#event:endOfFrame">endOfFrame</a></li><li><a href="global.html#event:input">input</a></li><li><a href="global.html#event:mouseButton">mouseButton</a></li><li><a href="global.html#event:runFile">runFile</a></li></ul><h3>Namespaces</h3><ul><li><a href="global.html">global</a></li><li><a href="global.console.html">console</a></li><li><a href="global.db.html">db</a></li><li><a href="global.draw.html">draw</a></li><li><a href="global.fs.html">fs</a></li><li><a href="global.headless.html">headless</a></li><li><a href="global.input.html">input</a></li><li><a href="global.sys.html">sys</a></li><li><a href="global.unsafe.html">unsafe</a></li><li><a href="ThreadAPI.html">ThreadAPI</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="global.db.Database.html">Database</a></li><li><a href="global.draw.Color.html">Color</a></li><li><a href="global.draw.Texture.html">Texture</a></li><li><a href="global.draw.VertexBuffer2D.html">VertexBuffer2D</a></li><li><a href="global.Math.Random.html">Random</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:draw">draw</a></li><li><a href="global.html#event:dumpProfile">dumpProfile</a></li><li><a href="global.html#event:endOfFrame">endOfFrame</a></li><li><a href="global.html#event:input">input</a></li><li><a href="global.html#event:mouseButton">mouseButton</a></li><li><a href="global.html#event:runFile">runFile</a></li></ul><h3>Namespaces</h3><ul><li><a href="global.html">global</a></li><li><a href="global.console.html">console</a></li><li><a href="global.db.html">db</a></li><li><a href="global.draw.html">draw</a></li><li><a href="global.fs.html">fs</a></li><li><a href="global.headless.html">headless</a></li><li><a href="global.input.html">input</a></li><li><a href="global.Math.html">Math</a></li><li><a href="global.sys.html">sys</a></li><li><a href="global.unsafe.html">unsafe</a></li><li><a href="ThreadAPI.html">ThreadAPI</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha10</a> on Sun Dec 14 2014 23:41:07 GMT+1300 (NZDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha10</a> on Tue Jan 27 2015 20:53:21 GMT+1300 (NZDT)
 </footer>
 
 <script> prettyPrint(); </script>

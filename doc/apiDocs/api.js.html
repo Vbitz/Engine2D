@@ -722,13 +722,6 @@ global.draw.polygon = function (xCenter, yCenter, arr) {};
 global.draw.colorPalette = function (name, color) {};
 
 /**
- * @typedef {Object} Color
- * @property {number} r The red value between 0.0 and 1.0
- * @property {number} g The green value between 0.0 and 1.0
- * @property {number} b The blue value between 0.0 and 1.0
- */
-
-/**
  * Set's the current drawing color to r, g, b
  * @param {number} r - The red value between 0.0 and 1.0
  * @param {number} g - The green value between 0.0 and 1.0
@@ -944,6 +937,143 @@ global.draw.setCenter = function (x, y) {};
 global.draw.drawColor = {r: 0, g: 0, b: 0};
 
 /**
+ * Create a new instace of Color
+ * 
+ * @class A color with 4 getter/setters r, g, b, a for storing color infomation
+ * @property {number} r Red Value (from 0.0 to 1.0)
+ * @property {number} g Green Value (from 0.0 to 1.0)
+ * @property {number} b Blue Value (from 0.0 to 1.0)
+ * @property {number} a Alpha Value (from 0.0 to 1.0)
+ * 
+ * @param {number|string} r|val|color Red Value or number in the format 0xrrggbb
+ * @param {number} [g|alpha] Green Value or Alpha value
+ * @param {number} [b] Blue Value
+ * @param {number} [a] Alpha Value
+ * @example &lt;caption>Create a color from a string&lt;/caption>
+ * var col = new draw.Color("red");
+ * @example &lt;caption>Create a color from a number with a alpha value&lt;/caption>
+ * var col = new draw.Color("0xff0000", 0.8);
+ * @example &lt;caption>Create a color from 4 numbers&lt;/caption>
+ * var col = new draw.Color(1.0, 0.0, 0.0, 0.8);
+ */
+global.draw.Color = function (r, g, b, a) { };
+
+/**
+ * Returns a {@link Color} from the HSV values
+ * @param  {number} h - The Hue Component between 0 and 360
+ * @param  {number} s - The Saturation Component between 0.0f and 1.0f
+ * @param  {number} v - The Value Component between 0.0f and 1.0f
+ * @return {Color}
+ */
+global.draw.Color.fromHsv = function (h, s, v) { };
+
+/**
+ * Returns a random color
+ * @return {Color} A random color with 100% alpha
+ */
+global.draw.Color.fromRandom = function () { };
+
+/**
+ * Returns the stirng repersentation of the color object
+ * @return {Color}
+ */
+global.draw.Color.prototype.toString = function () { };
+
+/**
+ * Create a VertexBuffer2D
+ * @class A VBO for storing triangle vertex infomation and rendering moderate amounts of data more effectively then Draw2D
+ * @property {Math.Matrix} model The model matrix to use for rendering
+ * 
+ * @param {string} effectFilename The shader spec JSON file to use for rendering
+ * @example &lt;caption>Construct a plane that can be rendered using plane.draw();&lt;/caption>
+ * 	var vBuff = new draw.VertexBuffer2D("shaders/basic.json");
+ *
+ *	vBuff.setDepthTest(true);
+ *	vBuff.setProjectionPerspective(true);
+ *	vBuff.setLookAtView(2.0, 2.0, 2.0, 0, 0, 0);
+ *
+ *	// add a triangle
+ *	var vCol = new draw.Color(0x303030);
+ *	vBuff.addVert(-1, -1, vCol);
+ *	vBuff.addVert(1, -1, vCol);
+ *	vBuff.addVert(1, 1, vCol);
+ *	vBuff.addVert(-1, -1, vCol);
+ *	vBuff.addVert(-1, 1, vCol);
+ *	vBuff.addVert(1, 1, vCol);
+ */
+global.draw.VertexBuffer2D = function (effectFilename) { };
+
+/**
+ * Add a vertex to the vertexBuffer
+ * @param {number} x
+ * @param {number} y
+ * @param {Color} [col] The color to render the vert with
+ * @param {number} [u] The x part of the 2d texture coardnate  
+ * @param {number} [v] The y part of the 2d texture coardnate
+ */
+global.draw.VertexBuffer2D.prototype.addVert = function (x, y, col, u, v) { };
+
+/**
+ * Render the vertexBuffer as a series of triangles
+ */
+global.draw.VertexBuffer2D.prototype.draw = function () { };
+
+/**
+ * Save the vertexBuffer to filename
+ * @param  {string} filename The filename to save the vertexBuffer as
+ */
+global.draw.VertexBuffer2D.prototype.save = function (filename) { };
+
+/**
+ * Replases the vertexBuffer with the content of the file
+ * @param  {string} filename The filename to load the vertexBuffer from
+ */
+global.draw.VertexBuffer2D.prototype.load = function (filename) { };
+
+/**
+ * Use perspective or ortographic view matrixes for rendering
+ * @param {boolean} enable Set to use perspective view matrix false for ortographic
+ */
+global.draw.VertexBuffer2D.prototype.setProjectionPerspective = function (enable) { };
+
+/**
+ * Set the camerea to look at target from source
+ * @param {number} sourceX
+ * @param {number} sourceY
+ * @param {number} sourceZ
+ * @param {number} targetX
+ * @param {number} targetY
+ * @param {number} targetZ
+ */
+global.draw.VertexBuffer2D.prototype.setLookAtView = function (sourceX, sourceY, sourceZ, targetX, targetY, targetZ) { };
+
+/**
+ * Enable depth testing on the vertexBuffer
+ * @param {boolean} enable
+ */
+global.draw.VertexBuffer2D.prototype.setDepthTest = function (enable) { };
+
+/**
+ * Enable writeframe rendering on the vertexBuffer
+ * @param {boolean} enable
+ */
+global.draw.VertexBuffer2D.prototype.setWireframe = function (enable) { };
+
+/**
+ * Use vertex data to compute vertex normals on the vertexBufffer
+ */
+global.draw.VertexBuffer2D.prototype.computeNormals = function () { };
+
+/**
+ * Create a new instace of Texture from a image file or a raw pixel array
+ * @class A class for storing a image in graphics memeory
+ * @param {string|Float32Buffer} filename|pixels The filename or pixel array to load the texutre from
+ * @param {number} width    The width of the new image
+ * @param {number} height   The height of the new iamge
+ */
+global.draw.Texture = function (filename, width, height) { };
+
+/**
  * @namespace
  */
 global.headless = {};
@@ -1026,6 +1156,70 @@ global.db.Database.prototype.exec = function (sql) {};
  * @return {object[]}   return value as a list of objects
  */
 global.db.Database.prototype.execPrepare = function (sql) {};
+
+/**
+ * Extends to the already provided JS math functions focusing on 2D and 3D vector math
+ * @namespace
+ */
+global.Math = global.Math;
+
+/**
+ * @type {Number}
+ */
+global.Math.PI = 3.14159265358979323846264338327950288;
+
+/**
+ * @type {Number}
+ */
+global.Math.PI_2 = 1.57079632679489661923132169163975144;
+
+/**
+ * @type {Number}
+ */
+global.Math.PI_4 = 0.785398163397448309615660845819875721;
+
+/**
+ * Convertes degrees to radians
+ * @param  {number} value Input in degrees
+ * @return {number}       Output in radians
+ */
+global.Math.degToRad = function (value) { };
+
+/**
+ * Convertes radians to degrees
+ * @param  {number} value Input in radians
+ * @return {number}       Output in degrees
+ */
+global.Math.radToDeg = function (value) { };
+
+/**
+ * Creates a new instace of Math.Random with a opional seed
+ * @class A non-deterministic (platform to platform) psedo-random number generator
+ * @param {number} [seed]
+ */
+global.Math.Random = function (seed) { };
+
+/**
+ * Returns a random number optionaly from min to max 
+ * @param  {number}   [min]
+ * @param  {number}   [max]
+ * @return {number}
+ */
+global.Math.Random.prototype.next = function (min, max) { };
+
+/**
+ * Returns a uniformly distributed random number from 0.0 to 1.0
+ * @return {number}
+ */
+global.Math.Random.prototype.nextDouble = function () { };
+
+/**
+ * Returns a normaly distributed random number with a mean of mean and a standed deviation of sd
+ * @param  {number} mean
+ * @param  {number} sd
+ * @return {number}
+ */
+global.Math.Random.prototype.nextNormal = function (mean, sd) { };
 
 /**
  * Exposed as a dynamicly loadable lib, test.js uses
@@ -1117,13 +1311,13 @@ global.unsafe.pageSize = 4096;
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="global.db.Database.html">Database</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:draw">draw</a></li><li><a href="global.html#event:dumpProfile">dumpProfile</a></li><li><a href="global.html#event:endOfFrame">endOfFrame</a></li><li><a href="global.html#event:input">input</a></li><li><a href="global.html#event:mouseButton">mouseButton</a></li><li><a href="global.html#event:runFile">runFile</a></li></ul><h3>Namespaces</h3><ul><li><a href="global.html">global</a></li><li><a href="global.console.html">console</a></li><li><a href="global.db.html">db</a></li><li><a href="global.draw.html">draw</a></li><li><a href="global.fs.html">fs</a></li><li><a href="global.headless.html">headless</a></li><li><a href="global.input.html">input</a></li><li><a href="global.sys.html">sys</a></li><li><a href="global.unsafe.html">unsafe</a></li><li><a href="ThreadAPI.html">ThreadAPI</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="global.db.Database.html">Database</a></li><li><a href="global.draw.Color.html">Color</a></li><li><a href="global.draw.Texture.html">Texture</a></li><li><a href="global.draw.VertexBuffer2D.html">VertexBuffer2D</a></li><li><a href="global.Math.Random.html">Random</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:draw">draw</a></li><li><a href="global.html#event:dumpProfile">dumpProfile</a></li><li><a href="global.html#event:endOfFrame">endOfFrame</a></li><li><a href="global.html#event:input">input</a></li><li><a href="global.html#event:mouseButton">mouseButton</a></li><li><a href="global.html#event:runFile">runFile</a></li></ul><h3>Namespaces</h3><ul><li><a href="global.html">global</a></li><li><a href="global.console.html">console</a></li><li><a href="global.db.html">db</a></li><li><a href="global.draw.html">draw</a></li><li><a href="global.fs.html">fs</a></li><li><a href="global.headless.html">headless</a></li><li><a href="global.input.html">input</a></li><li><a href="global.Math.html">Math</a></li><li><a href="global.sys.html">sys</a></li><li><a href="global.unsafe.html">unsafe</a></li><li><a href="ThreadAPI.html">ThreadAPI</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha10</a> on Sun Dec 14 2014 23:41:07 GMT+1300 (NZDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha10</a> on Tue Jan 27 2015 20:53:21 GMT+1300 (NZDT)
 </footer>
 
 <script> prettyPrint(); </script>
