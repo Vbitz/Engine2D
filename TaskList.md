@@ -3,6 +3,7 @@
 - Fix OpenGL Contexts on Linux
 - Fix remaining rendering bugs on older scripts due to the new batching
 - Fix V8 Classes (Probaly something they broke in an update)
+	- It's still a feature in beta, maybe they deactivated it or changed the command line to reactivate it
 
 # Task List
 
@@ -39,12 +40,17 @@ Most of these come from my internal task list so don't take this as final.
 			- This is a combination of less state changes and defering script updating frame by frame
 	- **DONE** Release a testing version
 	- **DONE** Commit back to upstream
+	- Add release task support for windows
+		- Probaly just generate the same exact thing I do manuly right now
+		- It would be nice to trim the resources dir though
 	- Add CI Support with http://www.appveyor.com/
 		- I've done inital tests but the depenandancys end up being too slow to build
 		- the best solution seems to be to make a 40mb archive of the depends prebuilt and use that
 		- Useful to make the windows developer ux better as well
 	- **DONE** Add console color support to windows
-	- Add Release config for Win32
+	- Add Release config for Win32 VS Project
+		- No Debug Info
+		- Maybe add PROFILER automaticly to the Debug config
 	- Add 64-bit Windows Option
 - Port to Linux
 	- Fix Windows/OpenGL on linux
