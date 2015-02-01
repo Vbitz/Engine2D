@@ -361,8 +361,10 @@ namespace Engine {
         }
         
         void Context::_enableHarmony() {
-            const char* harmony = "-harmony";
+            const char* harmony = "--harmony";
             v8::V8::SetFlagsFromString(harmony, std::strlen(harmony));
+            const char* harmony_classes = "--harmony_classes";
+            v8::V8::SetFlagsFromString(harmony_classes, std::strlen(harmony_classes));
         }
         
         void Context::_createEventMagic() {

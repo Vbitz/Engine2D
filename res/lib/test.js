@@ -131,29 +131,29 @@ var tests = {
 			}
 		}
 
-//		class BaseHello {
-//			constructor(target) {
-//				this.target = target;
-//			}
-//
-//			sayHello() {
-//				return "Hello, " + this.target;
-//			}
-//		}
+		// class BaseHello {
+		// 	constructor {
+		// 		this.target = target;
+		// 	}
 
-//		class HelloWorld extends BaseHello {
-//			constructor() {
-//				super("World");
-//			}
-//		}
+		// 	sayHello {
+		// 		return "Hello, " + this.target;
+		// 	}
+		// }
 
-//		if ((new BaseHello("Test")).sayHello() != "Hello, Test") {
-//			return false;
-//		}
+		// class HelloWorld extends BaseHello {
+		// 	constructor() {
+		// 		super("World");
+		// 	}
+		// }
 
-//		if ((new HelloWorld()).sayHello() != "Hello, World") {
-//			return false;
-//		}
+		// if ((new BaseHello("Test")).sayHello() != "Hello, Test") {
+		// 	return false;
+		// }
+
+		// if ((new HelloWorld()).sayHello() != "Hello, World") {
+		// 	return false;
+		// }
 
 		return true;
 	},
